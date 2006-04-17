@@ -105,7 +105,7 @@ public class PropertiesSubstitutor {
                 }
             }
 
-            if (m == null) {
+            if (start < 0) {
                 break;
             }
 
