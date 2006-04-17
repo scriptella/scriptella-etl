@@ -1,0 +1,52 @@
+<!--
+ Copyright 2006 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <properties>
+        <!--Uncomment if using outside ant
+        <include href="build.properties"/>
+        -->
+        #Declare properties with file paths.
+        file1=song1.mp3
+        #Any URL may be used.
+        file2=file:///$basedir/song2.mp3
+    </properties>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
+
+    <script>
+        DROP TABLE Track IF EXISTS;
+        CREATE TABLE Track (
+          ID INT,
+          ALBUM_ID INT,
+          NAME VARCHAR(100),
+          DATA LONGVARBINARY
+        );
+        <!-- Inserts file with path relative to executed script location -->
+        insert into Track(id, album_id, name, data) values 
+               (1, 1, 'Song1.mp3', ${this.file(file1)});
+        <!-- Inserts file from URL, 
+             other protocols like ftp, http or https are supported too -->
+        insert into Track(id, album_id, name, data) values 
+               (2, 2, 'Song2.mp3', ${this.file(file2)});
+    </script>
+    <script><!-- Correctly shutdown the DB -->
+        <dialect database=".*hsql.*">
+            COMMIT;
+            SHUTDOWN;
+        </dialect>
+    </script>
+
+</scripts>
