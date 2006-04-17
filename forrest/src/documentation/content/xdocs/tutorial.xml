@@ -1,10 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-	<header>
-		<title>Two Minute Tutorial</title>
-	</header>
-	<body>
-		<note>TODO</note>
-	</body>
+    <header>
+        <title>Two Minute Tutorial</title>
+    </header>
+    <body>
+        <section id="ant_setup">
+            <title>Ant task setup</title>
+            <p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+            <source><![CDATA[
+<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>
+                ]]></source>
+        </section>
+        <section id="execution">
+            <title>Script execution</title>
+            <p>Running SQL scripts from Ant is simple:</p>
+            <source><![CDATA[
+<execute classpath="../lib/hsqldb.jar"/><!-- Register your jdbc driver here instead of hsqldb-->
+                ]]></source>
+            <note>
+By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
+            </note>
+        </section>
+        <section id="copy_db_table">
+            <title>Copy table to another database</title>
+            <p>Assume Database #1 contains Table Product with id, category and name columns. The following script
+			copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
+            <p>script.xml:</p>
+            <source><![CDATA[
+<scripts>
+    <connection id="db1" driver="jdbc.Driver.Name" url="jdbc:database1:sample" user="sa" password=""/>
+    <connection id="db2" driver="jdbc.Driver.Name2" url="jdbc:database2:sample" user="sa" password=""/>
+    <query connection-id="db1">
+        <!-- Select product from software category in db1-->
+        SELECT * FROM Product WHERE category='software';
+        <!-- for all rows execute script -->
+        <script connection-id="db2">
+            <!-- Insert all selected products to db2
+                 ?,$,: use to reference properties, columns or {expressions}-->
+            INSERT INTO Product(id, category, product_name) values (?id, ${category}, :name);
+        </script>
+    </query>
+</scripts>
+                ]]></source>
+        </section>
+        <section id="blobs">
+            <title>Working with BLOBs</title>
+            <p>The following sample initializes table of music tracks.</p>
+            <p>script.xml:</p>
+            <source><![CDATA[
+<scripts>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
+    <script>
+        CREATE TABLE Track (
+          ID INT,
+          ALBUM_ID INT,
+          NAME VARCHAR(100),
+          DATA LONGVARBINARY
+        );
+        <!-- Inserts file with path relative to executed script location -->
+        insert into Track(id, album_id, name, data) values
+               (1, 1, Song1.mp3', ${this.file(song1.mp3')});
+        <!-- Inserts file from URL-->
+        insert into Track(id, album_id, name, data) values
+               (2, 2, Song2.mp3, ${this.file('http://musicstoresample.com/song2.mp3')});
+    </script>
+</scripts>
+                ]]></source>
+        </section>
+        <section id="dialects">
+            <title>Supporting several SQL dialects</title>
+            <p>TODO: Add example here</p>
+            <p>script.xml:</p>
+            <source><![CDATA[
+<scripts>
+</scripts>
+                ]]></source>
+        </section>
+        <note>TODO</note>
+    </body>
 </document>

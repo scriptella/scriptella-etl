@@ -26,7 +26,7 @@ See http://forrest.apache.org/docs/linking.html for more info
     <features label="Download" href="download.html" description="Download Scriptella Binary and Source Distribution"/>
   </scriptella>
   <getstart label="Getting Started">
-    <tutorial label="2 Minute Tutotial" href="tutorial.html" description="2 Minute Tutorial"/>
+    <tutorial label="Two Minute Tutotial" href="tutorial.html" description="Two Minute Tutorial"/>
   </getstart>
   <doc label="Documentation">
   <!--The href must be wholesite.html/pdf  You can change the labels and node names-->
