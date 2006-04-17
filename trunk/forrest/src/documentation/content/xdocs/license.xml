@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-	<header>
-		<title>Scriptella Project License</title>
-	</header>
-	<body>
-		<source><![CDATA[
-         	                       Apache License
+    <header>
+        <title>Scriptella Project License</title>
+    </header>
+    <body>
+        <source><![CDATA[
+                                Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -207,8 +207,6 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-]]>
-		</source>
-	
-	</body>
+            ]]></source>
+    </body>
 </document>
