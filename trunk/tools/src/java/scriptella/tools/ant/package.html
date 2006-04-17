@@ -1,0 +1,36 @@
+<body>
+Ant tasks.
+
+<h2>How to register ScriptsExecuteTask</h2>
+To use the task in a build file, the following taskdef declaration should be added:
+<pre>
+    <code>
+        &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar"/&gt;
+    </code>
+</pre>
+
+<p>
+    <u>Parameters</u><br/>
+<table>
+
+    <tr>
+        <th>Attribute</th><th>Description</th><th>Required</th>
+    </tr>
+    <tr>
+        <td>file</td><td>The script file to execute.</td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
+    </tr>
+    <tr>
+        <td>fork</td><td>if enabled triggers the class execution in another VM (disabled by default)</td><td>No</td>
+    </tr>
+    <tr>
+        <td>maxmemory</td><td>Max amount of memory to allocate to the forked VM (ignored if fork is disabled)</td><td>
+        No</td>
+    </tr>
+    <tr>
+        <td>inheritAll</td><td>If true, pass all properties to the Script Executor. Defaults to false.</td><td>No</td>
+    </tr>
+
+
+</table>
+
+</body>

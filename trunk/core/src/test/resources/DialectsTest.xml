@@ -1,0 +1,48 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:dialectstest" user="sa" password=""/>
+    <script>
+        <!--must execute-->
+        CREATE TABLE Test (
+        ID INT,
+        VALUE VARCHAR(255)
+        );
+    </script>
+    <script>
+        <!--must execute-->
+        insert into test(id, value) values (1,'222');
+    </script>
+    <script>
+        <dialect database=".*oracle.*">
+            insert into test(id, value) values (2,'333');
+        </dialect>
+    </script>
+    <script>
+        <dialect database="hsql.*"><!--must execute-->
+            insert into test(id, value) values (3,'333');
+        </dialect>
+        <dialect><!--skipped-->
+            insert into test(id, value) values (4,'333');
+        </dialect>
+        <dialect database=""><!--skipped-->
+            insert into test(id, value) values (33,'333');
+        </dialect>
+
+    </script>
+    <script>
+        <dialect><!--must execute-->
+            insert into test(id, value) values (5,'333');
+        </dialect>
+    </script>
+    <script>
+        <dialect database="HSQL.*" version="1\.8\..*"><!--must execute-->
+            insert into test(id, value) values (6,'333');
+        </dialect>
+        <dialect><!--skipped-->
+            insert into test(id, value) values (7,'333');
+        </dialect>
+
+    </script>
+
+
+</scripts>

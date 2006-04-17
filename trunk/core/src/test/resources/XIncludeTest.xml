@@ -1,0 +1,16 @@
+<scripts>
+    <connection/>
+    <script>
+        <include href="XIncludeTest.sql"/>
+    </script>
+    <script>
+        <include href="xinctst/XIncludeTest.sql"/>
+    </script>
+    <script>
+        --Sample1--
+        <include href="XIncludeTest.sql"/>
+        --Sample2--
+    </script>
+
+
+</scripts>

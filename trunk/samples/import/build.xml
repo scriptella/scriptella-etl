@@ -1,0 +1,15 @@
+<project name="Import Ant File" default="main">
+    <!-- Registers scriptella ant tasks.
+    Update classpath attribute if necessary-->
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar:../lib/hsqldb.jar"/>
+
+    <target name="main">
+        <delete file="out.csv" failonerror="no"/>
+        <!--Executes sample1.xml specify  hsqldb library required for this script on classpath-->
+        <execute/>
+        <delete failonerror="no">
+            <fileset dir="${basedir}" includes="indb.* outdb.*"/>
+        </delete>
+
+    </target>
+</project>
