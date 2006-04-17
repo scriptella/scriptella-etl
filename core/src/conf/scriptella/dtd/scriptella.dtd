@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2006 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT properties (#PCDATA | include)*>
+<!ELEMENT connection EMPTY>
+<!ATTLIST connection
+id ID #IMPLIED
+driver CDATA #REQUIRED
+url CDATA #REQUIRED
+user CDATA #REQUIRED
+password CDATA #REQUIRED
+catalog CDATA #IMPLIED
+schema CDATA #IMPLIED
+>
+<!ELEMENT include EMPTY>
+<!ATTLIST include
+href CDATA #REQUIRED
+>
+<!ELEMENT dialect (#PCDATA | include)*>
+<!ATTLIST dialect
+database CDATA #IMPLIED
+version CDATA #IMPLIED
+>
+<!ELEMENT query (#PCDATA | include | dialect | query | script)*>
+<!ATTLIST query
+connection-id IDREF #IMPLIED
+if CDATA #IMPLIED
+>
+
+<!ELEMENT script (#PCDATA | include | dialect)*>
+<!ATTLIST script
+connection-id IDREF #IMPLIED
+new-tx (true | false) "false"
+if CDATA #IMPLIED
+>
+<!ELEMENT scripts (description?, properties?, connection*, (script*, query*)*)>
+<!ATTLIST scripts>

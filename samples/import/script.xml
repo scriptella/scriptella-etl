@@ -1,0 +1,33 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:indb" user="sa" password=""/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
+    <script connection-id="in">
+        CREATE TEXT TABLE Test (
+        ID INT,
+        TEXT VARCHAR(100)
+        );
+        SET TABLE Test SOURCE "in.csv"
+    </script>
+    <script connection-id="out">
+        CREATE TEXT TABLE Test (
+        ID INT,
+        TEXT VARCHAR(100)
+        );
+        SET TABLE Test SOURCE "out.csv;fs=|"
+    </script>
+
+    <query connection-id="in">
+        select * from test
+        <script connection-id="out">
+            insert into Test(id, text) values (?id*10, ?text);
+        </script>
+    </query>
+    <!-- Just for HSQLDB graceful shutdown -->
+    <script connection-id="in">
+        shutdown;
+    </script>
+    <script connection-id="out">
+        shutdown;
+    </script>
+</scripts>

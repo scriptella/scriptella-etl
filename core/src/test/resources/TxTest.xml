@@ -1,0 +1,17 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:txtest" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT,
+        VALUE CHAR(11)
+        );
+        insert into test(id, value) values (1,'222');
+        insert into test(id, value) values (2,'333');
+        insert into test(id, value) values (3,'three');
+    </script>
+    <script new-tx="true">
+        insert into test(id, value) values (1111,'no');
+        insert into nosuchtable(id, value) values (11,'222');
+    </script>
+</scripts>

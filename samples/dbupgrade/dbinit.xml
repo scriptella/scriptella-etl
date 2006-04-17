@@ -1,0 +1,53 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <description>Database creation script</description>
+    <properties>
+        <include href="dbinit.properties"/>
+    </properties>
+    <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
+    <script>
+        DROP TABLE Account IF EXISTS;
+        DROP TABLE Account_Details IF EXISTS;
+    </script>
+    <script if="version==1">
+        CREATE TABLE Account (
+        Account_ID INT PRIMARY KEY,
+        Login VARCHAR(20),
+        Password VARCHAR(20)
+        );
+        INSERT INTO Account VALUES (1, 'user', 'password');
+    </script>
+    <script if="version==2">
+        CREATE TABLE Account (
+        Account_ID INT PRIMARY KEY,
+        Login VARCHAR(20),
+        Password VARCHAR(20),
+        EMail VARCHAR(20),
+        Suspended BOOLEAN DEFAULT false NOT NULL
+        );
+        INSERT INTO Account VALUES (1, 'user', 'password', 'no@host.com', FALSE);
+    </script>
+    <script if="version==3">
+        CREATE TABLE Account (
+        Account_ID INT PRIMARY KEY,
+        Login VARCHAR(20),
+        Password VARCHAR(20),
+        Suspended BOOLEAN DEFAULT false NOT NULL
+        );
+        CREATE TABLE Account_Details (
+        Account_ID INT,
+        EMail VARCHAR(20),
+        FOREIGN KEY (Account_ID) REFERENCES Account (Account_ID)
+        );
+        INSERT INTO Account VALUES (1, 'user', 'password', FALSE);
+        INSERT INTO Account_Details VALUES (1, 'no@host.com');
+
+
+    </script>
+    <script>
+        COMMIT;
+        SHUTDOWN COMPACT;
+    </script>
+
+
+</scripts>

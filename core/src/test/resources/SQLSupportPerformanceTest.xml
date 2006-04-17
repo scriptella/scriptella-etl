@@ -1,0 +1,11 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <properties>property=1</properties>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlsupport" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT
+        );
+        <include href="tst:///hugefile"/>
+    </script>
+</scripts>

@@ -1,0 +1,8 @@
+<project name="scriptella-core" default="jar">
+    <property name="classpath" value="${basedir}/../lib/commons-jexl-1.0.jar"/>
+    <property name="test.classpath"
+              value="${classpath}:${basedir}/../lib/hsqldb.jar:${basedir}/../lib/commons-logging-1.0.4.jar"/>
+
+    <import file="..\build-template.xml"/>
+
+</project>

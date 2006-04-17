@@ -1,0 +1,29 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:est" user="sa" password=""/>
+    <script>
+        create table t1 (
+        id int
+        );
+        create table t2 (
+        id int
+        );
+        insert into t1(id) values(1);
+        insert into t1(id) values(2);
+    </script>
+    <query>
+        select * from t1
+        <query>
+            select * from t1 where id=${id}
+            <script>
+                insert into t2 values(${id})
+            </script>
+        </query>
+
+    </query>
+    <script>
+        SHUTDOWN;
+    </script>
+
+
+</scripts>
