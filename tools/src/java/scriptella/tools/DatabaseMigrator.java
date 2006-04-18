@@ -56,7 +56,7 @@ public class DatabaseMigrator {
                     .append("\" type=\"sql\" connection-id=\"out\">\n")
                     .append("      insert into ").append(t).append("(");
             appendColumnNames(con, t, o).append(") VALUES (");
-            appendColumnNames(con, t, o, ", ", "?").append(")")
+            appendColumnNames(con, t, o, ", ", "$").append(")")
                     .append("\n    </script>\n");
         }
 

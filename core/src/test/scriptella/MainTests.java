@@ -19,6 +19,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import scriptella.configuration.XIncludeTest;
 import scriptella.execution.ExecutionStatisticsTest;
+import scriptella.expressions.PropertiesSubstitutorTest;
+import scriptella.sql.SQLParserBaseTest;
 
 
 /**
@@ -38,9 +40,11 @@ public class MainTests {
         suite.addTestSuite(TxTest.class);
         suite.addTestSuite(XIncludeTest.class);
         suite.addTestSuite(SQLParametersTest.class);
+        suite.addTestSuite(SQLParserBaseTest.class);
         suite.addTestSuite(ExecutionStatisticsTest.class);
         suite.addTestSuite(JDBCEscapingTest.class);
         suite.addTestSuite(ConditionsTest.class);
+        suite.addTestSuite(PropertiesSubstitutorTest.class);
 
         return suite;
     }

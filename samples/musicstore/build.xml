@@ -19,7 +19,7 @@
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <property file="build.properties"/>
     <target name="main">
-        <!--Executes script.xml specify  hsqldb library required for this script on classpath-->
+        <!--Executes script.xml with hsqldb on classpath-->
         <execute inheritAll="true" classpath="../lib/hsqldb.jar"/>
     </target>
 </project>

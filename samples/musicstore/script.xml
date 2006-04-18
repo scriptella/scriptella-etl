@@ -35,11 +35,11 @@
           DATA LONGVARBINARY
         );
         <!-- Inserts file with path relative to executed script location -->
-        insert into Track(id, album_id, name, data) values 
+        INSERT INTO Track(id, album_id, name, data) VALUES
                (1, 1, 'Song1.mp3', ${this.file(file1)});
         <!-- Inserts file from URL, 
              other protocols like ftp, http or https are supported too -->
-        insert into Track(id, album_id, name, data) values 
+        INSERT INTO Track(id, album_id, name, data) VALUES
                (2, 2, 'Song2.mp3', ${this.file(file2)});
     </script>
     <script><!-- Correctly shutdown the DB -->
