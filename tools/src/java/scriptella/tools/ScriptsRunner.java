@@ -26,6 +26,8 @@ import scriptella.sql.SQLEngine;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +52,11 @@ public class ScriptsRunner {
 
     private static void printUsage() {
         System.out.println("Usage java " + ScriptsRunner.class.getName() +
-                " <file 1>[ ... <file N>]");
+                " [-options] [<file 1> ... <file N>]");
+        System.out.println("where options include:");
+        System.out.println("   -h displays help ");
+        System.out.println("        A ; separated list of directories, JAR archives,\n" +
+                       "            and ZIP archives to search for drivers.");
     }
 
     public void setDriversClassLoader(final ClassLoader classLoader) {
@@ -82,28 +88,29 @@ public class ScriptsRunner {
 
     public static void main(final String args[]) {
         boolean failed = false;
-
-        if (args.length == 0) {
-            printUsage();
-
-            return;
-        }
-
-        ScriptsRunner runner = new ScriptsRunner();
-        runner.setProgressIndicator(new ConsoleProgressIndicator(
-                "Scripts execution"));
-
+        List<File> files = new ArrayList<File>();
         for (int i = 0; i < args.length; i++) {
-            String fileName = args[i];
+            if (args[i].startsWith("-h")) {
+                printUsage();
+                return;
+            }
+            files.add(new File(args[i]));
+        }
+        if (files.isEmpty()) { //adding default name if no files specified
+            files.add(new File("script.xml"));
+        }
+        ScriptsRunner runner = new ScriptsRunner();
+        runner.setProgressIndicator(new ConsoleProgressIndicator("Scripts execution"));
 
+        for (File file : files) {
             try {
-                runner.execute(new File(fileName));
-                LOG.info("Script " + fileName +
+                runner.execute(file);
+                LOG.info("Script " + file +
                         " has been executed successfully");
             } catch (Exception e) {
                 failed = true;
                 LOG.log(Level.SEVERE,
-                        "Script " + fileName + " execution failed.", e);
+                        "Script " + file + " execution failed.", e);
             }
         }
 

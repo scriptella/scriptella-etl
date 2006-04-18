@@ -28,7 +28,7 @@
             <fileset dir="${basedir}/core/build" includes="*.jar"/>
             <fileset dir="${basedir}/tools/build" includes="*.jar"/>
         </copy>
-        <jar destfile="${build.dir}/scriptella-${version}.jar">
+        <jar destfile="${build.dir}/scriptella.jar">
             <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-jexl-1.0.jar" includes="**" excludes="META-INF/*"/>
@@ -36,7 +36,7 @@
             <zipfileset dir="${lib.dir}" includes="*license*" prefix="META-INF"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
-                <attribute name="Main-Class" value="scriptella.tools.ScriptRunner"/>
+                <attribute name="Main-Class" value="scriptella.tools.ScriptsRunner"/>
                 <attribute name="Specification-Title" value="Scriptella SQL Scripts Tool"/>
                 <attribute name="Specification-Vendor" value="The Scriptella Project Team"/>
                 <attribute name="Implementation-Title" value="scriptella"/>
