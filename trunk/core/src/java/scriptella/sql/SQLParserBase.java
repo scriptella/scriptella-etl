@@ -21,7 +21,6 @@ import scriptella.expressions.PropertiesSubstitutor;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -72,13 +71,11 @@ public class SQLParserBase {
         st.commentChar('-');
         st.ordinaryChar(';');
         st.ordinaryChar('$');
-        st.ordinaryChar('?');
-        st.ordinaryChar(':');
         st.quoteChar('"');
         st.quoteChar('\'');
 
         StringBuilder b = new StringBuilder(80);
-        List<Integer> injections = new ArrayList<Integer>();
+        List<Integer> injections = null;
 
         for (int token; (token = st.nextToken()) != StreamTokenizer.TT_EOF;) {
             switch (token) {
@@ -119,18 +116,18 @@ public class SQLParserBase {
                     // A regular character was found; the value is the token itself
                     char ch = (char) st.ttype;
 
-                    //                    System.out.println("Char " + ch);
                     switch (ch) {
                         case ';':
                             handleStatement(b, injections);
                             b.setLength(0);
-                            injections.clear();
-
+                            if (injections!=null) {
+                                injections.clear();
+                            }
                             break;
-
                         case '$':
-                        case ':':
-                        case '?':
+                            if (injections==null) {
+                                injections=new ArrayList<Integer>();
+                            }
                             injections.add(b.length());
                             b.append(ch);
                     }
@@ -142,34 +139,45 @@ public class SQLParserBase {
         }
     }
 
+    //Just a small optimization to minimize matcher creation time - please note that these fields are not thread-safe
+    private final Matcher emptyMatcher = EMPTY_PTR.matcher("");
+    private final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher("");
+    private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
     private void handleStatement(final StringBuilder sql,
                                  final List<Integer> injections) {
-        if (EMPTY_PTR.matcher(sql).matches()) {
+        if (emptyMatcher.reset(sql).matches()) {
             return;
         }
 
-        final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher(sql);
-        final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher(sql);
-        StringBuilder res = new StringBuilder(sql.length());
-        int lastPos = 0;
+        if (injections!=null && !injections.isEmpty()) {
+            m.reset(sql);
+            extM.reset(sql);
 
-        for (Integer ind : injections) {
-            if (m.find(ind) && (m.start() == ind)) { //property reference
-                res.append(sql.substring(lastPos, m.start()));
-                lastPos = m.end();
-                res.append(handleParameter(m.group(1), false));
-            } else if (extM.find(ind) && (extM.start() == ind)) { //expression
-                res.append(sql.substring(lastPos, extM.start()));
-                lastPos = extM.end();
-                res.append(handleParameter(extM.group(1), true));
+            StringBuilder res = new StringBuilder(sql.length());
+            int lastPos = 0;
+
+            for (Integer index : injections) {
+                int ind = index+1;
+                if (m.find(ind) && (m.start() == ind)) { //property reference
+                    res.append(sql.substring(lastPos, m.start()-1));
+                    lastPos = m.end();
+                    res.append(handleParameter(m.group(1), false));
+                } else if (extM.find(ind) && (extM.start() == ind)) { //expression
+                    res.append(sql.substring(lastPos, extM.start()-1));
+                    lastPos = extM.end();
+                    res.append(handleParameter(extM.group(1), true));
+                }
             }
+
+            if (lastPos < sql.length()) { //Add right side
+                res.append(sql.substring(lastPos, sql.length()));
+            }
+            statementParsed(res.toString());
+        } else {
+            statementParsed(sql.toString());
         }
 
-        if (lastPos < sql.length()) { //Add right side
-            res.append(sql.substring(lastPos, sql.length()));
-        }
 
-        statementParsed(res.toString());
     }
 
     /**
@@ -180,9 +188,7 @@ public class SQLParserBase {
      * @return substituion string.
      */
     protected String handleParameter(final String name, final boolean expression) {
-        System.out.println("Parameter " + name);
-
-        return expression ? ("${" + name + "}") : ("$" + name);
+        return expression ? ("${" + name + '}') : ("$" + name);
     }
 
     /**
@@ -191,23 +197,6 @@ public class SQLParserBase {
      * @param sql content of the preprocessed statement.
      */
     protected void statementParsed(final String sql) {
-        System.out.println("SQL=\n" + sql);
-        System.out.println("-----------------------");
     }
 
-    public String toString() {
-        return "SQLParserBase{}";
-    }
-
-    public static void main(final String args[]) throws IOException {
-        String s = "--Test\n" + "     \n" + "     CREATE TABLE Test (\n" +
-                "            ID INT,\n" + "            VALUE VARCHAR(255)\n" +
-                "        );\n" + " ${extra}\n" +
-                "        insert {file  'test.dat'   } into test(id, value) values (?1,  '?222');\n" +
-                "        insert into test(id, value) values (?value,'Эта тест');\n" +
-                "        insert into test(id, value) values (3,?text);\n" +
-                " --comment" + "";
-        SQLParserBase p = new SQLParserBase();
-        p.parse(new StringReader(s));
-    }
 }

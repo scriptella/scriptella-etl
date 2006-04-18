@@ -37,8 +37,8 @@ By default file ${basedir}/script.xml is executed. Use file attribute to specify
         <!-- for all rows execute script -->
         <script connection-id="db2">
             <!-- Insert all selected products to db2
-                 ?,$,: use to reference properties, columns or {expressions}-->
-            INSERT INTO Product(id, category, product_name) values (?id, ${category}, :name);
+                 use $ to reference properties, columns or ${expressions}-->
+            INSERT INTO Product(id, category, product_name) values ($id, ${category}, :name);
         </script>
     </query>
 </scripts>

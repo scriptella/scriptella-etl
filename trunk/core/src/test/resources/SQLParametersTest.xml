@@ -13,8 +13,8 @@ This suite tests properties substitution.
         ID INT,
         TEXT VARCHAR(100)
         );
-        insert into Test(id, text) values (1, :global);<!-- Must be substituted-->
-        insert into Test(id, text) values (2, ?global2+'Three${global}');<!-- Literals are skipped-->
+        insert into Test(id, text) values (1, $global);<!-- Must be substituted-->
+        insert into Test(id, text) values (2, $global2+'Three${global}');<!-- Literals are skipped-->
     </script>
 
 </scripts>

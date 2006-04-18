@@ -19,6 +19,7 @@
     <property name="core" value="${basedir}/core"/>
     <property name="tools" value="${basedir}/tools"/>
     <property name="samples" value="${basedir}/samples"/>
+    <property name="version" value="0.1-dev"/>
 
     <target name="jar">
         <ant dir="${basedir}/core" inheritall="false"/>
@@ -27,7 +28,7 @@
             <fileset dir="${basedir}/core/build" includes="*.jar"/>
             <fileset dir="${basedir}/tools/build" includes="*.jar"/>
         </copy>
-        <jar destfile="${build.dir}/scriptella.jar">
+        <jar destfile="${build.dir}/scriptella-${version}.jar">
             <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-jexl-1.0.jar" includes="**" excludes="META-INF/*"/>
@@ -40,7 +41,7 @@
                 <attribute name="Specification-Vendor" value="The Scriptella Project Team"/>
                 <attribute name="Implementation-Title" value="scriptella"/>
                 <attribute name="Implementation-Vendor" value="The Scriptella Project Team"/>
-                <attribute name="Implementation-Version" value="0.1-dev"/>
+                <attribute name="Implementation-Version" value="${version}"/>
             </manifest>
         </jar>
     </target>

@@ -5,7 +5,7 @@
         <include href="PropertiesTest.properties"/>
         var=1
         #replaces b
-        b=$var|:var|?var|${var}|:{var}|?{var}
+        b=$var|$var|$var|${var}|${var}|${var}
         url.prefix=jdbc:hsqldb:mem
         dbname=propertiestest
         driver=org.hsqldb.jdbcDriver

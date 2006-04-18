@@ -20,7 +20,7 @@
     <query connection-id="in">
         select * from test
         <script connection-id="out">
-            insert into Test(id, text) values (?id, ?text);
+            insert into Test(id, text) values ($id, $text);
         </script>
     </query>
 

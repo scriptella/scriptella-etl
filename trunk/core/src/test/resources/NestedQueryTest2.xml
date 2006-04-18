@@ -17,9 +17,9 @@
     <query connection-id="c1">
         select ID*4 as id from test
         <query connection-id="c1">
-            select id+:id as id from Test
+            select id+$id as id from Test
             <script connection-id="c2">
-                insert into test(id) values (:id)
+                insert into test(id) values ($id)
             </script>
         </query>
     </query>
@@ -27,7 +27,7 @@
     <query connection-id="c1">
         select ID*2 as id from Test
         <script connection-id="c2">
-            insert into test(id) values (:id)
+            insert into test(id) values ($id)
         </script>
 
     </query>

@@ -6,6 +6,7 @@
         CREATE TABLE Test (
         ID INT
         );
+        COMMIT;
         <include href="tst:///hugefile"/>
     </script>
 </scripts>
