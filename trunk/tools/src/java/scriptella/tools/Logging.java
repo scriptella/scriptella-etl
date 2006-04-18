@@ -48,7 +48,13 @@ class Logging {
                 args[1] = record.getLevel().getLocalizedName();
                 args[2] = record.getMessage();
 
-                final String s = f.format(args, sb, null).toString();
+                f.format(args, sb, null).toString();
+                final Throwable err = record.getThrown();
+                if (err!=null) {
+                    sb.append('\n');
+                    sb.append(err.getMessage());
+                }
+                final String s = sb.toString();
                 sb.setLength(0);
 
                 return s;
@@ -56,4 +62,6 @@ class Logging {
         });
         l.addHandler(h);
     }
+
+
 }

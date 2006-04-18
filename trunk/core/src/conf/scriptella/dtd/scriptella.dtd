@@ -27,9 +27,13 @@ password CDATA #REQUIRED
 catalog CDATA #IMPLIED
 schema CDATA #IMPLIED
 >
-<!ELEMENT include EMPTY>
+<!ELEMENT fallback (#PCDATA | include)*>
+<!ATTLIST fallback>
+
+<!ELEMENT include (fallback?)>
 <!ATTLIST include
 href CDATA #REQUIRED
+fallback CDATA #IMPLIED
 >
 <!ELEMENT dialect (#PCDATA | include)*>
 <!ATTLIST dialect

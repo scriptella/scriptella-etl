@@ -17,7 +17,6 @@ package scriptella.sql;
 
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
-import scriptella.execution.SystemException;
 
 import java.sql.*;
 import java.util.*;
@@ -79,10 +78,13 @@ public class ConnectionFactory {
 
                 return c;
             }
-        } catch (Exception e) {
-            throw new SystemException("Unable to obtain connection for " +
-                    connectionEl, e);
-        }
+        } catch (SQLException e) {
+            throw new JDBCException("Unable to obtain connection for " +
+                    connectionEl+": "+e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new JDBCException("Driver "+connectionEl.getDriver()+" could not be found", e);
+
+        } 
     }
 
     public Connection getConnection() {

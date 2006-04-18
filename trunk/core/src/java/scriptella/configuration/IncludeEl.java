@@ -21,6 +21,8 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -33,9 +35,8 @@ public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
     private URL url;
     private String href;
     private Charset charset;
-
-    public IncludeEl() {
-    }
+    private static final Logger LOG = Logger.getLogger(IncludeEl.class.getName());
+    private FallbackEl fallbackEl;
 
     public IncludeEl(XMLElement element) {
         configure(element);
@@ -57,6 +58,14 @@ public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
         this.charset = charset;
     }
 
+    public FallbackEl getFallbackEl() {
+        return fallbackEl;
+    }
+
+    public void setFallbackEl(FallbackEl fallbackEl) {
+        this.fallbackEl = fallbackEl;
+    }
+
     public void configure(final XMLElement element) {
         url = element.getDocumentURL();
         setRequiredProperty(element, "href");
@@ -73,16 +82,25 @@ public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
 
             charset = Charset.forName(enc);
         }
+        final XMLElement fallbackElement = element.getChild("fallback");
+        if (fallbackElement!=null) {
+            fallbackEl=new FallbackEl(fallbackElement);
+        }
     }
 
     public Reader open() throws IOException {
         try {
             URL u = new URL(url, href);
-
             return new InputStreamReader(u.openStream(), charset);
         } catch (MalformedURLException e) {
-            throw (IOException) new IOException(
-                    "Unable to open referenced resource " + href).initCause(e);
+            throw (IOException) new IOException("Malformed include url: " + href).initCause(e);
+        } catch (IOException e) {
+            if (fallbackEl!=null) {
+                LOG.log(Level.FINE, e.getMessage());
+                return fallbackEl.open();
+            } else {
+                throw e;
+            }
         }
     }
 }
