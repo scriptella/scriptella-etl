@@ -54,9 +54,8 @@ public class ScriptsRunner {
         System.out.println("Usage java " + ScriptsRunner.class.getName() +
                 " [-options] [<file 1> ... <file N>]");
         System.out.println("where options include:");
+        System.out.println("   -sp show execution progress");
         System.out.println("   -h displays help ");
-        System.out.println("        A ; separated list of directories, JAR archives,\n" +
-                       "            and ZIP archives to search for drivers.");
     }
 
     public void setDriversClassLoader(final ClassLoader classLoader) {
@@ -77,7 +76,7 @@ public class ScriptsRunner {
             factory.setResourceURL(file.toURL());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Wrong file path " +
-                    file.getPath());
+                    file.getPath(),e);
         }
 
         final ConfigurationEl c = factory.createConfiguration();
@@ -89,18 +88,26 @@ public class ScriptsRunner {
     public static void main(final String args[]) {
         boolean failed = false;
         List<File> files = new ArrayList<File>();
+        ConsoleProgressIndicator indicator = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-h")) {
                 printUsage();
                 return;
             }
-            files.add(new File(args[i]));
+            if (args[i].equalsIgnoreCase("-sp")) {
+                indicator = new ConsoleProgressIndicator("Scripts execution");
+            } else {
+                files.add(new File(args[i]));
+            }
         }
         if (files.isEmpty()) { //adding default name if no files specified
             files.add(new File("script.xml"));
         }
         ScriptsRunner runner = new ScriptsRunner();
-        runner.setProgressIndicator(new ConsoleProgressIndicator("Scripts execution"));
+
+        if (indicator!=null) {
+            runner.setProgressIndicator(indicator);
+        }
 
         for (File file : files) {
             try {
