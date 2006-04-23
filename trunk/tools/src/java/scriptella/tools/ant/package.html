@@ -1,16 +1,15 @@
 <body>
 Ant tasks.
 
-<h2>How to register ScriptsExecuteTask</h2>
+<h2>ScriptsExecuteTask</h2>
+<h3>How to register</h3>
 To use the task in a build file, the following taskdef declaration should be added:
-<pre>
-    <code>
-        &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar"/&gt;
-    </code>
-</pre>
+<pre><code>
+    &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar"/&gt;
+</code></pre>
 
 <p>
-    <u>Parameters</u><br/>
+    <h3>Parameters</h3>
 <table>
 
     <tr>
@@ -19,6 +18,11 @@ To use the task in a build file, the following taskdef declaration should be add
     <tr>
         <td>file</td><td>The script file to execute.</td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
     </tr>
+    <tr>
+        <td>progress</td><td>If true shows execution progress.</td><td>No, default value is false.</td>
+    </tr>
+
+    <tr><td colspan="3">The following attributes are not supported yet</td></tr>
     <tr>
         <td>fork</td><td>if enabled triggers the class execution in another VM (disabled by default)</td><td>No</td>
     </tr>
@@ -32,5 +36,26 @@ To use the task in a build file, the following taskdef declaration should be add
 
 
 </table>
+<p>
+    <h3>Nested Elements</h3>
+    The task supports <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a> and
+        <a href="http://ant.apache.org/manual/using.html#path">&lt;classpath&gt;</a> nested elements.
+<p>
+    <h3>Examples</h3>
+    <b>Executes script.xml file in the current directory:</b>
+    <pre><code>&lt;execute/&gt;</code></pre>
+    <b>Executes sql.xml file in the current directory using Oracle classes12.zip on classpath:</b>
+    <pre><code>&lt;execute file="sql.xml" classpath="classes12.zip"/&gt;
+</code></pre>
+    <b>Executes all xml files in db directory using hsqldb.jar and jconn2.jar on classpath:</b>
+    <pre><code>&lt;execute&gt;
+   &lt;classpath&gt;
+      &lt;pathelement location="lib/hsqldb.jar"/&gt;
+      &lt;pathelement location="lib/jconn2.jar"/&gt;
+   &lt;/classpath&gt;
+   &lt;fileset dir="db" includes="*.xml"/&gt;
+&lt;/execute&gt;
+</code></pre>
+
 
 </body>

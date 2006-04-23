@@ -21,7 +21,7 @@
 
     <target name="main">
         <delete file="result.csv" failonerror="no"/>
-        <execute file="exportsample.xml"/>
+        <execute/>
         <delete failonerror="no">
             <fileset dir="${basedir}" includes="outdb.*"/>
         </delete>

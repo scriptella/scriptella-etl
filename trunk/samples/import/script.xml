@@ -1,19 +1,16 @@
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
+    <description>
+        Copies CSV data from in.csv to out.csv. New IDs are 10 times bigger.
+    </description>
     <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:indb" user="sa" password=""/>
     <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
     <script connection-id="in">
-        CREATE TEXT TABLE Test (
-        ID INT,
-        TEXT VARCHAR(100)
-        );
+        <include href="schema.sql"/>
         SET TABLE Test SOURCE "in.csv"
     </script>
     <script connection-id="out">
-        CREATE TEXT TABLE Test (
-        ID INT,
-        TEXT VARCHAR(100)
-        );
+        <include href="schema.sql"/>
         SET TABLE Test SOURCE "out.csv;fs=|"
     </script>
 
@@ -28,6 +25,7 @@
         shutdown;
     </script>
     <script connection-id="out">
-        shutdown;
+        COMMIT;
+        SHUTDOWN;
     </script>
 </scripts>

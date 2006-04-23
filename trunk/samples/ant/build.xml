@@ -21,5 +21,17 @@
     <target name="main">
         <!--Executes script.xml specify  hsqldb library required for this script on classpath-->
         <execute inheritAll="true" classpath="../lib/hsqldb.jar"/>
+        <!-- Nested fileset and classpath elements are used-->
+        <execute inheritAll="true">
+            <fileset file="script.xml"/>
+            <classpath>
+                <pathelement location="../lib/hsqldb.jar"/>
+            </classpath>
+        </execute>
+        <path id="drivers.path">
+            <pathelement location="../lib/hsqldb.jar"/>
+        </path>
+        <!-- Using classpathref attrbute-->
+        <execute inheritAll="true" classpathref="drivers.path"/>
     </target>
 </project>

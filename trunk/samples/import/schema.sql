@@ -1,0 +1,4 @@
+CREATE TEXT TABLE Test (
+    ID INT,
+    TEXT VARCHAR(100)
+);

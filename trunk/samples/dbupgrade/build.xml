@@ -24,10 +24,10 @@
             <fileset dir="." includes="db.*"/>
         </delete>
         <!--Executes sample1.xml specify  hsqldb library required for this script on classpath-->
-        <execute inheritAll="true" file="dbinit.xml"/>
+        <execute file="dbinit.xml"/>
 
     </target>
     <target name="update">
-        <execute inheritAll="true" file="dbupdate.xml"/>
+        <execute file="dbupdate.xml"/>
     </target>
 </project>

@@ -19,6 +19,6 @@
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
         <!--Executes script.xml with hsqldb on classpath-->
-        <execute classpath="../lib/hsqldb.jar"/>
+        <execute fork="true" classpath="../lib/hsqldb.jar"/>
     </target>
 </project>
