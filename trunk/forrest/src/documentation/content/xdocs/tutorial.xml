@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-    <header>
-        <title>Two Minute Tutorial</title>
-    </header>
-    <body>
-        <section id="ant_exec">
-            <title>Using scriptella as Ant task</title>
-            <p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
-            <source><![CDATA[
+	<header>
+		<title>Two Minute Tutorial</title>
+	</header>
+	<body>
+		<section>
+			<title>Using scriptella as Ant task</title>
+			<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+			<source><![CDATA[
 <taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>
                 ]]></source>
-            <p>Running SQL scripts from Ant is simple:</p>
-            <source><![CDATA[
+			<p>Running SQL scripts from Ant is simple:</p>
+			<source><![CDATA[
 <execute classpath="../lib/hsqldb.jar"/><!-- Register your jdbc driver here instead of hsqldb-->
                 ]]></source>
-            <note>
+			<note>
 By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
             </note>
-        </section>
-        <section id="standalone">
-            <title>Standalone execution</title>
-            <source><![CDATA[
+		</section>
+		<section>
+			<title>Standalone execution</title>
+			<source><![CDATA[
 java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
                 ]]></source>
-            <note>
-                -Xbootclasspath/a: is used to overcome -jar option limitation to support additional classpath.
+			<note>
+                -Xbootclasspath/a: is used instead of -cp to specify additional classpath (overcomes -jar option limitation).
             </note>
-        </section>
-        <section>
-            <title>Examples</title>
-            <section id="copy_db_table">
-                <title>Copy table to another database</title>
-                <p>Assume Database #1 contains Table Product with id, category and name columns. The following script
+		</section>
+		<section>
+			<title>Examples</title>
+			<section>
+				<title>Copy table to another database</title>
+				<p>Assume Database #1 contains Table Product with id, category and name columns. The following script
                 copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
-                <p>script.xml:</p>
-                <source><![CDATA[
+				<p>script.xml:</p>
+				<source><![CDATA[
     <scripts>
         <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password=""/>
         <connection id="db2" driver="jdbc.Driver.Class2.Name" url="jdbc:database2:sample" user="sa" password=""/>
@@ -51,14 +51,14 @@ java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
         </query>
     </scripts>
                     ]]></source>
-            </section>
-            <section id="blobs">
-                <title>Working with BLOBs</title>
-                <p>The following sample initializes table of music tracks. Each track has a DATA field containing
+			</section>
+			<section>
+				<title>Working with BLOBs</title>
+				<p>The following sample initializes table of music tracks. Each track has a DATA field containing
  a file loaded from an external location. File song1.mp3 is stored in the same directory as script.xml and song2.mp3
  is loaded through the web.</p>
-                <p>script.xml:</p>
-                <source><![CDATA[
+				<p>script.xml:</p>
+				<source><![CDATA[
     <scripts>
         <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
         <script>
@@ -77,17 +77,17 @@ java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
         </script>
     </scripts>
                     ]]></source>
-            </section>
-            <section id="dialects">
-                <title>Supporting several SQL dialects</title>
-                <p>TODO: Add example here</p>
-                <p>script.xml:</p>
-                <source><![CDATA[
+			</section>
+			<section>
+				<title>Supporting several SQL dialects</title>
+				<p>TODO: Add example here</p>
+				<p>script.xml:</p>
+				<source><![CDATA[
     <scripts>
     </scripts>
                     ]]></source>
-            </section>
-        </section>
-        <note>TODO</note>
-    </body>
+			</section>
+		</section>
+		<fixme author="ejboy">TODO</fixme>
+	</body>
 </document>
