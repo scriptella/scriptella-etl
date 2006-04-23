@@ -15,18 +15,18 @@
 -->
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
-    <!--Uncomment if using outside ant
+    <!--
+    In this sample properties are inhertied from Ant environment.
+    Uncomment the following element if using outside ant
     <properties>
         <include href="build.properties"/>
     </properties>
     -->
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
     <script>
-        CREATE TABLE Test (
-        ID INT,
-        TEXT VARCHAR(100)
+        CREATE TABLE Foo (
+            BAR VARCHAR(100)
         );
-        insert into Test(id, text) values (1, ${qqq} );
     </script>
 
 </scripts>

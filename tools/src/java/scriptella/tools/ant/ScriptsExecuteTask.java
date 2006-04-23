@@ -39,6 +39,7 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
     private String maxmemory;
     private boolean fork;
     private boolean inheritAll;
+    private boolean progress;
 
     public boolean isFork() {
         return fork;
@@ -71,6 +72,21 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
      */
     public void setInheritAll(final boolean inheritAll) {
         this.inheritAll = inheritAll;
+    }
+
+    /**
+     * @return true if execution progress is shown. Default is false
+     */
+    public boolean isProgress() {
+        return progress;
+    }
+
+    /**
+     *
+     * @param progress true if execution progress is shown. Default is false
+     */
+    public void setProgress(boolean progress) {
+        this.progress = progress;
     }
 
     public void addFileset(final FileSet set) {
@@ -113,13 +129,15 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         ScriptsRunner runner = null;
         runner = new ScriptsRunner();
         runner.setDriversClassLoader(getClassLoader());
-        runner.setProgressIndicator(new ConsoleProgressIndicator() {
-            protected void println(final Object o) {
-                if (o != null) {
-                    log(o.toString(), Project.MSG_VERBOSE);
+        if (progress) {
+            runner.setProgressIndicator(new ConsoleProgressIndicator() {
+                protected void println(final Object o) {
+                    if (o != null) {
+                        log(o.toString(), Project.MSG_INFO);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             runner.setProperties(getProject().getProperties());
@@ -137,11 +155,16 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         }
     }
 
+    /**
+     * TODO Implement fork correctly - use ant LoaderUtils to get scriptella.jar location
+     * TODO Output errors
+     */
     private void fork(final List<File> files) {
         Java j = new Java();
         j.setFork(true);
         j.setProject(getProject());
         j.setClasspath(getClasspath());
+
         j.setClassname(ScriptsRunner.class.getName());
 
         StringBuilder line = new StringBuilder();
@@ -149,7 +172,6 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         for (File file : files) {
             line.append(file.getPath()).append(' ');
         }
-
         j.createArg().setLine(line.toString());
 
         if (maxmemory != null) {
@@ -157,7 +179,6 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         }
 
         int r = j.executeJava();
-
         if (r != 0) {
             throw new BuildException("Unable to execute files: " + files +
                     ". See error log.");

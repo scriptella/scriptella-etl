@@ -54,7 +54,7 @@ public class ScriptsRunner {
         System.out.println("Usage java " + ScriptsRunner.class.getName() +
                 " [-options] [<file 1> ... <file N>]");
         System.out.println("where options include:");
-        System.out.println("   -sp show execution progress");
+        System.out.println("   -progress show execution progress");
         System.out.println("   -h displays help ");
     }
 
@@ -94,7 +94,7 @@ public class ScriptsRunner {
                 printUsage();
                 return;
             }
-            if (args[i].equalsIgnoreCase("-sp")) {
+            if (args[i].equalsIgnoreCase("-progress")) {
                 indicator = new ConsoleProgressIndicator("Scripts execution");
             } else {
                 files.add(new File(args[i]));

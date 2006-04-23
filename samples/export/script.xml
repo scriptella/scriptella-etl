@@ -3,17 +3,12 @@
     <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb" user="sa" password=""/>
     <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
     <script connection-id="in">
-        CREATE TABLE Test (
-        ID INT,
-        TEXT VARCHAR(100)
-        );
+        CREATE TABLE Test (<include href="fields.sql"/>);
+
         insert into Test(id, text) values (1, 'One');
     </script>
     <script connection-id="out">
-        CREATE TEXT TABLE Test (
-        ID INT,
-        TEXT VARCHAR(100)
-        );
+        CREATE TEXT TABLE Test (<include href="fields.sql"/>);
         SET TABLE Test SOURCE "result.csv"
     </script>
 
