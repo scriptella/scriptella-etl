@@ -72,7 +72,7 @@ public class JDBCUtils {
     }
 
     public static List<String> getColumn(final ResultSet rs, final int columnPos) {
-        List<String> l = new ArrayList();
+        List<String> l = new ArrayList<String>();
 
         try {
             while (rs.next()) {

@@ -40,9 +40,6 @@ public class QueryEl extends SQLBasedElement {
         configure(element);
     }
 
-    public ContentEl getContent() {
-        return getContent(null);
-    }
 
     public List<SQLBasedElement> getChildSqlElements() {
         return childSqlElements;
