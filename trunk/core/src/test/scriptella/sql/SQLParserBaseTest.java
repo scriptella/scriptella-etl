@@ -72,7 +72,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
             }
 
             protected void statementParsed(final String sql) {
-                assertEquals(removeSpaces(expected[stInd]), removeSpaces(sql));
+                assertEquals(removeWhitespaceChars(expected[stInd]), removeWhitespaceChars(sql));
                 stInd++;
             }
         };
@@ -80,7 +80,4 @@ public class SQLParserBaseTest extends AbstractTestCase {
 
     }
 
-    private String removeSpaces(String s) {
-        return s.replaceAll("\\s+", " ").trim();
-    }
 }
