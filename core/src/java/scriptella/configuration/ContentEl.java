@@ -37,6 +37,9 @@ import java.util.List;
 public class ContentEl extends XMLConfigurableBase implements ExternalResource {
     private List<ExternalResource> content = new ArrayList<ExternalResource>();
 
+    public ContentEl() {
+    }
+
     public ContentEl(XMLElement element) {
         configure(element);
     }
@@ -64,6 +67,16 @@ public class ContentEl extends XMLConfigurableBase implements ExternalResource {
                         new XMLElement((Element) node, element)));
             }
         }
+    }
+
+    /**
+     * Merges this content with specified one and returns this element.
+     * @param contentEl content to merge with.
+     * @return this instance with merged content.
+     */
+    ContentEl merge(ContentEl contentEl) {
+        content.addAll(contentEl.content);
+        return this;
     }
 
     public String toString() {

@@ -36,6 +36,7 @@ public class ConnectionFactory {
     List<Connection> newConnections;
     private ConnectionEl connectionEl;
     private Driver driver;
+    private DialectIdentifier dialectIdentifier;
 
     public ConnectionFactory(ConnectionEl connection) {
         connectionEl = connection;
@@ -96,14 +97,17 @@ public class ConnectionFactory {
     }
 
     public DialectIdentifier getDialectIdentifier() {
-        try {
-            final DatabaseMetaData metaData = getConnection().getMetaData();
+        if (dialectIdentifier==null) {
+            try {
+                final DatabaseMetaData metaData = getConnection().getMetaData();
 
-            return new DialectIdentifier(metaData.getDatabaseProductName(),
-                    metaData.getDatabaseProductVersion());
-        } catch (SQLException e) {
-            throw new JDBCException(e);
+                dialectIdentifier=new DialectIdentifier(metaData.getDatabaseProductName(),
+                        metaData.getDatabaseProductVersion());
+            } catch (SQLException e) {
+                throw new JDBCException(e);
+            }
         }
+        return dialectIdentifier;
     }
 
     public Connection newConnection() {

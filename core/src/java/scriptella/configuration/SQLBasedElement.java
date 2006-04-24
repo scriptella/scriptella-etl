@@ -51,13 +51,16 @@ public abstract class SQLBasedElement extends XMLConfigurableBase {
      * @return content for specified dialect id or null - if script doesn't support this dialect.
      */
     public ContentEl getContent(final DialectIdentifier id) {
+        ContentEl result=null;
         for (Dialect d : dialects) {
             if (d.matches(id)) {
-                return d.getContentEl();
+                if (result==null) {
+                    result = new ContentEl();
+                }
+                result.merge(d.getContentEl());
             }
         }
-
-        return null;
+        return result;
     }
 
     public void addDialects(final Dialect dialect) {
@@ -85,14 +88,10 @@ public abstract class SQLBasedElement extends XMLConfigurableBase {
         setProperty(element, "if");
         //The following code loads nested dialect elements
         dialects = load(element.getChildren("dialect"), Dialect.class);
-
-        //if no <dialect> elements were found
-        if (dialects.isEmpty()) {
-            //Use element text as a default script
-            Dialect d = new Dialect();
-            d.configure(element);
-            dialects.add(d);
-        }
+        //Use element text as a default dialect
+        Dialect d = new Dialect();
+        d.configure(element);
+        dialects.add(d);
     }
 
     public static class Dialect extends XMLConfigurableBase {

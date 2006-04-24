@@ -13,7 +13,7 @@
         insert into test(id, value) values (1,'222');
     </script>
     <script>
-        <dialect database=".*oracle.*">
+        <dialect database=".*oracle.*"><!--Skipped-->
             insert into test(id, value) values (2,'333');
         </dialect>
     </script>
@@ -21,13 +21,9 @@
         <dialect database="hsql.*"><!--must execute-->
             insert into test(id, value) values (3,'333');
         </dialect>
-        <dialect><!--skipped-->
+        <dialect database=""><!--executes-->
             insert into test(id, value) values (4,'333');
         </dialect>
-        <dialect database=""><!--skipped-->
-            insert into test(id, value) values (33,'333');
-        </dialect>
-
     </script>
     <script>
         <dialect><!--must execute-->
@@ -38,9 +34,13 @@
         <dialect database="HSQL.*" version="1\.8\..*"><!--must execute-->
             insert into test(id, value) values (6,'333');
         </dialect>
-        <dialect><!--skipped-->
+        <dialect database="hsql.*" version="1.8.*"><!--executes-->
             insert into test(id, value) values (7,'333');
         </dialect>
+        <dialect database="hsql.*" version="1\.9.*"><!--skipped-->
+            insert into test(id, value) values (8,'333');
+        </dialect>
+        insert into test(id, value) values (9,'333');
 
     </script>
 

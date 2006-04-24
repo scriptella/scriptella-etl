@@ -41,7 +41,7 @@ public class DialectsTest extends DBTestCase {
 
         Query s = new Query("select * from test");
         final Set expected = new HashSet(Arrays.asList(
-                new Integer[]{1, 3, 5, 6}));
+                new Integer[]{1, 3, 4, 5, 6, 7, 9}));
         final Set actual = new HashSet<Integer>();
 
         s.execute(con,
