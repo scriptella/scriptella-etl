@@ -48,26 +48,32 @@ public class XIncludeTest extends AbstractTestCase {
 
         final ConfigurationEl c = cf.createConfiguration();
         final List<SQLBasedElement> scripts = c.getSqlElements();
-        assertEquals(scripts.size(), 3);
+        assertEquals(scripts.size(), 4);
 
         String text = asString(scripts.get(0).getContent(null));
         String str = "insert into test(id, value) values (2,'333');";
-        assertTrue("Script \n" + text.replace('\r', ' ').replace('\n', ' ') +
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         text = asString(scripts.get(1).getContent(null));
         str = "insert into test2(id, value) values (3,'444');";
-        assertTrue("Script \n" + text.replace('\r', ' ').replace('\n', ' ') +
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         text = asString(scripts.get(2).getContent(null));
         str = "insert into test(id, value) values (2,'333');";
-        assertTrue("Script \n" + text.replace('\r', ' ').replace('\n', ' ') +
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         str = "--Sample1--";
-        assertTrue("Script \n" + text.replace('\r', ' ').replace('\n', ' ') +
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         str = "--Sample2--";
-        assertTrue("Script \n" + text.replace('\r', ' ').replace('\n', ' ') +
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
+        //Fallback test
+        text = asString(scripts.get(3).getContent(null));
+        str = "Fallback!";
+        assertTrue("Script \n" + removeWhitespaceChars(text) +
+                "\n must contain substring: " + str, text.indexOf(str) > 0);
+
     }
 
     private String asString(final ContentEl content) {

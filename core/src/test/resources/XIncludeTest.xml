@@ -1,5 +1,6 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
-    <connection/>
+    <connection driver="" url="" user="" password=""/>
     <script>
         <include href="XIncludeTest.sql"/>
     </script>
@@ -10,6 +11,11 @@
         --Sample1--
         <include href="XIncludeTest.sql"/>
         --Sample2--
+    </script>
+    <script>
+        <include href="nosuchurl">
+            <fallback>Fallback!</fallback>
+        </include>
     </script>
 
 

@@ -136,6 +136,15 @@ public abstract class AbstractTestCase extends TestCase {
         return cf.createConfiguration();
     }
 
+    /**
+     * Removes extra whitespace characters.
+     * @param s string to replace.
+     * @return s with extra whitespace chars removed.
+     */
+    protected String removeWhitespaceChars(String s) {
+        return s.replaceAll("\\s+", " ").trim();
+    }
+
     protected static interface TestURLHandler {
         public InputStream getInputStream(final URL u)
                 throws IOException;
