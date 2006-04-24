@@ -37,10 +37,19 @@ public class ReaderInputStream extends InputStream {
         return reader.read();
     }
 
+    private char[] tmpBuf;//used to minimize memory allocations
+
     public int read(final byte b[], final int off, final int len)
             throws IOException {
-        char c[] = new char[len];
-        int n = reader.read(c);
+        char[] c = null;
+        if (tmpBuf != null && tmpBuf.length >= len) {
+            c = tmpBuf;
+        } else {
+            c = new char[len];
+        }
+
+        int n = reader.read(c, 0, len);
+        tmpBuf = c;
 
         if (n > 0) {
             for (int i = 0; i < n; i++) {
@@ -52,6 +61,7 @@ public class ReaderInputStream extends InputStream {
     }
 
     public void close() throws IOException {
+        tmpBuf = null;
         reader.close();
     }
 }
