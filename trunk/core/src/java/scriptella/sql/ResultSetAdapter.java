@@ -57,7 +57,6 @@ public class ResultSetAdapter implements ParametersCallback {
 
     public Object getParameter(final String name) {
         if (ThisParameter.NAME.equals(name)) { //this could not be overriden
-
             return ThisParameter.get(params);
         }
 

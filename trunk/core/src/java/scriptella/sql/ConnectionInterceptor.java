@@ -55,19 +55,19 @@ public class ConnectionInterceptor extends SQLElementInterceptor {
 
         @Override
         public Connection getConnection() {
-            return globalContext.getSqlEngine().getConnection(connectionId)
+            return getGlobalContext().getSqlEngine().getConnection(connectionId)
                     .getConnection();
         }
 
         @Override
         public Connection getNewConnection() {
-            return globalContext.getSqlEngine().getConnection(connectionId)
+            return getGlobalContext().getSqlEngine().getConnection(connectionId)
                     .newConnection();
         }
 
         @Override
         public DialectIdentifier getDialectIdentifier() {
-            return globalContext.getSqlEngine().getConnection(connectionId)
+            return getGlobalContext().getSqlEngine().getConnection(connectionId)
                     .getDialectIdentifier();
         }
     }
