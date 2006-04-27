@@ -58,14 +58,6 @@ public class SQLSupport {
         });
     }
 
-    public ExternalResource getExternalResource() {
-        return externalResource;
-    }
-
-    public void setExternalResource(final ExternalResource externalResource) {
-        this.externalResource = externalResource;
-    }
-
     protected int parseAndExecute(final Connection connection,
                                   final SQLContext sqlContext, final QueryCallback callBack) {
         Parser parser = new Parser(connection, callBack, sqlContext);
@@ -76,7 +68,9 @@ public class SQLSupport {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
+        //notify statistic interceptor on number of executed statements
+        //Performance Note: this solution may be retrofitted to avoid usage of ThreadLocals
+        StatisticInterceptor.statementsExecuted(parser.executedCount);
         return parser.updates ? parser.result : (-1);
     }
 
@@ -88,6 +82,7 @@ public class SQLSupport {
         ParametersCallback paramsCallback;
         List params = new ArrayList();
         private List<FileParameter> files;
+        private int executedCount;//number of executed statements
 
         public Parser(Connection con, QueryCallback callback,
                       ParametersCallback params) {
@@ -124,7 +119,6 @@ public class SQLSupport {
 
         int executeStatement(final String sql) {
             PreparedStatement ps = null;
-
             try {
                 ps = con.prepareStatement(sql);
 
@@ -132,7 +126,7 @@ public class SQLSupport {
                     Object o = params.get(i);
                     setObject(o, ps, i + 1);
                 }
-
+                int updateCount=-1;
                 if (ps.execute()) {
                     if (callback == null) {
                         LOG.warning("Missing callback for query with resultset");
@@ -150,11 +144,11 @@ public class SQLSupport {
                             JDBCUtils.closeSilent(rs);
                         }
                     }
-
-                    return -1;
+                } else {
+                    updateCount=ps.getUpdateCount();
                 }
-
-                return ps.getUpdateCount();
+                executedCount++;
+                return updateCount;
             } catch (SQLException e) {
                 throw new JDBCException("Unable to execute statement", e, sql,
                         params);

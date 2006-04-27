@@ -54,7 +54,6 @@ public class ScriptsRunner {
         System.out.println("Usage java " + ScriptsRunner.class.getName() +
                 " [-options] [<file 1> ... <file N>]");
         System.out.println("where options include:");
-        System.out.println("   -progress show execution progress");
         System.out.println("   -h displays help ");
     }
 
@@ -88,17 +87,13 @@ public class ScriptsRunner {
     public static void main(final String args[]) {
         boolean failed = false;
         List<File> files = new ArrayList<File>();
-        ConsoleProgressIndicator indicator = null;
+        ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Scripts execution");
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-h")) {
                 printUsage();
                 return;
             }
-            if (args[i].equalsIgnoreCase("-progress")) {
-                indicator = new ConsoleProgressIndicator("Scripts execution");
-            } else {
-                files.add(new File(args[i]));
-            }
+            files.add(new File(args[i]));
         }
         if (files.isEmpty()) { //adding default name if no files specified
             files.add(new File("script.xml"));
@@ -111,9 +106,10 @@ public class ScriptsRunner {
 
         for (File file : files) {
             try {
-                runner.execute(file);
+                final ExecutionStatistics st = runner.execute(file);
                 LOG.info("Script " + file +
                         " has been executed successfully");
+                LOG.info(st.toString());
             } catch (Exception e) {
                 failed = true;
                 LOG.log(Level.SEVERE,
