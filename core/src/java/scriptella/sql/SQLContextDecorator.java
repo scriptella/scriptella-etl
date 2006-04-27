@@ -67,6 +67,7 @@ public class SQLContextDecorator extends SQLContext {
      */
     void setContext(final SQLContext context) {
         this.context = context;
-        globalContext = context.globalContext;
+        this.globalContext = context.getGlobalContext();
     }
+
 }

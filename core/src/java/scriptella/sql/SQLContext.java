@@ -16,6 +16,7 @@
 package scriptella.sql;
 
 import scriptella.execution.ScriptsContext;
+import scriptella.execution.ThreadSafe;
 import scriptella.expressions.ParametersCallback;
 
 import java.sql.Connection;
@@ -27,7 +28,7 @@ import java.sql.Connection;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SQLContext implements ParametersCallback {
+public @ThreadSafe class SQLContext implements ParametersCallback {
     protected ScriptsContext globalContext;
 
     protected SQLContext() {
@@ -61,4 +62,9 @@ public class SQLContext implements ParametersCallback {
 
         return cf.getDialectIdentifier();
     }
+
+    protected ScriptsContext getGlobalContext() {
+        return globalContext;
+    }
+
 }

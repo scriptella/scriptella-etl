@@ -32,7 +32,7 @@ class Logging {
      * todo Add another method for outputting to swing application
      */
     public static void configure() {
-        final Logger l = Logger.getLogger(Logging.class.getPackage().getName());
+        final Logger l = Logger.getLogger("scriptella");
         l.setLevel(Level.INFO);
         l.setUseParentHandlers(false);
 
@@ -50,9 +50,10 @@ class Logging {
 
                 f.format(args, sb, null).toString();
                 final Throwable err = record.getThrown();
+                sb.append('\n');
                 if (err!=null) {
-                    sb.append('\n');
                     sb.append(err.getMessage());
+                    sb.append('\n');
                 }
                 final String s = sb.toString();
                 sb.setLength(0);
