@@ -38,7 +38,7 @@ public class ExecutionStatisticsBuilder {
         ei.okCount++;
 
         if (statements != 0) {
-            ei.statements = statements;
+            ei.statements += statements;
         }
     }
 

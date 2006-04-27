@@ -16,6 +16,7 @@
 package scriptella.sql;
 
 import scriptella.configuration.Location;
+import scriptella.execution.ExecutionStatisticsBuilder;
 
 
 /**
@@ -33,12 +34,40 @@ public class StatisticInterceptor extends SQLElementInterceptor {
     }
 
     public void execute(final SQLContext ctx) {
-        executeNext(ctx);
-        ctx.globalContext.getStatisticsBuilder().elementExecuted(location);
+        boolean ok=false;
+        try {
+            executeNext(ctx);
+            ok=true;
+        } finally {
+            if (ok) {
+                Integer count = STATEMENTS_INFO.get();//Obtain statistics of executed statements (if any)
+                STATEMENTS_INFO.remove(); //Clear threalocal state
+                final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
+                if (count==null) { //no information available
+                    statisticsBuilder.elementExecuted(location);
+                } else {
+                    statisticsBuilder.elementExecuted(location, count);
+                }
+            } else {
+                STATEMENTS_INFO.remove(); //Clear threalocal state
+                ctx.getGlobalContext().getStatisticsBuilder().elementFailed(location);
+            }
+        }
+
     }
 
     public static SQLExecutableElement prepare(
             final SQLExecutableElement next, final Location location) {
         return new StatisticInterceptor(next, location);
     }
+
+    /**
+     * Updates statistics on number of executed statements for current element.
+     * @param statements number of executed statements
+     */
+    static void statementsExecuted(int statements) {
+        STATEMENTS_INFO.set(statements);
+    }
+
+    private static final ThreadLocal<Integer> STATEMENTS_INFO = new ThreadLocal<Integer>();
 }

@@ -51,8 +51,6 @@ public class TxInterceptor extends SQLElementInterceptor {
             LOG.log(Level.INFO,
                     "Script " + ctxDecorator.scriptEl.getLocation() +
                             " failed during invocation in a separate transaction", e);
-            ctx.globalContext.getStatisticsBuilder()
-                    .elementFailed(ctxDecorator.scriptEl.getLocation());
         }
     }
 

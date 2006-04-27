@@ -31,6 +31,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor();
         final ExecutionStatistics s = se.execute();
         assertEquals(2, s.categories.size());
+        assertEquals(12, s.getExecutedStatementsCount()); //4+2+2+1+3
 
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
@@ -38,19 +39,24 @@ public class ExecutionStatisticsTest extends DBTestCase {
             if ("/scripts[1]/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(4, info.getStatementsCount());
             } else if ("/scripts[1]/query[1]/query[1]/script[1]".equals(
                     info.getId())) {
                 assertEquals(2, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(2, info.getStatementsCount()); //1 statement executed 2 times
             } else if ("/scripts[1]/query[1]/query[1]".equals(info.getId())) {
                 assertEquals(2, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(2, info.getStatementsCount());
             } else if ("/scripts[1]/query[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(1, info.getStatementsCount());
             } else if ("/scripts[1]/script[2]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(3, info.getStatementsCount());
             } else {
                 fail("Unrecognized statistic element " + info.getId());
             }

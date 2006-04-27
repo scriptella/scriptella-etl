@@ -31,9 +31,7 @@ public class ExecutionStatistics {
     Map<String, CategoryInfo> categories = new TreeMap<String, CategoryInfo>();
 
     /**
-     * TODO: Calculate executed statements count
-     *
-     * @return
+     * @return number of statements executed for all elements.
      */
     public int getExecutedStatementsCount() {
         return statements;
@@ -44,7 +42,7 @@ public class ExecutionStatistics {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder(200);
+        StringBuilder sb = new StringBuilder(1024);
         sb.append("Executed ");
 
         final Set<Map.Entry<String, CategoryInfo>> entries = categories.entrySet();
@@ -101,6 +99,12 @@ public class ExecutionStatistics {
             return failedCount;
         }
 
+        /**
+         * Returns total number of executed statements for this element.
+         * <p><b>Note:</b> execution in a loop affects total number,
+         * i.e. StatementsCount=loop_count*sql_statements_count
+         * @return number of executed statements.
+         */
         public int getStatementsCount() {
             return statements;
         }
