@@ -26,7 +26,7 @@ This element may contain plain text or includes.
 -->
 <!ELEMENT properties (#PCDATA | include)*>
 <!--
-The connection element specifies connection to a database. Attrbutes
+The connection element specifies connection to a database. Attributes
  * id - connection identifier. Used in scripts and queries
  * driver - driver class
  * url - jdbc url
