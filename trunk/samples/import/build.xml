@@ -1,7 +1,7 @@
 <project name="Import Ant File" default="main">
     <!-- Registers scriptella ant tasks.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar:../lib/hsqldb.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../../lib/scriptella.jar:../../lib/hsqldb.jar"/>
 
     <target name="main">
         <delete file="out.csv" failonerror="no"/>

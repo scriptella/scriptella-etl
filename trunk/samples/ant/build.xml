@@ -16,20 +16,20 @@
 <project name="ant samples" default="main">
     <!-- Registers scriptella ant tasks.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../../lib/scriptella.jar"/>
     <property file="build.properties"/>
     <target name="main">
         <!--Executes script.xml specify  hsqldb library required for this script on classpath-->
-        <execute inheritAll="true" classpath="../lib/hsqldb.jar"/>
+        <execute inheritAll="true" classpath="../../lib/hsqldb.jar"/>
         <!-- Nested fileset and classpath elements are used-->
         <execute inheritAll="true">
             <fileset file="script.xml"/>
             <classpath>
-                <pathelement location="../lib/hsqldb.jar"/>
+                <pathelement location="../../lib/hsqldb.jar"/>
             </classpath>
         </execute>
         <path id="drivers.path">
-            <pathelement location="../lib/hsqldb.jar"/>
+            <pathelement location="../../lib/hsqldb.jar"/>
         </path>
         <!-- Using classpathref attrbute-->
         <execute inheritAll="true" classpathref="drivers.path"/>

@@ -1,1 +1,1 @@
-java -Xbootclasspath/a:../lib/hsqldb.jar -jar ../lib/scriptella.jar
+java -Xbootclasspath/a:../../../lib/hsqldb.jar -jar ../../../lib/scriptella.jar
