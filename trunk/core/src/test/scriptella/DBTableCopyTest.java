@@ -48,6 +48,11 @@ public class DBTableCopyTest extends DBTestCase {
                     public void processRow(final ParametersCallback row) {
                         n[0]++;
                         assertEquals(n[0], row.getParameter("ID"));
+                        if (n[0]==3) { //3rd row column value2 has 'value'
+                            assertEquals("value", row.getParameter("value2"));
+                        } else {
+                            assertNull(row.getParameter("value2"));
+                        }
                     }
                 });
         assertEquals(n[0], 3);
