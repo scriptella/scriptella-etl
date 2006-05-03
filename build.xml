@@ -37,6 +37,7 @@
     <property name="jar.name" value="scriptella.jar"/>
     <property name="zip.name" value="scriptella-${version}.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
+    <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
 
     <!--Classpath to use for JUnit tests execution -->
     <path id="tests.classpath">
@@ -78,14 +79,26 @@
                 <attribute name="Implementation-Version" value="${version} (Build ${build})"/>
             </manifest>
         </jar>
+        <copy todir="${basedir}/samples/lib">
+            <fileset file="${lib.dir}/hsqldb.jar"/>
+            <fileset file="${build.dir}/${jar.name}"/>
+        </copy>
     </target>
 
     <target name="zip" depends="jar">
         <description>Prepares binary distribution</description>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
-            <fileset dir="${basedir}" includes="samples/** lib/**"/>
+            <fileset dir="${basedir}" includes="lib/**"/>
             <fileset dir="${build.dir}" includes="scriptella*.jar"/>
+        </zip>
+    </target>
+
+    <target name="examples" depends="jar">
+        <description>Prepares examples distribution</description>
+        <delete file="${build.dir}/${examples.zip.name}" failonerror="false"/>
+        <zip destfile="${build.dir}/${examples.zip.name}">
+            <fileset dir="${basedir}/samples" includes="**"/>
         </zip>
     </target>
 
@@ -97,7 +110,7 @@
         </zip>
     </target>
 
-    <target name="distrib" depends="zip, srczip">
+    <target name="distrib" depends="zip, srczip, examples">
         <description>Prepares binary and src distribution</description>
     </target>
 
@@ -115,7 +128,8 @@
         <unjar src="${build.dir}/scriptella.jar" dest="${tests.tmp.dir}"/>
         <!--Calling instrumentation if coverage is on-->
         <antcall target="instrument"/>
-        <javac srcdir="${core}/src/test" destdir="${tests.tmp.dir}" classpath="${build.dir}/scriptella.jar:${lib.dir}/hsqldb.jar"
+        <javac srcdir="${core}/src/test" destdir="${tests.tmp.dir}"
+               classpath="${build.dir}/scriptella.jar:${lib.dir}/hsqldb.jar"
                debug="on" debuglevel="lines,vars,source"/>
         <!--Copying resources-->
         <copy todir="${tests.tmp.dir}">
@@ -155,7 +169,7 @@
             <and>
                 <isset property="cobertura.dir"/>
                 <not>
-                    <available  file="${cobertura.dir}"/>
+                    <available file="${cobertura.dir}"/>
                 </not>
             </and>
         </condition>
@@ -174,8 +188,6 @@
         <antcall target="test"/>
         <ant antfile="${basedir}/coverage.xml" target="report"/>
     </target>
-
-
 
 
 </project>
