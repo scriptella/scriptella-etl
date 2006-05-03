@@ -1,0 +1,34 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <description>
+        Migrates data from LDAP to Database.
+        Creates users and roles tables suitable for Tomcat JDBCRealm authentication.
+        The source data is obtained from LDAP.
+    </description>
+    <connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
+                url="jdbc:ldap://localhost:389/dc=scriptella?SEARCH_SCOPE:=subTreeScope&amp;ignore_transactions:=true"
+                user="cn=root,dc=scriptella" password="secret"/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
+    <script connection-id="out">
+        <!--Creates empty database -->
+        <include href="dbschema.sql"/>
+    </script>
+    <query connection-id="in">
+        <!--Selects users-->
+        SELECT uid,userPassword,DN FROM ou=people WHERE objectClass = 'inetOrgPerson'
+        <script connection-id="out">
+            INSERT INTO Users VALUES ($uid, $userPassword);
+        </script>
+        <query>
+            SELECT cn FROM ou=groups WHERE objectClass = 'groupOfUniqueNames' and uniqueMember=$DN
+            <script connection-id="out">
+                INSERT INTO User_Roles VALUES ($uid, $cn);
+            </script>
+        </query>
+    </query>
+    <script connection-id="out">
+        <!-- Just to shutdown HSQL correctly -->
+        COMMIT;
+        SHUTDOWN;
+    </script>
+</scripts>
