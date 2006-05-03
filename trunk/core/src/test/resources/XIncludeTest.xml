@@ -1,6 +1,6 @@
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
-    <connection driver="" url="" user="" password=""/>
+    <connection driver="---" url="---" user="" password=""/>
     <script>
         <include href="XIncludeTest.sql"/>
     </script>
