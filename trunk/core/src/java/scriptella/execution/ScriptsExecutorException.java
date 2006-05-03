@@ -67,7 +67,9 @@ public class ScriptsExecutorException extends Exception {
 
         final StringWriter out = new StringWriter();
         PrintWriter pw = new PrintWriter(out); //Use print writer to handle line separators
-
+        if (cause != null && cause.getMessage() != null) {
+            pw.println(cause.getMessage());
+        }
         if (lastElementLocation != null) {
             pw.print("Location: ");
             pw.println(lastElementLocation);
@@ -98,7 +100,6 @@ public class ScriptsExecutorException extends Exception {
             pw.print(lastExpression.getMessage());
             pw.println();
         }
-
         this.message = out.toString();
     }
 
@@ -110,4 +111,5 @@ public class ScriptsExecutorException extends Exception {
         return cause instanceof Expression.ParseException ||
                 cause instanceof Expression.EvaluationException;
     }
+
 }
