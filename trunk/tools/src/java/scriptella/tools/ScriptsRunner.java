@@ -23,6 +23,7 @@ import scriptella.execution.ScriptsExecutorException;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.sql.SQLEngine;
+import scriptella.util.BugReport;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -75,7 +76,7 @@ public class ScriptsRunner {
             factory.setResourceURL(file.toURL());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Wrong file path " +
-                    file.getPath(),e);
+                    file.getPath(), e);
         }
 
         final ConfigurationEl c = factory.createConfiguration();
@@ -88,19 +89,19 @@ public class ScriptsRunner {
         boolean failed = false;
         List<File> files = new ArrayList<File>();
         ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Scripts execution");
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("-h")) {
+        for (String arg : args) {
+            if (arg.startsWith("-h")) {
                 printUsage();
                 return;
             }
-            files.add(new File(args[i]));
+            files.add(new File(arg));
         }
         if (files.isEmpty()) { //adding default name if no files specified
             files.add(new File("script.xml"));
         }
         ScriptsRunner runner = new ScriptsRunner();
 
-        if (indicator!=null) {
+        if (indicator != null) {
             runner.setProgressIndicator(indicator);
         }
 
@@ -114,6 +115,9 @@ public class ScriptsRunner {
                 failed = true;
                 LOG.log(Level.SEVERE,
                         "Script " + file + " execution failed.", e);
+                if (BugReport.isPossibleBug(e)) {
+                    LOG.log(Level.SEVERE, new BugReport(e).toString());
+                }
             }
         }
 
