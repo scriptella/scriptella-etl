@@ -16,9 +16,9 @@
 <project name="Music Store" default="main">
     <!-- Registers scriptella ant tasks.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../../lib/scriptella.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
         <!--Executes script.xml with hsqldb on classpath-->
-        <execute fork="true" classpath="../../lib/hsqldb.jar"/>
+        <execute fork="true" classpath="../lib/hsqldb.jar"/>
     </target>
 </project>
