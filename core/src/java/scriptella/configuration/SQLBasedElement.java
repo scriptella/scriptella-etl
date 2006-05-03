@@ -51,10 +51,10 @@ public abstract class SQLBasedElement extends XMLConfigurableBase {
      * @return content for specified dialect id or null - if script doesn't support this dialect.
      */
     public ContentEl getContent(final DialectIdentifier id) {
-        ContentEl result=null;
+        ContentEl result = null;
         for (Dialect d : dialects) {
             if (d.matches(id)) {
-                if (result==null) {
+                if (result == null) {
                     result = new ContentEl();
                 }
                 result.merge(d.getContentEl());
@@ -152,8 +152,9 @@ public abstract class SQLBasedElement extends XMLConfigurableBase {
         }
 
         boolean matches(final DialectIdentifier id) {
-            if (id == null) {
-                return true;
+            if (id == null) { //if db has no dialect identifier
+                //return true only if we have no specified restrictions
+                return database == null && version == null;
             }
 
             if ((database != null) &&
@@ -161,12 +162,9 @@ public abstract class SQLBasedElement extends XMLConfigurableBase {
                 return false;
             }
 
-            if ((version != null) &&
-                    !version.matcher(id.getVersion()).matches()) {
-                return false;
-            }
+            return !((version != null) &&
+                    !version.matcher(id.getVersion()).matches());
 
-            return true;
         }
 
         public String toString() {

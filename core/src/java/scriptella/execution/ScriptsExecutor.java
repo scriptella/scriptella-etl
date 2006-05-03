@@ -70,7 +70,6 @@ public class ScriptsExecutor {
             if (ctx != null) {
                 rollbackAll(ctx);
             }
-
             throw new ScriptsExecutorException(e);
         } finally {
             if (ctx != null) {

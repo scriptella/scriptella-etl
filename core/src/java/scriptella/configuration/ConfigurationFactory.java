@@ -23,6 +23,7 @@ import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -110,8 +111,10 @@ public class ConfigurationFactory {
 
             return new ConfigurationEl(new XMLElement(
                     document.getDocumentElement(), resourceURL));
+        } catch (IOException e) {
+            throw new ConfigurationException("Unable to load document: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ConfigurationException("Unable to parse document", e);
+            throw new ConfigurationException("Unable to parse document: " + e.getMessage(), e);
         }
     }
 }

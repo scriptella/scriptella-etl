@@ -92,8 +92,8 @@ public class ConnectionEl extends XMLConfigurableBase {
 
     public void configure(final XMLElement element) {
         setProperty(element, "id");
-        setProperty(element, "url");
-        setProperty(element, "driver");
+        setRequiredProperty(element, "url");
+        setRequiredProperty(element, "driver");
         setProperty(element, "user");
         setProperty(element, "password");
         setProperty(element, "catalog");
