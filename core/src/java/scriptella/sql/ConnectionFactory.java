@@ -18,8 +18,16 @@ package scriptella.sql;
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +54,7 @@ public class ConnectionFactory {
         try {
             driver = ((Class<Driver>) driverClassLoader.loadClass(connectionEl.getDriver())).newInstance();
         } catch (Exception e) {
-            throw new ConfigurationException(e);
+            throw new ConfigurationException("Unable to load driver: " + connectionEl.getDriver(), e);
         }
     }
 
@@ -81,11 +89,11 @@ public class ConnectionFactory {
             }
         } catch (SQLException e) {
             throw new JDBCException("Unable to obtain connection for " +
-                    connectionEl+": "+e.getMessage(), e);
+                    connectionEl + ": " + e.getMessage(), e);
         } catch (ClassNotFoundException e) {
-            throw new JDBCException("Driver "+connectionEl.getDriver()+" could not be found", e);
+            throw new JDBCException("Driver " + connectionEl.getDriver() + " could not be found", e);
 
-        } 
+        }
     }
 
     public Connection getConnection() {
@@ -97,12 +105,13 @@ public class ConnectionFactory {
     }
 
     public DialectIdentifier getDialectIdentifier() {
-        if (dialectIdentifier==null) {
+        if (dialectIdentifier == null) {
             try {
                 final DatabaseMetaData metaData = getConnection().getMetaData();
-
-                dialectIdentifier=new DialectIdentifier(metaData.getDatabaseProductName(),
-                        metaData.getDatabaseProductVersion());
+                if (metaData != null) { //Several drivers violate spec and return null
+                    dialectIdentifier = new DialectIdentifier(metaData.getDatabaseProductName(),
+                            metaData.getDatabaseProductVersion());
+                }
             } catch (SQLException e) {
                 throw new JDBCException(e);
             }
@@ -177,8 +186,7 @@ public class ConnectionFactory {
         }
 
         if (newConnections != null) {
-            for (int i = 0; i < newConnections.size(); i++) {
-                Connection c = newConnections.get(i);
+            for (Connection c : newConnections) {
                 JDBCUtils.closeSilent(c);
             }
         }
