@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+%
  Copyright 2006 The Scriptella Project Team.
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,15 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+%
+@title Script File DTD
 -->
+
+<!--
+The scripts is the root element of Scriptella XML file.
+-->
+<!ELEMENT scripts (description?, properties?, connection*, (script*, query*)*)>
+<!ATTLIST scripts>
 
 <!--
 Contains description of scripts file.
@@ -26,16 +35,28 @@ This element may contain plain text or includes.
 -->
 <!ELEMENT properties (#PCDATA | include)*>
 <!--
-The connection element specifies connection to a database. Attributes
- * id - connection identifier. Used in scripts and queries
- * driver - driver class
- * url - jdbc url
- * user - database login
- * password - database password
- * catalog - catalog
- * schema - schema
- -->
-<!ELEMENT connection EMPTY>
+The connection element specifies connection to a database or other jdbc component.
+This element may contain properties as plain text with includes.
+Example:
+%
+<connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
+            url="jdbc:ldap://localhost:389/dc=scriptella"
+            user="cn=root,dc=scriptella" password="secret">
+    SEARCH_SCOPE=subTreeScope
+    ignore_transactions=true
+</connection>
+%
+-->
+<!ELEMENT connection (#PCDATA | include)*>
+<!--
+ @attr id connection identifier. Used in scripts and queries
+ @attr driver driver class
+ @attr url jdbc url
+ @attr user database login
+ @attr password database password
+ @attr catalog catalog
+ @attr schema - schema
+-->
 <!ATTLIST connection
 id ID #IMPLIED
 driver CDATA #REQUIRED
@@ -48,40 +69,49 @@ schema CDATA #IMPLIED
 <!--
 The fallback element contains alternate content to be used if the requested resource cannot be found.
 This element may contain plain text or includes.
+Example:
+%
+<include href="http://no-such-url/file.txt">
+    <fallback>Failed to retrieve full text</fallback>
+</include>
+%
 -->
 <!ELEMENT fallback (#PCDATA | include)*>
 <!ATTLIST fallback>
 
 <!--
-The include element specifies content to include. Concept similar to XInclude. Attributes:
- * href - contains a URL pointing to the file to include
-This element may contain plain text, includes or fallbacks. 
+The include element specifies content to include. Concept similar to XInclude.
+This element may contain plain text, includes or fallbacks.
 -->
 <!ELEMENT include (fallback?)>
+<!--
+@attr href contains an URL pointing to the file to include
+-->
 <!ATTLIST include
 href CDATA #REQUIRED
-fallback CDATA #IMPLIED
 >
 <!--
 The dialect element defines a database specific SQL. SQL elements may contain any number of nested dialects.
-Attributes:
- * database - case insensitive regular expression to match database vendor name, e.g. .*oracle.*
- * version - case insensitive regular expression to match database version, e.g. 1\.0
 This element may contain plain text or includes.
 -->
 <!ELEMENT dialect (#PCDATA | include)*>
+<!--
+ @attr database - case insensitive regular expression to match database vendor name, e.g. .*oracle.*
+ @attr version - case insensitive regular expression to match database version, e.g. 1\.0
+-->
 <!ATTLIST dialect
 database CDATA #IMPLIED
 version CDATA #IMPLIED
 >
 <!--
 The query element is used to specify a query producing a result set.
-Attributes:
- * connection-id - references connection by identifier. The value of this attribute is inherited for nested elements.
- * if - expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
 This element may contain queries, scripts, plain text, includes and dialects.
 -->
 <!ELEMENT query (#PCDATA | include | dialect | query | script)*>
+<!--
+ @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+ @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+-->
 <!ATTLIST query
 connection-id IDREF #IMPLIED
 if CDATA #IMPLIED
@@ -89,21 +119,18 @@ if CDATA #IMPLIED
 
 <!--
 The script element is used to specify an SQL script.
-Attributes:
- * connection-id - references connection by identifier. The value of this attribute is inherited for nested elements.
- * new-tx - true if a new transaction(and extra JDBC connection) is required for this element.
- * if - expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
 This element may contain plain text, includes and dialects.
 -->
 
 <!ELEMENT script (#PCDATA | include | dialect)*>
+<!--
+ @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+ @attr new-tx true if a new transaction(and extra JDBC connection) is required for this element.
+ @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+
+-->
 <!ATTLIST script
 connection-id IDREF #IMPLIED
 new-tx (true | false) "false"
 if CDATA #IMPLIED
 >
-<!--
-The scripts is the root element of Scriptella XML file.
--->
-<!ELEMENT scripts (description?, properties?, connection*, (script*, query*)*)>
-<!ATTLIST scripts>
