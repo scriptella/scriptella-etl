@@ -1,0 +1,22 @@
+<project name="Scriptella Documentation Build" default="dtd">
+    <property file="custom.build.properties"/>
+    <property file="build.properties"/>
+    <property name="dtd.dest.dir" value="${basedir}/build/docs/dtd"/>
+    <target name="dtd">
+        <taskdef name="DTDDoc"
+                 classname="DTDDoc.DTDDocTask">
+            <classpath>
+                <fileset dir="${dtddoc.dir}" includes="*.jar"/>
+            </classpath>
+        </taskdef>
+        <delete dir="${dtd.dest.dir}" failonerror="no"/>
+        <mkdir dir="${dtd.dest.dir}"/>
+        <DTDDoc showHiddenTags="true"
+                showFixmeTags="false"
+                sourceDir="core/src/conf"
+                destDir="${dtd.dest.dir}"
+                docTitle="DTD Documentation">
+            <include name="**/*.dtd"/>
+        </DTDDoc>
+    </target>
+</project>
