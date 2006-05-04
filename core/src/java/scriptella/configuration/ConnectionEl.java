@@ -15,6 +15,8 @@
  */
 package scriptella.configuration;
 
+import java.util.Map;
+
 /**
  * TODO: Add documentation
  *
@@ -30,6 +32,7 @@ public class ConnectionEl extends XMLConfigurableBase {
     private String password;
     private String catalog;
     private String schema;
+    private Map<String, String> properties;
 
     public ConnectionEl() {
     }
@@ -90,6 +93,17 @@ public class ConnectionEl extends XMLConfigurableBase {
         this.schema = schema;
     }
 
+    /**
+     * @return Map of properties for this connection.
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
     public void configure(final XMLElement element) {
         setProperty(element, "id");
         setRequiredProperty(element, "url");
@@ -98,6 +112,7 @@ public class ConnectionEl extends XMLConfigurableBase {
         setProperty(element, "password");
         setProperty(element, "catalog");
         setProperty(element, "schema");
+        properties = new PropertiesEl(element);
 
         if (id == null) {
             id = DEFAULT_ID;
@@ -105,7 +120,7 @@ public class ConnectionEl extends XMLConfigurableBase {
     }
 
     public String toString() {
-        return "ConnectionEl{" + "id='" + id + "'" + ", url='" + url + "'" +
+        return "connection{" + "id='" + id + "'" + ", url='" + url + "'" +
                 ", driver='" + driver + "'" + ", user='" + user + "'" + ", password='" +
                 password + "'" + ", catalog='" + catalog + "'" + ", schema='" + schema +
                 "'" + "}";

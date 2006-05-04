@@ -17,7 +17,12 @@ package scriptella.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 
 /**
@@ -42,33 +47,35 @@ public class PropertiesEl extends XMLConfigurableBase implements Map<String, Str
         }
 
         properties = new LinkedHashMap<String, String>();
+        //optimization: if properties is empty - do not perform any additional steps
+        if (element.getElement().hasChildNodes()) {
+            Properties props = new Properties() { //Overrides Properties to preserve insertion order
 
-        Properties props = new Properties() { //Overrides Properties to preserve insertion order
+                public Object put(final Object k, final Object v) {
+                    if (properties.containsKey(k)) {
+                        properties.remove(k); //the added property becomes last in the list.
+                    }
 
-            public Object put(final Object k, final Object v) {
-                if (properties.containsKey(k)) {
-                    properties.remove(k); //the added property becomes last in the list.
+                    return properties.put((String) k, (String) v);
                 }
+            };
 
-                return properties.put((String) k, (String) v);
-            }
-        };
+            ContentEl content = new ContentEl(element);
+            InputStream is = null;
 
-        ContentEl content = new ContentEl(element);
-        InputStream is = null;
-
-        try {
-            is = new ReaderInputStream(content.open());
-            props.load(is);
-        } catch (Exception e) {
-            properties.clear(); //clear phantom properties - not to leave object in a partly constructed state
-            throw new ConfigurationException("Unable to load properties", e,
-                    element);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
+            try {
+                is = new ReaderInputStream(content.open());
+                props.load(is);
+            } catch (Exception e) {
+                properties.clear(); //clear phantom properties - not to leave object in a partly constructed state
+                throw new ConfigurationException("Unable to load properties", e,
+                        element);
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                    }
                 }
             }
         }

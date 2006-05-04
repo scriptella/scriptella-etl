@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -60,33 +61,29 @@ public class ConnectionFactory {
 
     private Connection getConnection(final ConnectionEl connectionEl) {
         try {
+            Properties info = new Properties();
+            final String u = connectionEl.getUser();
+            final String p = connectionEl.getPassword();
+            Map<String, String> props = connectionEl.getProperties();
+            if (props != null) {
+                info.putAll(props);
+            }
+            if (u != null) {
+                info.put("user", u);
+            }
+            if (p != null) {
+                info.put("password", p);
+            }
+            Connection c;
             if (driver != null) {
-                Properties info = new Properties();
-                final String u = connectionEl.getUser();
-
-                if (u != null) {
-                    info.put("user", u);
-                }
-
-                final String p = connectionEl.getPassword();
-
-                if (p != null) {
-                    info.put("password", p);
-                }
-
-                final Connection c = driver.connect(connectionEl.getUrl(), info);
-                c.setAutoCommit(false);
-
-                return c;
+                c = driver.connect(connectionEl.getUrl(), info);
             } else {
                 Class.forName(connectionEl.getDriver());
-
-                final Connection c = DriverManager.getConnection(connectionEl.getUrl(),
-                        connectionEl.getUser(), connectionEl.getPassword());
-                c.setAutoCommit(false);
-
-                return c;
+                c = DriverManager.getConnection(connectionEl.getUrl(), info);
             }
+            c.setAutoCommit(false);
+            return c;
+
         } catch (SQLException e) {
             throw new JDBCException("Unable to obtain connection for " +
                     connectionEl + ": " + e.getMessage(), e);
