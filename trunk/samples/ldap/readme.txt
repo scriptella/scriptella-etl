@@ -70,7 +70,7 @@ objectClass: groupOfUniqueNames
 cn: developer
 uniqueMember: uid=fbloggs,ou=people,dc=scriptella
 
-You may check if the required data is present in LDAP by running:
+You may check for required data presence in LDAP by running:
 ldapsearch -b "dc=scriptella" "(objectclass=*)"
 
 Execute ldap2db.xml script to migrate data from LDAP to HSQLDB database named "outdb".
