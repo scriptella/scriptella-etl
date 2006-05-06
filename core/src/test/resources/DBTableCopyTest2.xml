@@ -21,7 +21,7 @@
     <query connection-id="c1">
         select * from Test
         <script connection-id="c2">
-            insert into test2(id, value) values ($id,$value);
+            insert into test2(id, value) values (?id,?value);
         </script>
     </query>
 
