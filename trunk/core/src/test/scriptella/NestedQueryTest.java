@@ -33,7 +33,6 @@ import java.util.Set;
 public class NestedQueryTest extends DBTestCase {
     public void test() throws ScriptsExecutorException {
         final Connection con = getConnection("nestedquerytestdb2");
-        getConnection("nestedquerytestdb1"); //Just to close the db
 
         final ScriptsExecutor se = newScriptsExecutor();
         se.execute();
@@ -63,7 +62,6 @@ public class NestedQueryTest extends DBTestCase {
 
     public void test2() throws ScriptsExecutorException {
         final Connection con = getConnection("nestedquerytest2db2");
-        getConnection("nestedquerytest2db1"); //Just to close the db
 
         final ScriptsExecutor se = newScriptsExecutor("NestedQueryTest2.xml");
         se.execute();
@@ -82,4 +80,29 @@ public class NestedQueryTest extends DBTestCase {
                 });
         assertEquals(ids, expectedIds);
     }
+
+    /**
+     * Tests rownum pseudo-column.
+     */
+    public void testRownum() throws ScriptsExecutorException {
+        final Connection con = getConnection("nestedquerytestrownum");
+
+        final ScriptsExecutor se = newScriptsExecutor("NestedQueryTestRownum.xml");
+        se.execute();
+
+        Query s = new Query("select * from Result");
+        final Set<Integer> ids = new HashSet<Integer>();
+        Set<Integer> expectedIds = new HashSet<Integer>(Arrays.asList(
+                new Integer[]{1, 2, 3, 11, 12, 13}));
+
+        s.execute(con,
+                new QueryCallback() {
+                    public void processRow(final ParametersCallback evaluator) {
+                        final Integer id = (Integer) evaluator.getParameter("id");
+                        ids.add(id);
+                    }
+                });
+        assertEquals(expectedIds, ids);
+    }
+
 }
