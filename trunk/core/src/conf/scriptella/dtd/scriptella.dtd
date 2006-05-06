@@ -111,10 +111,12 @@ This element may contain queries, scripts, plain text, includes and dialects.
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+ @attr id script identifier(name).
 -->
 <!ATTLIST query
 connection-id IDREF #IMPLIED
 if CDATA #IMPLIED
+id ID #IMPLIED
 >
 
 <!--
@@ -127,10 +129,11 @@ This element may contain plain text, includes and dialects.
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
  @attr new-tx true if a new transaction(and extra JDBC connection) is required for this element.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
-
+ @attr id script identifier(name).
 -->
 <!ATTLIST script
 connection-id IDREF #IMPLIED
 new-tx (true | false) "false"
 if CDATA #IMPLIED
+id ID #IMPLIED
 >
