@@ -20,9 +20,9 @@ import scriptella.expressions.PropertiesSubstitutor;
 import scriptella.expressions.ThisParameter;
 import scriptella.interactive.ProgressCallback;
 import scriptella.sql.SQLEngine;
+import scriptella.util.PropertiesMap;
 
 import java.net.URL;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class ScriptsContext implements ParametersCallback {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = new LinkedHashMap<String, String>();
+    private Map<String, String> properties = new PropertiesMap();
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     SQLEngine sqlEngine; //SQL stuff is here
@@ -73,14 +73,7 @@ public class ScriptsContext implements ParametersCallback {
      */
     void addProperties(final Map<String, String> properties) {
         for (Map.Entry<String, String> entry : properties.entrySet()) {
-            final String key = entry.getKey();
-
-            if (this.properties.containsKey(key)) { //if property exists
-                this.properties.remove(key); //the overriden property becomes last in the list.
-            }
-
-            String newValue = substituteProperties(entry.getValue());
-            this.properties.put(entry.getKey(), newValue);
+            this.properties.put(entry.getKey(), substituteProperties(entry.getValue()));
         }
     }
 
