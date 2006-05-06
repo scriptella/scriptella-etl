@@ -46,7 +46,7 @@ public class JDBCException extends SystemException {
      */
     public JDBCException(String message, Throwable cause, String sql,
                          List params) {
-        super(message + ". Statement: " + sql + ". Parameters: " + params, cause);
+        super(message, cause);
         this.sql = sql;
         this.parameters = new ArrayList<Object>(params);
     }

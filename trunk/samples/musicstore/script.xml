@@ -27,18 +27,18 @@
     <script>
         DROP TABLE Track IF EXISTS;
         CREATE TABLE Track (
-          ID INT,
-          ALBUM_ID INT,
-          NAME VARCHAR(100),
-          DATA LONGVARBINARY
+        ID INT,
+        ALBUM_ID INT,
+        NAME VARCHAR(100),
+        DATA LONGVARBINARY
         );
         <!-- Inserts file with path relative to executed script location -->
         INSERT INTO Track(id, album_id, name, data) VALUES
-               (1, 1, 'Song1.mp3', ${this.file(file1)});
+        (1, 1, 'Song1.mp3', ?{this.file(file1)});
         <!-- Inserts file from URL, 
              other protocols like ftp, http or https are supported too -->
         INSERT INTO Track(id, album_id, name, data) VALUES
-               (2, 2, 'Song2.mp3', ${this.file(file2)});
+        (2, 2, 'Song2.mp3', ?{this.file(file2)});
     </script>
     <script><!-- Correctly shutdown the DB -->
         <dialect database=".*hsql.*">

@@ -6,8 +6,8 @@
         id int,
         c binary
         );
-        insert into t(id, c) values(1,${this.file('tst://file')});
-        insert into t(id, c) values(2,${this.file('tst://file')});
-        insert into t(id, c) values(3,${this.file('tst://file')})
+        insert into t(id, c) values(1,?{this.file('tst://file')});
+        insert into t(id, c) values(2,?{this.file('tst://file')});
+        insert into t(id, c) values(3,?{this.file('tst://file')})
     </script>
 </scripts>

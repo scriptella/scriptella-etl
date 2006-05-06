@@ -19,13 +19,13 @@
             <dialect database="FOO"><!--Skipped-->
                 insert into test2 values (3);
             </dialect>
-            insert into test2 values (${ID});
+            insert into test2 values (?{ID});
         </script>
     </query>
 
     <query>
         <script>
-            insert into test2 values (${ID});
+            insert into test2 values (?{ID});
         </script>
         <dialect database="HSQL.*"><!--executes-->
             select * from test where id=2;

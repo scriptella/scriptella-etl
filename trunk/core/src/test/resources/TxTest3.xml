@@ -17,7 +17,7 @@
     <query>
         select * from Test
         <script new-tx="true"><!--Should fail after 1st iteration-->
-            insert into Test2(id, value) values (1,$VALUE);
+            insert into Test2(id, value) values (1,?VALUE);
         </script>
     </query>
 

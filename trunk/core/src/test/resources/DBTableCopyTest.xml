@@ -20,7 +20,7 @@
     <query>
         select * from Test
         <script>
-            insert into test2(id, value, value2) values (${id},${value}, ${value2});
+            insert into test2(id, value, value2) values (?{id},?{value}, ?{value2});
         </script>
     </query>
 

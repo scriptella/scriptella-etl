@@ -30,7 +30,7 @@ import java.net.URL;
  * @version 1.0
  */
 public class SQLSupportPerformanceTest extends DBTestCase {
-    private static final byte SQL[] = "update test set id=${property};rollback;".getBytes();
+    private static final byte SQL[] = "update ${'test'} set id=?{property};rollback;".getBytes();
 
     public void test() throws ScriptsExecutorException {
         AbstractTestCase.testURLHandler = new TestURLHandler() {

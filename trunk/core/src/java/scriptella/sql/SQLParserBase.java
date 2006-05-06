@@ -30,13 +30,23 @@ import java.util.regex.Pattern;
 /**
  * Customizable SQL parser.
  * <p><u>Supported extensions</u>
- * The parser supports extensions described in {@link PropertiesSubstitutor}.
+ * The parser supports extensions described in {@link PropertiesSubstitutor}.<br/>
+ * Additionally <b>?</b> prefix is used for expressions which should be injected as prepared statement parameters.
+ * Example:
+ * <pre><code>
+ * var=_name
+ * id=11
+ * --------------------------------------
+ * select * FROM table${var} where id=?id
+ *      --- is transformed to ---
+ * select * FROM table_name where id=?  where statement parameter has value of 11
+ * </code></pre>
  * <i>Notes:</i><br>
- * SQL quoted expressions are not substituted. Example:
+ * SQL quoted expressions and comments are not substituted. Example:
  * <pre><code>
  * SELECT * FROM "Table" WHERE NAME="John${prop}" and SURNAME=?surname; --only SURNAME is handled
  * </code></pre>
- * These extensions are handled by subclasses in {@link #handleParameter(String, boolean)} method.
+ * These extensions are handled by subclasses in {@link #handleParameter(String, boolean, boolean)} method.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -71,6 +81,7 @@ public class SQLParserBase {
         st.commentChar('-');
         st.ordinaryChar(';');
         st.ordinaryChar('$');
+        st.ordinaryChar('?');
         st.quoteChar('"');
         st.quoteChar('\'');
 
@@ -120,13 +131,14 @@ public class SQLParserBase {
                         case ';':
                             handleStatement(b, injections);
                             b.setLength(0);
-                            if (injections!=null) {
+                            if (injections != null) {
                                 injections.clear();
                             }
                             break;
                         case '$':
-                            if (injections==null) {
-                                injections=new ArrayList<Integer>();
+                        case '?':
+                            if (injections == null) {
+                                injections = new ArrayList<Integer>();
                             }
                             injections.add(b.length());
                             b.append(ch);
@@ -143,13 +155,14 @@ public class SQLParserBase {
     private final Matcher emptyMatcher = EMPTY_PTR.matcher("");
     private final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher("");
     private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
+
     private void handleStatement(final StringBuilder sql,
                                  final List<Integer> injections) {
         if (emptyMatcher.reset(sql).matches()) {
             return;
         }
 
-        if (injections!=null && !injections.isEmpty()) {
+        if (injections != null && !injections.isEmpty()) {
             m.reset(sql);
             extM.reset(sql);
 
@@ -157,16 +170,25 @@ public class SQLParserBase {
             int lastPos = 0;
 
             for (Integer index : injections) {
-                int ind = index+1;
+                int ind = index + 1;
+                Matcher found = null;
+                boolean expr = false;
                 if (m.find(ind) && (m.start() == ind)) { //property reference
-                    res.append(sql.substring(lastPos, m.start()-1));
-                    lastPos = m.end();
-                    res.append(handleParameter(m.group(1), false));
+                    found = m;
+
                 } else if (extM.find(ind) && (extM.start() == ind)) { //expression
-                    res.append(sql.substring(lastPos, extM.start()-1));
-                    lastPos = extM.end();
-                    res.append(handleParameter(extM.group(1), true));
+                    found = extM;
+                    expr = true;
                 }
+                if (found != null) {
+                    int exprStart = ind - 1;
+                    //? - jdbcParam, $ - insert value as text
+                    boolean jdbcParam = sql.charAt(exprStart) == '?';
+                    res.append(sql.substring(lastPos, exprStart));
+                    lastPos = found.end();
+                    res.append(handleParameter(found.group(1), expr, jdbcParam));
+                }
+
             }
 
             if (lastPos < sql.length()) { //Add right side
@@ -185,10 +207,12 @@ public class SQLParserBase {
      *
      * @param name       parameter name or expression
      * @param expression true if specified name is an expression, not a simple property reference
+     * @param jdbcParam  true if parameter value should be passed as prepared statement parameter. Othewise it's value should be inserted
+     *                   into statement text.
      * @return substituion string.
      */
-    protected String handleParameter(final String name, final boolean expression) {
-        return expression ? ("${" + name + '}') : ("$" + name);
+    protected String handleParameter(final String name, final boolean expression, final boolean jdbcParam) {
+        return expression ? ((jdbcParam ? "?{" : "${") + name + '}') : ((jdbcParam ? "?{" : "$") + name);
     }
 
     /**

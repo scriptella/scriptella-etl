@@ -1,7 +1,7 @@
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
     <description>
-        Copies CSV data from in.csv to out.csv. New IDs are 10 times bigger.
+        Copies CSV data from in.csv to out.csv. New IDs are multiplied by 10.
     </description>
     <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:indb" user="sa" password=""/>
     <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
@@ -17,7 +17,7 @@
     <query connection-id="in">
         select * from test
         <script connection-id="out">
-            insert into Test(id, text) values ($id*10, $text);
+            insert into Test(id, text) values (?id*10, ?text);
         </script>
     </query>
     <!-- Just for HSQLDB graceful shutdown -->
