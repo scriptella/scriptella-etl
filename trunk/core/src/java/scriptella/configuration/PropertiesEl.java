@@ -15,14 +15,12 @@
  */
 package scriptella.configuration;
 
+import scriptella.util.PropertiesMap;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 
 /**
@@ -31,8 +29,8 @@ import java.util.Set;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class PropertiesEl extends XMLConfigurableBase implements Map<String, String> {
-    Map<String, String> properties = Collections.emptyMap();
+public class PropertiesEl extends XMLConfigurableBase {
+    Map<String, String> map = Collections.emptyMap();
 
     public PropertiesEl() {
     }
@@ -45,29 +43,17 @@ public class PropertiesEl extends XMLConfigurableBase implements Map<String, Str
         if (element == null) {
             return; //Properties is not a mandatory element
         }
-
-        properties = new LinkedHashMap<String, String>();
         //optimization: if properties is empty - do not perform any additional steps
         if (element.getElement().hasChildNodes()) {
-            Properties props = new Properties() { //Overrides Properties to preserve insertion order
-
-                public Object put(final Object k, final Object v) {
-                    if (properties.containsKey(k)) {
-                        properties.remove(k); //the added property becomes last in the list.
-                    }
-
-                    return properties.put((String) k, (String) v);
-                }
-            };
-
+            PropertiesMap p = new PropertiesMap();
             ContentEl content = new ContentEl(element);
             InputStream is = null;
 
             try {
                 is = new ReaderInputStream(content.open());
-                props.load(is);
+                p.load(is);
+                map = p;
             } catch (Exception e) {
-                properties.clear(); //clear phantom properties - not to leave object in a partly constructed state
                 throw new ConfigurationException("Unable to load properties", e,
                         element);
             } finally {
@@ -81,59 +67,11 @@ public class PropertiesEl extends XMLConfigurableBase implements Map<String, Str
         }
     }
 
-    public int size() {
-        return properties.size();
+    public Map<String, String> getMap() {
+        return map;
     }
 
-    public boolean isEmpty() {
-        return properties.isEmpty();
-    }
-
-    public boolean containsKey(final Object key) {
-        return properties.containsKey(key);
-    }
-
-    public boolean containsValue(final Object value) {
-        return properties.containsValue(value);
-    }
-
-    public String get(final Object key) {
-        return properties.get(key);
-    }
-
-    public String put(final String key, final String value) {
-        return properties.put(key, value);
-    }
-
-    public String remove(final Object key) {
-        return properties.remove(key);
-    }
-
-    public void putAll(final Map<?extends String, ?extends String> t) {
-        properties.putAll(t);
-    }
-
-    public void clear() {
-        properties.clear();
-    }
-
-    public Set<String> keySet() {
-        return properties.keySet();
-    }
-
-    public Collection<String> values() {
-        return properties.values();
-    }
-
-    public Set<Entry<String, String>> entrySet() {
-        return properties.entrySet();
-    }
-
-    public boolean equals(final Object o) {
-        return properties.equals(o);
-    }
-
-    public int hashCode() {
-        return properties.hashCode();
+    public void setMap(Map<String, String> map) {
+        this.map = new PropertiesMap(map);
     }
 }

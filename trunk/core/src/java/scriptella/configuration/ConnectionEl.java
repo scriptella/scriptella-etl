@@ -32,7 +32,7 @@ public class ConnectionEl extends XMLConfigurableBase {
     private String password;
     private String catalog;
     private String schema;
-    private Map<String, String> properties;
+    private PropertiesEl properties;
 
     public ConnectionEl() {
     }
@@ -97,12 +97,9 @@ public class ConnectionEl extends XMLConfigurableBase {
      * @return Map of properties for this connection.
      */
     public Map<String, String> getProperties() {
-        return properties;
+        return properties.getMap();
     }
 
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
-    }
 
     public void configure(final XMLElement element) {
         setProperty(element, "id");

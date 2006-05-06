@@ -16,7 +16,6 @@
 package scriptella.configuration;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,12 +52,8 @@ public class ConfigurationEl extends XMLConfigurableBase {
         this.sqlElements = sqlElements;
     }
 
-    public PropertiesEl getProperties() {
-        return properties;
-    }
-
-    public void setProperties(final PropertiesEl properties) {
-        this.properties = properties;
+    public Map<String, String> getProperties() {
+        return properties.getMap();
     }
 
     public URL getDocumentUrl() {
@@ -72,8 +67,6 @@ public class ConfigurationEl extends XMLConfigurableBase {
     public void configure(final XMLElement element) {
         documentUrl = element.getDocumentURL();
         properties = new PropertiesEl(element.getChild("properties"));
-
-        Map<String, String> allProps = new HashMap<String, String>();
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
