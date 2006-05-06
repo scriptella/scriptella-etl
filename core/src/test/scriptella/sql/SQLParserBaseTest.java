@@ -33,23 +33,23 @@ public class SQLParserBaseTest extends AbstractTestCase {
                 "     \n" +
                 "     CREATE TABLE Test (\n" +
                 "            ID INT,\n" +
-                "            VALUE VARCHAR(255)\n" +
+                "            $VALUE VARCHAR(255)\n" +
                 "        );\n" +
                 " ${extra}\n" +
-                "        insert into test(id, value) values ($1,  '$justatext');\n" +
-                "        insert into test(id, value) values ($value,'A test${justatext}');\n" +
-                "        insert into test(id, value) values (3,$text);\n" +
-                " --comment$justatext ${justatext}" + "";
+                "        insert into test(id, value) values (?1,  '$justatext');\n" +
+                "        insert into test(id, value) values (?value,'A test${justatext}');\n" +
+                "        insert into test(id, value) values (3,?text);\n" +
+                " --comment$justatext ?{justatext} ?justatext";
         //comments are ignored and quoted values are not parsed
         final String[] expected = {
                 "CREATE TABLE Test (\n" +
                         "            ID INT,\n" +
-                        "            VALUE VARCHAR(255)\n" +
+                        "            $/VALUE/ VARCHAR(255)\n" +
                         "        )",
-                " !/extra/" +
-                        "        insert into test(id, value) values (!/1/,  '$justatext')",
-                "        insert into test(id, value) values (!/value/,'A test${justatext}')",
-                "        insert into test(id, value) values (3,!/text/)"};
+                " $/extra/" +
+                        "        insert into test(id, value) values (?/1/,  '$justatext')",
+                "        insert into test(id, value) values (?/value/,'A test${justatext}')",
+                "        insert into test(id, value) values (3,?/text/)"};
 
 
         final Set<String> exprSet = new TreeSet<String>();
@@ -57,18 +57,20 @@ public class SQLParserBaseTest extends AbstractTestCase {
         final Set<String> propSet = new TreeSet<String>();
         propSet.add("1");
         propSet.add("value");
+        propSet.add("VALUE");
         propSet.add("text");
 
         SQLParserBase p = new SQLParserBase() {
             int stInd;
 
-            protected String handleParameter(final String name, final boolean expression) {
+            @Override
+            protected String handleParameter(final String name, final boolean expression, boolean jdbcParam) {
                 if (expression) {
                     assertTrue(exprSet.contains(name));
                 } else {
                     assertTrue(propSet.contains(name));
                 }
-                return "!/" + name + '/';
+                return (jdbcParam ? "?/" : "$/") + name + '/';
             }
 
             protected void statementParsed(final String sql) {

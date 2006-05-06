@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +92,7 @@ public class SQLSupport {
 
         @Override
         protected String handleParameter(final String name,
-                                         final boolean expression) {
+                                         final boolean expression, boolean jdbcParam) {
             Object p;
 
             if (expression) {
@@ -102,9 +101,13 @@ public class SQLSupport {
                 p = paramsCallback.getParameter(name);
             }
 
-            params.add(p);
-
-            return "?";
+            if (jdbcParam) { //if insert as prepared stmt parameter
+                params.add(p);
+                return "?";
+            } else { //otherwise return string representation.
+                //todo we need to defines rules for toString transformations
+                return p == null ? "" : p.toString();
+            }
         }
 
         @Override
@@ -126,26 +129,25 @@ public class SQLSupport {
                     Object o = params.get(i);
                     setObject(o, ps, i + 1);
                 }
-                int updateCount=-1;
+                int updateCount = -1;
                 if (ps.execute()) {
                     if (callback == null) {
                         LOG.warning("Missing callback for query with resultset");
                     } else {
-                        final ResultSet rs = ps.getResultSet();
-
+                        ResultSetAdapter r = null;
                         try {
-                            final ResultSetAdapter r = new ResultSetAdapter(rs,
-                                    paramsCallback);
-
-                            while (rs.next()) {
+                            r = new ResultSetAdapter(ps.getResultSet(), paramsCallback);
+                            while (r.next()) {
                                 callback.processRow(r);
                             }
                         } finally {
-                            JDBCUtils.closeSilent(rs);
+                            if (r != null) {
+                                r.close();
+                            }
                         }
                     }
                 } else {
-                    updateCount=ps.getUpdateCount();
+                    updateCount = ps.getUpdateCount();
                 }
                 executedCount++;
                 return updateCount;

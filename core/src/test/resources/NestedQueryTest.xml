@@ -30,9 +30,9 @@
 
     <query connection-id="c1">
         <query connection-id="c2">
-            select * from test where id=${id}
+            select * from test where id=?{id}
             <script connection-id="c2">
-                insert into result(id, text, text2) values ($id,$text,$property+'tst');
+                insert into result(id, text, text2) values (?id,?text,?property+'tst');
             </script>
         </query>
         select * from test

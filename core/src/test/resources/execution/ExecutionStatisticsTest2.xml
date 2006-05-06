@@ -17,7 +17,7 @@
             insert into t3 values(1111)<!--Won't execute-->
         </script>
         <script>
-            insert into t2 values(${id})
+            insert into t2 values(?{id})
         </script>
     </query>
     <script>

@@ -14,9 +14,9 @@
     <query>
         select * from t1
         <query>
-            select * from t1 where id=$id
+            select * from t1 where id=?id
             <script>
-                insert into t2 values($id)
+                insert into t2 values(?id)
             </script>
         </query>
 
