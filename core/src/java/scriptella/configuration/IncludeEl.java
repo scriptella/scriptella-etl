@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
+public class IncludeEl extends XMLConfigurableBase implements Resource {
     private URL url;
     private String href;
     private Charset charset;
@@ -83,8 +83,8 @@ public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
             charset = Charset.forName(enc);
         }
         final XMLElement fallbackElement = element.getChild("fallback");
-        if (fallbackElement!=null) {
-            fallbackEl=new FallbackEl(fallbackElement);
+        if (fallbackElement != null) {
+            fallbackEl = new FallbackEl(fallbackElement);
         }
     }
 
@@ -95,7 +95,7 @@ public class IncludeEl extends XMLConfigurableBase implements ExternalResource {
         } catch (MalformedURLException e) {
             throw (IOException) new IOException("Malformed include url: " + href).initCause(e);
         } catch (IOException e) {
-            if (fallbackEl!=null) {
+            if (fallbackEl != null) {
                 LOG.log(Level.FINE, e.getMessage());
                 return fallbackEl.open();
             } else {

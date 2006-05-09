@@ -22,7 +22,7 @@ import org.apache.tools.ant.types.Reference;
 
 
 /**
- * TODO: Add documentation
+ * Not in use now
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -79,4 +79,5 @@ public abstract class ClasspathSupportTask extends Task {
     public Path getClasspath() {
         return classpath;
     }
+
 }

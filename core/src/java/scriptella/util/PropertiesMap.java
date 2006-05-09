@@ -130,7 +130,7 @@ public class PropertiesMap implements Map<String, String> {
         Properties tmp = new Properties() { //Overrides Properties to preserve insertion order
 
             public Object put(final Object k, final Object v) {
-                return props.put((String) k, (String) v);
+                return PropertiesMap.this.put((String) k, (String) v);
             }
         };
         tmp.load(is);

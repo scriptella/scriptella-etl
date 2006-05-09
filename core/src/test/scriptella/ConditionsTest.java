@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.sql.JDBCUtils;
+import scriptella.jdbc.JDBCUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

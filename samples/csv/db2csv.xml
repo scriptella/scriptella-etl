@@ -1,0 +1,39 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <description>
+        Export data from table to CSV file.
+    </description>
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb" user="sa" password=""/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" password=""/>
+    <script connection-id="in">
+        <!--Initialize DEMO database -->
+        CREATE TABLE Bug (
+            <include href="fields.sql"/>
+        );
+        insert into Bug values (1, 'Critical', 'NullPointerException in Main class', 'Open');
+        insert into Bug values (5, 'Low', 'Checkstyle, PMD, Findbugs issues', 'Reopened');
+        insert into Bug values (7, 'Low', 'Maven integration', 'Open');
+        insert into Bug values (10, 'High', 'SPI API', 'Closed');
+    </script>
+    <script connection-id="out">
+        <!-- Creates TEXT table to output CSV data -->
+        CREATE TEXT TABLE Bug (
+            <include href="fields.sql"/>
+        );
+        <!--Specify file to store table results -->
+        SET TABLE Bug SOURCE "bugs-out.csv";
+    </script>
+
+    <query connection-id="in">
+        <!--Selects all not closed bugs -->
+        SELECT * from Bug WHERE Status != 'Closed'
+        <script connection-id="out">
+            insert into Bug values (?ID, ?priority, ?summary, ?status);
+        </script>
+    </query>
+
+    <script connection-id="out"><!-- Correctly shutdown the DB -->
+        COMMIT;
+        SHUTDOWN;
+    </script>
+</scripts>

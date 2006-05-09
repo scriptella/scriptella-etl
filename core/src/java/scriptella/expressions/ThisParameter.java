@@ -51,13 +51,15 @@ public class ThisParameter {
     }
 
     /**
+     * Returns {@link URL} for fileUrl string parameter.
+     *
      * @param fileUrl absolute URL or relative to script base URL.
      * @return FileParameter for corresponding file url.
      * @see scriptella.execution.ScriptsContext#getBaseURL()
      */
-    public FileParameter file(final String fileUrl) {
+    public URL file(final String fileUrl) {
         try {
-            return new FileParameter(new URL(ctx.getBaseURL(), fileUrl));
+            return new URL(ctx.getBaseURL(), fileUrl);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }

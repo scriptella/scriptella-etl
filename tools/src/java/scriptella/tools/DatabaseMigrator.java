@@ -15,14 +15,21 @@
  */
 package scriptella.tools;
 
-import scriptella.configuration.ConnectionEl;
-import scriptella.sql.ConnectionFactory;
-import scriptella.sql.JDBCException;
+import scriptella.jdbc.JDBCException;
+import scriptella.jdbc.JDBCUtils;
+import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.spi.ConnectionParameters;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -33,13 +40,15 @@ import java.util.*;
  */
 public class DatabaseMigrator {
     public static void main(final String args[]) {
-        ConnectionEl c = new ConnectionEl();
-        c.setDriver("org.hsqldb.jdbcDriver");
-        c.setUrl("jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm");
-        c.setUser("sa");
+        //Currently this class is just a sample of how to create a migration script
+        //Rewite it
 
-        final ConnectionFactory con = new ConnectionFactory(c);
-        final Set<String> tables = sortTables(con);
+        ConnectionParameters params = new ConnectionParameters(null, "jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm", "sa", "", null, null);
+        ScriptellaJDBCDriver jdbcDriver = new ScriptellaJDBCDriver();
+
+
+        final Connection con = jdbcDriver.connect(params).getNativeConnection();
+        final Set<String> tables = sortTables(con, params);
         StringBuilder o = new StringBuilder();
         o.append("<sql-scripts version=\"1\">\n" +
                 "    <connection id=\"in\" driver=\"com.sybase.jdbc2.jdbc.SybDriver\" url=\"jdbc:sybase:Tds:localhost:2638\" user=\"DBA\" password=\"SQL\"/>\n" +
@@ -49,14 +58,14 @@ public class DatabaseMigrator {
             o.append("    <query id=\"").append("in.").append(t)
                     .append("\" type=\"sql\" connection-id=\"in\">\n")
                     .append("      select ");
-            appendColumnNames(con, t, o).append(" from ").append(t)
+            appendColumnNames(con, params, t, o).append(" from ").append(t)
                     .append("\n    </datasource>\n");
 
             o.append("    <script query-id=\"").append("in.").append(t)
                     .append("\" type=\"sql\" connection-id=\"out\">\n")
                     .append("      insert into ").append(t).append("(");
-            appendColumnNames(con, t, o).append(") VALUES (");
-            appendColumnNames(con, t, o, ", ", "$").append(")")
+            appendColumnNames(con, params, t, o).append(") VALUES (");
+            appendColumnNames(con, params, t, o, ", ", "$").append(")")
                     .append("\n    </script>\n");
         }
 
@@ -67,14 +76,14 @@ public class DatabaseMigrator {
     }
 
     private static StringBuilder appendColumnNames(
-            final ConnectionFactory con, final String table, final StringBuilder sql) {
-        return appendColumnNames(con, table, sql, ", ", "");
+            final Connection con, ConnectionParameters params, final String table, final StringBuilder sql) {
+        return appendColumnNames(con, params, table, sql, ", ", "");
     }
 
     private static StringBuilder appendColumnNames(
-            final ConnectionFactory con, final String table,
+            final Connection con, ConnectionParameters params, final String table,
             final StringBuilder sql, final String separator, final String prefix) {
-        final Set<String> tableColumns = con.getTableColumns(table);
+        final Set<String> tableColumns = getTableColumns(con, params, table);
 
         for (Iterator<String> it = tableColumns.iterator(); it.hasNext();) {
             String s = it.next();
@@ -89,8 +98,8 @@ public class DatabaseMigrator {
         return sql;
     }
 
-    private static Set<String> sortTables(final ConnectionFactory con) {
-        List<String> tables = con.getTables();
+    private static Set<String> sortTables(final Connection con, ConnectionParameters params) {
+        List<String> tables = getTables(con, params);
         System.out.println("Sorting " + tables);
 
         int n = tables.size();
@@ -103,12 +112,12 @@ public class DatabaseMigrator {
         String tbls[] = tables.toArray(new String[n]);
 
         try {
-            final DatabaseMetaData metaData = con.getConnection().getMetaData();
+            final DatabaseMetaData metaData = con.getMetaData();
 
             for (int i = 0; i < n; i++) {
                 String t = tbls[i];
-                final ResultSet rs = metaData.getExportedKeys(con.getCatalog(),
-                        con.getSchema(), t);
+                final ResultSet rs = metaData.getExportedKeys(params.getCatalog(),
+                        params.getSchema(), t);
 
                 while (rs.next()) {
                     //                    if (rs.getInt(11) != 2) { //Only not null FKs are taken into account
@@ -171,7 +180,7 @@ public class DatabaseMigrator {
 
             return res;
         } catch (SQLException e) {
-            throw new JDBCException(e);
+            throw new JDBCException(e.getMessage(), e);
         }
     }
 
@@ -184,4 +193,26 @@ public class DatabaseMigrator {
 
         return -1;
     }
+
+    private static List<String> getTables(Connection con, ConnectionParameters params) {
+        try {
+            return JDBCUtils.getColumn(con.getMetaData()
+                    .getTables(con.getCatalog(),
+                    params.getSchema(), null, new String[]{"TABLE"}), 3);
+        } catch (SQLException e) {
+            throw new JDBCException(e.getMessage(), e);
+        }
+    }
+
+    private static Set<String> getTableColumns(Connection con, ConnectionParameters params, final String tableName) {
+        try {
+            return new HashSet<String>(JDBCUtils.getColumn(
+                    con.getMetaData()
+                            .getColumns(params.getCatalog(), params.getSchema(), tableName, null),
+                    4));
+        } catch (SQLException e) {
+            throw new JDBCException(e.getMessage(), e);
+        }
+    }
+
 }

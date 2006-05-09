@@ -15,9 +15,9 @@
  */
 package scriptella.util;
 
+import scriptella.core.ExceptionInterceptor;
+import scriptella.core.SystemException;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.execution.SystemException;
-import scriptella.sql.ExceptionInterceptor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

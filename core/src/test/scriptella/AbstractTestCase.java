@@ -116,7 +116,7 @@ public abstract class AbstractTestCase extends TestCase {
     }
 
     protected ConfigurationEl loadConfiguration(final String path) {
-        String newPath = path;
+        String newPath;
         if (!path.startsWith("/")) {
             newPath = RESOURCES_DIR_NAME + '/' + path;
         } else {
@@ -138,6 +138,7 @@ public abstract class AbstractTestCase extends TestCase {
 
     /**
      * Removes extra whitespace characters.
+     *
      * @param s string to replace.
      * @return s with extra whitespace chars removed.
      */

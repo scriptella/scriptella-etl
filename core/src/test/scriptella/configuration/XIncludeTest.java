@@ -47,18 +47,18 @@ public class XIncludeTest extends AbstractTestCase {
         cf.setResourceURL(url);
 
         final ConfigurationEl c = cf.createConfiguration();
-        final List<SQLBasedElement> scripts = c.getSqlElements();
+        final List<ScriptingElement> scripts = c.getScriptingElements();
         assertEquals(scripts.size(), 4);
 
-        String text = asString(scripts.get(0).getContent(null));
+        String text = asString(scripts.get(0).getDialectContent(null));
         String str = "insert into test(id, value) values (2,'333');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
-        text = asString(scripts.get(1).getContent(null));
+        text = asString(scripts.get(1).getDialectContent(null));
         str = "insert into test2(id, value) values (3,'444');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
-        text = asString(scripts.get(2).getContent(null));
+        text = asString(scripts.get(2).getDialectContent(null));
         str = "insert into test(id, value) values (2,'333');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
@@ -69,7 +69,7 @@ public class XIncludeTest extends AbstractTestCase {
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         //Fallback test
-        text = asString(scripts.get(3).getContent(null));
+        text = asString(scripts.get(3).getDialectContent(null));
         str = "Fallback!";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);

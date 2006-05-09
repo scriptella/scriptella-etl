@@ -15,15 +15,18 @@
  */
 package scriptella.configuration;
 
+import java.util.List;
+
 /**
  * TODO: Add documentation
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptEl extends SQLBasedElement {
+public class ScriptEl extends ScriptingElement {
     public static final String TAG_NAME = "script";
     private boolean newTx;
+    protected List<OnErrorEl> onerrors;
 
     public ScriptEl() {
     }
@@ -40,13 +43,23 @@ public class ScriptEl extends SQLBasedElement {
         this.newTx = newTx;
     }
 
+    public List<OnErrorEl> getOnerrorElements() {
+        return onerrors;
+    }
+
+    public void setOnerrorElements(List<OnErrorEl> list) {
+        onerrors = list;
+    }
+
     public void configure(final XMLElement element) {
         super.configure(element);
         newTx = element.getBooleanProperty("new-tx", false);
-        location = new Location(element.getXPath(), "scripts");
+        setLocation(element, "scripts");
+        //The following code loads nested onerror elements
+        onerrors = load(element.getChildren("onerror"), OnErrorEl.class);
     }
 
     public String toString() {
-        return "ScriptEl{" + "dialects=" + dialects + ", newTx=" + newTx + "}";
+        return "ScriptEl{" + super.toString() + ", newTx=" + newTx + "}";
     }
 }

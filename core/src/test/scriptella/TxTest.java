@@ -17,15 +17,15 @@ package scriptella;
 
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConnectionEl;
+import scriptella.core.ConnectionManager;
+import scriptella.core.SqlTestHelper;
 import scriptella.execution.ScriptsContext;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.execution.TestableScriptsExecutor;
 import scriptella.expressions.ParametersCallback;
-import scriptella.sql.ConnectionFactory;
-import scriptella.sql.Query;
-import scriptella.sql.QueryCallback;
-import scriptella.sql.SqlTestHelper;
+import scriptella.jdbc.Query;
+import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
 import java.util.List;
@@ -61,7 +61,7 @@ public class TxTest extends DBTestCase {
     }
 
     public void test2() {
-        final Connection con = getConnection("txtest2");
+        final java.sql.Connection con = getConnection("txtest2");
         final ScriptsExecutor se = newScriptsExecutor("TxTest2.xml");
 
         try {
@@ -101,9 +101,9 @@ public class TxTest extends DBTestCase {
 
             @Override
             public void closeAll(final ScriptsContext ctx) {
-                final Map<String, ConnectionFactory> connections = SqlTestHelper.getConnections(ctx.getSqlEngine());
-                final ConnectionFactory cf = connections.get(ConnectionEl.DEFAULT_ID);
-                final List<Connection> newConnections = SqlTestHelper.getNewConnections(cf);
+                final Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());
+                final ConnectionManager cf = connections.get(ConnectionEl.DEFAULT_ID);
+                final List<scriptella.spi.Connection> newConnections = SqlTestHelper.getNewConnections(cf);
 
                 if ((newConnections == null) ||
                         (newConnections.size() != 1)) {
@@ -135,7 +135,7 @@ public class TxTest extends DBTestCase {
         s.execute(con,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback row) {
-                        fail("Table Test2 should be empty");
+                        fail("Table Test2 should have no rows");
                     }
                 });
     }

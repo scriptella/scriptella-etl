@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class ConfigurationEl extends XMLConfigurableBase {
     private List<ConnectionEl> connections;
-    private List<SQLBasedElement> sqlElements;
+    private List<ScriptingElement> scriptingElements;
     private PropertiesEl properties;
     private URL documentUrl;
 
@@ -44,12 +44,12 @@ public class ConfigurationEl extends XMLConfigurableBase {
         this.connections = connections;
     }
 
-    public List<SQLBasedElement> getSqlElements() {
-        return sqlElements;
+    public List<ScriptingElement> getScriptingElements() {
+        return scriptingElements;
     }
 
-    public void setSqlElements(final List<SQLBasedElement> sqlElements) {
-        this.sqlElements = sqlElements;
+    public void setScriptingElements(final List<ScriptingElement> scriptingElements) {
+        this.scriptingElements = scriptingElements;
     }
 
     public Map<String, String> getProperties() {
@@ -70,12 +70,12 @@ public class ConfigurationEl extends XMLConfigurableBase {
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
-        sqlElements = QueryEl.loadSqlElements(element);
+        scriptingElements = QueryEl.loadScriptingElements(element);
     }
 
     public String toString() {
         return "ConfigurationEl{" + "connections=" + connections +
-                ", sqlElements=" + sqlElements + ", properties=" + properties +
+                ", scriptingElements=" + scriptingElements + ", properties=" + properties +
                 ", documentUrl=" + documentUrl + "}";
     }
 }
