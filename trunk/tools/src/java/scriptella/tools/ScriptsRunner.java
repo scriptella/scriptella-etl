@@ -22,7 +22,6 @@ import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.ProgressIndicator;
-import scriptella.sql.SQLEngine;
 import scriptella.util.BugReport;
 
 import java.io.File;
@@ -49,17 +48,13 @@ public class ScriptsRunner {
 
     private ScriptsExecutor exec = new ScriptsExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
-    private ProgressIndicator indicator = null;
+    private ProgressIndicator indicator;
 
     private static void printUsage() {
         System.out.println("Usage java " + ScriptsRunner.class.getName() +
                 " [-options] [<file 1> ... <file N>]");
         System.out.println("where options include:");
         System.out.println("   -h displays help ");
-    }
-
-    public void setDriversClassLoader(final ClassLoader classLoader) {
-        SQLEngine.setDriversClassLoader(classLoader);
     }
 
     public void setProperties(final Map<?, ?> props) {
@@ -81,7 +76,6 @@ public class ScriptsRunner {
 
         final ConfigurationEl c = factory.createConfiguration();
         exec.setConfiguration(c);
-
         return exec.execute(indicator);
     }
 

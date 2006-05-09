@@ -16,11 +16,13 @@
 package scriptella;
 
 import scriptella.configuration.ConfigurationEl;
-import scriptella.configuration.ConnectionEl;
+import scriptella.core.ConnectionManager;
+import scriptella.core.SqlTestHelper;
 import scriptella.execution.ScriptsContext;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.interactive.ProgressIndicator;
+import scriptella.spi.ConnectionParameters;
 
 import java.util.Map;
 
@@ -33,17 +35,15 @@ import java.util.Map;
  */
 public class PropertiesTest extends AbstractTestCase {
     private ScriptsContext ctx; //execution context
+    private ConnectionParameters params;
 
     public void test() throws ScriptsExecutorException {
         final ScriptsExecutor se = newScriptsExecutor("PropertiesTest.xml");
         se.execute();
 
-        final ConfigurationEl c = se.getConfiguration();
-        final ConnectionEl con = c.getConnections().get(0);
-        assertEquals("org.hsqldb.jdbcDriver", con.getDriver());
-        assertEquals("jdbc:hsqldb:mem:propertiestest", con.getUrl());
-        assertEquals("sa", con.getUser());
-        assertEquals("", con.getPassword());
+        assertEquals("jdbc:hsqldb:mem:propertiestest", params.getUrl());
+        assertEquals("sa", params.getUser());
+        assertEquals("", params.getPassword());
 
         //check substituted properties in a context
         final Map<String, String> props = ctx.getProperties();
@@ -60,12 +60,18 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("", ctx.getParameter("password"));
     }
 
+    @Override
     protected ScriptsExecutor newScriptsExecutor(
             final ConfigurationEl configuration) {
         return new ScriptsExecutor(configuration) {
+            //overrides prepare method to get ctx and params for connection
             protected ScriptsContext prepare(
                     final ProgressIndicator indicator) {
-                return ctx = super.prepare(indicator); //store ctx for assertions
+                ctx = super.prepare(indicator); //store ctx for assertions
+                Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());
+                ConnectionManager con = connections.entrySet().iterator().next().getValue();
+                params = SqlTestHelper.getConnectionParameters(con);
+                return ctx;
             }
         };
     }

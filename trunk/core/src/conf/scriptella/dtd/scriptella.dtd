@@ -35,7 +35,7 @@ This element may contain plain text or includes.
 -->
 <!ELEMENT properties (#PCDATA | include)*>
 <!--
-The connection element specifies connection to a database or other jdbc component.
+The connection element specifies connection to a database or other system.
 This element may contain properties as plain text with includes.
 Example:
 %
@@ -60,9 +60,9 @@ Example:
 <!ATTLIST connection
 id ID #IMPLIED
 driver CDATA #REQUIRED
-url CDATA #REQUIRED
-user CDATA #REQUIRED
-password CDATA #REQUIRED
+url CDATA #IMPLIED
+user CDATA #IMPLIED
+password CDATA #IMPLIED
 catalog CDATA #IMPLIED
 schema CDATA #IMPLIED
 >
@@ -91,18 +91,43 @@ This element may contain plain text, includes or fallbacks.
 href CDATA #REQUIRED
 >
 <!--
-The dialect element defines a database specific SQL. SQL elements may contain any number of nested dialects.
+The dialect element defines a vendor specific script. Scripting elements may contain any number of nested dialects.
 This element may contain plain text or includes.
 -->
 <!ELEMENT dialect (#PCDATA | include)*>
 <!--
- @attr database - case insensitive regular expression to match database vendor name, e.g. .*oracle.*
- @attr version - case insensitive regular expression to match database version, e.g. 1\.0
+ @attr database case insensitive regular expression to match database vendor name, e.g. .*oracle.*
+ @attr version case insensitive regular expression to match database version, e.g. 1\.0
 -->
 <!ATTLIST dialect
 database CDATA #IMPLIED
 version CDATA #IMPLIED
 >
+
+<!--
+The onerror element defines fallback script to execute if error occurs.
+This element may contain plain text or includes.
+Example:
+%
+<onerror type=".*SQLException">
+DROP TABLE MYTABLE
+</onerror>
+%
+-->
+<!ELEMENT onerror (#PCDATA | include | dialect)*>
+<!--
+ @attr type Regular expression pattern to match exception type
+ @attr codes Comma-separated list of vendor codes/sql states
+ @attr message Regular expression pattern to match exception message
+ @attr retry true if statement which caused a problem should be retried after this handler completes.
+-->
+<!ATTLIST onerror
+type CDATA #IMPLIED
+codes CDATA #IMPLIED
+message CDATA #IMPLIED
+retry (true | false) "false"
+>
+
 <!--
 The query element is used to specify a query producing a result set.
 This element may contain queries, scripts, plain text, includes and dialects.
@@ -120,14 +145,14 @@ id ID #IMPLIED
 >
 
 <!--
-The script element is used to specify an SQL script.
-This element may contain plain text, includes and dialects.
+The script element is used to specify a script.
+This element may contain plain text,onerror handlers, includes and dialects.
 -->
 
-<!ELEMENT script (#PCDATA | include | dialect)*>
+<!ELEMENT script (#PCDATA | include | dialect | onerror)*>
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
- @attr new-tx true if a new transaction(and extra JDBC connection) is required for this element.
+ @attr new-tx true if a new transaction(and extra connection) is required for this element.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
  @attr id script identifier(name).
 -->

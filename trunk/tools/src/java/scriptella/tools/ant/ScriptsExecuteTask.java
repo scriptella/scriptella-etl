@@ -18,6 +18,7 @@ package scriptella.tools.ant;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
 import scriptella.interactive.ConsoleProgressIndicator;
@@ -34,7 +35,7 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecuteTask extends ClasspathSupportTask {
+public class ScriptsExecuteTask extends Task {
     private List<FileSet> filesets = new ArrayList<FileSet>();
     private String maxmemory;
     private boolean fork;
@@ -82,7 +83,6 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
     }
 
     /**
-     *
      * @param progress true if execution progress is shown. Default is false
      */
     public void setProgress(boolean progress) {
@@ -126,9 +126,7 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
     }
 
     private void execute(final List<File> files) {
-        ScriptsRunner runner = null;
-        runner = new ScriptsRunner();
-        runner.setDriversClassLoader(getClassLoader());
+        ScriptsRunner runner = new ScriptsRunner();
         if (progress) {
             runner.setProgressIndicator(new ConsoleProgressIndicator() {
                 protected void println(final Object o) {
@@ -142,6 +140,7 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             runner.setProperties(getProject().getProperties());
         }
+
 
         for (File file : files) {
             try {
@@ -163,7 +162,7 @@ public class ScriptsExecuteTask extends ClasspathSupportTask {
         Java j = new Java();
         j.setFork(true);
         j.setProject(getProject());
-        j.setClasspath(getClasspath());
+//        j.setClasspath(getClasspath());
 
         j.setClassname(ScriptsRunner.class.getName());
 

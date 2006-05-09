@@ -15,11 +15,11 @@
  */
 package scriptella.execution;
 
+import scriptella.core.Session;
 import scriptella.expressions.ParametersCallback;
 import scriptella.expressions.PropertiesSubstitutor;
 import scriptella.expressions.ThisParameter;
 import scriptella.interactive.ProgressCallback;
-import scriptella.sql.SQLEngine;
 import scriptella.util.PropertiesMap;
 
 import java.net.URL;
@@ -31,7 +31,7 @@ import java.util.Map;
  * <p/>
  * This class contains global data for executed elements.
  * <br><b>Note:</b> Execution context is not intended to change its state during sql elements
- * execution as opposed to {@link scriptella.sql.SQLContext}.
+ * execution as opposed to {@link scriptella.core.DynamicContext}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -41,7 +41,7 @@ public class ScriptsContext implements ParametersCallback {
     private Map<String, String> properties = new PropertiesMap();
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
-    SQLEngine sqlEngine; //SQL stuff is here
+    Session session; //Connections related stuff is here
     private final PropertiesSubstitutor propertiesSubstitutor = new PropertiesSubstitutor();
     private ThisParameter thisParameter = new ThisParameter(this);
 
@@ -94,12 +94,12 @@ public class ScriptsContext implements ParametersCallback {
         this.statisticsBuilder = statisticsBuilder;
     }
 
-    public SQLEngine getSqlEngine() {
-        return sqlEngine;
+    public Session getSession() {
+        return session;
     }
 
-    void setSqlEngine(final SQLEngine sqlEngine) {
-        this.sqlEngine = sqlEngine;
+    void setSession(final Session session) {
+        this.session = session;
     }
 
     public String substituteProperties(final String s) {

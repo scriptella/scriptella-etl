@@ -34,8 +34,28 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ContentEl extends XMLConfigurableBase implements ExternalResource {
-    private List<ExternalResource> content = new ArrayList<ExternalResource>();
+public class ContentEl extends XMLConfigurableBase implements Resource {
+    private List<Resource> content = new ArrayList<Resource>();
+    /**
+     * Null-Object to use instead of null if necessary
+     */
+    public static final ContentEl NULL_CONTENT = new ContentEl() {
+        public Reader open() {
+            return new StringReader("");
+        }
+
+        public void configure(final XMLElement element) {
+            throw new UnsupportedOperationException();
+        }
+
+        ContentEl merge(ContentEl contentEl) {
+            throw new UnsupportedOperationException();
+        }
+
+        public String toString() {
+            return "Empty Content";
+        }
+    };
 
     public ContentEl() {
     }
@@ -56,7 +76,7 @@ public class ContentEl extends XMLConfigurableBase implements ExternalResource {
             final Node node = childNodes.item(i);
 
             if (node instanceof Text) {
-                content.add(new ExternalResource() {
+                content.add(new Resource() {
                     public Reader open() {
                         return new StringReader(node.getTextContent());
                     }
@@ -71,6 +91,7 @@ public class ContentEl extends XMLConfigurableBase implements ExternalResource {
 
     /**
      * Merges this content with specified one and returns this element.
+     *
      * @param contentEl content to merge with.
      * @return this instance with merged content.
      */

@@ -16,9 +16,9 @@
 package scriptella.execution;
 
 import scriptella.configuration.ConfigurationEl;
+import scriptella.core.Session;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
-import scriptella.sql.SQLEngine;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -83,18 +83,18 @@ public class ScriptsExecutor {
 
     void rollbackAll(final ScriptsContext ctx) {
         try {
-            ctx.sqlEngine.rollback();
+            ctx.session.rollback();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Unable to rollback script", e);
         }
     }
 
     void commitAll(final ScriptsContext ctx) {
-        ctx.sqlEngine.commit();
+        ctx.session.commit();
     }
 
     void closeAll(final ScriptsContext ctx) {
-        ctx.sqlEngine.close();
+        ctx.session.close();
     }
 
     private void execute(final ScriptsContext ctx) {
@@ -103,7 +103,7 @@ public class ScriptsExecutor {
         final ProgressCallback p = oldProgress.fork(85, 100);
         final ProgressCallback p2 = p.fork(100);
         ctx.setProgressCallback(p2);
-        ctx.sqlEngine.execute(ctx);
+        ctx.session.execute(ctx);
         p.complete();
         ctx.setProgressCallback(oldProgress);
     }
@@ -111,7 +111,7 @@ public class ScriptsExecutor {
     protected ScriptsContext prepare(final ProgressIndicator indicator) {
         ScriptsContext ctx = new ScriptsContext();
         ctx.setBaseURL(configuration.getDocumentUrl());
-        ctx.sqlEngine = new SQLEngine();
+        ctx.session = new Session();
         ctx.setProgressCallback(new ProgressCallback(100, indicator));
 
         final ProgressCallback progress = ctx.getProgressCallback();
@@ -123,7 +123,7 @@ public class ScriptsExecutor {
 
         ctx.addProperties(configuration.getProperties());
         ctx.setProgressCallback(progress.fork(9, 100));
-        ctx.sqlEngine.init(configuration, ctx);
+        ctx.session.init(configuration, ctx);
         ctx.getProgressCallback().complete();
         ctx.setProgressCallback(progress); //Restoring
 

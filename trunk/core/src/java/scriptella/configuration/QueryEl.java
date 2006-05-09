@@ -29,9 +29,9 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class QueryEl extends SQLBasedElement {
+public class QueryEl extends ScriptingElement {
     public static final String TAG_NAME = "query";
-    private List<SQLBasedElement> childSqlElements;
+    private List<ScriptingElement> childScriptinglElements;
 
     public QueryEl() {
     }
@@ -41,19 +41,19 @@ public class QueryEl extends SQLBasedElement {
     }
 
 
-    public List<SQLBasedElement> getChildSqlElements() {
-        return childSqlElements;
+    public List<ScriptingElement> getChildScriptinglElements() {
+        return childScriptinglElements;
     }
 
-    public void setChildSqlElements(
-            final List<SQLBasedElement> childSqlElements) {
-        this.childSqlElements = childSqlElements;
+    public void setChildScriptinglElements(
+            final List<ScriptingElement> childScriptinglElements) {
+        this.childScriptinglElements = childScriptinglElements;
     }
 
-    static List<SQLBasedElement> loadSqlElements(final XMLElement element) {
+    static List<ScriptingElement> loadScriptingElements(final XMLElement element) {
         final List<XMLElement> elements = element.getChildren(new HashSet<String>(
                 Arrays.asList(QueryEl.TAG_NAME, ScriptEl.TAG_NAME)));
-        List<SQLBasedElement> scripts = new ArrayList<SQLBasedElement>(elements.size());
+        List<ScriptingElement> scripts = new ArrayList<ScriptingElement>(elements.size());
 
         for (XMLElement xmlElement : elements) {
             final Element e = xmlElement.getElement();
@@ -72,7 +72,7 @@ public class QueryEl extends SQLBasedElement {
 
     public void configure(final XMLElement element) {
         super.configure(element);
-        setChildSqlElements(loadSqlElements(element));
-        location = new Location(element.getXPath(), "queries");
+        setChildScriptinglElements(loadScriptingElements(element));
+        setLocation(element, "queries");
     }
 }

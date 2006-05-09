@@ -14,24 +14,22 @@
  limitations under the License.
 -->
 <project name="ant samples" default="main">
-    <!-- Registers scriptella ant tasks.
+    <!-- Registers scriptella ant tasks. HSQLDB driver jar is also added to classpath.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
     <property file="build.properties"/>
     <target name="main">
-        <!--Executes script.xml specify  hsqldb library required for this script on classpath-->
-        <execute inheritAll="true" classpath="../lib/hsqldb.jar"/>
-        <!-- Nested fileset and classpath elements are used-->
-        <execute inheritAll="true">
-            <fileset file="script.xml"/>
+        <!--Executes script.xml -->
+        <execute inheritAll="true"/>
+        <!-- You may reassign classpath just before executing a script-->
+        <taskdef resource="antscriptella.properties">
             <classpath>
+                <pathelement location="../lib/scriptella.jar"/>
                 <pathelement location="../lib/hsqldb.jar"/>
             </classpath>
+        </taskdef>
+        <execute inheritAll="true">
+            <fileset file="script.xml"/>
         </execute>
-        <path id="drivers.path">
-            <pathelement location="../lib/hsqldb.jar"/>
-        </path>
-        <!-- Using classpathref attrbute-->
-        <execute inheritAll="true" classpathref="drivers.path"/>
     </target>
 </project>

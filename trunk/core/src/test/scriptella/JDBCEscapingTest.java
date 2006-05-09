@@ -18,8 +18,8 @@ package scriptella;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.expressions.ParametersCallback;
-import scriptella.sql.Query;
-import scriptella.sql.QueryCallback;
+import scriptella.jdbc.Query;
+import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
 import java.sql.Timestamp;

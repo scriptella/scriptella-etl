@@ -15,23 +15,40 @@
  */
 package scriptella.configuration;
 
-import scriptella.execution.SystemException;
+import scriptella.core.SystemException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
  * Base class for configuration elements.
  */
 public abstract class XMLConfigurableBase implements XMLConfigurable {
+    private Location location;
+
     protected void setRequiredProperty(final XMLElement element,
                                        final String attribute, final String property) {
         setProperty(element, attribute, property);
         assertRequiredFieldPresent(element, attribute, property);
     }
 
+    /**
+     * @see #setProperty(XMLElement, String, String)
+     */
+    protected void setProperty(final XMLElement element, final String attribute) {
+        setProperty(element, attribute, attribute);
+    }
+
+    /**
+     * Sets property on this object using attribute value.
+     *
+     * @param element   element to get attribute.
+     * @param attribute attribute name
+     * @param property  property name.
+     */
     protected void setProperty(final XMLElement element,
                                final String attribute, final String property) {
         String attributeValue = element.getAttribute(attribute);
@@ -45,24 +62,56 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
         }
     }
 
+    /**
+     * @see #setPatternProperty(XMLElement, String, String)
+     */
+    protected void setPatternProperty(final XMLElement element, final String property) {
+        setPatternProperty(element, property, property);
+    }
+
+    /**
+     * Sets {@link Pattern} property on this object using attribute value.
+     *
+     * @param element   element to get attribute.
+     * @param attribute attribute name
+     * @param property  property name.
+     */
+    protected void setPatternProperty(final XMLElement element,
+                                      final String attribute, final String property) {
+        String ptrStr = element.getAttribute(attribute);
+        Pattern ptr = null;
+        if (ptrStr != null) {
+            try {
+                ptr = Pattern.compile(ptrStr, Pattern.CASE_INSENSITIVE);
+            } catch (Exception e) {
+                throw new ConfigurationException("Attribute " + attribute + " requires valid regular expression, but was: " +
+                        ptrStr, e, element);
+            }
+        }
+        try {
+            final Method method = getClass().getMethod(
+                    "set" + Character.toUpperCase(property.charAt(0)) + property.substring(1), Pattern.class);
+            method.invoke(this, ptr);
+        } catch (Exception e) {
+            throw new ConfigurationException("Unable to set property " +
+                    property + " from attribute " + attribute, e, element);
+        }
+
+
+    }
+
     protected Method findSetter(final String property)
             throws NoSuchMethodException {
         return getClass()
                 .getMethod("set" +
                         Character.toUpperCase(property.charAt(0)) + property.substring(1),
-                        new Class[]{String.class});
+                        String.class);
     }
 
     protected Method findGetter(final String property)
             throws NoSuchMethodException {
         return getClass()
-                .getMethod("get" +
-                        Character.toUpperCase(property.charAt(0)) + property.substring(1),
-                        (Class[]) null);
-    }
-
-    protected void setProperty(final XMLElement element, final String attribute) {
-        setProperty(element, attribute, attribute);
+                .getMethod("get" + Character.toUpperCase(property.charAt(0)) + property.substring(1));
     }
 
     protected void setRequiredProperty(final XMLElement element,
@@ -141,5 +190,19 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
     protected void assertRequiredFieldPresent(final XMLElement element,
                                               final String property) {
         assertRequiredFieldPresent(element, property, property);
+    }
+
+    /**
+     * Called by elements wishing to report their location in XML.
+     *
+     * @param element  element to calculate location
+     * @param category optional category name (used in statistics).
+     */
+    protected void setLocation(XMLElement element, String category) {
+        location = new Location(element.getXPath(), category);
+    }
+
+    protected Location getLocation() {
+        return location;
     }
 }

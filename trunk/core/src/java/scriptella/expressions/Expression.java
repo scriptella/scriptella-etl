@@ -15,7 +15,7 @@
  */
 package scriptella.expressions;
 
-import scriptella.execution.SystemException;
+import scriptella.core.SystemException;
 
 import java.util.Map;
 import java.util.WeakHashMap;

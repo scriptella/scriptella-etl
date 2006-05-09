@@ -16,13 +16,12 @@
 package scriptella.execution;
 
 import scriptella.configuration.Location;
+import scriptella.core.ExceptionInterceptor;
 import scriptella.expressions.Expression;
-import scriptella.sql.ExceptionInterceptor;
-import scriptella.sql.JDBCException;
+import scriptella.spi.ProviderException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.SQLException;
 
 
 /**
@@ -32,8 +31,7 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class ScriptsExecutorException extends Exception {
-    private JDBCException lastJDBC;
-    private SQLException lastSQL;
+    private ProviderException lastProvider;
     private Throwable lastExpression;
     private Location lastElementLocation;
     private String message;
@@ -46,18 +44,14 @@ public class ScriptsExecutorException extends Exception {
                 lastExpression = ex;
             }
 
-            if (ex instanceof JDBCException) {
-                JDBCException jdbcEx = (JDBCException) ex;
+            if (ex instanceof ProviderException) {
+                ProviderException providerEx = (ProviderException) ex;
 
-                if (jdbcEx.getSql() != null) {
-                    lastJDBC = jdbcEx;
-                } else if (lastJDBC == null) {
-                    lastJDBC = jdbcEx;
+                if (providerEx.getErrorStatement() != null) {
+                    lastProvider = providerEx;
+                } else if (lastProvider == null) {
+                    lastProvider = providerEx;
                 }
-            }
-
-            if (ex instanceof SQLException) {
-                lastSQL = (SQLException) ex;
             }
 
             if (ex instanceof ExceptionInterceptor.ExecutionException) {
@@ -75,25 +69,24 @@ public class ScriptsExecutorException extends Exception {
             pw.println(lastElementLocation);
         }
 
-        if (lastJDBC != null) {
-            pw.print("JDBC exception: ");
-            pw.print(lastJDBC.getMessage());
+        if (lastProvider != null) {
+            pw.print(lastProvider.getProviderName() + " provider exception: ");
+            pw.println(lastProvider.getMessage());
 
-            if (lastJDBC.getSql() != null) {
-                pw.print(". Statement: ");
-                pw.print(lastJDBC.getSql());
-                pw.print(". Parameters: ");
-                pw.print(lastJDBC.getParameters());
+            if (lastProvider.getErrorStatement() != null) {
+                pw.print(". Error statement: ");
+                pw.print(lastProvider.getErrorStatement());
+                pw.println();
             }
-
-            pw.println();
+            pw.println("error codes: " + lastProvider.getErrorCodes());
+            Throwable nativeException = lastProvider.getNativeException();
+            if (nativeException != null) {
+                pw.print("Driver exception: ");
+                pw.print(nativeException.toString());
+                pw.println();
+            }
         }
 
-        if (lastSQL != null) {
-            pw.print("JDBC driver exception: ");
-            pw.print(lastSQL.getMessage());
-            pw.println();
-        }
 
         if (lastExpression != null) {
             pw.print("Expression exception: ");

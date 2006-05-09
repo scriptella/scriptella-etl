@@ -15,7 +15,7 @@
  */
 package scriptella.configuration;
 
-import scriptella.execution.SystemException;
+import scriptella.core.SystemException;
 
 
 /**

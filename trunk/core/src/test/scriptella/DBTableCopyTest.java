@@ -18,9 +18,9 @@ package scriptella;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.expressions.ParametersCallback;
-import scriptella.sql.JDBCException;
-import scriptella.sql.Query;
-import scriptella.sql.QueryCallback;
+import scriptella.jdbc.Query;
+import scriptella.spi.ProviderException;
+import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
 
@@ -48,7 +48,7 @@ public class DBTableCopyTest extends DBTestCase {
                     public void processRow(final ParametersCallback row) {
                         n[0]++;
                         assertEquals(n[0], row.getParameter("ID"));
-                        if (n[0]==3) { //3rd row column value2 has 'value'
+                        if (n[0] == 3) { //3rd row column value2 has 'value'
                             assertEquals("value", row.getParameter("value2"));
                         } else {
                             assertNull(row.getParameter("value2"));
@@ -82,7 +82,7 @@ public class DBTableCopyTest extends DBTestCase {
         try {
             new Query("select * from test2").execute(con, null);
             fail("Test2 is absent in the 1st database");
-        } catch (JDBCException e) {
+        } catch (ProviderException e) {
             //OK
         }
     }
