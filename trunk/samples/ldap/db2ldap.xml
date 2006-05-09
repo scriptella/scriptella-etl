@@ -1,0 +1,113 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <description>
+        Migrates data from Database to LDAP.
+        JdbcLdapDriver IMPORTANT NOTES:
+        - Do not quote values in INSERT statements
+        - Due to JdbcLdapDriver bug - do not insert extra spaces between attribute names ;)
+    </description>
+    <!--Connection to the in memory database-->
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb" user="sa" password=""/>
+    <!--Connection to the LDAP-->
+    <connection id="out" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
+                url="jdbc:ldap://localhost:389"
+                user="cn=root,dc=scriptella" password="secret">
+        <!--Define connection properties-->
+        SEARCH_SCOPE=subTreeScope
+        ignore_transactions=true
+        <!--You may embed properties into url using driver specific syntax, e.g.
+         jdbc:ldap://localhost:389/dc=scriptella?SEARCH_SCOPE:=subTreeScope&amp;ignore_transactions:=true
+         -->
+    </connection>
+    <script connection-id="in">
+        <!-- Fills the in-memory database with initial data-->
+        <include href="dbschema.sql"/>
+        INSERT INTO users VALUES ('jjones','janet');
+        INSERT INTO users VALUES ('fbloggs','fred');
+        INSERT INTO user_roles VALUES ('jjones','admin');
+        INSERT INTO user_roles VALUES ('fbloggs','admin');
+        INSERT INTO user_roles VALUES ('fbloggs','developer');
+    </script>
+    <script connection-id="out">
+        <!-- Inserts top-level entry
+        dn: dc=scriptella
+        objectclass: dcObject
+        objectclass: organization
+        o: Company
+        dc: scriptella
+        -->
+        INSERT INTO dc(objectClass,objectClass,o,dc) VALUES (dcObject,organization,Company,scriptella);
+
+        <!--
+        # Define an entry to contain people
+        dn: ou=people,dc=scriptella
+        objectClass: organizationalUnit
+        ou: people
+        -->
+        INSERT INTO ou,dc=scriptella (objectClass,ou) VALUES (organizationalUnit,people);
+
+        <!--
+        # Define an entry to contain LDAP groups
+        dn: ou=groups,dc=scriptella
+        objectClass: organizationalUnit
+        ou: groups
+        -->
+        INSERT INTO ou,dc=scriptella (objectClass,ou) VALUES (organizationalUnit,groups);
+
+        <onerror message=".*already exists.*">
+            --If entries already exist - proceed with migration
+        </onerror>
+    </script>
+    <query connection-id="in">
+        SELECT user_name,user_pass FROM users;
+        <script connection-id="out">
+            <!--
+            Create user entry
+            dn: uid=?user_name,ou=people,dc=scriptella
+            objectClass: inetOrgPerson
+            uid: ?user_name
+            sn: ?user_name
+            cn: ?user_name
+            userPassword: ?user_pass
+            -->
+            INSERT INTO uid,ou=people,dc=scriptella (objectClass,uid,sn,cn,userPassword) VALUES (inetOrgPerson,?user_name,?user_name,?user_name,?user_pass);
+            <onerror message=".*already exists.*" retry="true">
+                <!--If user entry exists - delete it -->
+                DELETE FROM ou=people,dc=scriptella WHERE uid=?user_name
+            </onerror>
+        </script>
+    </query>
+    <query connection-id="in">
+        SELECT DISTINCT role_name FROM user_roles;
+        <script connection-id="out">
+            <!--
+            # Define an entry for the role_name role
+            dn: cn=?role_name,ou=groups,dc=scriptella
+            objectClass: groupOfUniqueNames
+            cn: ?role_name
+        -->
+            INSERT INTO cn,ou=groups,dc=scriptella (objectClass,cn,uniqueMember) VALUES (groupOfUniqueNames,?role_name,"dc=scriptella");
+            <onerror message=".*already exists.*" retry="true">
+                <!--If group entry exists - delete it -->
+                DELETE FROM ou=groups,dc=scriptella WHERE cn=?role_name
+            </onerror>
+
+        </script>
+        <query connection-id="in">
+            SELECT user_name FROM user_roles WHERE role_name=?role_name;
+            <!-- First user replaces artificial uniqueMember: dc=scriptella
+                 Note: ?role_name is inserted directly  into statement text,
+                 ?{} expressions are injected as prepared statement parameters-->
+            <script connection-id="out" if="rownum==1">
+                UPDATE ENTRY cn=$role_name,ou=groups,dc=scriptella DO REPLACE SET
+                uniqueMember=?{'uid='+user_name+',ou=people,dc=scriptella'};
+            </script>
+            <!-- Subsequent users are added-->
+            <script connection-id="out" if="rownum gt 1">
+                UPDATE ENTRY cn=$role_name,ou=groups,dc=scriptella DO ADD SET
+                uniqueMember=?{'uid='+user_name+',ou=people,dc=scriptella'};
+            </script>
+        </query>
+    </query>
+
+</scripts>

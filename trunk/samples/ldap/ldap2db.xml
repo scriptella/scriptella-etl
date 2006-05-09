@@ -28,16 +28,16 @@
         <!--For each found user executes the following script-->
         <script connection-id="out">
             <!--Inserts user record using parameters from the outer query result set-->
-            INSERT INTO Users VALUES ($uid, $userPassword);
+            INSERT INTO Users VALUES (?uid, ?userPassword);
         </script>
         <!--Additionally we need to query a list of groups containing found user-->
         <query>
-            <!-- ldapsearch.exe -b dc=scriptella "(&(objectClass=groupOfUniqueNames)(uniqueMember=$DN))" -->
-            SELECT cn FROM ou=groups WHERE objectClass = 'groupOfUniqueNames' and uniqueMember=$DN
+            <!-- ldapsearch.exe -b dc=scriptella "(&(objectClass=groupOfUniqueNames)(uniqueMember=?DN))" -->
+            SELECT cn FROM ou=groups WHERE objectClass = 'groupOfUniqueNames' and uniqueMember=?DN
             <!-- For each group in the query result set-->
             <script connection-id="out">
                 <!--Insert User_Role record into database-->
-                INSERT INTO User_Roles VALUES ($uid, $cn);
+                INSERT INTO User_Roles VALUES (?uid, ?cn);
             </script>
         </query>
     </query>
