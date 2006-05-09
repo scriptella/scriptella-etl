@@ -3,7 +3,7 @@ In particular this example shows how to migrate users/roles between Tomcat JDBC/
 
 !Important!
     This example needs JDBC-LDAP bridge. Download http://www.qa.octetstring.com/downloads/jdbcldap/jdbcldap20en.zip,
-    extract jdbcLdapJldap.jar and save in this directory as jdbcldap.jar
+    extract jdbcLdapJldap.jar and save in this directory with jdbcldap.jar name.
 
 
 OpenLDAP configuration
@@ -74,6 +74,10 @@ You may check for required data presence in LDAP by running:
 ldapsearch -b "dc=scriptella" "(objectclass=*)"
 
 Execute ldap2db.xml script to migrate data from LDAP to HSQLDB database named "outdb".
-Note: You may use command line "execute ldap2db.xml" to run the script.
+Note: Use command line "execute ldap2db.xml" to run the script.
 
 Migration of database data to LDAP.
+-----------------------------------
+
+
+

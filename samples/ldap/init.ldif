@@ -2,8 +2,8 @@
 #Use ldapadd -x -D "cn=root,dc=scriptella" -W -f init.ldif
 # top-level entry
 dn: dc=scriptella
-objectclass: dcObject
-objectclass: organization
+objectClass: dcObject
+objectClass: organization
 o: Company
 dc: scriptella
 
