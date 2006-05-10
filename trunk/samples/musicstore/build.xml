@@ -24,6 +24,6 @@
     </taskdef>
     <target name="main">
         <!--Executes script.xml with hsqldb on classpath-->
-        <execute fork="true"/>
+        <execute/>
     </target>
 </project>
