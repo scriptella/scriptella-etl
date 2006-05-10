@@ -1,108 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-	<header>
-		<title>Scriptella Reference Documentation</title>
-		<authors>
-			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
-		</authors>
-	</header>
-	<body>
-		<section>
-			<title>Introduction</title>
-			<fixme author="ejboy">Add introduction</fixme>
-		</section>
-		<section>
-			<title>Installation</title>
-			<section>
-				<title>System Requirements</title>
-				<p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
-			</section>
-		</section>
-		<section>
-			<title>XML Script Syntax</title>
-			<fixme author="ejboy">Describe all elements</fixme>
-		</section>
-		<section>
-			<title>Command Line Execution</title>
-			<fixme author="ejboy">Describe command line tools</fixme>
-		</section>
-		<section>
-			<title>Ant Integration</title>
-			<section>
-				<title>System requirements</title>
-				<p>Ant 1.6 or later is recommended.</p>
-			</section>
-			<section>
-				<title>Installation</title>
-				<p>Use scriptella.jar from the binary distribution. This file contains all necessary classes and resources for integration with Ant.</p>
-				<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
-				<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
-				<note>You may add paths to your database drivers using nested classpath element</note>
-			</section>
-			<section>
-				<title>Scriptella &quot;Execute&quot; Task</title>
-				<section>
-					<title>Parameters</title>
-					<table>
-						<tr>
-							<th>Attribute</th>
-							<th>Description</th>
-							<th>Required</th>
-						</tr>
-						<tr>
-							<td>file</td>
-							<td>The script file to execute.</td>
-							<td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
-						</tr>
-						<tr>
-							<td>inheritAll</td>
-							<td>If true, pass Ant project properties to the Script Executor.</td>
-							<td>No, default value is false.</td>
-						</tr>
-						<tr>
-							<td>progress</td>
-							<td>If true shows execution progress.</td>
-							<td>No, default value is false.</td>
-						</tr>
-					</table>
-				</section>
-				<section>
-					<title>Nested Elements</title>
-					<p>The task supports <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a> and
-        <a href="http://ant.apache.org/manual/using.html#path">&lt;classpath&gt;</a> nested elements.</p>
-				</section>
-				<section>
-					<title>Examples</title>
-					<p>
-						<em>Executes script.xml file in the current directory:</em>
-					</p>
-					<source>&lt;execute/&gt;</source>
-					<p>
-						<em>Executes sql.xml file in the current directory using Oracle classes12.zip on classpath:</em>
-					</p>
-					<source>&lt;execute file="sql.xml" classpath="classes12.zip"/&gt;
-</source>
-					<p>
-						<em>Executes all xml files in db directory using hsqldb.jar and jconn2.jar on classpath:</em>
-					</p>
-					<source>&lt;execute&gt;
-   &lt;classpath&gt;
-      &lt;pathelement location="lib/hsqldb.jar"/&gt;
-      &lt;pathelement location="lib/jconn2.jar"/&gt;
-   &lt;/classpath&gt;
-   &lt;fileset dir="db" includes="*.xml"/&gt;
-&lt;/execute&gt;
-</source>
-				</section>
-			</section>
-		</section>
-		<section>
-			<title>Examples</title>
-			<fixme author="ejboy">Describe examples here</fixme>
-		</section>
-		<section>
-			<title>Best Practices</title>
-		</section>
-	</body>
+    <header>
+        <title>Scriptella Reference Documentation</title>
+        <authors>
+            <person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+        </authors>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <fixme author="ejboy">Add introduction</fixme>
+        </section>
+        <section>
+            <title>Installation</title>
+            <section>
+                <title>System Requirements</title>
+                <p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
+            </section>
+        </section>
+        <section>
+            <title>XML Script Syntax</title>
+            <fixme author="ejboy">Describe all elements</fixme>
+        </section>
+        <section>
+            <title>Command Line Execution</title>
+            <fixme author="ejboy">Describe command line tools</fixme>
+        </section>
+        <section>
+            <title>Ant Integration</title>
+            <section>
+                <title>System requirements</title>
+                <p>Ant 1.6 or later is recommended.</p>
+            </section>
+            <section>
+                <title>Installation</title>
+                <p>Use scriptella.jar from the binary distribution. This file contains all necessary classes and
+                    resources for integration with Ant.</p>
+                <p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+                <source>
+                    <![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
+                <note>You may add paths to your database drivers using nested classpath element</note>
+            </section>
+            <section>
+                <title>Scriptella &quot;Execute&quot; Task</title>
+                <section>
+                    <title>Parameters</title>
+                    <table>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Description</th>
+                            <th>Required</th>
+                        </tr>
+                        <tr>
+                            <td>file</td>
+                            <td>The script file to execute.</td>
+                            <td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
+                        </tr>
+                        <tr>
+                            <td>inheritAll</td>
+                            <td>If true, pass Ant project properties to the Script Executor.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                        <tr>
+                            <td>progress</td>
+                            <td>If true shows execution progress.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <title>Nested Elements</title>
+                    <p>The task supports
+                        <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a>
+                        and
+                        <a href="http://ant.apache.org/manual/using.html#path">&lt;classpath&gt;</a>
+                        nested elements.
+                    </p>
+                </section>
+                <section>
+                    <title>Examples</title>
+                    <p>
+                        <em>Executes script.xml file in the current directory:</em>
+                    </p>
+                    <source>&lt;execute/&gt;</source>
+                    <p>
+                        <em>Executes sql.xml file in the current directory using Oracle classes12.zip on classpath:</em>
+                    </p>
+                    <source>&lt;execute file="sql.xml" classpath="classes12.zip"/&gt;
+                    </source>
+                    <p>
+                        <em>Executes all xml files in db directory using hsqldb.jar and jconn2.jar on classpath:</em>
+                    </p>
+                    <source>&lt;execute&gt;
+                        &lt;classpath&gt;
+                        &lt;pathelement location="lib/hsqldb.jar"/&gt;
+                        &lt;pathelement location="lib/jconn2.jar"/&gt;
+                        &lt;/classpath&gt;
+                        &lt;fileset dir="db" includes="*.xml"/&gt;
+                        &lt;/execute&gt;
+                    </source>
+                </section>
+            </section>
+        </section>
+        <section>
+            <title>Non-relational Datasources Interoperability</title>
+            <p>Direct integration of non JDBC datasources is planned for future versions.
+                We plan to include built-in support for CSV files and LDAP directories, so
+                it would be possible to embed CSV data or LDIF files directly into script files.
+            </p>
+            <p>Currently we recommend various JDBC bridges to work with specific datasources like directories, CSV
+                files,
+                XML files or object databases.
+            </p>
+            <section>
+                <title>Accesing directories based on LDAP</title>
+                <p>The freely available
+                    <a href="http://www.openldap.org/jdbcldap/">JDBC-LDAP Bridge Driver</a>
+                    (JDBC-LDAP) enables you to access information held in directories.
+                </p>
+                <fixme author="ejboy">Add LDAP sample script</fixme>
+                <p>See
+                    <a href="http://www.octetstring.com/support/jdbcldapdriver/GettingStarted.php">Getting Started
+                        Documentation</a>
+                    .
+                </p>
+                <p>A similar driver is offered by Novell. See
+                    <a href="http://developer.novell.com/ndk/doc/ldapjdbc/">LDAP JDBC Driver</a>
+                    for more details.
+                </p>
+            </section>
+            <section>
+                <title>Working with CSV data</title>
+                <p>
+                    <a href="http://www.hsqldb.org/doc/guide/ch06.html">HSQLDB text tables</a>
+                    feature could be used work
+                    with CSV files.
+                </p>
+                <fixme author="ejboy">Add LDAP sample script</fixme>
+                <p>See
+                    <a href="http://www.octetstring.com/support/jdbcldapdriver/GettingStarted.php">Getting Started
+                        Documentation</a>
+                    .
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Examples</title>
+            <fixme author="ejboy">Describe examples here</fixme>
+        </section>
+        <section>
+            <title>Best Practices</title>
+        </section>
+    </body>
 </document>
