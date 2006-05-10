@@ -15,6 +15,7 @@
 -->
         <!-- Template project used by submodules-->
 <project name="scriptella-template" default="">
+    <description>Base build for submodules</description>
     <property file="${basedir}/build.properties"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="tests.report.dir" value="${build.dir}/tests"/>
@@ -36,7 +37,7 @@
         <mkdir dir="${tests.tmp.dir}"/>
     </target>
 
-    <target name="clean" unless="nocleanup">
+    <target name="clean" unless="noclean">
         <delete failonerror="no">
             <fileset dir="${tmp.dir}" includes="**"/>
         </delete>

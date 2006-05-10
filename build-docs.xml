@@ -1,8 +1,15 @@
-<project name="Scriptella Documentation Build" default="dtd">
+<project name="Scriptella Documentation Build" default="codereports">
     <property file="custom.build.properties"/>
     <property file="build.properties"/>
     <property name="dtd.dest.dir" value="${basedir}/build/docs/dtd"/>
+    <property name="javadoc.dest.dir" value="${basedir}/build/docs/api"/>
+    <path id="class.path">
+        <fileset dir="lib" includes="**/*.jar"/>
+    </path>
+
+    <target name="codereports" depends="dtd, javadoc"/>
     <target name="dtd">
+        <description>Generates DTD using DTDDoc</description>
         <taskdef name="DTDDoc"
                  classname="DTDDoc.DTDDocTask">
             <classpath>
@@ -19,4 +26,18 @@
             <include name="**/*.dtd"/>
         </DTDDoc>
     </target>
+
+    <target name="javadoc">
+        <delete dir="${javadoc.dest.dir}" failonerror="no"/>
+        <mkdir dir="${javadoc.dest.dir}"/>
+        <javadoc destdir="${javadoc.dest.dir}"
+                 use="true" windowtitle="Scriptella API Documentation">
+            <classpath refid="class.path"/>
+            <packageset dir="core/src/java"/>
+            <doctitle><![CDATA[<h1>Scriptella API Documentation</h1>]]></doctitle>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; Copyright 2006 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
+        </javadoc>
+    </target>
+
 </project>
