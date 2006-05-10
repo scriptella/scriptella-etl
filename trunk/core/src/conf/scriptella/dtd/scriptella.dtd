@@ -51,11 +51,11 @@ Example:
 <!--
  @attr id connection identifier. Used in scripts and queries
  @attr driver driver class
- @attr url jdbc url
+ @attr url connection url. Required for JDBC providers.
  @attr user database login
  @attr password database password
  @attr catalog catalog
- @attr schema - schema
+ @attr schema schema
 -->
 <!ATTLIST connection
 id ID #IMPLIED
@@ -110,14 +110,17 @@ This element may contain plain text or includes.
 Example:
 %
 <onerror type=".*SQLException">
-DROP TABLE MYTABLE
+    DROP TABLE MYTABLE
 </onerror>
 %
+Note: Attributes are applied using AND condition, so if you specified
+%<onerror type=".*ProviderException" codes="100,200">%
+so only Provider Exceptions having 100 and/or 200 error code are handled. 
 -->
 <!ELEMENT onerror (#PCDATA | include | dialect)*>
 <!--
  @attr type Regular expression pattern to match exception type
- @attr codes Comma-separated list of vendor codes/sql states
+ @attr codes Comma-separated list of vendor codes/sql states. Triggered if any of these codes matches one of the codes reported by driver.
  @attr message Regular expression pattern to match exception message
  @attr retry true if statement which caused a problem should be retried after this handler completes.
 -->

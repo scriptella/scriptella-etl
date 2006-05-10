@@ -6,21 +6,25 @@ Although Scriptella supports any JDBC Driver through
 JDBC Bridge, writing a custom Provider may be easier and more effective.
 The requirements for Service Provider are minimal:
 <ul>
-    <li>Provide a class implementing <a href="ScriptellaDriver.java">Scriptella Driver Interface</a>.
+    <li>Provide a class implementing <a href="ScriptellaDriver.html">Scriptella Driver Interface</a>.
         This class must have a public no-arg constructor</li>
-    <li>Create a subclass of <a href="ProviderException.java">Provider Exception</a>. Override methods if necessary</li>
+    <li>Create a subclass of <a href="ProviderException.html">Provider Exception</a>. Override methods if necessary</li>
 </ul>
 
 <h2>Driver Registration</h2>
 No special steps are required to register Scriptella Provider.
-Simply specify driver class name in <b>driver</b> attribute of <b>&lt;connection&gt;</b> element
+Simply specify driver class name in <b>driver</b> attribute of <b>&lt;connection&gt;</b> element.
+Example:
+<code><pre>
+    &lt;connection driver="provider.class.name" url="provider:url"/&gt;
+</pre></code>
 
 <h2>Additional Recommendations</h2>
 <ul>
     <li>URL is not a required parameter for custom providers, nevertheless
         it may make sense to specify URL protocol for your driver.</li>
     <li>If you solution performs scripts compilation and this procedure is expensive, use caching
-        based on Resource indentities as described in javadoc for <a href="Connection.java">Connection</a>.</li>
+        based on Resource indentities as described in javadoc for <a href="Connection.html">Connection</a>.</li>
 
     <li>Pack your provider as a JAR file setting specification title, version and other attributes in manifest.
         Adding a simple readme file inside a JAR may help users to quickly get how to use it.</li>
