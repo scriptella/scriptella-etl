@@ -7,11 +7,14 @@
     <body>
         <section id="overview">
             <title>About Scriptella</title>
-            <p>Scriptella is a database migration and SQL scripts execution tool.</p>
-            <p>Scriptella differs from other tools in its SQL-centric approach where almost all logic is written in SQL.</p>
+            <p>Scriptella is an open source database migration and SQL scripts execution tool.</p>
+            <p>Scriptella differs from other tools in its SQL-centric approach where almost all logic is written in
+                SQL.</p>
             <p>
-                <a href="download.html">Download</a> and
-                <a href="tutorial.html">use it</a>! Scriptella is licensed under the
+                <a href="download.html">Download</a>
+                and
+                <a href="tutorial.html">use it</a>
+                ! Scriptella is licensed under the
                 <a href="license.html">Apache License, Version 2.0</a>
             </p>
         </section>
@@ -27,7 +30,8 @@
         <section id="features">
             <title>Features</title>
             <ul>
-                <li>Simple XML syntax for scripts.You can upgrade your existing SQL scripts by creating a simple Scriptella XML file:
+                <li>Simple XML syntax for scripts.You can upgrade your existing SQL scripts by creating a simple
+                    Scriptella XML file:
                     <source><![CDATA[
 <scripts>
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
@@ -36,10 +40,11 @@
         -- And/or directly insert SQL here
     </script>
 </scripts>
-    ]]>				</source>
+    ]]>                </source>
                 </li>
                 <li>Support for multiple databases (or multiple connections to a single database) in a script file.</li>
-                <li>Support for many useful JDBC features, e.g. parameters in SQL including file blobs and JDBC escaping.</li>
+                <li>Support for many useful JDBC features, e.g. parameters in SQL including file blobs and JDBC
+                    escaping.</li>
                 <li>Support for evaluated expressions and properties (JEXL syntax)</li>
                 <li>Support for cross-database SQL scripts by using &lt;dialect&gt; elements</li>
                 <li>Transactional execution</li>
