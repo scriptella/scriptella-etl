@@ -16,7 +16,7 @@
 <project name="scriptella" default="jar">
     <description>
         Build file for Scriptella Project.
-        Use build.properties to customize its behaviour.
+        Use build.properties/custom.build.properties to customize its behaviour.
     </description>
     <property file="custom.build.properties"/>
     <property file="build.properties"/>
@@ -45,7 +45,7 @@
         <pathelement location="${tests.tmp.dir}"/>
     </path>
 
-    <target name="clean" unless="nocleanup">
+    <target name="clean" unless="noclean">
         <description>
             Optional temp files cleanup.
         </description>
@@ -87,10 +87,18 @@
 
     <target name="zip" depends="jar">
         <description>Prepares binary distribution</description>
+        <!--Validation-->
+        <condition property="no_dtddoc">
+            <available file="${dtddoc.dir}"/>
+        </condition>
+        <fail message="DTDDoc is required to build binary distribution. Set dtddoc.dir property.
+        DTDDoc URL: http://dtddoc.sourceforge.net" unless="no_dtddoc"/>
+        <!--End Validation-->
+        <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
             <fileset dir="${basedir}" includes="lib/**"/>
-            <fileset dir="${build.dir}" includes="scriptella*.jar"/>
+            <fileset dir="${build.dir}" includes="scriptella*.jar docs/**"/>
         </zip>
     </target>
 
@@ -106,7 +114,8 @@
         <description>Prepares src distribution</description>
         <delete file="${build.dir}/${src.zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${src.zip.name}">
-            <fileset dir="${basedir}" includes="samples/** lib/** core/src/** tools/src/** **/build.xml"/>
+            <fileset dir="${basedir}" includes="samples/** lib/** core/src/** tools/src/** **/*build.xml"
+                     excludes="samples/lib/**"/>
         </zip>
     </target>
 
