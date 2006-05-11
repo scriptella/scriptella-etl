@@ -43,11 +43,24 @@ public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
             if (params.getPassword() != null) {
                 props.put("password", params.getPassword());
             }
-            return new JDBCConnection(DriverManager.getConnection(params.getUrl(), props));
+            return connect(params, props);
+
         } catch (SQLException e) {
             throw new JDBCException("Unable to obtain connection for URL " + params.getUrl(), e);
         }
-
     }
+
+    /**
+     * Creates Scriptella JDBC connection.
+     *
+     * @param parameters connection parameters
+     * @param props      properties to pass to jdbc driver
+     * @return Scriptella JDBC connection.
+     * @throws SQLException if DB exception occurs.
+     */
+    protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
+        return new JDBCConnection(DriverManager.getConnection(parameters.getUrl(), props));
+    }
+
 
 }
