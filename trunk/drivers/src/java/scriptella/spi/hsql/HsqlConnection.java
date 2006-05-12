@@ -33,24 +33,34 @@ public class HsqlConnection extends JDBCConnection {
     private static final Logger LOG = Logger.getLogger(HsqlConnection.class.getName());
     private boolean shutdownOnExit;
 
-    public HsqlConnection(Connection con, boolean shutdownOnExit) {
+    /**
+     * Creates a wrapper for HSQL connection.
+     *
+     * @param con
+     * @param shutdownOnExit if true register using {@link Driver#setLastConnection(HsqlConnection)}
+     *                       to SHUTDOWN on JVM exit.
+     */
+    HsqlConnection(Connection con, boolean shutdownOnExit) {
         super(con);
         this.shutdownOnExit = shutdownOnExit;
     }
 
     void shutdown() {
         assert shutdownOnExit;
+        Connection con = getNativeConnection();
+        assert con != null; //we are going to close, so con!=null
         try {
-            Connection con = getNativeConnection();
-            assert con != null; //we are going to close, so con!=null
             if (con.isClosed()) {
                 LOG.info("Unable to correctly shutdown in-process HSQLDB. Connection has already already been closed");
+                return;
             }
             Statement st = con.createStatement();
             st.execute("SHUTDOWN");
             JDBCUtils.closeSilent(st);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB", e);
+        } finally {
+            JDBCUtils.closeSilent(con);
         }
     }
 
