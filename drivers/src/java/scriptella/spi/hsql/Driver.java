@@ -21,6 +21,8 @@ import scriptella.spi.ConnectionParameters;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,21 +44,25 @@ public class Driver extends ScriptellaJDBCDriver {
      */
     public static final String SHUTDOWN_ON_EXIT = "hsql.shutdown_on_exit";
 
-    private static HsqlConnection lastConnection; //Send SHUTDOWN on JVM exit to fix
+    private static Map<String, HsqlConnection> lastConnections = null; //Send SHUTDOWN on JVM exit to fix
     private static boolean hookAdded = false;
 
 
+    /**
+     * Shutdown hook closing all the databases being used.
+     */
     static final Thread HOOK = new Thread("Scriptella HSLQDB Shutdown Fix") {
         public void run() {
-            if (lastConnection != null) {
-                try {
-                    lastConnection.shutdown();
-                    lastConnection = null;
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB database", e);
+            if (lastConnections != null) {
+                for (Map.Entry<String, HsqlConnection> entry : lastConnections.entrySet()) {
+                    try {
+                        entry.getValue().shutdown();
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB database " + entry.getKey(), e);
+                    }
                 }
+                lastConnections = null;
             }
-
         }
     };
 
@@ -70,7 +76,8 @@ public class Driver extends ScriptellaJDBCDriver {
 
     @Override
     protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
-        boolean shutdownOnExit = Boolean.parseBoolean(props.getProperty(SHUTDOWN_ON_EXIT))
+        final String property = props.getProperty(SHUTDOWN_ON_EXIT);
+        boolean shutdownOnExit = property == null || Boolean.parseBoolean(property)
                 && isInprocess(parameters.getUrl());
         return new HsqlConnection(DriverManager.getConnection(parameters.getUrl(), props), shutdownOnExit);
     }
@@ -90,19 +97,32 @@ public class Driver extends ScriptellaJDBCDriver {
     }
 
     /**
-     * Sets last connection and returns previous value of lastConnection field.
+     * Sets last connection and returns previous value of lastConnection for connection url.
+     * <p>Driver stores map of connections using URLs as keys.
      *
      * @param connection last connection
      * @return previous value of lastConnection field.Null if no connections have been registered.
+     * @see #HOOK
      */
     static synchronized HsqlConnection setLastConnection(HsqlConnection connection) {
-        HsqlConnection old = lastConnection;
-        lastConnection = connection;
+        if (lastConnections == null) {
+            lastConnections = new HashMap<String, HsqlConnection>();
+        }
+        final HsqlConnection old = lastConnections.put(getConnectionURL(connection), connection);
         if (!hookAdded) {
             Runtime.getRuntime().addShutdownHook(HOOK);
             hookAdded = true;
         }
         return old;
+    }
+
+    private static String getConnectionURL(HsqlConnection connection) {
+        try {
+            return connection.getNativeConnection().getMetaData().getURL();
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Unable to read connection meta data", e);
+            return "";
+        }
     }
 
 
