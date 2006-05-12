@@ -15,7 +15,10 @@
 -->
 <project name="scriptella-template" default="">
     <description>Base build for submodules</description>
+    <property file="${basedir}/custom.build.properties"/>
     <property file="${basedir}/build.properties"/>
+    <property file="${basedir}/../custom.build.properties"/>
+    <property file="${basedir}/../build.properties"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="tests.report.dir" value="${build.dir}/tests"/>
     <property name="jar.name" value="${ant.project.name}.jar"/>
@@ -34,6 +37,7 @@
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${tests.tmp.dir}"/>
+        <available file="${conf.dir}" property="resources_present"/>
     </target>
 
     <target name="clean" unless="noclean">
@@ -45,45 +49,16 @@
     <target name="compile" depends="init">
         <javac srcdir="${java.dir}" destdir="${classes.dir}" classpath="${classpath}"
                debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="resources" if="resources_present" depends="init">
         <copy todir="${classes.dir}">
             <fileset dir="${conf.dir}" includes="**"/>
         </copy>
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="jar" depends="compile, resources">
         <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}"/>
     </target>
-
-    <target name="test" depends="compile">
-        <!-- Add junit.jar + xalan.jar to ant libs -->
-        <javac srcdir="${test.dir}" destdir="${tests.tmp.dir}" classpath="${test.classpath}:${classes.dir}"
-               debug="on" debuglevel="lines,vars,source"/>
-        <copy todir="${tests.tmp.dir}">
-            <fileset dir="${test.dir}" includes="**/*.xml **/*.properties **/*.sql"/>
-        </copy>
-        <mkdir dir="${tests.tmp.dir}/reports"/>
-        <junit fork="on" dir="${root.dir}">
-            <classpath>
-                <pathelement path="${test.classpath}"/>
-                <pathelement location="${classes.dir}"/>
-                <pathelement location="${tests.tmp.dir}"/>
-            </classpath>
-            <formatter type="xml"/>
-            <batchtest todir="${tests.tmp.dir}/reports">
-                <fileset dir="${tests.tmp.dir}">
-                    <include name="**/*Test.*"/>
-                    <exclude name="reports/**"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        <mkdir dir="${tests.report.dir}"/>
-        <junitreport todir="${tests.report.dir}">
-            <fileset dir="${tests.tmp.dir}/reports">
-                <include name="TEST-*.xml"/>
-            </fileset>
-            <report todir="${tests.report.dir}"/>
-        </junitreport>
-    </target>
-
 
 </project>

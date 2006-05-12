@@ -1,7 +1,4 @@
 <project name="scriptella-tools" default="jar">
-    <ant target="jar" dir="${basedir}/../core">
-        <property name="nocleanup" value="1"/>
-    </ant>
     <property name="classpath" value="${basedir}/../core/build/scriptella-core.jar"/>
     <import file="..\build-template.xml"/>
 
