@@ -22,7 +22,6 @@
 The scripts is the root element of Scriptella XML file.
 -->
 <!ELEMENT scripts (description?, properties?, connection*, (script*, query*)*)>
-<!ATTLIST scripts>
 
 <!--
 Contains description of scripts file.
@@ -77,7 +76,6 @@ Example:
 %
 -->
 <!ELEMENT fallback (#PCDATA | include)*>
-<!ATTLIST fallback>
 
 <!--
 The include element specifies content to include. Concept similar to XInclude.
