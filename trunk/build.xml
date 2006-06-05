@@ -36,7 +36,8 @@
     <property name="tests.xml.report.dir" value="${tests.tmp.dir}/junit-xml"/>
     <property name="instrumented.dir" value="${tmp.dir}/instrumented"/>
     <property name="jar.name" value="scriptella.jar"/>
-    <property name="zip.name" value="scriptella-${version}.zip"/>
+    <property name="product.name" value="scriptella-${version}"/>
+    <property name="zip.name" value="${product.name}.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
 
@@ -101,8 +102,10 @@
         <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
-            <fileset dir="${basedir}" includes="lib/**"/>
-            <fileset dir="${build.dir}" includes="scriptella*.jar docs/**"/>
+            <zipfileset dir="${basedir}/lib" excludes="hsqldb.*" prefix="${product.name}/lib"/>
+            <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
+            <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
+            <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
         </zip>
     </target>
 
