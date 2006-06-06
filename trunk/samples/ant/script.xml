@@ -15,18 +15,15 @@
 -->
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
-    <!--
-    In this sample properties are inhertied from Ant environment.
-    Uncomment the following element if using outside ant
     <properties>
-        <include href="build.properties"/>
+        <include href="script.properties"/>
     </properties>
-    -->
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
     <script>
         CREATE TABLE Foo (
             BAR VARCHAR(100)
         );
+        INSERT INTO FOO VALUES (?antproperty);
     </script>
 
 </scripts>

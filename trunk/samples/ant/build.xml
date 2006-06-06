@@ -17,8 +17,8 @@
     <!-- Registers scriptella ant tasks. HSQLDB driver jar is also added to classpath.
     Update classpath attribute if necessary-->
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
-    <property file="build.properties"/>
     <target name="main">
+        <property name="antproperty" value="Ant Property"/>
         <!--Executes script.xml -->
         <execute inheritAll="true"/>
         <!-- You may reassign classpath just before executing a script-->
