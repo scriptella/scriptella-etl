@@ -6,23 +6,38 @@
 	</header>
 	<body>
 		<section>
-			<title>Using scriptella as Ant task</title>
+			<title>Installation</title>
+			<ul>
+				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
+				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&lt;/bin to your system path.</li>
+				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&lt;/lib directory.</li>
+			</ul>
+		</section>
+		<section>
+			<title>Use scriptella as Ant task</title>
 			<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
 			<source><![CDATA[
 <taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>
                 ]]></source>
-			<p>Running SQL scripts from Ant is simple:</p>
+			<p>Running Scriptella files from Ant is simple:</p>
 			<source><![CDATA[
 <execute classpath="../lib/hsqldb.jar"/><!-- Register your jdbc driver here instead of hsqldb-->
                 ]]></source>
+                <p>or</p>
+			<source><![CDATA[
+<execute classpath="../lib/hsqldb.jar" file="path/to/your/file/>
+                ]]></source>
+                
 			<note>
 By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
             </note>
 		</section>
 		<section>
-			<title>Standalone execution</title>
+			<title>Command-line execution</title>
+			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
+			Alternatively you can use java launcher:</p>  
 			<source><![CDATA[
-java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
+java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar scriptella.jar
                 ]]></source>
 			<note>
                 -Xbootclasspath/a: is used instead of -cp to specify additional classpath (overcomes -jar option limitation).
@@ -45,8 +60,8 @@ java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
             <!-- for all rows execute script -->
             <script connection-id="db2">
                 <!-- Insert all selected products to db2
-                     use $ to reference properties, columns or ${expressions}-->
-                INSERT INTO Product(id, category, product_name) values ($id, ${category}, $name);
+                     use ? to reference properties, columns or ?{expressions}-->
+                INSERT INTO Product(id, category, product_name) values (?id, ?{category}, ?name);
             </script>
         </query>
     </scripts>
@@ -70,10 +85,10 @@ java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar ../lib/scriptella.jar
             );
             <!-- Inserts file with path relative to executed script location -->
             insert into Track(id, album_id, name, data) values
-                   (1, 1, Song1.mp3', ${this.file(song1.mp3')});
+                   (1, 1, Song1.mp3', ?{this.file(song1.mp3')});
             <!-- Inserts file from URL-->
             insert into Track(id, album_id, name, data) values
-                   (2, 2, Song2.mp3, ${this.file('http://musicstoresample.com/song2.mp3')});
+                   (2, 2, Song2.mp3, ?{this.file('http://musicstoresample.com/song2.mp3')});
         </script>
     </scripts>
                     ]]></source>
