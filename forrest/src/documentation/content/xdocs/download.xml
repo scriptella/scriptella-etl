@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-    <header>
-        <title>Downloads</title>
-    </header>
-    <body>
-        <section id="ver0_1">
-            <title>Development Version: 0.1dev</title>
-            <p>
-                <strong>Binary distribution:</strong>
-            </p>
-            <p>
-                <strong>Source distribution:</strong>
-            </p>
-        </section>
-    </body>
+	<header>
+		<title>Downloads</title>
+	</header>
+	<body>
+		<section>
+			<title>Development Version: 0.1dev</title>
+			<p>
+				<strong>Binary distribution:</strong>
+			</p>
+			<p>
+				<strong>Source distribution:</strong>
+			</p>
+		</section>
+	</body>
 </document>

@@ -102,10 +102,11 @@
         <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${basedir}/lib" excludes="hsqldb.*" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}" excludes="hsqldb.*" prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
+            <zipfileset dir="${basedir}" includes="README LICENSE NOTICE" prefix="${product.name}"/>
         </zip>
     </target>
 
