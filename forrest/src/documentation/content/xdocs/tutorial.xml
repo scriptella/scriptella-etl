@@ -9,8 +9,8 @@
 			<title>Installation</title>
 			<ul>
 				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
-				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&lt;/bin to your system path.</li>
-				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&lt;/lib directory.</li>
+				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to your system path.</li>
+				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory.</li>
 			</ul>
 		</section>
 		<section>
@@ -27,7 +27,7 @@
 			<source><![CDATA[
 <execute classpath="../lib/hsqldb.jar" file="path/to/your/file/>
                 ]]></source>
-                
+
 			<note>
 By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
             </note>
@@ -35,7 +35,7 @@ By default file ${basedir}/script.xml is executed. Use file attribute to specify
 		<section>
 			<title>Command-line execution</title>
 			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
-			Alternatively you can use java launcher:</p>  
+			Alternatively you can use java launcher:</p>
 			<source><![CDATA[
 java -Xbootclasspath/a:../path/to/jdbcdriver.jar -jar scriptella.jar
                 ]]></source>

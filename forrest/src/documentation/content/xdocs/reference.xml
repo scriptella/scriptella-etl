@@ -10,15 +10,16 @@
 	<body>
 		<section>
 			<title>Introduction</title>
-			<fixme author="ejboy">Add introduction</fixme>
+            <fixme author="ejboy">Add introduction</fixme>
 		</section>
+        <section>
+            <title>System Requirements</title>
+            <p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
+        </section>
 		<section>
 			<title>Installation</title>
-			<section>
-				<title>System Requirements</title>
-				<p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
-			</section>
-		</section>
+
+        </section>
 		<section>
 			<title>XML Script Syntax</title>
 			<fixme author="ejboy">Describe all elements</fixme>
