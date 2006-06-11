@@ -28,7 +28,7 @@ See http://forrest.apache.org/docs/linking.html for more info
 	</getstart>
 	<doc label="Documentation">
 		<!--The href must be wholesite.html/pdf  You can change the labels and node names-->
-		<reference label="Reference" href="reference/index.html" description="Scriptella Reference Documentation"/>
+		<reference tab="reference" label="Reference" href="reference/index.html" description="Scriptella Reference Documentation"/>
 		<whole_site_html label="Whole Site HTML" href="wholesite.html"/>
 		<whole_site_pdf label="Whole Site PDF" href="wholesite.pdf"/>
 	</doc>
