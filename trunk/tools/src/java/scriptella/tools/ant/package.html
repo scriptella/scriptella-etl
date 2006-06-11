@@ -44,23 +44,18 @@ To use the task in a build file, the following taskdef declaration should be add
 <p>
 
 <h3>Nested Elements</h3>
-The task supports <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a> and
-<a href="http://ant.apache.org/manual/using.html#path">&lt;classpath&gt;</a> nested elements.
+The task supports nested <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a> element.
 <p>
 
 <h3>Examples</h3>
 <b>Executes script.xml file in the current directory:</b>
 <pre><code>&lt;execute/&gt;</code></pre>
-<b>Executes sql.xml file in the current directory using Oracle classes12.zip on classpath:</b>
-<pre><code>&lt;execute file="sql.xml" classpath="classes12.zip"/&gt;
+<b>Executes sql.xml file in the current directory:</b>
+<pre><code>&lt;execute file="sql.xml" /&gt;
 </code></pre>
-<b>Executes all xml files in db directory using hsqldb.jar and jconn2.jar on classpath:</b>
+<b>Executes all xml files in db directory:</b>
 <pre><code>&lt;execute&gt;
-    &lt;classpath&gt;
-    &lt;pathelement location="lib/hsqldb.jar"/&gt;
-    &lt;pathelement location="lib/jconn2.jar"/&gt;
-    &lt;/classpath&gt;
-    &lt;fileset dir="db" includes="*.xml"/&gt;
+    &lt;fileset dir="db" includes="*.xml" /&gt;
     &lt;/execute&gt;
 </code></pre>
 
