@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+	<header>
+		<title>Scriptella Reference Documentation</title>
+		<authors>
+			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+		</authors>
+	</header>
+	<body>
+		<section>
+			<title>Introduction</title>
+			<p>Scriptella is a Java-based scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge. 
+			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
+			<p>The following diagram is an overview of the Scriptella execution model:
+			<img src="images/ref-intro.gif" alt="Architecture Overview"/>
+			</p>
+			<section>
+				<title>When to use</title>
+				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarious when Scripella may be a very helpful tool:</p>
+ 			       <ul>
+				    <li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependenices on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
+    				    <li>Working with several databases. For example gathering statistics from the one database and store it inside the other one</li>
+				    <li>Data migration with custom rules. Typically your data migration process consists of several SQL queries with custom filter coniditions and insert statements based on queries result sets. This is the most typical Scriptella usage scenario.</li>
+     			       </ul>
+     			       <p>Of course there are situations when you'd probably try to find a better tool:</p>
+     			       <ul>
+     			       	<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier, for example Octopus.</li>
+     			       </ul>
+			</section>
+		</section>
+		<section>
+			<title>System Requirements</title>
+			<p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
+			<p>The memory requirements are dependant on your script content and referenced connection providers. For example if in-process database connections are used inside script we recommend to use at least 512Mb of RAM.</p>
+		</section>
+		<section>
+			<title>Installation</title>
+		</section>
+		<section>
+			<title>XML Script Syntax</title>
+			<fixme author="ejboy">Describe all elements</fixme>
+		</section>
+		<section>
+			<title>Command Line Execution</title>
+			<fixme author="ejboy">Describe command line tools</fixme>
+		</section>
+		<section>
+			<title>Ant Integration</title>
+			<section>
+				<title>System requirements</title>
+				<p>Ant 1.6 or later is recommended.</p>
+			</section>
+			<section>
+				<title>Installation</title>
+				<p>Use scriptella.jar from the binary distribution. This file contains all necessary classes and
+                    resources for integration with Ant.</p>
+				<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+				<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
+				<p>You also have to add paths to database drivers used inside the script:</p>
+				<source><![CDATA[<taskdef resource="antscriptella.properties" 
+   <classpath>
+       <pathelement location="$SCRIPTELLA_HOME/scriptella.jar"> 
+       <pathelement location="lib/hsqldb.jar">
+       <pathelement location="lib/jconn2.jar">
+   </classpath>
+</taskdef>]]></source>
+			</section>
+			<section>
+				<title>Scriptella &quot;Execute&quot; Task</title>
+				<section>
+					<title>Parameters</title>
+					<table>
+						<tr>
+							<th>Attribute</th>
+							<th>Description</th>
+							<th>Required</th>
+						</tr>
+						<tr>
+							<td>file</td>
+							<td>The script file to execute.</td>
+							<td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
+						</tr>
+						<tr>
+							<td>inheritAll</td>
+							<td>If true, pass Ant project properties to the Script Executor.</td>
+							<td>No, default value is false.</td>
+						</tr>
+						<tr>
+							<td>progress</td>
+							<td>If true shows execution progress.</td>
+							<td>No, default value is false.</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<title>Nested Elements</title>
+					<p>The task supports nested
+                        <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a>
+                        element.
+                    </p>
+				</section>
+				<section>
+					<title>Examples</title>
+					<p>
+						<em>Executes script.xml file in the current directory:</em>
+					</p>
+					<source>&lt;execute/&gt;</source>
+					<p>
+						<em>Executes sql.xml file in the current directory:</em>
+					</p>
+					<source>&lt;execute file="sql.xml"/&gt;
+                    </source>
+					<p>
+						<em>Executes all xml files in db directory:</em>
+					</p>
+					<source>&lt;execute&gt;
+   &lt;fileset dir="db" includes="*.xml"/&gt;
+&lt;/execute&gt;</source>
+				</section>
+			</section>
+		</section>
+		<section>
+			<title>Non-relational Datasources Interoperability</title>
+			<p>We plan to include built-in support for CSV files and LDAP directories, so
+                it would be possible to embed CSV data or LDIF files directly into script files.
+            </p>
+			<p>Currently we recommend various JDBC bridges to work with specific datasources like directories, CSV files, XML files or object databases.
+            </p>
+			<section>
+				<title>Accesing directories based on LDAP</title>
+				<p>The freely available
+                    <a href="http://www.openldap.org/jdbcldap/">JDBC-LDAP Bridge Driver</a>
+                    (JDBC-LDAP) enables you to access information held in directories.
+                </p>
+				<p>See
+                    <a href="http://www.octetstring.com/support/jdbcldapdriver/GettingStarted.php">Getting Started
+                        Documentation</a>
+                    .
+                </p>
+				<p>A similar driver is offered by Novell. See
+                    <a href="http://developer.novell.com/ndk/doc/ldapjdbc/">LDAP JDBC Driver</a>
+                    for more details.
+                </p>
+			</section>
+			<section>
+				<title>Working with CSV data</title>
+				<p>
+					<a href="http://www.hsqldb.org/doc/guide/ch06.html">HSQLDB text tables</a>
+                    feature could be used to work
+                    with CSV files.
+                </p>
+			</section>
+		</section>
+		<section>
+			<title>Examples</title>
+			<fixme author="ejboy">Describe examples here</fixme>
+		</section>
+		<section>
+			<title>Best Practices</title>
+		</section>
+	</body>
+</document>

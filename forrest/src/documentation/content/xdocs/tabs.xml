@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE tabs PUBLIC "-//APACHE//DTD Cocoon Documentation Tab V1.1//EN" "http://forrest.apache.org/dtd/tab-cocoon-v11.dtd">
-
-<tabs software="MyProj"
-  title="MyProj"
-  copyright="Foo"
-  xmlns:xlink="http://www.w3.org/1999/xlink">
-
-  <!-- The rules for tabs are:
+<tabs software="MyProj" title="MyProj" copyright="Foo" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<!-- The rules for tabs are:
     @dir will always have '/@indexfile' added.
     @indexfile gets appended to @dir if the tab is selected. Defaults to 'index.html'
     @href is not modified unless it is root-relative and obviously specifies a
@@ -16,11 +11,10 @@
    Tabs can be embedded to a depth of two. The second level of tabs will only 
     be displayed when their parent tab is selected.    
   -->
-
-  <tab id="" label="Home" dir="" indexfile="index.html"/>
-  <!-- Add new tabs here, eg:
+	<tab id="" label="Home" dir="" indexfile="index.html"/>
+	<tab id="" label="Reference" dir="reference/"/>
+	<!-- Add new tabs here, eg:
   <tab label="How-Tos" dir="community/howto/"/>
   <tab label="XML Site" dir="xml-site/"/>
   -->
-
 </tabs>
