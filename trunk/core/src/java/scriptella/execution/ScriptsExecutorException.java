@@ -61,7 +61,7 @@ public class ScriptsExecutorException extends Exception {
 
         final StringWriter out = new StringWriter();
         PrintWriter pw = new PrintWriter(out); //Use print writer to handle line separators
-        if (cause != null && cause.getMessage() != null) {
+        if ((lastProvider==null || lastElementLocation==null) && cause != null && cause.getMessage() != null) {
             pw.println(cause.getMessage());
         }
         if (lastElementLocation != null) {

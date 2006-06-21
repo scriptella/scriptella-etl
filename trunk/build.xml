@@ -66,6 +66,7 @@
             <fileset dir="${tools}/build" includes="*.jar"/>
             <fileset dir="${drivers}/build" includes="*.jar"/>
         </copy>
+        <delete file="${build.dir}/${jar.name}" failonerror="no"/>
         <jar destfile="${build.dir}/${jar.name}">
             <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
@@ -84,6 +85,7 @@
                 <attribute name="Implementation-Version" value="${version} (Build ${build})"/>
             </manifest>
         </jar>
+        <!-- Update samples libs --> 
         <copy todir="${basedir}/samples/lib">
             <fileset file="${lib.dir}/hsqldb.jar"/>
             <fileset file="${build.dir}/${jar.name}"/>
