@@ -15,7 +15,12 @@
  */
 package scriptella.execution;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 
 /**
@@ -68,7 +73,7 @@ public class ExecutionStatistics {
             }
 
             if (ei.okCount > 0) {
-                sb.append(" Succesfully executed ").append(ei.okCount)
+                sb.append(" Successfully executed ").append(ei.okCount)
                         .append(" of ").append(ei.failedCount + ei.okCount)
                         .append(" time(s).");
             } else {
