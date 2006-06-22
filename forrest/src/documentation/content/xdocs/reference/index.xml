@@ -10,7 +10,7 @@
 	<body>
 		<section>
 			<title>Introduction</title>
-			<p>Scriptella is a Java-based scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge. 
+			<p>Scriptella is a Java-based ETL and scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge. 
 			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
 			<p>The following diagram is an overview of the Scriptella execution model:
 			<img src="images/ref-intro.gif" alt="Architecture Overview"/>
@@ -32,7 +32,7 @@
 		<section>
 			<title>System Requirements</title>
 			<p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
-			<p>The memory requirements are dependant on your script content and referenced connection providers. For example if in-process database connections are used inside script we recommend to use at least 512Mb of RAM.</p>
+			<p>The memory requirements are dependant on your script content and referenced connection providers. For example if in-process database connections are used inside a script we recommend to use at least 512Mb of RAM.</p>
 		</section>
 		<section>
 			<title>Installation</title>
