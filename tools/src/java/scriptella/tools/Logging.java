@@ -15,9 +15,8 @@
  */
 package scriptella.tools;
 
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 
 /**
@@ -26,42 +25,24 @@ import java.util.logging.*;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-class Logging {
+public class Logging {
+    private Logging() {
+    }
+
     /**
-     * Configures logging messages to be printed to console
+     * Configures logging messages to use specified handler
      * todo Add another method for outputting to swing application
      */
-    public static void configure() {
+    public static void configure(Handler handler) {
         final Logger l = Logger.getLogger("scriptella");
-        l.setLevel(Level.INFO);
+        l.setLevel(handler.getLevel());
         l.setUseParentHandlers(false);
+        l.addHandler(handler);
+    }
 
-        final ConsoleHandler h = new ConsoleHandler();
-        final MessageFormat f = new MessageFormat("{0,date} {0,time} <{1}> {2}");
-        final StringBuffer sb = new StringBuffer();
-        final Date d = new Date();
-        final Object args[] = new Object[3];
-        args[0] = d;
-        h.setFormatter(new Formatter() {
-            public synchronized String format(final LogRecord record) {
-                d.setTime(record.getMillis());
-                args[1] = record.getLevel().getLocalizedName();
-                args[2] = record.getMessage();
-
-                f.format(args, sb, null).toString();
-                final Throwable err = record.getThrown();
-                sb.append('\n');
-                if (err!=null) {
-                    sb.append(err.getMessage());
-                    sb.append('\n');
-                }
-                final String s = sb.toString();
-                sb.setLength(0);
-
-                return s;
-            }
-        });
-        l.addHandler(h);
+    public static void remove(Handler handler) {
+        final Logger l = Logger.getLogger("scriptella");
+        l.removeHandler(handler);
     }
 
 

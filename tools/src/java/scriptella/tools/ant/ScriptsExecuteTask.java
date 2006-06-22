@@ -22,11 +22,15 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
 import scriptella.interactive.ConsoleProgressIndicator;
+import scriptella.tools.Logging;
 import scriptella.tools.ScriptsRunner;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 
 /**
@@ -40,7 +44,8 @@ public class ScriptsExecuteTask extends Task {
     private String maxmemory;
     private boolean fork;
     private boolean inheritAll;
-    private boolean progress;
+    private boolean debug;
+    private boolean quiet;
 
     public boolean isFork() {
         return fork;
@@ -75,19 +80,22 @@ public class ScriptsExecuteTask extends Task {
         this.inheritAll = inheritAll;
     }
 
-    /**
-     * @return true if execution progress is shown. Default is false
-     */
-    public boolean isProgress() {
-        return progress;
+    public boolean isDebug() {
+        return debug;
     }
 
-    /**
-     * @param progress true if execution progress is shown. Default is false
-     */
-    public void setProgress(boolean progress) {
-        this.progress = progress;
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
+
+    public boolean isQuiet() {
+        return quiet;
+    }
+
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
+    }
+
 
     public void addFileset(final FileSet set) {
         filesets.add(set);
@@ -127,21 +135,22 @@ public class ScriptsExecuteTask extends Task {
 
     private void execute(final List<File> files) {
         ScriptsRunner runner = new ScriptsRunner();
-        if (progress) {
-            runner.setProgressIndicator(new ConsoleProgressIndicator() {
-                protected void println(final Object o) {
-                    if (o != null) {
-                        log(o.toString(), Project.MSG_INFO);
-                    }
-                }
-            });
-        }
+        runner.setProgressIndicator(new ConsoleProgressIndicator());
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             runner.setProperties(getProject().getProperties());
         }
 
 
+        Handler h = new AntHandler();
+        h.setLevel(Level.INFO);
+        if (debug) {
+            h.setLevel(Level.FINE);
+        }
+        if (quiet) {
+            h.setLevel(Level.WARNING);
+        }
+        Logging.configure(h);
         for (File file : files) {
             try {
                 runner.execute(file);
@@ -152,6 +161,7 @@ public class ScriptsExecuteTask extends Task {
                         ": " + e.getMessage(), e);
             }
         }
+        Logging.remove(h);
     }
 
     /**
@@ -183,4 +193,60 @@ public class ScriptsExecuteTask extends Task {
                     ". See error log.");
         }
     }
+
+    class AntHandler extends Handler {
+        private StringBuilder sb = new StringBuilder();
+
+        public synchronized void publish(LogRecord record) {
+            String msg = record.getMessage();
+            if (msg != null) {
+                sb.append(msg);
+            }
+            Throwable thrown = record.getThrown();
+            if (thrown != null) {
+                sb.append("\n").append(thrown.toString()).append('\n');
+            }
+            final int lev = convert(record.getLevel());
+            if (lev >= 0) {
+                log(sb.toString(), lev);
+            }
+            sb.setLength(0);
+        }
+
+        /**
+         * Converts JUL level to appropriate Ant message priority
+         *
+         * @param level JUL level
+         * @return Ant message priority
+         */
+        private int convert(Level level) {
+            final int lev = level.intValue();
+            if (lev >= Level.SEVERE.intValue()) {
+                return Project.MSG_ERR;
+            }
+            if (lev >= Level.WARNING.intValue()) {
+                return Project.MSG_WARN;
+            }
+            if (lev >= Level.INFO.intValue()) {
+                return Project.MSG_INFO;
+            }
+            if (debug) {
+                return Project.MSG_INFO;
+            }
+            if (lev >= Level.FINE.intValue()) {
+                return Project.MSG_VERBOSE;
+            }
+            if (lev > Level.OFF.intValue()) {
+                return Project.MSG_DEBUG;
+            }
+            return -1;
+        }
+
+        public void flush() {
+        }
+
+        public void close() {
+        }
+    }
+
 }

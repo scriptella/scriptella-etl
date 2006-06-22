@@ -53,7 +53,14 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         do {
             repeat = false;
             try {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Executing script "+getLocation());
+                }
                 con.executeScript(content, ctx);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Script "+getLocation()+" completed");
+                }
+
             } catch (Throwable t) {
                 if (scriptEl.getOnerrorElements() != null) {
                     repeat = onError(t, new OnErrorHandler(scriptEl), ctx);

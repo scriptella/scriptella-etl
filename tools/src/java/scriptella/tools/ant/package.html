@@ -25,11 +25,15 @@ To use the task in a build file, the following taskdef declaration should be add
         <td>file</td><td>The script file to execute.</td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
     </tr>
     <tr>
-        <td>progress</td><td>If true shows execution progress.</td><td>No, default value is false.</td>
-    </tr>
-    <tr>
         <td>inheritAll</td><td>If true, pass all properties to the Script Executor. Defaults to false.</td><td>No</td>
     </tr>
+    <tr>
+        <td>debug</td><td>If true print debugging information.</td><td>No, default value is false.</td>
+    </tr>
+    <tr>
+        <td>quiet</td><td>If true be extra quiet.</td><td>No, default value is false.</td>
+    </tr>
+
     <tr><td colspan="3">The following attributes are not supported yet</td></tr>
     <tr>
         <td>fork</td><td>if enabled triggers the class execution in another VM (disabled by default)</td><td>No</td>
