@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -125,7 +126,13 @@ public class SQLSupport {
             PreparedStatement ps = null;
             try {
                 ps = prepareStatement(sql);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("     Executing statement "+sql.trim()+", Parameters: "+params);
+                }
                 int updateCount = executeStatement(ps);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("     Statement executed successfully. Update count="+updateCount);
+                }
                 executedCount++;
                 return updateCount;
             } catch (SQLException e) {

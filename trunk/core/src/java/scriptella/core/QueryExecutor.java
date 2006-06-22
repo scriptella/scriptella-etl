@@ -25,6 +25,8 @@ import scriptella.spi.QueryCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public class QueryExecutor extends ContentExecutor<QueryEl> {
     private List<ExecutableElement> nestedElements;
+    private static final Logger LOG = Logger.getLogger(QueryExecutor.class.getName());
 
     private QueryExecutor(QueryEl queryEl) {
         super(queryEl);
@@ -66,16 +69,26 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
             return;
         }
         final QueryCtxDecorator ctxDecorator = new QueryCtxDecorator(ctx);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Executing query "+getLocation());
+        }
         c.executeQuery(content, ctx,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback params) {
                         ctxDecorator.setParams(params);
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.fine("Processing row for query "+getLocation());
+                        }
 
                         for (ExecutableElement exec : nestedElements) {
                             exec.execute(ctxDecorator);
                         }
                     }
                 });
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Query "+getLocation()+" process completed");
+        }
+
     }
 
 
