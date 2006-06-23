@@ -41,5 +41,6 @@ See http://forrest.apache.org/docs/linking.html for more info
 		</forrest>
 		<cocoon href="http://cocoon.apache.org/"/>
 		<xml.apache.org href="http://xml.apache.org/"/>
-	</external-refs>
+        <jexl href="http://jakarta.apache.org/commons/jexl"/>
+    </external-refs>
 </site>

@@ -18,15 +18,15 @@
 			<section>
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarious when Scripella may be a very helpful tool:</p>
- 			       <ul>
-				    <li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependenices on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
-    				    <li>Working with several databases. For example gathering statistics from the one database and store it inside the other one</li>
-				    <li>Data migration with custom rules. Typically your data migration process consists of several SQL queries with custom filter coniditions and insert statements based on queries result sets. This is the most typical Scriptella usage scenario.</li>
-     			       </ul>
-     			       <p>Of course there are situations when you'd probably try to find a better tool:</p>
-     			       <ul>
-     			       	<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier, for example Octopus.</li>
-     			       </ul>
+				<ul>
+					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependenices on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
+					<li>Working with several databases. For example gathering statistics from the one database and store it inside the other one</li>
+					<li>Data migration with custom rules. Typically your data migration process consists of several SQL queries with custom filter coniditions and insert statements based on queries result sets. This is the most typical Scriptella usage scenario.</li>
+				</ul>
+				<p>Of course there are situations when you'd probably try to find a better tool:</p>
+				<ul>
+					<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier, for example Octopus.</li>
+				</ul>
 			</section>
 		</section>
 		<section>
@@ -40,6 +40,62 @@
 		<section>
 			<title>XML Script Syntax</title>
 			<fixme author="ejboy">Describe all elements</fixme>
+		</section>
+		<section>
+			<title>Expressions and Properties Substitution</title>
+			<p>Scriptella supports properties substitution and expression evaluation based on the following syntax:</p>
+			<ul>
+				<li>$Property_Name ? inserts a value of the specified property</li>
+				<li>${expression} - inserts a value of the expression evaluation.
+                    <a href="ext:jexl">JEXL</a> syntax is used for expressions.</li>
+				<li>?Propery_Name or ?{expression} are used only in queries and scripts to set prepared statement parameters</li>
+			</ul>
+			<note>
+                This syntax is only valid for Scriptella configuration elements and SQL scripts processed by JDBC Provider,
+                other providers may not support properties/expressions substitution.
+            </note>
+			<section>
+				<title>Implicit Variables</title>
+				<p>The following implicit variables are available in scripts and queries:</p>
+				<table>
+					<tr>
+						<th>Variable</th>
+						<th>Description</th>
+						<th>Context</th>
+					</tr>
+					<tr>
+						<td>
+							<code>this</code>
+						</td>
+						<td>This variables provides the following methods and properties:
+                            <ul>
+                                <li>scriptFileURL - URL of the script file being executed</li>
+                                <li>file(relativeURL) - inserts a file with URL relative to scriptFileURL. Useful for BLOB parameters.</li>
+							</ul>
+						</td>
+						<td>Query/Script</td>
+					</tr>
+					<tr>
+						<td>
+							<code>rownum</code>
+						</td>
+						<td>Represents row number of query result set. Starts with 1.</td>
+						<td>Nested elements of Query</td>
+					</tr>
+				</table>
+				<p>Additionally each query produces a set of implicit variables corresponding to selected column names. These variables are available in nested elements.</p>
+			</section>
+			<section>
+				<title>Examples</title>
+				<p>Execute a query for table specified by TABLE  property and inserts the first row into TABLE2</p>
+				<source><![CDATA[<
+    <query>
+        SELECT V1, V2, V3 from $TABLE;
+        <script if=?rownum==1>
+            INSERT INTO $TABLE2 VALUES (?V1, ?{V2+V3});
+        </script>
+    </query>]]></source>
+			</section>
 		</section>
 		<section>
 			<title>Command Line Execution</title>
@@ -58,9 +114,9 @@
 				<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
 				<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
 				<p>You also have to add paths to database drivers used inside the script:</p>
-				<source><![CDATA[<taskdef resource="antscriptella.properties" 
+				<source><![CDATA[<taskdef resource="antscriptella.properties"
    <classpath>
-       <pathelement location="$SCRIPTELLA_HOME/scriptella.jar"> 
+       <pathelement location="$SCRIPTELLA_HOME/scriptella.jar">
        <pathelement location="lib/hsqldb.jar">
        <pathelement location="lib/jconn2.jar">
    </classpath>
@@ -91,12 +147,12 @@
 							<td>If true print debugging information.</td>
 							<td>No, default value is false.</td>
 						</tr>
-                        <tr>
-                            <td>quiet</td>
-                            <td>If true be extra quiet.</td>
-                            <td>No, default value is false.</td>
-                        </tr>
-                    </table>
+						<tr>
+							<td>quiet</td>
+							<td>If true be extra quiet.</td>
+							<td>No, default value is false.</td>
+						</tr>
+					</table>
 				</section>
 				<section>
 					<title>Nested Elements</title>
