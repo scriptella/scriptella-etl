@@ -71,7 +71,7 @@ public abstract class AbstractTestCase extends TestCase {
     protected final File resourceBaseDir;
 
     public AbstractTestCase() {
-        setName(getClass().getName());
+        setName(getClass().getSimpleName());
         //If running under maven/ant - we use basedir
         String projectBaseDir = System.getProperty("basedir");
 
