@@ -45,7 +45,7 @@
 			<title>Expressions and Properties Substitution</title>
 			<p>Scriptella supports properties substitution and expression evaluation based on the following syntax:</p>
 			<ul>
-				<li>$Property_Name ? inserts a value of the specified property</li>
+				<li>$Property_Name - inserts a value of the specified property</li>
 				<li>${expression} - inserts a value of the expression evaluation.
                     <a href="ext:jexl">JEXL</a> syntax is used for expressions.</li>
 				<li>?Propery_Name or ?{expression} are used only in queries and scripts to set prepared statement parameters</li>
@@ -88,7 +88,7 @@
 			<section>
 				<title>Examples</title>
 				<p>Execute a query for table specified by TABLE  property and inserts the first row into TABLE2</p>
-				<source><![CDATA[<
+				<source><![CDATA[
     <query>
         SELECT V1, V2, V3 from $TABLE;
         <script if=?rownum==1>
