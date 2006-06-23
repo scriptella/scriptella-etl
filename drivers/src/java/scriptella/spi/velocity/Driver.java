@@ -74,6 +74,7 @@ public class Driver extends AbstractScriptellaDriver {
      * @return new connection.
      */
     public Connection connect(ConnectionParameters connectionParameters) {
+        //TODO: Add support for output file encoding
         String urlStr = connectionParameters.getUrl();
         URL url;
         try {
