@@ -28,6 +28,8 @@ import java.io.Reader;
 public interface Resource {
     /**
      * Opens a resource and returns a content reader.
+     * <p>The returned reader implementation should be effective enough to allow usage without
+     * extra buffering, etc.
      *
      * @return resource content reader
      * @throws IOException if I/O error occurs.

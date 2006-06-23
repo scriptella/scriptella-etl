@@ -88,7 +88,7 @@ public abstract class ProviderException extends SystemException {
      * @return external API throwable wich may be important for user to recognize the problem.
      */
     public Throwable getNativeException() {
-        return null;
+        return getCause();
     }
 
     /**
