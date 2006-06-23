@@ -91,7 +91,7 @@
 				<source><![CDATA[
     <query>
         SELECT V1, V2, V3 from $TABLE;
-        <script if=?rownum==1>
+        <script if="rownum==1">
             INSERT INTO $TABLE2 VALUES (?V1, ?{V2+V3});
         </script>
     </query>]]></source>
