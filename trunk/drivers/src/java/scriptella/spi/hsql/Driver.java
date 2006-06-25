@@ -42,7 +42,7 @@ public class Driver extends ScriptellaJDBCDriver {
      * In 1.7.2, in-process databases are no longer closed when the last connection to the database
      * is explicitly closed via JDBC, a SHUTDOWN is required
      */
-    public static final String SHUTDOWN_ON_EXIT = "hsql.shutdown_on_exit";
+    public static final String SHUTDOWN_ON_EXIT = "shutdown_on_exit";
 
     private static Map<String, HsqlConnection> lastConnections = null; //Send SHUTDOWN on JVM exit to fix
     private static boolean hookAdded = false;
