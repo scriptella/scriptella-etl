@@ -20,6 +20,7 @@ import scriptella.execution.ScriptsExecutorException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 
@@ -36,6 +37,10 @@ public class SQLSupportPerformanceTest extends DBTestCase {
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
                 return new RepeatingInputStream(SQL, 50000);
+            }
+
+            public OutputStream getOutputStream(final URL u) {
+                throw new UnsupportedOperationException();
             }
 
             public int getContentLength(final URL u) {

@@ -65,7 +65,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
 
     public void test2() throws ScriptsExecutorException {
         final ScriptsExecutor se = newScriptsExecutor(
-                "execution/ExecutionStatisticsTest2.xml");
+                "ExecutionStatisticsTest2.xml");
         final ExecutionStatistics s = se.execute();
         assertEquals(2, s.categories.size());
 
