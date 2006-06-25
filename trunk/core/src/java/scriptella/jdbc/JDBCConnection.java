@@ -40,6 +40,9 @@ public class JDBCConnection extends AbstractConnection {
     private boolean transactable = false;
 
     public JDBCConnection(Connection con) {
+        if (con==null) {
+            throw new IllegalArgumentException("Connection cannot be null");
+        }
         this.con = con;
         try {
             con.setAutoCommit(false);
@@ -82,7 +85,6 @@ public class JDBCConnection extends AbstractConnection {
         }
         try {
             con.commit();
-            con = null;
         } catch (Exception e) {
             throw new JDBCException("Unable to commit transaction", e);
         }
@@ -120,6 +122,6 @@ public class JDBCConnection extends AbstractConnection {
     }
 
     public String toString() {
-        return "JDBCConnection{" + con.getClass() + '}';
+        return "JDBCConnection{" + (con == null ? "" : con.getClass()) + '}';
     }
 }
