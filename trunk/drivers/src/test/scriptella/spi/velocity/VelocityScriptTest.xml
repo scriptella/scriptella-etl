@@ -1,0 +1,20 @@
+<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<scripts>
+    <connection id="in" driver="scriptella.spi.hsql.Driver" url="jdbc:hsqldb:mem:velocity" user="sa" password=""/>
+    <connection id="report" driver="scriptella.spi.velocity.Driver" url="tst://testfile"/>
+    <script connection-id="in">
+        <!-- Test data -->
+        CREATE TABLE Test (
+            COL INT
+        );
+        INSERT INTO Test VALUES(10);
+        INSERT INTO Test VALUES(20);
+        INSERT INTO Test VALUES(30);
+    </script>
+    <query connection-id="in">
+        <!-- Produce a report for a query -->
+        SELECT * FROM Test
+        <script connection-id="report">$COL</script>
+    </query>
+
+</scripts>
