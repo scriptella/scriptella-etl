@@ -23,6 +23,7 @@ import scriptella.execution.ScriptsExecutor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -36,7 +37,6 @@ import java.net.URLStreamHandlerFactory;
  * @version 1.0
  */
 public abstract class AbstractTestCase extends TestCase {
-    protected static final String RESOURCES_DIR_NAME = "resources";
     protected static TestURLHandler testURLHandler;
 
     static {
@@ -48,6 +48,10 @@ public abstract class AbstractTestCase extends TestCase {
                         protected URLConnection openConnection(final URL u) {
                             return new URLConnection(u) {
                                 public void connect() {
+                                }
+
+                                public OutputStream getOutputStream() throws IOException {
+                                    return testURLHandler.getOutputStream(u);
                                 }
 
                                 public InputStream getInputStream()
@@ -78,32 +82,22 @@ public abstract class AbstractTestCase extends TestCase {
         if (projectBaseDir == null) {
             projectBaseDir = "core";
         }
-        resourceBaseDir = new File(projectBaseDir, "src/test/" + RESOURCES_DIR_NAME);
+        resourceBaseDir = new File(projectBaseDir, "src/test");
     }
 
 
     /**
      * This method returns file with path relative to project's src/test/resources directory
      *
-     * @param path file path relative to project's src/test/resources directory
-     * @return file with path relative to project's src/test/resources directory
+     * @param path file path relative to project's src/test directory
+     * @return file with path relative to project's src/test directory
      */
     protected File getFileResource(final String path) {
         return new File(resourceBaseDir, path);
     }
 
     protected ScriptsExecutor newScriptsExecutor() {
-        String name = this.getClass().getName();
-        final String p = AbstractTestCase.class.getPackage().getName() + '.';
-        int ind = name.indexOf(p);
-
-        if (ind >= 0) { //if test class name starts with scriptella package - we remove it
-            name = name.substring(p.length());
-        }
-
-        name = name.replace('.', '/'); //make path
-        name += ".xml";
-
+        String name = getClass().getSimpleName()+".xml";
         return newScriptsExecutor(name);
     }
 
@@ -116,19 +110,11 @@ public abstract class AbstractTestCase extends TestCase {
     }
 
     protected ConfigurationEl loadConfiguration(final String path) {
-        String newPath;
-        if (!path.startsWith("/")) {
-            newPath = RESOURCES_DIR_NAME + '/' + path;
-        } else {
-            newPath = path.substring(1);
-        }
-
         ConfigurationFactory cf = new ConfigurationFactory();
-        final URL resource = Thread.currentThread().getContextClassLoader()
-                .getResource(newPath);
+        final URL resource = getClass().getResource(path);
 
         if (resource == null) {
-            throw new IllegalStateException("Resource " + newPath + " not found");
+            throw new IllegalStateException("Resource " + path + " not found");
         }
 
         cf.setResourceURL(resource);
@@ -148,6 +134,8 @@ public abstract class AbstractTestCase extends TestCase {
 
     protected static interface TestURLHandler {
         public InputStream getInputStream(final URL u)
+                throws IOException;
+        public OutputStream getOutputStream(final URL u)
                 throws IOException;
 
         public int getContentLength(final URL u);

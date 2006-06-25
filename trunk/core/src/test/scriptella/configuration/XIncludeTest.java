@@ -32,13 +32,12 @@ import java.util.List;
  */
 public class XIncludeTest extends AbstractTestCase {
     public void testClasspathResource() {
-        URL url = Thread.currentThread().getContextClassLoader()
-                .getResource(RESOURCES_DIR_NAME + "/XIncludeTest.xml");
+        URL url = getClass().getResource("XIncludeTest.xml");
         test(url);
     }
 
     public void testFileResource() throws MalformedURLException {
-        URL u = getFileResource("XIncludeTest.xml").toURL();
+        URL u = getFileResource(getClass().getPackage().getName().replace('.','/')+"/XIncludeTest.xml").toURL();
         test(u);
     }
 

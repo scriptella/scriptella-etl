@@ -23,6 +23,7 @@ import scriptella.spi.QueryCallback;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Arrays;
@@ -39,6 +40,10 @@ public class FilePropertiesTest extends DBTestCase {
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
                 return new ByteArrayInputStream(FILE);
+            }
+
+            public OutputStream getOutputStream(final URL u) {
+                throw new UnsupportedOperationException();
             }
 
             public int getContentLength(final URL u) {
