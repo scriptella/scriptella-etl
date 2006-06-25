@@ -41,6 +41,7 @@
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
 
+
     <!--Classpath to use for JUnit tests execution -->
     <path id="tests.classpath">
         <pathelement location="${lib.dir}/hsqldb.jar"/>
@@ -72,8 +73,8 @@
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset file="${basedir}/version.properties"/>
-            <zipfileset src="${lib.dir}/commons-jexl-1.0.jar" includes="**" excludes="META-INF/*"/>
-            <zipfileset src="${lib.dir}/commons-logging-1.0.4.jar" includes="**" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-jexl.jar" includes="**" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-logging.jar" includes="**" excludes="META-INF/*"/>
             <zipfileset dir="${lib.dir}" includes="*license*" prefix="META-INF"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
@@ -104,7 +105,7 @@
         <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${lib.dir}" excludes="hsqldb.*" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}" includes="*jexl* *logging*" prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
