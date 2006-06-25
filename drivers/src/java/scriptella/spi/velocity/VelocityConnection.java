@@ -26,6 +26,7 @@ import scriptella.util.IOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -41,27 +42,39 @@ public class VelocityConnection extends AbstractConnection {
     private final VelocityEngine engine;
     private final VelocityContextAdapter adapter;
     private Writer writer;//lazy initialized
+    private String encoding;//encoding for writer
+
 
 
     /**
      * Instantiates a velocity connection.
      *
-     * @param url URL for output.
+     * @param url            URL for output.
      */
     public VelocityConnection(URL url) {
+        this(url, null);
+    }
+
+    /**
+     * Instantiates a velocity connection.
+     *
+     * @param url            URL for output.
+     * @param outputEncoding charset name for output stream. If null default charset is used.
+     */
+    public VelocityConnection(URL url, String outputEncoding) {
         super(Driver.DIALECT);
         this.url = url;
         engine = new VelocityEngine();
         engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, Driver.LOG_SYSTEM);
-        engine.setProperty("velocimacro.library","");//unnecessary file in our case
+        engine.setProperty("velocimacro.library", "");//unnecessary file in our case
         try {
             engine.init();
         } catch (Exception e) {
-            throw new VelocityProviderException("Unable to initialize engine",e);
+            throw new VelocityProviderException("Unable to initialize engine", e);
         }
         adapter = new VelocityContextAdapter();
+        encoding = outputEncoding;
     }
-
 
     /**
      * Executes a script specified by its content.
@@ -69,6 +82,7 @@ public class VelocityConnection extends AbstractConnection {
      * provider may precompile scripts and use compiled versions for subsequent executions.
      * <p>This method is synchronized to to prevent multiple threads from working with the same writer.
      * Additionally single velocityEngine and context adapter instances are used.
+     *
      * @param scriptContent      script content.
      * @param parametersCallback callback to get parameter values.
      */
@@ -78,8 +92,8 @@ public class VelocityConnection extends AbstractConnection {
         adapter.setCallback(parametersCallback);//we may use single context+engine because method is synchronized
         Reader reader = null;
         try {
-            reader=scriptContent.open();
-            engine.evaluate(adapter, getWriter(), url.getFile(),reader);
+            reader = scriptContent.open();
+            engine.evaluate(adapter, getWriter(), url.getFile(), reader);
         } catch (Exception e) {
             throw new VelocityProviderException("Unable to execute script", e);
         } finally {
@@ -105,7 +119,9 @@ public class VelocityConnection extends AbstractConnection {
         if (writer == null) {
             try {
                 URLConnection con = url.openConnection();
-                writer = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+                final OutputStream os = con.getOutputStream();
+                writer = new BufferedWriter(encoding == null ? new OutputStreamWriter(os) :
+                        new OutputStreamWriter(os, encoding));
             } catch (IOException e) {
                 throw new VelocityProviderException("Unable to open URL " + url, e);
             }

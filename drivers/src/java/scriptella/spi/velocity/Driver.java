@@ -35,6 +35,7 @@ import java.util.logging.Logger;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Velocity", "1.4");
+    public static final String OUTPUT_ENCODING = "output.encoding";
     private static final Logger LOG = Logger.getLogger(Driver.class.getName());
     static final LogSystem LOG_SYSTEM = new LogSystem() {
         public void init(RuntimeServices rs) {
@@ -76,10 +77,11 @@ public class Driver extends AbstractScriptellaDriver {
     public Connection connect(ConnectionParameters connectionParameters) {
         //TODO: Add support for output file encoding
         String urlStr = connectionParameters.getUrl();
+        String outEnc = connectionParameters.getProperty(OUTPUT_ENCODING);
         URL url;
         try {
             url = new URL(urlStr);
-            return new VelocityConnection(url);
+            return new VelocityConnection(url, outEnc);
         } catch (MalformedURLException e) {
             throw new VelocityProviderException("Malformed URL " + urlStr, e);
         }
