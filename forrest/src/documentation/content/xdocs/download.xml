@@ -5,14 +5,14 @@
 		<title>Downloads</title>
 	</header>
 	<body>
-		<section>
+        <section>
 			<title>Development Version: 0.1dev</title>
-			<p>
-				<strong>Binary distribution:</strong>
-			</p>
-			<p>
-				<strong>Source distribution:</strong>
-			</p>
+            <table>
+                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.1dev.zip">scriptella-0.1dev.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.1dev-src.zip">scriptella-0.1dev-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-0.1dev.zip">scriptella-examples-0.1dev.zip</a></td></tr>
+            </table>
 		</section>
-	</body>
+        <p>See also <a href="http://javaforge.com/proj/doc.do?doc_id=8353">JavaForge Downloads Page</a></p>
+    </body>
 </document>
