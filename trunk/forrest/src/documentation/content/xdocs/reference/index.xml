@@ -19,13 +19,13 @@
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarious when Scripella may be a very helpful tool:</p>
 				<ul>
-					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependenices on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
-					<li>Working with several databases. For example gathering statistics from the one database and store it inside the other one</li>
-					<li>Data migration with custom rules. Typically your data migration process consists of several SQL queries with custom filter coniditions and insert statements based on queries result sets. This is the most typical Scriptella usage scenario.</li>
+					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
+					<li>Working with several datasources. For example gathering statistics from the one database and store it inside the other one</li>
+					<li>If you prefer to write <source>SELECT * FROM Account WHERE login=?name</source> instead of using a "Smart Query Designer GUI"</li>
 				</ul>
 				<p>Of course there are situations when you'd probably try to find a better tool:</p>
 				<ul>
-					<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier, for example Octopus.</li>
+					<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier.</li>
 				</ul>
 			</section>
 		</section>
@@ -38,7 +38,35 @@
 			<title>Installation</title>
 		</section>
 		<section>
-			<title>XML Script Syntax</title>
+			<title>XML Script Elements</title>
+			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
+			</note>
+			<p>The following XML stanza briefly covers main Scriptella XML elements:</p><source><![CDATA[
+<!DOCTYPE scripts SYSTEM "http://scriptella.javaforge.com/dtd/scriptella.dtd">
+<scripts>
+    <description></description>
+	<properties>
+        <include href="script.properties"/>
+	</properties>
+    <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678"/>
+    <connection id="con2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" password=""/>
+    <script connection-id="out">
+	    <include href="dbschema.sql"/>
+    </script>
+    <query connection-id="in">
+        SELECT * from Bug
+        <script connection-id="out">
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        </script>
+    </query>
+</scripts>]]></source>
+			<p>&lt;scripts&gt; is a root element of all Scriptella files.</p>
+			<section>
+				<title>Properties</title>
+				<p>In this element define properties to be substituted in other script elements. This concept is similar to
+                Ant except that overriding a property value is POSSIBLE in Scriptella.</p>
+				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
+			</section>
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
 		<section>
@@ -47,7 +75,7 @@
 			<ul>
 				<li>$Property_Name - inserts a value of the specified property</li>
 				<li>${expression} - inserts a value of the expression evaluation.
-                    <a href="ext:jexl">JEXL</a> syntax is used for expressions.</li>
+                    <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.</li>
 				<li>?Propery_Name or ?{expression} are used only in queries and scripts to set prepared statement parameters</li>
 			</ul>
 			<note>
@@ -69,8 +97,8 @@
 						</td>
 						<td>This variables provides the following methods and properties:
                             <ul>
-                                <li>scriptFileURL - URL of the script file being executed</li>
-                                <li>file(relativeURL) - inserts a file with URL relative to scriptFileURL. Useful for BLOB parameters.</li>
+								<li>scriptFileURL - URL of the script file being executed</li>
+								<li>file(relativeURL) - inserts a file with URL relative to scriptFileURL. Useful for BLOB parameters.</li>
 							</ul>
 						</td>
 						<td>Query/Script</td>

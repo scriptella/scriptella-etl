@@ -7,9 +7,9 @@
 	<body>
 		<section id="overview">
 			<title>About Scriptella</title>
-			<p>Scriptella is an open source database migration and SQL scripts execution tool.</p>
-			<p>Scriptella differs from other tools in its SQL-centric approach where almost all logic is written in
-                SQL.</p>
+			<p>Scriptella is an open source ETL and scripts execution tool.</p>
+			<p>Our primary focus is simplicity. You don't have to study yet another complex XML scripting language - use SQL(or other
+                scripting language suitable for your datasource) to perform required transformations.</p>
 			<p>
 				<a href="download.html">Download</a>
                 and
@@ -21,17 +21,17 @@
 		<section id="usage">
 			<title>Typical use</title>
 			<ul>
-				<li>Database migration, including schema changes.</li>
+				<li>Database migration.</li>
 				<li>Database creation/update scripts.</li>
-				<li>Cross-database SQL scripts.</li>
-				<li>Import/Export</li>
+				<li>Cross-database ETL operations, import/export</li>
+				<li>Replacement of Ant &lt;sql&gt; task.</li>
 			</ul>
 		</section>
 		<section id="features">
 			<title>Features</title>
 			<ul>
-				<li>Simple XML syntax for scripts.You can upgrade your existing SQL scripts by creating a simple
-                    Scriptella XML file:
+				<li>Simple XML syntax for scripts. Add dynamics to your existing SQL scripts by creating a thin
+                    wrapper XML file:
                     <source><![CDATA[
 <scripts>
     <connection driver="$driver" url="$url" user="$user" password="$password"/>
@@ -42,17 +42,18 @@
 </scripts>
     ]]></source>
 				</li>
-				<li>Support for multiple databases (or multiple connections to a single database) in a script file.</li>
+				<li>Support for multiple datasources (or multiple connections to a single database) in a script file.</li>
 				<li>Support for many useful JDBC features, e.g. parameters in SQL including file blobs and JDBC
                     escaping.</li>
 				<li>Support for evaluated expressions and properties (JEXL syntax)</li>
 				<li>Support for cross-database SQL scripts by using &lt;dialect&gt; elements</li>
 				<li>Transactional execution</li>
-				<li>Using queries result sets as an input for SQL scripts.</li>
+				<li>Error handling via &lt;onerror&gt; elements</li>
 				<li>Conditional scripts/queries execution(similar to Ant if/unless attrbutes but more powerful)</li>
 				<li>Easy-to-Use as a standalone tool or Ant task. No deployment/installation required.</li>
-				<li>Import/Export from / to CSV, LDAP through JDBC bridge.</li>
-				<li>Non-JDBC Datasources</li>
+				<li>Service Provider Interface (SPI) for interoperability with non-JDBC Datasources.</li>
+				<li>Velocity and Janino providers. Generate reports with Velocity directly from your script files.
+                For complex tasks embed java code which is compiled and executed by Janino.</li>
 			</ul>
 		</section>
 	</body>

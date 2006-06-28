@@ -38,12 +38,20 @@ public class ConfigurationFactory {
     private static final Logger LOG = Logger.getLogger(ConfigurationFactory.class.getName());
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "scriptella.dtd";
+    private URL resourceURL;
 
     static {
-        DBF.setValidating(true);
+        setValidating(true);
     }
 
-    private URL resourceURL;
+
+    /**
+     * Sets validation option.
+     * @param validating true if XML file validation should be performed.
+     */
+    public static void setValidating(boolean validating) {
+        DBF.setValidating(validating);
+    }
 
     public ConfigurationFactory() {
     }
@@ -62,7 +70,7 @@ public class ConfigurationFactory {
             db.setEntityResolver(new EntityResolver() {
                 public InputSource resolveEntity(final String publicId,
                                                  final String systemId) {
-                    if (systemId.endsWith(DTD_NAME)) {
+                    if (systemId!=null && systemId.trim().endsWith(DTD_NAME)) {
                         return new InputSource(ConfigurationFactory.class.getResourceAsStream(
                                 "/scriptella/dtd/" + DTD_NAME));
                     }
