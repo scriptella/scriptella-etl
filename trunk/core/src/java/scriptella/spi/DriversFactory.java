@@ -39,8 +39,8 @@ public final class DriversFactory {
      * @return Scriptella Driver.
      * @throws ClassNotFoundException if If the class was not found.
      */
-    public static ScriptellaDriver getDriver(String driverClassName) throws ClassNotFoundException {
-        return getDriver(Class.forName(driverClassName));
+    public static ScriptellaDriver getDriver(String driverClassName, ClassLoader cl) throws ClassNotFoundException {
+        return getDriver(Class.forName(driverClassName, true, cl));
     }
 
     /**
@@ -55,8 +55,14 @@ public final class DriversFactory {
     @SuppressWarnings("unchecked")
     public static ScriptellaDriver getDriver(Class drvClass) {
         if (Driver.class.isAssignableFrom(drvClass)) {
-            //We don't have to pass driver class, because it must register itself
-            return new ScriptellaJDBCDriver();
+            //We must load JDBC driver using the same classloader as drvClass
+            try {
+                Class<?> cl = Class.forName("scriptella.jdbc.ScriptellaJDBCDriver", true, drvClass.getClassLoader());
+                return (ScriptellaDriver)cl.newInstance();
+            } catch (Exception e) {
+                throw new IllegalStateException("Unable to instantiate JDBC driver for class " + drvClass);
+
+            }
         } else if (ScriptellaDriver.class.isAssignableFrom(drvClass)) {
             try {
                 return (ScriptellaDriver) drvClass.newInstance();

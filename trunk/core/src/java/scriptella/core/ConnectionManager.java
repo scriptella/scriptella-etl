@@ -21,9 +21,13 @@ import scriptella.execution.ScriptsContext;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.DriversClassLoader;
 import scriptella.spi.DriversFactory;
 import scriptella.spi.ScriptellaDriver;
+import scriptella.util.UrlPathTokenizer;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,9 +56,25 @@ public class ConnectionManager {
         String user = ctx.substituteProperties(c.getUser());
         String schema = ctx.substituteProperties(c.getSchema());
         String url = ctx.substituteProperties(c.getUrl());
+        String cp = ctx.substituteProperties(c.getClasspath());
+
+        //Obtains a classloader
+        ClassLoader cl = getClass().getClassLoader();
+        if (cp!=null) { //if classpath specified
+            //Parse it and create a new classloader
+            UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getBaseURL());
+            try {
+                URL[] urls = tok.split(cp);
+                if (urls.length>0) {
+                    cl = new DriversClassLoader(urls);
+                }
+            } catch (MalformedURLException e) {
+                throw new ConfigurationException("Unable to parse classpath parameter for "+connection, e);
+            }
+        }
         connectionParameters = new ConnectionParameters(c.getProperties(), url, user, pwd, schema, cat);
         try {
-            driver = DriversFactory.getDriver(drvClass);
+            driver = DriversFactory.getDriver(drvClass, cl);
         } catch (ClassNotFoundException e) {
             throw new ConfigurationException("Driver class " + drvClass + " not found for " + connectionParameters +
                     ".Please check if the class name is correct and required libraries available on classpath", e);
@@ -62,7 +82,6 @@ public class ConnectionManager {
             throw new ConfigurationException("Unable to initialize driver for " + connectionParameters + ":" + e.getMessage(), e);
         }
     }
-
 
     public Connection getConnection() {
         if (connection == null) {
@@ -149,5 +168,7 @@ public class ConnectionManager {
         }
         return cl;
     }
+
+
 
 }
