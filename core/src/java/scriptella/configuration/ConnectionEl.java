@@ -32,6 +32,7 @@ public class ConnectionEl extends XMLConfigurableBase {
     private String password;
     private String catalog;
     private String schema;
+    private String classpath;
     private PropertiesEl properties;
 
     public ConnectionEl() {
@@ -93,6 +94,14 @@ public class ConnectionEl extends XMLConfigurableBase {
         this.schema = schema;
     }
 
+    public String getClasspath() {
+        return classpath;
+    }
+
+    public void setClasspath(String classpath) {
+        this.classpath = classpath;
+    }
+
     /**
      * @return Map of properties for this connection.
      */
@@ -109,6 +118,7 @@ public class ConnectionEl extends XMLConfigurableBase {
         setProperty(element, "password");
         setProperty(element, "catalog");
         setProperty(element, "schema");
+        setProperty(element, "classpath");
         properties = new PropertiesEl(element);
 
         if (id == null) {
@@ -117,9 +127,31 @@ public class ConnectionEl extends XMLConfigurableBase {
     }
 
     public String toString() {
-        return "connection{" + "id='" + id + "'" + ", url='" + url + "'" +
-                ", driver='" + driver + "'" + ", user='" + user + "'" + ", password='" +
-                password + "'" + ", catalog='" + catalog + "'" + ", schema='" + schema +
-                "'" + "}";
+        StringBuilder res = new StringBuilder("Connection{driver='").append(driver).append('\'');
+
+        res.append("properties=").append(properties);
+        if (classpath != null) {
+            res.append(", classpath='").append(classpath).append('\'');
+        }
+        if (schema != null) {
+            res.append(", schema='").append(schema).append('\'');
+        }
+        if (catalog != null) {
+            res.append(", catalog='").append(catalog).append('\'');
+        }
+        if (password != null) {
+            res.append(", password='").append(password).append('\'');
+        }
+        if (user != null) {
+            res.append(", user='").append(user).append('\'');
+        }
+        if (url != null) {
+            res.append(", url='").append(url).append('\'');
+        }
+        if (id != null) {
+            res.append(", id='").append(id).append('\'' + '}');
+        }
+
+        return res.toString();
     }
 }
