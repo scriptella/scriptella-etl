@@ -22,6 +22,8 @@
 					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
 					<li>Working with several datasources. For example gathering statistics from the one database and store it inside the other one</li>
 					<li>If you prefer to write <source>SELECT * FROM Account WHERE login=?name</source> instead of using a "Smart Query Designer GUI"</li>
+					<li>Test data generation. You don't have to store huge random filled test files - produce
+                    test data during script execution.</li>
 				</ul>
 				<p>Of course there are situations when you'd probably try to find a better tool:</p>
 				<ul>
@@ -41,14 +43,17 @@
 			<title>XML Script Elements</title>
 			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
 			</note>
-			<p>The following XML stanza briefly covers main Scriptella XML elements:</p><source><![CDATA[
+			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
+			<source><![CDATA[
 <!DOCTYPE scripts SYSTEM "http://scriptella.javaforge.com/dtd/scriptella.dtd">
 <scripts>
     <description></description>
-	<properties>
+    <properties>
         <include href="script.properties"/>
-	</properties>
-    <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678"/>
+    </properties>
+    <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678">
+        driver.property=value
+    </connection>
     <connection id="con2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" password=""/>
     <script connection-id="out">
 	    <include href="dbschema.sql"/>
@@ -62,10 +67,23 @@
 </scripts>]]></source>
 			<p>&lt;scripts&gt; is a root element of all Scriptella files.</p>
 			<section>
-				<title>Properties</title>
+				<title>&lt;properties&gt;</title>
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
                 Ant except that overriding a property value is POSSIBLE in Scriptella.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
+			</section>
+			<section>
+				<title>&lt;connection&gt;</title>
+				<p>Elements of this type define connections to different datasources to work with.
+                    A set of required attributes depends on driver. For example JDBC drivers require
+                    driver, url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
+				<p>id attribute is required if you declare more than one connections inside your script.
+                    The value of this attribute is used to reference the connection in scripts and queries.</p>
+				<p>classpath attribute is used specify additional classpath to load driver libraries. Alternatively you may
+                add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
+                    Boot classpath libraries take precedence over libraries specified connection classpath attribute.
+                </p>
+				<p>Use element's content to pass properties into connection.</p>
 			</section>
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
@@ -78,9 +96,15 @@
                     <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.</li>
 				<li>?Propery_Name or ?{expression} are used only in queries and scripts to set prepared statement parameters</li>
 			</ul>
+			<warning>
+                In sql scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
+                In this case prepared statements may be cached thus increasing the performance of hot spot sections evaluated multiple times.
+                Use $ for direct substitution only if you have problems passing prepared statement parameters via ?, ?{} syntax.
+            </warning>
 			<note>
                 This syntax is only valid for Scriptella configuration elements and SQL scripts processed by JDBC Provider,
                 other providers may not support properties/expressions substitution.
+                Consult JDBC Provider Javadoc for more details.
             </note>
 			<section>
 				<title>Implicit Variables</title>
@@ -98,7 +122,7 @@
 						<td>This variables provides the following methods and properties:
                             <ul>
 								<li>scriptFileURL - URL of the script file being executed</li>
-								<li>file(relativeURL) - inserts a file with URL relative to scriptFileURL. Useful for BLOB parameters.</li>
+								<li>file(relativeURL) - inserts a file with URL relative to a scriptFileURL. Useful for BLOB parameters.</li>
 							</ul>
 						</td>
 						<td>Query/Script</td>
@@ -141,7 +165,7 @@
                     resources for integration with Ant.</p>
 				<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
 				<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
-				<p>You also have to add paths to database drivers used inside the script:</p>
+				<p>You may also add paths to database drivers used inside the script:</p>
 				<source><![CDATA[<taskdef resource="antscriptella.properties"
    <classpath>
        <pathelement location="$SCRIPTELLA_HOME/scriptella.jar">
@@ -150,6 +174,8 @@
    </classpath>
 </taskdef>]]></source>
 			</section>
+			<p>These drivers will be available on the boot classpath.
+                In this case you don't have to specify classpath in &lt;connection&gt; elements.</p>
 			<section>
 				<title>Scriptella &quot;Execute&quot; Task</title>
 				<section>

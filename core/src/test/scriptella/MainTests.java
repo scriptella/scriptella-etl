@@ -21,6 +21,8 @@ import scriptella.configuration.XIncludeTest;
 import scriptella.core.SQLParserBaseTest;
 import scriptella.execution.ExecutionStatisticsTest;
 import scriptella.expressions.PropertiesSubstitutorTest;
+import scriptella.spi.DriversClassLoaderTest;
+import scriptella.util.UrlPathTokenizerTest;
 
 
 /**
@@ -46,6 +48,9 @@ public class MainTests {
         suite.addTestSuite(ConditionsTest.class);
         suite.addTestSuite(PropertiesSubstitutorTest.class);
         suite.addTestSuite(ExecutionStatisticsTest.class);
+        suite.addTestSuite(DriversClassLoaderTest.class);
+        suite.addTestSuite(UrlPathTokenizerTest.class);
+
 
         return suite;
     }

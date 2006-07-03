@@ -10,7 +10,8 @@
 			<ul>
 				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
 				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to your system path.</li>
-				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory.</li>
+				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+                    or implicitly specify classpath attribute in script connection elements.</li>
 			</ul>
 		</section>
 		<section>
@@ -19,7 +20,9 @@
 			<source><![CDATA[
 <taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar;additional_drivers.jar"/>
                 ]]></source>
-			<p>Running Scriptella files from Ant is simple:</p>
+            <note>Additional drivers classpath elements are optional. You may directly specify classpath attribute in
+            connection XML element.</note>
+            <p>Running Scriptella files from Ant is simple:</p>
 			<source><![CDATA[
 <execute/>
                 ]]></source>
@@ -37,10 +40,12 @@ By default file ${basedir}/script.xml is executed. Use file attribute to specify
 			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
 			Alternatively you can use java launcher:</p>
 			<source><![CDATA[
-java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.jar
+java -jar scriptella.jar
                 ]]></source>
 			<note>
-                -Xbootclasspath/a: is used instead of -cp to specify additional classpath (overcomes -jar option limitation).
+                You may use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar
+                to specify additional classpath (overcomes -jar option limitation). In this case
+                you don't have to define connection classpath attributes.
             </note>
 		</section>
 		<section>
@@ -52,7 +57,7 @@ java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.j
 				<p>script.xml:</p>
 				<source><![CDATA[
     <scripts>
-        <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password=""/>
+        <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
         <connection id="db2" driver="jdbc.Driver.Class2.Name" url="jdbc:database2:sample" user="sa" password=""/>
         <query connection-id="db1">
             <!-- Select product from software category in db1-->

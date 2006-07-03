@@ -18,8 +18,8 @@ package scriptella.execution;
 import scriptella.core.Session;
 import scriptella.expressions.ParametersCallback;
 import scriptella.expressions.PropertiesSubstitutor;
-import scriptella.expressions.ThisParameter;
 import scriptella.interactive.ProgressCallback;
+import scriptella.spi.ThisParameter;
 import scriptella.util.PropertiesMap;
 
 import java.net.URL;
@@ -105,4 +105,5 @@ public class ScriptsContext implements ParametersCallback {
     public String substituteProperties(final String s) {
         return propertiesSubstitutor.substitute(s, this);
     }
+
 }
