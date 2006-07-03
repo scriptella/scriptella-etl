@@ -20,12 +20,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
 /**
- * TODO: Add documentation
+ * Utility class JDBC related operations.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -34,6 +33,10 @@ public final class JDBCUtils {
     private JDBCUtils() {
     }
 
+    /**
+     * Silently closes a connection.
+     * @param con connection to close. Nulls allowed.
+     */
     public static void closeSilent(final Connection con) {
         try {
             if (con != null) {
@@ -43,6 +46,10 @@ public final class JDBCUtils {
         }
     }
 
+    /**
+     * Silently closes a statement.
+     * @param s statement to close. Nulls allowed.
+     */
     public static void closeSilent(final Statement s) {
         try {
             if (s != null) {
@@ -52,6 +59,10 @@ public final class JDBCUtils {
         }
     }
 
+    /**
+     * Silently closes a result set.
+     * @param rs result set to close. Nulls allowed.
+     */
     public static void closeSilent(final ResultSet rs) {
         try {
             if (rs != null) {
@@ -61,16 +72,12 @@ public final class JDBCUtils {
         }
     }
 
-    public static Collection<String> toUppercase(final Collection<String> col) {
-        Collection<String> r = new ArrayList<String>(col.size());
-
-        for (String s : col) {
-            r.add(s.toUpperCase());
-        }
-
-        return r;
-    }
-
+    /**
+     * Iterates through the resultset and returns column values.
+     * @param rs resultset to iterate.
+     * @param columnPos column position. Starts at 1.
+     * @return list of column values.
+     */
     public static List<String> getColumn(final ResultSet rs, final int columnPos) {
         List<String> l = new ArrayList<String>();
 

@@ -16,7 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.expressions.ParametersCallback;
-import scriptella.expressions.ThisParameter;
+import scriptella.spi.ThisParameter;
 
 import java.io.Closeable;
 import java.sql.ResultSet;

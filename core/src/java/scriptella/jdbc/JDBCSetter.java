@@ -36,102 +36,68 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JDBCSetter implements Closeable {
-    private PreparedStatement ps;
-    private UrlSetter urlSetter; //Strategy for files
-
-    /**
-     * For internal purposes only
-     */
-    protected JDBCSetter() {
-    }
-
-    /**
-     * Creates setter for <code>preparedStatement</code>.
-     *
-     * @param preparedStatement preparedStatement to set parameters.
-     */
-    public JDBCSetter(PreparedStatement preparedStatement) {
-        ps = preparedStatement;
-    }
+class JDBCSetter implements Closeable {
+    private List<InputStream> streams;
 
     /**
      * Sets the value of the designated parameter using the given object.
      * <p>Depending on the value type the concrete subclass of JDBCSetter is chosen.
      *
+     * @param preparedStatement prepared statement to set object.
      * @param index he first parameter is 1, the second is 2, ...
      * @param value the object containing the input parameter value
      * @throws SQLException
      */
-    public void setObject(int index, Object value) throws SQLException {
+    public void setObject(final PreparedStatement preparedStatement, final int index, final Object value) throws SQLException {
         //Choosing a setter strategy
         if (value instanceof URL) {
-            if (urlSetter == null) {
-                urlSetter = new UrlSetter();
-            }
-            urlSetter.setObject(index, value);
+            setURLObject(preparedStatement, index, (URL) value);
         } else {
-            ps.setObject(index, value);
+            preparedStatement.setObject(index, value);
 
         }
     }
+
+    /**
+     * Sets a content of the file specified by URL.
+     */
+    protected void setURLObject(final PreparedStatement ps, final int index, final URL url) throws SQLException {
+        try {
+            final URLConnection c = url.openConnection();
+            final InputStream is = new BufferedInputStream(c.getInputStream());
+
+            if (streams == null) {
+                streams = new ArrayList<InputStream>();
+            }
+
+            streams.add(is);
+
+            int len = c.getContentLength();
+
+            if (len < 0) {
+                throw new SQLException("Unknown content-length for file " + url);
+            }
+
+            ps.setBinaryStream(index, is, len);
+        } catch (IOException e) {
+            throw (SQLException) new SQLException("Unable to read content for file " + url +
+                    ": " + e.getMessage()).initCause(e);
+        }
+
+
+    }
+
 
     /**
      * Closes any resources opened during this object lifecycle.
      */
     public void close() {
-        ps = null;
-        if (urlSetter != null) {
-            urlSetter.close();
-            urlSetter = null;
-        }
-    }
-
-    /**
-     * {@link URL} handling strategy.
-     * URLs are treated as reference to content which should be downloaded
-     * as set as stream parameter.
-     */
-    class UrlSetter extends JDBCSetter {
-        private List<InputStream> streams;
-
-        public void setObject(int index, Object value) throws SQLException {
-            URL url = (URL) value;
-            try {
-                final URLConnection c = url.openConnection();
-                final InputStream is = new BufferedInputStream(c.getInputStream());
-
-                if (streams == null) {
-                    streams = new ArrayList<InputStream>(2);
-                }
-
-                streams.add(is);
-
-                int len = c.getContentLength();
-
-                if (len < 0) {
-                    throw new SQLException("Unknown content-length for file " + url);
-                }
-
-                ps.setBinaryStream(index, is, len);
-            } catch (IOException e) {
-                throw (SQLException) new SQLException("Unable to read content for file " + url +
-                        ": " + e.getMessage()).initCause(e);
+        if (streams != null) {
+            for (InputStream is : streams) {
+                IOUtils.closeSilently(is);
             }
-
-
+            streams = null;
         }
-
-        public void close() {
-            if (streams != null) {
-                for (InputStream is : streams) {
-                    IOUtils.closeSilently(is);
-                }
-                streams = null;
-            }
-        }
-
-
     }
 
 

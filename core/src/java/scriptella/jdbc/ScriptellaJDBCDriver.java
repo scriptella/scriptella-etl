@@ -18,17 +18,36 @@ package scriptella.jdbc;
 import scriptella.spi.AbstractScriptellaDriver;
 import scriptella.spi.ConnectionParameters;
 
+import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * TODO: Add documentation
+ * Adapter for JDBC drivers.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
+    static {
+        //Redirects DriverManager's logging
+        final Logger LOG = Logger.getLogger("scriptella.DriverManagerLog");
+        if (LOG.isLoggable(Level.FINE)) {
+            if (DriverManager.getLogWriter() == null) {
+                DriverManager.setLogWriter(new PrintWriter(System.out) {
+                    public void println(String s) {
+                        LOG.fine(s);
+                    }
+                });
+
+            }
+        }
+    }
+
     public JDBCConnection connect(ConnectionParameters params) {
         if (params.getUrl() == null) {
             throw new IllegalArgumentException("URL parameter is required for JDBC driver connection");
@@ -50,6 +69,7 @@ public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
         }
     }
 
+
     /**
      * Creates Scriptella JDBC connection.
      *
@@ -59,7 +79,16 @@ public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
      * @throws SQLException if DB exception occurs.
      */
     protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
-        return new JDBCConnection(DriverManager.getConnection(parameters.getUrl(), props));
+        return new JDBCConnection(getConnection(parameters.getUrl(), props));
+    }
+
+    /**
+     * A helper method for subclasses to avoid direct interaction with DriverManager API.
+     * <p>Calls {@link DriverManager#getConnection(String, java.util.Properties)}
+     *
+     */
+    protected Connection getConnection(String url, Properties props) throws SQLException {
+        return DriverManager.getConnection(url, props);
     }
 
 
