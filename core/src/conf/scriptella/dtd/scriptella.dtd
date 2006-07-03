@@ -36,7 +36,7 @@ This element may contain plain text or includes.
 <!--
 The connection element specifies connection to a database or other system.
 This element may contain properties as plain text with includes.
-Example:
+Examples:
 %
 <connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
             url="jdbc:ldap://localhost:389/dc=scriptella"
@@ -44,6 +44,10 @@ Example:
     SEARCH_SCOPE=subTreeScope
     ignore_transactions=true
 </connection>
+
+<connection driver="hsql"
+            url="jdbc:hsqldb:file:db"
+            user="sa" classpath="hsqldb.jar"/>
 %
 -->
 <!ELEMENT connection (#PCDATA | include)*>
@@ -55,6 +59,7 @@ Example:
  @attr password database password
  @attr catalog catalog
  @attr schema schema
+ @attr classpath the classpath to use when loading the driver. Paths are resolved relative to scripts file location.
 -->
 <!ATTLIST connection
 id ID #IMPLIED
@@ -64,6 +69,7 @@ user CDATA #IMPLIED
 password CDATA #IMPLIED
 catalog CDATA #IMPLIED
 schema CDATA #IMPLIED
+classpath CDATA #IMPLIED
 >
 <!--
 The fallback element contains alternate content to be used if the requested resource cannot be found.
@@ -84,9 +90,11 @@ This element may contain plain text, includes or fallbacks.
 <!ELEMENT include (fallback?)>
 <!--
 @attr href contains an URL pointing to the file to include
+@attr encoding Included text encoding name.
 -->
 <!ATTLIST include
 href CDATA #REQUIRED
+encoding CDATA #IMPLIED
 >
 <!--
 The dialect element defines a vendor specific script. Scripting elements may contain any number of nested dialects.
@@ -94,11 +102,11 @@ This element may contain plain text or includes.
 -->
 <!ELEMENT dialect (#PCDATA | include)*>
 <!--
- @attr database case insensitive regular expression to match database vendor name, e.g. .*oracle.*
- @attr version case insensitive regular expression to match database version, e.g. 1\.0
+ @attr name case insensitive regular expression to match vendor name, e.g. .*oracle.*
+ @attr version case insensitive regular expression to match vendor version, e.g. 1\.0
 -->
 <!ATTLIST dialect
-database CDATA #IMPLIED
+name CDATA #IMPLIED
 version CDATA #IMPLIED
 >
 
