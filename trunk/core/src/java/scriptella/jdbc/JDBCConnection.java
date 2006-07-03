@@ -38,6 +38,7 @@ public class JDBCConnection extends AbstractConnection {
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JDBCConnection.class.getName());
     private boolean transactable = false;
+    private StatementCache statementCache=new StatementCache(100);
 
     public JDBCConnection(Connection con) {
         if (con==null) {
@@ -71,11 +72,13 @@ public class JDBCConnection extends AbstractConnection {
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {
         Script s = new Script(scriptContent);
+        s.setStatementCache(statementCache);
         s.execute(con, parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
         Query q = new Query(queryContent);
+        q.setStatementCache(statementCache);
         q.execute(con, parametersCallback, queryCallback);
     }
 
@@ -109,6 +112,8 @@ public class JDBCConnection extends AbstractConnection {
             } catch (SQLException e) {
                 throw new JDBCException("Unable to close connection", e);
             }
+            statementCache.close();
+            statementCache=null;
         }
     }
 

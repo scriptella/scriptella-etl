@@ -18,10 +18,15 @@ package scriptella;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 
 /**
@@ -32,8 +37,14 @@ import java.net.URL;
  */
 public class SQLSupportPerformanceTest extends DBTestCase {
     private static final byte SQL[] = "update ${'test'} set id=?{property};rollback;".getBytes();
+    private static final byte SQL2[] = "update test set id=?{property};".getBytes();
 
+    /**
+     * 5406
+     * 5563
+     */
     public void test() throws ScriptsExecutorException {
+        getConnection("sqlsupport");
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
                 return new RepeatingInputStream(SQL, 50000);
@@ -51,6 +62,57 @@ public class SQLSupportPerformanceTest extends DBTestCase {
         ScriptsExecutor se = newScriptsExecutor();
         se.execute();
     }
+
+    /**
+     * 3703 (2281,875)
+     * 3843 (2312,938)
+     * @throws ScriptsExecutorException
+     * @throws SQLException
+     * @throws IOException
+     */
+    public void testCompare() throws ScriptsExecutorException, SQLException, IOException {
+        final int n = 20000;
+        Connection con = getConnection("sqlsupport");
+        con.setAutoCommit(false);
+        AbstractTestCase.testURLHandler = new TestURLHandler() {
+            public InputStream getInputStream(final URL u) {
+                return new RepeatingInputStream(SQL2, n);
+            }
+
+            public OutputStream getOutputStream(final URL u) {
+                throw new UnsupportedOperationException();
+            }
+
+            public int getContentLength(final URL u) {
+
+                return n * SQL.length;
+            }
+        };
+
+        ScriptsExecutor se = newScriptsExecutor();
+        long ti = System.currentTimeMillis();
+        se.execute();
+        ti = System.currentTimeMillis()-ti;
+        System.out.println("ti = " + ti);
+        System.gc();
+        //Now let's test direct HSQL connection
+        RepeatingInputStream ris = new RepeatingInputStream("update test set id=?\n".getBytes(), n);
+        BufferedReader br = new BufferedReader(new InputStreamReader(ris));
+        ti = System.currentTimeMillis();
+        for (String s;(s=br.readLine())!=null;) {
+            PreparedStatement ps = con.prepareStatement(s);
+            ps.setObject(1,1);
+            ps.execute();
+            ps.close();
+        }
+        con.commit();
+        ti = System.currentTimeMillis()-ti;
+        System.out.println("ti hsql = " + ti);
+
+
+
+    }
+
 
     public static void main(final String args[])
             throws ScriptsExecutorException {

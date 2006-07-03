@@ -20,6 +20,7 @@ import scriptella.core.StatisticInterceptor;
 import scriptella.expressions.Expression;
 import scriptella.expressions.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -42,6 +43,8 @@ import java.util.logging.Logger;
 public class SQLSupport {
     private static final Logger LOG = Logger.getLogger(SQLSupport.class.getName());
     protected Resource resource;
+    protected StatementCache statementCache; //may be null, if caching switched off
+    private JDBCSetter setter=new JDBCSetter(); //Setter for prepared statement parameters
 
     public SQLSupport(Resource resource) {
         if (resource == null) {
@@ -57,6 +60,14 @@ public class SQLSupport {
                 return new StringReader(sql);
             }
         };
+    }
+
+    public StatementCache getStatementCache() {
+        return statementCache;
+    }
+
+    public void setStatementCache(StatementCache statementCache) {
+        this.statementCache = statementCache;
     }
 
     protected int parseAndExecute(final Connection connection,
@@ -82,7 +93,6 @@ public class SQLSupport {
         QueryCallback callback;
         ParametersCallback paramsCallback;
         List params = new ArrayList();
-        private JDBCSetter setter; //Setter for prepared statement parameters
         private int executedCount;//number of executed statements
 
         public Parser(Connection con, QueryCallback callback,
@@ -123,15 +133,14 @@ public class SQLSupport {
         }
 
         int executeStatement(final String sql) {
-            PreparedStatement ps = null;
             try {
-                ps = prepareStatement(sql);
+                PreparedStatement ps = prepareStatement(sql);
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("     Executing statement "+sql.trim()+", Parameters: "+params);
+                    LOG.fine("     Executing statement " + sql.trim() + ", Parameters: " + params);
                 }
                 int updateCount = executeStatement(ps);
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("     Statement executed successfully. Update count="+updateCount);
+                    LOG.fine("     Statement executed successfully. Update count=" + updateCount);
                 }
                 executedCount++;
                 return updateCount;
@@ -145,7 +154,7 @@ public class SQLSupport {
                 }
                 throw e; //rethrow
             } finally {
-                releaseStatement(ps);
+                releaseStatement();
             }
 
         }
@@ -158,12 +167,18 @@ public class SQLSupport {
          * @throws SQLException if driver fails
          */
         PreparedStatement prepareStatement(final String sql) throws SQLException {
-            PreparedStatement ps = con.prepareStatement(sql);
-            setter = new JDBCSetter(ps);
+            //Check if statement has been cached
+            PreparedStatement ps = statementCache != null ? statementCache.get(sql) : null;
+            if (ps == null) { //If not cached
+                ps = con.prepareStatement(sql);
+                if (statementCache != null) { //Put new statement to cache if necessary
+                    statementCache.put(sql, ps);
+                }
+            }
 
             for (int i = 0, n = params.size(); i < n; i++) {
                 Object o = params.get(i);
-                setter.setObject(i + 1, o);
+                setter.setObject(ps, i + 1, o);
             }
             return ps;
         }
@@ -201,13 +216,12 @@ public class SQLSupport {
             return updateCount;
         }
 
-        private void releaseStatement(final PreparedStatement ps) {
-            JDBCUtils.closeSilent(ps);
-            params.clear();
-            if (setter != null) {
-                setter.close(); //closing resources opened by setter
-                setter = null;
+        private void releaseStatement() {
+            if (statementCache!=null) {
+                statementCache.closeRemovedStatements();
             }
+            params.clear();
+            IOUtils.closeSilently(setter); //closing resources opened by setter
         }
 
     }
