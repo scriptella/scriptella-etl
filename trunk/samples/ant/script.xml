@@ -18,7 +18,10 @@
     <properties>
         <include href="script.properties"/>
     </properties>
-    <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
+    <!--<connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>-->
+    <!-- You may specify driver's jars location using classpath attribute. In this case
+    there is no need to specify additional classpath in Ant task declaration.-->
+    <connection driver="${driver}" url="${url}" user="${user}" password="${password}" classpath="../lib/hsqldb.jar"/>
     <script>
         CREATE TABLE Foo (
             BAR VARCHAR(100)

@@ -14,9 +14,8 @@
  limitations under the License.
 -->
 <project name="ant samples" default="main">
-    <!-- Registers scriptella ant tasks. HSQLDB driver jar is also added to classpath.
-    Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
+    <!-- Registers scriptella ant tasks. -->
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
         <property name="antproperty" value="Ant Property"/>
         <!--Executes script.xml -->
@@ -25,6 +24,8 @@
         <taskdef resource="antscriptella.properties">
             <classpath>
                 <pathelement location="../lib/scriptella.jar"/>
+                <!-- The following classpath elements are optional.
+                Use connection classpath attribute to specify driver's classpath in a script file -->
                 <pathelement location="../lib/hsqldb.jar"/>
             </classpath>
         </taskdef>
@@ -32,4 +33,5 @@
             <fileset file="script.xml"/>
         </execute>
     </target>
+
 </project>
