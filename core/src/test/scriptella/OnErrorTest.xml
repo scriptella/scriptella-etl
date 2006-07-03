@@ -24,7 +24,7 @@
     <script>
         insert into test(id, value) values (1,'Updated');
         <onerror>
-            <dialect database=".*fakedb.*">
+            <dialect name=".*fakedb.*">
                 skipped text
             </dialect>
             UPDATE test set value='Updated1' where ID=1;
@@ -36,7 +36,7 @@
             insert into test(id, value) values (2,'Updated');
         </onerror>
         <onerror message=".*Unique constraint violation.*"><!--Updates-->
-            <dialect database=".*hsql.*">
+            <dialect name=".*hsql.*">
                 UPDATE test set value='Updated2' where ID=2;
             </dialect>
         </onerror>

@@ -69,16 +69,16 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
 
 
     public static class Dialect extends XMLConfigurableBase {
-        private Pattern database;
+        private Pattern name;
         private Pattern version;
         private ContentEl contentEl;
 
-        public Pattern getDatabase() {
-            return database;
+        public Pattern getName() {
+            return name;
         }
 
-        public void setDatabase(final Pattern database) {
-            this.database = database;
+        public void setName(final Pattern name) {
+            this.name = name;
         }
 
         public Pattern getVersion() {
@@ -98,7 +98,7 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
         }
 
         public void configure(final XMLElement element) {
-            setPatternProperty(element, "database");
+            setPatternProperty(element, "name");
             setPatternProperty(element, "version");
 
             contentEl = new ContentEl(element);
@@ -107,11 +107,11 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
         boolean matches(final DialectIdentifier id) {
             if (id == null) { //if db has no dialect identifier
                 //return true only if we have no specified restrictions
-                return database == null && version == null;
+                return name == null && version == null;
             }
 
-            if ((database != null) &&
-                    !database.matcher(id.getName()).matches()) {
+            if ((name != null) &&
+                    !name.matcher(id.getName()).matches()) {
                 return false;
             }
 
@@ -121,7 +121,7 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
         }
 
         public String toString() {
-            return "Dialect{" + "database=" + database + ", version=" +
+            return "Dialect{" + "name=" + name + ", version=" +
                     version + ", contentEl=" + contentEl + "}";
         }
     }

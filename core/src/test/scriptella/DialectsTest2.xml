@@ -16,7 +16,7 @@
     <query>
         select * from test where id=1
         <script>
-            <dialect database="FOO"><!--Skipped-->
+            <dialect name="FOO"><!--Skipped-->
                 insert into test2 values (3);
             </dialect>
             insert into test2 values (?{ID});
@@ -27,16 +27,16 @@
         <script>
             insert into test2 values (?{ID});
         </script>
-        <dialect database="HSQL.*"><!--executes-->
+        <dialect name="HSQL.*"><!--executes-->
             select * from test where id=2;
         </dialect>
-        <dialect database=".*oracle.*"><!--Skipped-->
+        <dialect name=".*oracle.*"><!--Skipped-->
             select * from test where id=3
         </dialect>
     </query>
 
     <script><!--Skipped but not failed-->
-        <dialect database="FOO">
+        <dialect name="FOO">
             select * from test2
         </dialect>
     </script>
