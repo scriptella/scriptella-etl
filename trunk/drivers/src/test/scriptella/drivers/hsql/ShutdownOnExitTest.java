@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi.hsql;
+package scriptella.drivers.hsql;
 
 import scriptella.AbstractTestCase;
 import scriptella.jdbc.JDBCConnection;

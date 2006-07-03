@@ -23,14 +23,14 @@
     </query>
     <script>
         <!--Only hsql dialects are executed-->
-        <dialect database=".*hsql.*">
+        <dialect name=".*hsql.*">
             COMMIT;<!--Just for test -->
             COMMIT;
         </dialect>
-        <dialect database=".*hsql.*">
+        <dialect name=".*hsql.*">
             SHUTDOWN;
         </dialect>
-        <dialect database=".*oracle.*">
+        <dialect name=".*oracle.*">
             Won't execute;
         </dialect>
 
