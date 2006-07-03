@@ -102,7 +102,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         return q;
     }
 
-    private static class QueryCtxDecorator extends DynamicContextDecorator {
+    private static final class QueryCtxDecorator extends DynamicContextDecorator {
         private ParametersCallback params;
 
         public QueryCtxDecorator(DynamicContext context) {
@@ -114,7 +114,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         }
 
         @Override
-        public Object getParameter(final String name) {
+        public final Object getParameter(final String name) {
             return params.getParameter(name);
         }
     }

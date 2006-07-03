@@ -75,7 +75,7 @@ public abstract class ProviderException extends SystemException {
      * @param errStmt statement text.
      * @return this exception for convenience.
      */
-    public ProviderException setErrorStatement(String errStmt) {
+    protected ProviderException setErrorStatement(String errStmt) {
         this.errorStatement = errStmt;
         return this;
     }
@@ -94,7 +94,7 @@ public abstract class ProviderException extends SystemException {
     /**
      * Returns a statement for this error if any.
      *
-     * @return statement text and addtional data.
+     * @return statement text and additional data.
      */
     public String getErrorStatement() {
         return errorStatement;

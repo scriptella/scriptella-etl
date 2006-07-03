@@ -83,7 +83,7 @@ public class JexlExpression extends Expression {
      * <p>Only {@link #get(Object)} method is supported. Invocations of other methods result in
      * {@link UnsupportedOperationException} thrown.
      */
-    private static class ParametersCallbackMap implements Map {
+    private static final class ParametersCallbackMap implements Map {
         private ParametersCallback callback;
 
         public int size() {

@@ -21,16 +21,17 @@
  * Copyright 2003-2005
  * All rights reserved.
  */
-package scriptella.expressions;
+package scriptella.spi;
 
 import scriptella.execution.ScriptsContext;
+import scriptella.expressions.ParametersCallback;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 
 /**
- * Goobal  variable available in all expressions.
+ * Global  variable available in all expressions.
  * <p>ThisParameter is obtained by using <code>this</code> variable name in
  * expressions, all public methods/properties may be invoked from expressions using
  * method invocation syntax.
@@ -40,21 +41,34 @@ import java.net.URL;
  */
 public class ThisParameter {
     public static final String NAME = "this";
-    private ScriptsContext ctx;
+    private final ScriptsContext ctx;
 
     public ThisParameter(ScriptsContext ctx) {
         this.ctx = ctx;
     }
 
-    public URL getScriptFileURL() {
+    public URL getBaseURL() {
         return ctx.getBaseURL();
     }
 
+
+
     /**
-     * Returns {@link URL} for fileUrl string parameter.
+     * Resolves a fileUrl URI relative to base URL.
+     * <p><b>Examples:</b></p>
+     * <code><pre>
+     * baseUrl = "file:///tmp/doc.xml"
+     * uri = "http://site.com/file.html"
+     * </pre></code>
+     * Resolves to: <code>http://site.com/file.html</code>
+     * <code><pre>
+     * baseUrl = "file:///tmp/doc.xml"
+     * uri = "file.html"
+     * </pre></code>
+     * Resolves to: <code>file:///tmp/file.html</code>
      *
-     * @param fileUrl absolute URL or relative to script base URL.
-     * @return FileParameter for corresponding file url.
+     * @param fileUrl uri to resolve..
+     * @return resolved file URL.
      * @see scriptella.execution.ScriptsContext#getBaseURL()
      */
     public URL file(final String fileUrl) {
@@ -72,4 +86,5 @@ public class ThisParameter {
     public static ThisParameter get(final ParametersCallback callback) {
         return (ThisParameter) callback.getParameter(NAME);
     }
+
 }
