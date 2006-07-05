@@ -29,7 +29,7 @@
         DATA LONGVARBINARY,
         CREATED DATETIME
         );
-        <!-- Inserts file with path relative to executed script location -->
+        <!-- Inserts file with path relative to executed script directory location -->
         INSERT INTO Track(ID, ALBUM_ID, NAME, DATA, CREATED) VALUES
         <!--You may use JDBC Escape Syntax for timestamps, i.e. {ts 'yyyy-mm-dd hh:mm:ss.f...'}-->
         (1, 1, 'Song1.mp3', ?{this.file(file1)}, {ts '2006-01-15 10:00:00'});

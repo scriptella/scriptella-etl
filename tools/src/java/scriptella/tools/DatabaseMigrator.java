@@ -40,36 +40,34 @@ import java.util.Set;
  */
 public class DatabaseMigrator {
     public static void main(final String args[]) {
-        //Currently this class is just a sample of how to create a migration script
+        //Currently this class is just a sample of how to generate a migration script template
         //Rewite it
 
-        ConnectionParameters params = new ConnectionParameters(null, "jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm", "sa", "", null, null);
+        ConnectionParameters params = new ConnectionParameters(null, "jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm", "sa", "", null, null, null);
         ScriptellaJDBCDriver jdbcDriver = new ScriptellaJDBCDriver();
 
 
         final Connection con = jdbcDriver.connect(params).getNativeConnection();
         final Set<String> tables = sortTables(con, params);
         StringBuilder o = new StringBuilder();
-        o.append("<sql-scripts version=\"1\">\n" +
+        o.append("<scripts>\n" +
                 "    <connection id=\"in\" driver=\"com.sybase.jdbc2.jdbc.SybDriver\" url=\"jdbc:sybase:Tds:localhost:2638\" user=\"DBA\" password=\"SQL\"/>\n" +
                 "    <connection id=\"out\" driver=\"org.hsqldb.jdbcDriver\" url=\"jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm\" user=\"sa\" password=\"\"/>\n");
 
         for (String t : tables) {
-            o.append("    <query id=\"").append("in.").append(t)
-                    .append("\" type=\"sql\" connection-id=\"in\">\n")
+            o.append("    <query connection-id=\"in\">\n")
                     .append("      select ");
-            appendColumnNames(con, params, t, o).append(" from ").append(t)
-                    .append("\n    </datasource>\n");
+            appendColumnNames(con, params, t, o).append(" from ").append(t);
 
-            o.append("    <script query-id=\"").append("in.").append(t)
-                    .append("\" type=\"sql\" connection-id=\"out\">\n")
-                    .append("      insert into ").append(t).append("(");
+            o.append("      <script connection-id=\"out\">\n")
+                    .append("         insert into ").append(t).append("(");
             appendColumnNames(con, params, t, o).append(") VALUES (");
-            appendColumnNames(con, params, t, o, ", ", "$").append(")")
-                    .append("\n    </script>\n");
+            appendColumnNames(con, params, t, o, ", ", "?").append(")")
+                    .append("\n      </script>\n").
+            append("\n    </query>\n");
         }
 
-        o.append("</sql-scripts>\n");
+        o.append("</scripts>\n");
         System.out.println("o = " + o);
 
         //        JDBCUtils.getTableColumns(con, c,)
@@ -153,7 +151,7 @@ public class DatabaseMigrator {
                 int min = Integer.MAX_VALUE;
                 int minI = -1;
 
-                for (int j = 0; j < n; j++) { //choosing an available candiate
+                for (int j = 0; j < n; j++) { //choosing an available candidate
 
                     int s = 0;
 

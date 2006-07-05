@@ -22,8 +22,9 @@ import java.io.Closeable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 
@@ -38,24 +39,30 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     public static final String ROWNUM = "rownum";
     private static final Pattern NUM_PTR = Pattern.compile("\\d+");
     private ResultSet resultSet;
-    private Set<String> names;
+    private Map<String, Integer> namesMap;
     private ParametersCallback params;
     private int rowNum;
+    private Object[] row;
 
     public ResultSetAdapter(ResultSet resultSet,
                             ParametersCallback parametersCallback) {
         this.params = parametersCallback;
         this.resultSet = resultSet;
-        names = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        namesMap = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
 
         try {
             final ResultSetMetaData m = resultSet.getMetaData();
             final int n = m.getColumnCount();
 
             for (int i = 1; i <= n; i++) {
-                names.add(m.getColumnName(i));
+                String columnName = m.getColumnName(i);
+                if (!ThisParameter.NAME.equalsIgnoreCase(columnName)) {
+                    namesMap.put(columnName, i);
+                }
             }
+            row = new Object[n];
         } catch (SQLException e) {
+            throw new JDBCException("Unable to process result set ", e);
         }
     }
 
@@ -67,6 +74,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
         try {
             boolean res = resultSet.next();
             rowNum++;
+            Arrays.fill(row, null);
             return res;
         } catch (SQLException e) {
             throw new JDBCException("Unable to move cursor to the next row", e);
@@ -75,29 +83,32 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
 
     public Object getParameter(final String name) {
-        if (ThisParameter.NAME.equals(name)) { //this could not be overriden
-            return ThisParameter.get(params);
-        } else if (ROWNUM.equalsIgnoreCase(name)) { //return current row number
+        if (ROWNUM.equalsIgnoreCase(name)) { //return current row number
             return rowNum;
         }
         try {
-            if (!names.contains(name)) {
-                //If name is not a column name and is integer
-                if (NUM_PTR.matcher(name).matches()) {
+            Integer index = namesMap.get(name);
+            if (index == null) {
+                //Check for "this" parameter
+                if (ThisParameter.NAME.equalsIgnoreCase(name)) {
+                    return ThisParameter.get(params);
+                } else if (NUM_PTR.matcher(name).matches()) {//If name is not a column name and is integer
                     try {
-                        int index = Integer.parseInt(name);
-
-                        //Use name as index
-                        return resultSet.getObject(index);
+                        index = Integer.valueOf(name); //Try to parse name as index
                     } catch (NumberFormatException e) {
                     }
-                } else { //otherwise call previus params
-
-                    return params.getParameter(name);
                 }
             }
+            if (index != null) { //if index found
+                int ind = index-1;
+                if (row[ind] == null) { //cache miss
+                    row[ind] = resultSet.getObject(ind+1);
+                }
+                return row[ind];
+            } else { //otherwise call uppper level params
+                return params.getParameter(name);
+            }
 
-            return resultSet.getObject(name);
         } catch (SQLException e) {
             throw new JDBCException("Unable to get parameter " + name, e);
         }
@@ -111,6 +122,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
         if (resultSet != null) {
             JDBCUtils.closeSilent(resultSet);
             resultSet = null;
+            row = null;
         }
     }
 }

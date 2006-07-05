@@ -135,7 +135,8 @@
 						<td>Nested elements of Query</td>
 					</tr>
 				</table>
-				<p>Additionally each query produces a set of implicit variables corresponding to selected column names. These variables are available in nested elements.</p>
+				<p>Additionally each query produces a set of implicit variables corresponding to selected column names. These variables are available in nested elements.
+                Columns may also be referenced using a result set column number, e.g. ?1, ?2 ,...</p>
 			</section>
 			<section>
 				<title>Examples</title>

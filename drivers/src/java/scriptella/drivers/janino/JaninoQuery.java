@@ -18,8 +18,8 @@ package scriptella.drivers.janino;
 import scriptella.expressions.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A base class for Janino &lt;query&gt; elements.
@@ -98,7 +98,7 @@ public class JaninoQuery extends JaninoScript implements ParametersCallback {
      */
     public final void set(String name, Object value) {
         if (row == null) {
-            row = new HashMap<String, Object>();
+            row = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
         }
         row.put(name, value);
     }
