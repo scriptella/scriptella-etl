@@ -20,10 +20,10 @@ import scriptella.expressions.ParametersCallback;
 import scriptella.expressions.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.ThisParameter;
-import scriptella.util.PropertiesMap;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class ScriptsContext implements ParametersCallback {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = new PropertiesMap();
+    private Map<String, String> properties = new TreeMap<String,String>(String.CASE_INSENSITIVE_ORDER);
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     Session session; //Connections related stuff is here
@@ -46,7 +46,7 @@ public class ScriptsContext implements ParametersCallback {
     private ThisParameter thisParameter = new ThisParameter(this);
 
     public Object getParameter(final String name) {
-        if (ThisParameter.NAME.equals(name)) {
+        if (ThisParameter.NAME.equalsIgnoreCase(name)) {
             return thisParameter;
         }
 

@@ -59,7 +59,7 @@ Examples:
  @attr password database password
  @attr catalog catalog
  @attr schema schema
- @attr classpath the classpath to use when loading the driver. Paths are resolved relative to scripts file location.
+ @attr classpath the classpath to use when loading the driver. Paths are resolved relative to a directory where scripts file resides.
 -->
 <!ATTLIST connection
 id ID #IMPLIED

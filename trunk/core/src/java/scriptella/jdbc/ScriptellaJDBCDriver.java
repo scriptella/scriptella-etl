@@ -79,7 +79,7 @@ public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
      * @throws SQLException if DB exception occurs.
      */
     protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
-        return new JDBCConnection(getConnection(parameters.getUrl(), props));
+        return new JDBCConnection(getConnection(parameters.getUrl(), props), parameters );
     }
 
     /**

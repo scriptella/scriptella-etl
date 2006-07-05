@@ -18,6 +18,7 @@ package scriptella.jdbc;
 import scriptella.configuration.Resource;
 import scriptella.expressions.ParametersCallback;
 import scriptella.spi.AbstractConnection;
+import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -35,16 +36,18 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class JDBCConnection extends AbstractConnection {
+    public static final String STATEMENT_CACHE_SIZE_KEY = "statement.cache.size";
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JDBCConnection.class.getName());
     private boolean transactable = false;
-    private StatementCache statementCache=new StatementCache(100);
+    private StatementCache statementCache;
 
-    public JDBCConnection(Connection con) {
+    public JDBCConnection(Connection con, ConnectionParameters parameters) {
         if (con==null) {
             throw new IllegalArgumentException("Connection cannot be null");
         }
         this.con = con;
+        init(parameters);
         try {
             con.setAutoCommit(false);
         } catch (SQLException e) {
@@ -54,6 +57,25 @@ public class JDBCConnection extends AbstractConnection {
             transactable = Connection.TRANSACTION_NONE != con.getTransactionIsolation();
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "Unable to determine transaction isolation level for connection " + toString(), e);
+        }
+    }
+
+    /**
+     * Called in constructor
+     */
+    protected void init(ConnectionParameters parameters) {
+        String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_SIZE_KEY);
+        int statementCacheSize=100;
+        if (cacheSizeStr!=null && cacheSizeStr.trim().length()>0) {
+            try {
+                statementCacheSize=Integer.valueOf(cacheSizeStr);
+            } catch (NumberFormatException e) {
+                throw new JDBCException(STATEMENT_CACHE_SIZE_KEY+" property must be a non negative integer",e);
+            }
+        }
+
+        if (statementCacheSize>0) {
+            statementCache=new StatementCache(statementCacheSize);
         }
     }
 

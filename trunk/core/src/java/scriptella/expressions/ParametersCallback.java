@@ -26,7 +26,7 @@ package scriptella.expressions;
  */
 public interface ParametersCallback {
     /**
-     * @param name parameter name.
+     * @param name parameter name. Name is case insensitive.
      * @return parameter value or null if parameter doesn't exist.
      */
     Object getParameter(final String name);
