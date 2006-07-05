@@ -17,6 +17,7 @@ package scriptella.drivers.hsql;
 
 import scriptella.jdbc.JDBCConnection;
 import scriptella.jdbc.JDBCUtils;
+import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -30,6 +31,13 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class HsqlConnection extends JDBCConnection {
+    /**
+     * True if SHUTDOWN command should be executed before last connection closed. Default value is true.
+     * In 1.7.2, in-process databases are no longer closed when the last connection to the database
+     * is explicitly closed via JDBC, a SHUTDOWN is required
+     */
+    public static final String SHUTDOWN_ON_EXIT = "shutdown_on_exit";
+
     private static final Logger LOG = Logger.getLogger(HsqlConnection.class.getName());
     private boolean shutdownOnExit;
 
@@ -37,12 +45,17 @@ public class HsqlConnection extends JDBCConnection {
      * Creates a wrapper for HSQL connection.
      *
      * @param con
-     * @param shutdownOnExit if true register using {@link Driver#setLastConnection(HsqlConnection)}
-     *                       to SHUTDOWN on JVM exit.
      */
-    HsqlConnection(Connection con, boolean shutdownOnExit) {
-        super(con);
-        this.shutdownOnExit = shutdownOnExit;
+    HsqlConnection(Connection con, ConnectionParameters parameters) {
+        super(con, parameters);
+    }
+
+    @Override
+    protected void init(ConnectionParameters parameters) {
+        super.init(parameters);
+        final String property = parameters.getProperty(SHUTDOWN_ON_EXIT);
+        shutdownOnExit = property == null || Boolean.parseBoolean(property)
+                && isInprocess(parameters.getUrl());
     }
 
     void shutdown() {
@@ -76,6 +89,21 @@ public class HsqlConnection extends JDBCConnection {
             super.close();
         }
     }
+
+    private static boolean isInprocess(String url) {
+        //Returning false for server modes
+        if (url.startsWith("jdbc:hsqldb:http:")) {
+            return false;
+        }
+        if (url.startsWith("jdbc:hsqldb:https:")) {
+            return false;
+        }
+        if (url.startsWith("jdbc:hsqldb:hsql")) {
+            return false;
+        }
+        return !url.startsWith("jdbc:hsqldb:hsqls");
+    }
+
 
 
 }

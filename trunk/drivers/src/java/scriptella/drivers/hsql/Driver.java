@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 /**
  * Scriptella Adapter for HSLQDB database.
- * <p>The primary feature of this driver is {@link #SHUTDOWN_ON_EXIT}.
+ * <p>The primary feature of this driver is {@link HsqlConnection#SHUTDOWN_ON_EXIT}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -36,12 +36,6 @@ import java.util.logging.Logger;
 public class Driver extends ScriptellaJDBCDriver {
     private static final Logger LOG = Logger.getLogger(Driver.class.getName());
     public static final String HSQLDB_DRIVER_NAME = "org.hsqldb.jdbcDriver";
-    /**
-     * True if SHUTDOWN command should be executed before last connection closed. Default value is true.
-     * In 1.7.2, in-process databases are no longer closed when the last connection to the database
-     * is explicitly closed via JDBC, a SHUTDOWN is required
-     */
-    public static final String SHUTDOWN_ON_EXIT = "shutdown_on_exit";
 
     private static Map<String, HsqlConnection> lastConnections = null; //Send SHUTDOWN on JVM exit to fix
     private static boolean hookAdded = false;
@@ -75,25 +69,9 @@ public class Driver extends ScriptellaJDBCDriver {
 
     @Override
     protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
-        final String property = props.getProperty(SHUTDOWN_ON_EXIT);
-        boolean shutdownOnExit = property == null || Boolean.parseBoolean(property)
-                && isInprocess(parameters.getUrl());
-        return new HsqlConnection(getConnection(parameters.getUrl(), props), shutdownOnExit);
+        return new HsqlConnection(getConnection(parameters.getUrl(), props), parameters);
     }
 
-    private boolean isInprocess(String url) {
-        //Returning false for server modes
-        if (url.startsWith("jdbc:hsqldb:http:")) {
-            return false;
-        }
-        if (url.startsWith("jdbc:hsqldb:https:")) {
-            return false;
-        }
-        if (url.startsWith("jdbc:hsqldb:hsql")) {
-            return false;
-        }
-        return !url.startsWith("jdbc:hsqldb:hsqls");
-    }
 
     /**
      * Sets last connection and returns previous value of lastConnection for connection url.
