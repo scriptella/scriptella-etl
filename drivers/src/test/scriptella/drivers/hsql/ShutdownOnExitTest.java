@@ -40,14 +40,14 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         Map<String, String> props = new HashMap<String, String>();
 
         final String url = "jdbc:hsqldb:mem:shutdowntest";
-        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null);
+        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
         JDBCConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         Statement st = nc.createStatement();
 
         st.execute("        CREATE TABLE Test (ID INT);");
         props.put("ifexists", "true"); //do not create new database if not exists
-        ConnectionParameters params2 = new ConnectionParameters(props, url, "sa", null, null, null);
+        ConnectionParameters params2 = new ConnectionParameters(props, url, "sa", null, null, null, null);
 
         JDBCConnection con2 = drv.connect(params2);
         con2.close();
@@ -83,7 +83,7 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         Map<String, String> props = new HashMap<String, String>();
 
         final String url = "jdbc:hsqldb:mem:alreadyClosed";
-        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null);
+        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
         JDBCConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         nc.createStatement().execute("SHUTDOWN;");
@@ -103,12 +103,12 @@ public class ShutdownOnExitTest extends AbstractTestCase {
 
         //Create first db and obtain 2 connections
         String url1 = "jdbc:hsqldb:mem:DifferentDbs1";
-        ConnectionParameters params = new ConnectionParameters(props, url1, "sa", null, null, null);
+        ConnectionParameters params = new ConnectionParameters(props, url1, "sa", null, null, null, null);
         JDBCConnection con1 = drv.connect(params);
         JDBCConnection con11 = drv.connect(params);
         //Create second db and obtain 2 connections
         String url2 = "jdbc:hsqldb:mem:DifferentDbs2";
-        params = new ConnectionParameters(props, url2, "sa", null, null, null);
+        params = new ConnectionParameters(props, url2, "sa", null, null, null, null);
         JDBCConnection con2 = drv.connect(params);
         JDBCConnection con22 = drv.connect(params);
         //close everything
