@@ -11,7 +11,7 @@
 				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
 				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to your system path.</li>
 				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
-                    or implicitly specify classpath attribute in script connection elements.</li>
+                    or directly specify classpath attribute in script connection elements.</li>
 			</ul>
 		</section>
 		<section>
