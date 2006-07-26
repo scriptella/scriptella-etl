@@ -19,7 +19,7 @@ import scriptella.configuration.ContentEl;
 import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.spi.Connection;
 import scriptella.spi.QueryCallback;
 

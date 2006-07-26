@@ -87,7 +87,7 @@ public abstract class AbstractTestCase extends TestCase {
 
 
     /**
-     * This method returns file with path relative to project's src/test/resources directory
+     * This method returns file with path relative to project's src/test directory
      *
      * @param path file path relative to project's src/test directory
      * @return file with path relative to project's src/test directory

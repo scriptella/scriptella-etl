@@ -49,9 +49,6 @@ public class ScriptellaJDBCDriver extends AbstractScriptellaDriver {
     }
 
     public JDBCConnection connect(ConnectionParameters params) {
-        if (params.getUrl() == null) {
-            throw new IllegalArgumentException("URL parameter is required for JDBC driver connection");
-        }
         try {
             Properties props = new Properties();
             props.putAll(params.getProperties());

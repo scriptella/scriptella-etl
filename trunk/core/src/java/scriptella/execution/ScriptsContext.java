@@ -16,8 +16,8 @@
 package scriptella.execution;
 
 import scriptella.core.Session;
-import scriptella.expressions.ParametersCallback;
-import scriptella.expressions.PropertiesSubstitutor;
+import scriptella.expression.ParametersCallback;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.ThisParameter;
 

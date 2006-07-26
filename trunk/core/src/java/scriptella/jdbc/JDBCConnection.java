@@ -16,11 +16,10 @@
 package scriptella.jdbc;
 
 import scriptella.configuration.Resource;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
-import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
@@ -108,10 +107,14 @@ public class JDBCConnection extends AbstractConnection {
         if (con == null) {
             throw new IllegalStateException("Attempt to commit a transaction on a closed connection");
         }
-        try {
-            con.commit();
-        } catch (Exception e) {
-            throw new JDBCException("Unable to commit transaction", e);
+        if (!transactable) {
+            LOG.log(Level.INFO, "Connection " + toString() + " doesn't support transactions. Commit ignored.");
+        } else {
+            try {
+                con.commit();
+            } catch (Exception e) {
+                throw new JDBCException("Unable to commit transaction", e);
+            }
         }
     }
 
@@ -119,10 +122,14 @@ public class JDBCConnection extends AbstractConnection {
         if (con == null) {
             throw new IllegalStateException("Attempt to roll back a transaction on a closed connection");
         }
-        try {
-            con.rollback();
-        } catch (Exception e) {
-            throw new JDBCException("Unable to roll back transaction", e);
+        if (!transactable) {
+            LOG.log(Level.INFO, "Connection " + toString() + " doesn't support transactions. Rollback ignored.");
+        } else {
+            try {
+                con.rollback();
+            } catch (Exception e) {
+                throw new JDBCException("Unable to roll back transaction", e);
+            }
         }
     }
 
@@ -132,16 +139,11 @@ public class JDBCConnection extends AbstractConnection {
                 con.close();
                 con = null;
             } catch (SQLException e) {
-                throw new JDBCException("Unable to close connection", e);
+                throw new JDBCException("Unable to close a connection", e);
             }
             statementCache.close();
             statementCache=null;
         }
-    }
-
-    @Override
-    public boolean isTransactable() throws ProviderException {
-        return transactable;
     }
 
     public Connection getNativeConnection() {

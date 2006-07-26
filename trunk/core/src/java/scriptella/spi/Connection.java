@@ -16,7 +16,7 @@
 package scriptella.spi;
 
 import scriptella.configuration.Resource;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 
 /**
  * Represents a connection to the system provided by {@link ScriptellaDriver}.
@@ -48,19 +48,21 @@ public interface Connection {
      * @param queryContent       query content.
      * @param parametersCallback callback to get parameter values.
      * @param queryCallback      callback to call for each result set element produced by this query.
-     * @see #executeScript(scriptella.configuration.Resource, scriptella.expressions.ParametersCallback)
+     * @see #executeScript(scriptella.configuration.Resource, scriptella.expression.ParametersCallback)
      */
     void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException;
 
     /**
-     * Commits current transaction (if any).
+     * Commits a current transaction (if any).
      */
     void commit() throws ProviderException;
 
     /**
-     * Rolls back current transaction
+     * Rolls back a current transaction (if any).
+     * @throws ProviderException if driver fails to roll back a transaction.
+     * @throws UnsupportedOperationException if transactions are not supported
      */
-    void rollback() throws ProviderException;
+    void rollback() throws ProviderException, UnsupportedOperationException;
 
 
     /**
@@ -68,12 +70,7 @@ public interface Connection {
      */
     void close() throws ProviderException;
 
-    /**
-     * @return true if connection support transactions.
-     */
-    boolean isTransactable() throws ProviderException;
-
-    /**
+     /**
      * @return meaningful label for connection
      */
     String toString();

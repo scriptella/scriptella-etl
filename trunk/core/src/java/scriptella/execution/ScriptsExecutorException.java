@@ -17,7 +17,7 @@ package scriptella.execution;
 
 import scriptella.configuration.Location;
 import scriptella.core.ExceptionInterceptor;
-import scriptella.expressions.Expression;
+import scriptella.expression.Expression;
 import scriptella.spi.ProviderException;
 
 import java.io.PrintWriter;

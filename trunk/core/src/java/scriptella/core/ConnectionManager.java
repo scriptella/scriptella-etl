@@ -115,25 +115,22 @@ public class ConnectionManager {
     public void rollback() {
         for (Connection c : getAllConnections()) {
             try {
-                if (c.isTransactable()) {
-                    c.rollback();
-                } else {
-                    LOG.log(Level.INFO, "Connection " + c + " doesn't support transactions. Roll back ignored");
-                }
+                c.rollback();
+            } catch (UnsupportedOperationException e) {
+                String msg = e.getMessage();
+                LOG.log(Level.WARNING,
+                        "Unable to rollback transaction for connection " + c + (msg==null?"": ": " + msg));
+
             } catch (Exception e) {
                 LOG.log(Level.WARNING,
-                        "Unable to rollback transaction for connection " + c);
+                        "Unable to rollback transaction for connection " + c, e);
             }
         }
     }
 
     public void commit() {
         for (Connection c : getAllConnections()) {
-            if (c.isTransactable()) {
-                c.commit();
-            } else {
-                LOG.log(Level.INFO, "Connection " + c + " doesn't support transactions. Commit ignored.");
-            }
+            c.commit();
         }
     }
 

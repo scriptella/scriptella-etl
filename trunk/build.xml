@@ -89,6 +89,8 @@
         <!-- Update samples libs --> 
         <copy todir="${basedir}/samples/lib">
             <fileset file="${lib.dir}/hsqldb.jar"/>
+            <fileset file="${lib.dir}/velocity-dep.jar"/>
+            <fileset file="${lib.dir}/janino.jar"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
     </target>

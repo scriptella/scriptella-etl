@@ -23,7 +23,7 @@ import scriptella.execution.ScriptsContext;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.execution.TestableScriptsExecutor;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.jdbc.Query;
 import scriptella.spi.QueryCallback;
 

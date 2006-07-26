@@ -16,7 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.configuration.ConfigurationException;
-import scriptella.expressions.PropertiesSubstitutor;
+import scriptella.expression.PropertiesSubstitutor;
 
 import java.io.IOException;
 import java.io.Reader;

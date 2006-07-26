@@ -17,7 +17,7 @@ package scriptella.core;
 
 import scriptella.configuration.Location;
 import scriptella.configuration.ScriptingElement;
-import scriptella.expressions.Expression;
+import scriptella.expression.Expression;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  *
  * @author Fyodor Kupolov
  * @version 1.0
- * @see scriptella.expressions.JexlExpression
+ * @see scriptella.expression.JexlExpression
  */
 public class IfInterceptor extends ElementInterceptor {
     private static final Logger LOG = Logger.getLogger(IfInterceptor.class.getName());

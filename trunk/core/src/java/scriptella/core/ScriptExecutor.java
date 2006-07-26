@@ -68,7 +68,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
                     ExceptionUtils.throwUnchecked(t);
                 }
             }
-        } while (repeat); //repat while onError returns retry
+        } while (repeat); //repeat while onError returns retry
 
     }
 
