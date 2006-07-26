@@ -199,12 +199,12 @@
 						</tr>
 						<tr>
 							<td>debug</td>
-							<td>If true print debugging information.</td>
+							<td>If true, print debugging information.</td>
 							<td>No, default value is false.</td>
 						</tr>
 						<tr>
 							<td>quiet</td>
-							<td>If true be extra quiet.</td>
+							<td>If true, be extra quiet.</td>
 							<td>No, default value is false.</td>
 						</tr>
 					</table>
@@ -236,7 +236,34 @@
 				</section>
 			</section>
 		</section>
-		<section>
+        <section>
+            <title>JDBC Adapters</title>
+            <p>Scriptella is bundled with a set of adapters for popular
+            JDBC drivers. You may always use your JDBC vendor drivers, but
+            the Scriptella adapters provide the following benefits:</p>
+            <ul>
+                <li>Simplified naming. No need to specify a full driver's class
+                name, alias may be used, e.g. driver="hslqdb", "oracle" etc.</li>
+                <li>Scriptella adapters are preconfigured for optimal performance, syntax parsing rules
+                and other execution options, e.g. BLOB handling for oracle. In most cases
+                you can specify a generic JDBC property, but using adapters simplifies
+                switching between drivers and even a target platform e.g. Java/.Net</li>
+            </ul>
+            <p>Currently Scriptella provides the following adapters:</p>
+            <table>
+                <tr>
+                    <th>Adapter name</th>
+                    <th>Native driver</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td><a href="docs/api/scriptella/drivers/hsqldb/">HSQLDB</a></td>
+                    <td>org.hsqldb.jdbcDriver</td>
+                    <td></td>
+                </tr>
+            </table>
+        </section>
+        <section>
 			<title>Non-relational Datasources Interoperability</title>
 			<p>We plan to include built-in support for CSV files and LDAP directories, so
                 it would be possible to embed CSV data or LDIF files directly into script files.

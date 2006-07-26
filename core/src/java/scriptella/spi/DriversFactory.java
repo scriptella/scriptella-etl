@@ -31,16 +31,37 @@ public final class DriversFactory {
     }
 
     /**
-     * Load a class for <code>driverClassName</code> and creates
-     * a driver using {@link #getDriver(Class)}.
-     * <p>Thread.currentThread().getContextClassLoader() is used to obtain class loader.
-     *
-     * @param driverClassName driver class name.
-     * @return Scriptella Driver.
-     * @throws ClassNotFoundException if If the class was not found.
+     * Loads a driver specified by a full or a short name.
+     * This method tries to lookup a driver class specified by a name.
+     * <p>The looking up procedure is the following:
+     * <ol>
+     * <li>Class with name <code>driverName</code> is looked up.
+     * <li>If class not found, a class with the following name is checked:
+     * scriptella.driver.&lt;driverName&gt;.Driver
+     * <li>If no classes found - an exception is raised.
+     * </ol>
+     * <p>
+     * @param driverName driver class short or full name.
+     * @param loader class loader to use when loading driver classes.
+     * @return found driver class.
+     * @throws ClassNotFoundException if no drivers satisfy specified name.
      */
-    public static ScriptellaDriver getDriver(String driverClassName, ClassLoader cl) throws ClassNotFoundException {
-        return getDriver(Class.forName(driverClassName, true, cl));
+    public static ScriptellaDriver getDriver(String driverName, ClassLoader loader) throws ClassNotFoundException {
+        //try direct match
+        try {
+            return getDriver(Class.forName(driverName, true, loader));
+        } catch (ClassNotFoundException e) {
+            //if not found try to produce a full name from a short one
+            String fullName = "scriptella.driver."+driverName+".Driver";
+            try {
+                return getDriver(Class.forName(fullName, true, loader));
+            } catch (ClassNotFoundException ignoredException) {
+                throw e;//it's not a typo - return the first exception
+            }
+
+        }
+
+
     }
 
     /**

@@ -48,13 +48,33 @@ public class DriversClassLoader extends URLClassLoader {
      * @throws ClassNotFoundException If the class was not found
      */
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (name.startsWith("scriptella.jdbc.") || name.startsWith("scriptella.drivers.")) {
+        if (name.startsWith("scriptella.jdbc.") || name.startsWith("scriptella.driver.")) {
             byte[] b = getClassBytes(name);
             if (b != null) {
+                definePackage(name);
                 return defineClass(name, b, 0, b.length);
             }
         }
         return super.loadClass(name);
+    }
+
+    /**
+     * Defines a package for a class name.
+     * @param className class name to define a package.
+     * @see #definePackage(String, java.util.jar.Manifest, java.net.URL)
+     */
+    private void definePackage(String className) {
+        if (className==null) {
+            return;
+        }
+        int ind = className.lastIndexOf('.');
+        if (ind<0) {
+            return;
+        }
+        String pName = className.substring(0, ind);
+        if (getPackage(pName)==null) {
+            definePackage(pName, null ,null, null ,null, null, null, null);
+        }
     }
 
     /**

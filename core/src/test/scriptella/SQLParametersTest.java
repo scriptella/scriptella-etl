@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.jdbc.Query;
 import scriptella.spi.QueryCallback;
 

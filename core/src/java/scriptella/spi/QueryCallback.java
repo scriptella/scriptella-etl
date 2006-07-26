@@ -15,7 +15,7 @@
  */
 package scriptella.spi;
 
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 
 
 /**

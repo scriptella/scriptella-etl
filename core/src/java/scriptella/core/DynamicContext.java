@@ -16,7 +16,7 @@
 package scriptella.core;
 
 import scriptella.execution.ScriptsContext;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.spi.Connection;
 
 

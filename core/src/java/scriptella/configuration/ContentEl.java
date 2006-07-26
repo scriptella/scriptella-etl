@@ -74,19 +74,36 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
 
         for (int i = 0; i < n; i++) {
             final Node node = childNodes.item(i);
-
-            if (node instanceof Text) {
-                content.add(new Resource() {
-                    public Reader open() {
-                        return new StringReader(node.getTextContent());
-                    }
-                });
-            } else if (node instanceof Element &&
-                    "include".equals(node.getNodeName())) {
-                content.add(new IncludeEl(
-                        new XMLElement((Element) node, element)));
+            Resource resource = asResource(element, node);
+            if (resource!=null) {
+                content.add(resource);
             }
         }
+    }
+
+
+    /**
+     * Creates a resource using content from the specified node.
+     * <p>If node is not textual content or not include element, the content is skipped and null is returned.
+     * @param parentElement parent element of this node.
+     * @param node node to get content from.
+     * @return parsed resource or null.
+     */
+    static Resource asResource(final XMLElement parentElement, final Node node) {
+        if (node instanceof Text) {
+             return new Resource() {
+                 public Reader open() {
+                     return new StringReader(node.getTextContent());
+                 }
+             };
+         } else if (node instanceof Element &&
+                 "include".equals(node.getNodeName())) {
+             return new IncludeEl(
+                     new XMLElement((Element) node, parentElement));
+         }
+        return null;
+
+
     }
 
     /**

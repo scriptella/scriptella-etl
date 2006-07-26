@@ -17,8 +17,8 @@ package scriptella.jdbc;
 
 import scriptella.configuration.Resource;
 import scriptella.core.StatisticInterceptor;
-import scriptella.expressions.Expression;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.Expression;
+import scriptella.expression.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.util.IOUtils;
 
@@ -44,7 +44,7 @@ public class SQLSupport {
     private static final Logger LOG = Logger.getLogger(SQLSupport.class.getName());
     protected Resource resource;
     protected StatementCache statementCache; //may be null, if caching switched off
-    private JDBCSetter setter=new JDBCSetter(); //Setter for prepared statement parameters
+    private JDBCTypesConverter converter = new JDBCTypesConverter(); //Setter for prepared statement parameters
 
     public SQLSupport(Resource resource) {
         if (resource == null) {
@@ -178,7 +178,7 @@ public class SQLSupport {
 
             for (int i = 0, n = params.size(); i < n; i++) {
                 Object o = params.get(i);
-                setter.setObject(ps, i + 1, o);
+                converter.setObject(ps, i + 1, o);
             }
             return ps;
         }
@@ -200,7 +200,7 @@ public class SQLSupport {
                 } else {
                     ResultSetAdapter r = null;
                     try {
-                        r = new ResultSetAdapter(ps.getResultSet(), paramsCallback);
+                        r = new ResultSetAdapter(ps.getResultSet(), paramsCallback, converter);
                         while (r.next()) {
                             callback.processRow(r);
                         }
@@ -221,7 +221,7 @@ public class SQLSupport {
                 statementCache.closeRemovedStatements();
             }
             params.clear();
-            IOUtils.closeSilently(setter); //closing resources opened by setter
+            IOUtils.closeSilently(converter); //closing resources opened by converter
         }
 
     }

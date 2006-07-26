@@ -51,13 +51,9 @@ public abstract class AbstractConnection implements Connection {
     public void commit() throws ProviderException {
     }
 
-    public void rollback() throws ProviderException {
+    public void rollback() throws ProviderException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("Transactions are not supported by "+toString());
     }
-
-    public boolean isTransactable() throws ProviderException {
-        return false;
-    }
-
 
     public String toString() {
         String simpleName = getClass().getSimpleName();

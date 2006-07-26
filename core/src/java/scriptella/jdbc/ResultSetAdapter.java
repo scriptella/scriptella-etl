@@ -15,8 +15,9 @@
  */
 package scriptella.jdbc;
 
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 import scriptella.spi.ThisParameter;
+import scriptella.util.IOUtils;
 
 import java.io.Closeable;
 import java.sql.ResultSet;
@@ -37,18 +38,27 @@ import java.util.regex.Pattern;
  */
 public class ResultSetAdapter implements ParametersCallback, Closeable {
     public static final String ROWNUM = "rownum";
-    private static final Pattern NUM_PTR = Pattern.compile("\\d+");
+    private static final Pattern NUM_PTR = Pattern.compile("\\d+"); //Regexp checking is faster than catching exceptions
     private ResultSet resultSet;
-    private Map<String, Integer> namesMap;
-    private ParametersCallback params;
-    private int rowNum;
-    private Object[] row;
+    private final Map<String, Integer> namesMap;//map of column names for caching and working with converter
+    private final ParametersCallback params; //parent parameters callback to use
+    private int rowNum; //current row number
+    private Object[] row;//cache for row elements
+    private JDBCTypesConverter converter;
 
+    /**
+     * Instantiates an adapter, prepares a cache and builds a map of column names.
+     *
+     * @param resultSet          resultset to adapt.
+     * @param parametersCallback parent parameter callback.
+     * @param converter          type converter to use for getting column values as object.
+     */
     public ResultSetAdapter(ResultSet resultSet,
-                            ParametersCallback parametersCallback) {
+                            ParametersCallback parametersCallback, JDBCTypesConverter converter) {
         this.params = parametersCallback;
         this.resultSet = resultSet;
         namesMap = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        this.converter = converter;
 
         try {
             final ResultSetMetaData m = resultSet.getMetaData();
@@ -100,9 +110,9 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
                 }
             }
             if (index != null) { //if index found
-                int ind = index-1;
+                int ind = index - 1;
                 if (row[ind] == null) { //cache miss
-                    row[ind] = resultSet.getObject(ind+1);
+                    row[ind] = converter.getObject(resultSet, ind + 1);
                 }
                 return row[ind];
             } else { //otherwise call uppper level params
@@ -121,6 +131,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     public void close() {
         if (resultSet != null) {
             JDBCUtils.closeSilent(resultSet);
+            IOUtils.closeSilently(converter);
             resultSet = null;
             row = null;
         }

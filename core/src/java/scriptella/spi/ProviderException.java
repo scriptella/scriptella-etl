@@ -105,9 +105,7 @@ public abstract class ProviderException extends SystemException {
      *
      * @return provider name.
      */
-    public String getProviderName() {
-        return getClass().getPackage().toString();
-    }
+    public abstract String getProviderName();
 
 
 }

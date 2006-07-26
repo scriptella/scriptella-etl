@@ -16,7 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.configuration.Resource;
-import scriptella.expressions.ParametersCallback;
+import scriptella.expression.ParametersCallback;
 
 import java.sql.Connection;
 

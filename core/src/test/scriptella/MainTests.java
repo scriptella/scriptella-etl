@@ -20,7 +20,7 @@ import junit.framework.TestSuite;
 import scriptella.configuration.XIncludeTest;
 import scriptella.core.SQLParserBaseTest;
 import scriptella.execution.ExecutionStatisticsTest;
-import scriptella.expressions.PropertiesSubstitutorTest;
+import scriptella.expression.PropertiesSubstitutorTest;
 import scriptella.spi.DriversClassLoaderTest;
 import scriptella.util.UrlPathTokenizerTest;
 
