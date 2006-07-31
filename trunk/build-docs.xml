@@ -10,7 +10,7 @@
     </path>
 
     <target name="codereports" depends="dtd, javadoc"/>
-    <target name="dtd">
+    <target name="dtd" depends="clean">
         <description>Generates DTD using DTDDoc</description>
         <!--Validation-->
         <condition property="no_dtddoc">
@@ -25,7 +25,6 @@
                 <fileset dir="${dtddoc.dir}" includes="*.jar"/>
             </classpath>
         </taskdef>
-        <delete dir="${dtd.dest.dir}" failonerror="no"/>
         <mkdir dir="${dtd.dest.dir}"/>
         <DTDDoc showHiddenTags="true"
                 showFixmeTags="false"
@@ -39,19 +38,27 @@
         </copy>
     </target>
 
-    <target name="javadoc">
-        <delete dir="${javadoc.dest.dir}" failonerror="no"/>
+    <target name="javadoc" depends="clean">
         <mkdir dir="${javadoc.dest.dir}"/>
         <javadoc destdir="${javadoc.dest.dir}"
                  use="true" windowtitle="Scriptella API Documentation">
             <classpath refid="class.path"/>
             <packageset dir="core/src/java"/>
+            <packageset dir="drivers/src/java"/>
+            <packageset dir="tools/src/java"/>
             <doctitle><![CDATA[<h1>Scriptella API Documentation</h1>]]></doctitle>
             <bottom>
                 <![CDATA[<i>Copyright &#169; Copyright 2006 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
         </javadoc>
     </target>
 
+    <target name="clean" unless="noclean">
+        <delete dir="${dtd.dest.dir}" failonerror="no"/>
+        <delete dir="${javadoc.dest.dir}" failonerror="no"/>
+        <delete failonerror="no">
+            <fileset dir="${site.dir}" includes="docs/** dtd/**"/>
+        </delete>
+    </target>
     <target name="site" description="Prepares site" depends="codereports">
         <!--Validation-->
         <condition property="no_forrest">

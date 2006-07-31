@@ -47,7 +47,7 @@ public class JNDIDriverTest extends AbstractTestCase {
      */
     public void testGetConnection() throws NamingException {
         //Just to initialize HSLQB driver class
-        Logger.getAnonymousLogger().fine("Initializing " + new scriptella.driver.hsql.Driver());
+        Logger.getAnonymousLogger().fine("Initializing " + new scriptella.driver.hsqldb.Driver());
         //Preparing the environment
         Map<String, String> env = new HashMap<String, String>();
         //Setting up a test JNDI factory

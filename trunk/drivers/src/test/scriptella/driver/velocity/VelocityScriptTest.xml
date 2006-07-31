@@ -1,7 +1,7 @@
 <!DOCTYPE scripts SYSTEM "scriptella.dtd">
 <scripts>
-    <connection id="in" driver="scriptella.driver.hsql.Driver" url="jdbc:hsqldb:mem:velocity" user="sa" password=""/>
-    <connection id="report" driver="scriptella.driver.velocity.Driver" url="tst://testfile"/>
+    <connection id="in" driver="hsqldb" url="jdbc:hsqldb:mem:velocity" user="sa" password=""/>
+    <connection id="report" driver="velocity" url="tst://testfile"/>
     <script connection-id="in">
         <!-- Test data -->
         CREATE TABLE Test (
