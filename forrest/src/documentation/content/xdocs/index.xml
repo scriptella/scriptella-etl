@@ -33,13 +33,13 @@
 				<li>Simple XML syntax for scripts. Add dynamics to your existing SQL scripts by creating a thin
                     wrapper XML file:
                     <source><![CDATA[
-<scripts>
+<scriptella>
     <connection driver="$driver" url="$url" user="$user" password="$password"/>
     <script>
         <include href="PATH_TO_YOUR_SCRIPT.sql"/>
         -- And/or directly insert SQL here
     </script>
-</scripts>
+</scriptella>
     ]]></source>
 				</li>
 				<li>Support for multiple datasources (or multiple connections to a single database) in a script file.</li>

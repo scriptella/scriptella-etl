@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:est2" user="sa" password=""/>
     <script>
         create table t1 (
@@ -25,4 +25,4 @@
     </script>
 
 
-</scripts>
+</scriptella>

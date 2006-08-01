@@ -1,8 +1,8 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <!--
 This suite tests properties substitution.
 -->
-<scripts>
+<scriptella>
     <properties><!-- Registers global property-->
         global=globalValue
         global2=global2Value
@@ -19,4 +19,4 @@ This suite tests properties substitution.
         ${insert} Test(id, text) values (2, ?global2+'Three${global}');<!-- Literals are skipped-->
     </script>
 
-</scripts>
+</scriptella>

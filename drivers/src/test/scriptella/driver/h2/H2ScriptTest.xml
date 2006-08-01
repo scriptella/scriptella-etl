@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         Simply creates a table with data in one db and copy it to another H2 database.
     </description>
@@ -27,4 +27,4 @@
         </script>
     </query>
 
-</scripts>
+</scriptella>

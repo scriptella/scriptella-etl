@@ -1,8 +1,8 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <!--
 This suite tests support of numbered parameters,e.g. ?1,?2 additionally to column names
 -->
-<scripts>
+<scriptella>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlparamstst2" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
@@ -22,4 +22,4 @@ This suite tests support of numbered parameters,e.g. ?1,?2 additionally to colum
     </query>
 
 
-</scripts>
+</scriptella>

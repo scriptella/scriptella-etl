@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>Database creation script</description>
     <properties>
         <include href="dbinit.properties"/>
@@ -50,4 +50,4 @@
     </script>
 
 
-</scripts>
+</scriptella>

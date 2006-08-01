@@ -38,8 +38,17 @@ import java.net.URLStreamHandlerFactory;
  */
 public abstract class AbstractTestCase extends TestCase {
     protected static TestURLHandler testURLHandler;
+    protected static final File resourceBaseDir;
 
     static {
+        //If running under maven/ant - we use basedir
+        String projectBaseDir = System.getProperty("basedir");
+
+        if (projectBaseDir == null) {
+            projectBaseDir = "core";
+        }
+        resourceBaseDir = new File(projectBaseDir, "src/test");
+        
         //Registering tst URL, subclasses should set testUrlStreamHandler in test method if they use "tst" url
         URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
             public URLStreamHandler createURLStreamHandler(final String protocol) {
@@ -72,17 +81,8 @@ public abstract class AbstractTestCase extends TestCase {
         });
     }
 
-    protected final File resourceBaseDir;
-
     public AbstractTestCase() {
         setName(getClass().getSimpleName());
-        //If running under maven/ant - we use basedir
-        String projectBaseDir = System.getProperty("basedir");
-
-        if (projectBaseDir == null) {
-            projectBaseDir = "core";
-        }
-        resourceBaseDir = new File(projectBaseDir, "src/test");
     }
 
 

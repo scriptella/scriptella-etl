@@ -1,8 +1,8 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <!--
 This suite tests valid JDBC timestamp escaping support, e.g. {ts 'yyyy-mm-dd hh:mm:ss.f...'}
 -->
-<scripts>
+<scriptella>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcet" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
@@ -11,4 +11,4 @@ This suite tests valid JDBC timestamp escaping support, e.g. {ts 'yyyy-mm-dd hh:
         );
         insert into Test values (1,{ts '2005-10-10 22:33:44.1'});
     </script>
-</scripts>
+</scriptella>

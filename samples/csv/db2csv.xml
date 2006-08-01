@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         Export data from table to CSV file.
     </description>
@@ -36,4 +36,4 @@
         COMMIT;
         SHUTDOWN;
     </script>
-</scripts>
+</scriptella>

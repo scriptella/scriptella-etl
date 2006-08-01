@@ -13,8 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         This script produces prime numbers and builds an HTML report.
     </description>
@@ -26,7 +26,7 @@
     <!--Set up an in-memory connection to HSQLDB database.
     hsql - driver name is a Scriptella adapter for HSQLDB.
     You may specify org.hsqldb.jdbcDriver directly, see JDBC Adapters in Scriptella reference-->
-    <connection id="db" driver="hsql" url="jdbc:hsqldb:mem:mix" user="sa" classpath="../lib/hsqldb.jar"/>
+    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:mix" user="sa" classpath="../lib/hsqldb.jar"/>
 
     <!--Create a database schema. Single table for prime numbers. -->
     <script connection-id="db">
@@ -97,4 +97,4 @@
     </script>
 
 
-</scripts>
+</scriptella>

@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         Migrates data from LDAP to Database.
         Creates users and roles tables suitable for Tomcat JDBCRealm authentication.
@@ -46,4 +46,4 @@
         COMMIT;
         SHUTDOWN;
     </script>
-</scripts>
+</scriptella>

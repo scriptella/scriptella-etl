@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:test" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
@@ -24,4 +24,4 @@
         </script>
     </query>
 
-</scripts>
+</scriptella>

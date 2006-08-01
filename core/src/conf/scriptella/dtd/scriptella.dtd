@@ -21,7 +21,7 @@
 <!--
 The scripts is the root element of Scriptella XML file.
 -->
-<!ELEMENT scripts (description?, properties?, connection*, (script*, query*)*)>
+<!ELEMENT scriptella (description?, properties?, connection*, (script*, query*)*)>
 
 <!--
 Contains description of scripts file.

@@ -13,8 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <properties>
         <include href="script.properties"/>
     </properties>
@@ -45,4 +45,4 @@
         </dialect>
     </script>
 
-</scripts>
+</scriptella>

@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <properties>
         property=!
     </properties>
@@ -39,4 +39,4 @@
     </query>
 
 
-</scripts>
+</scriptella>
