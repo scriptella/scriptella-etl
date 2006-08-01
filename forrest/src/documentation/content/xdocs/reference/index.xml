@@ -71,7 +71,9 @@
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
                 Ant.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
-			</section>
+                <note>The values of properties defined in this element are overriden by System properties or other
+                external properties specified depending on execution environment, e.g. Ant properties.</note>
+            </section>
 			<section>
 				<title>&lt;connection&gt;</title>
 				<p>Elements of this type define connections to different datasources to work with.
