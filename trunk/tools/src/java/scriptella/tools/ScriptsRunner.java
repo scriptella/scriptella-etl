@@ -141,7 +141,7 @@ public class ScriptsRunner {
         if (indicator != null) {
             runner.setProgressIndicator(indicator);
         }
-
+        runner.setProperties(System.getProperties());
         for (File file : files) {
             try {
                 final ExecutionStatistics st = runner.execute(file);

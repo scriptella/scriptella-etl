@@ -45,8 +45,8 @@
 			</note>
 			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
 			<source><![CDATA[
-<!DOCTYPE scripts SYSTEM "http://scriptella.javaforge.com/dtd/scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "http://scriptella.javaforge.com/dtd/scriptella.dtd">
+<scriptella>
     <description></description>
     <properties>
         <include href="script.properties"/>
@@ -64,12 +64,12 @@
             INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
         </script>
     </query>
-</scripts>]]></source>
-			<p>&lt;scripts&gt; is a root element of all Scriptella files.</p>
+</scriptella>]]></source>
+			<p>&lt;scriptella&gt; is a root element of all Scriptella files.</p>
 			<section>
 				<title>&lt;properties&gt;</title>
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
-                Ant except that overriding a property value is POSSIBLE in Scriptella.</p>
+                Ant.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
 			</section>
 			<section>
@@ -108,7 +108,7 @@
             </note>
 			<section>
 				<title>Implicit Variables</title>
-				<p>The following implicit variables are available in scripts and queries:</p>
+                <p>The following implicit variables are available in scripts and queries:</p>
 				<table>
 					<tr>
 						<th>Variable</th>

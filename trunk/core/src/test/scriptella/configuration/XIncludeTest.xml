@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection driver="---" url="---" user="" password=""/>
     <script>
         <include href="XIncludeTest.sql"/>
@@ -19,4 +19,4 @@
     </script>
 
 
-</scripts>
+</scriptella>

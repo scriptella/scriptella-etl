@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection id="in" driver="hsqldb" url="jdbc:hsqldb:mem:velocity" user="sa" password=""/>
     <connection id="report" driver="velocity" url="tst://testfile"/>
     <script connection-id="in">
@@ -17,4 +17,4 @@
         <script connection-id="report">$COL</script>
     </query>
 
-</scripts>
+</scriptella>

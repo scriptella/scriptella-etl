@@ -16,11 +16,12 @@
 package scriptella.execution;
 
 import scriptella.configuration.ConfigurationEl;
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.core.Session;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
 
-import java.util.HashMap;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,7 +29,24 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * Executor for script files.
+ * <p>Use {@link ConfigurationFactory} to parse script files and to configure
+ * the executor.
+ * <p>The usage scenario of this class may be described using the following steps:
+ * <ul>
+ * <li>{@link #ScriptsExecutor(ConfigurationEl)} Create an instance of this class
+ * and pass a {@link scriptella.configuration.ConfigurationFactory#createConfiguration() script file configuration} .
+ * <li>Optionally {@link #setExternalProperties(java.util.Map) set external properties}.
+ * <li>{@link #execute() Execute} the script
+ * </ul>
+ * </pre></code>
+ * <p>Additionally simplified helper methods are declared in this class:
+ * <ul>
+ * <li>{@link #newExecutor(java.net.URL)}
+ * <li>{@link #newExecutor(java.net.URL, java.util.Map)}
+ * </ul>
+ *
+ *
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -36,7 +54,7 @@ import java.util.logging.Logger;
 public class ScriptsExecutor {
     private static final Logger LOG = Logger.getLogger(ScriptsExecutor.class.getName());
     private ConfigurationEl configuration;
-    private Map<String, String> externalProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> externalProperties;
 
     public ScriptsExecutor() {
     }
@@ -141,6 +159,35 @@ public class ScriptsExecutor {
      * @param externalProperties
      */
     public void setExternalProperties(final Map<?, ?> externalProperties) {
-        this.externalProperties = new HashMap<String, String>((Map<String, String>) externalProperties);
+        this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
     }
+
+    /**
+     * Helper method to create a new ScriptExecutor for specified script URL.
+     * <p>Calls {@link #newExecutor(java.net.URL, java.util.Map)}.
+     * @param scriptFileUrl URL of script file.
+     * @return configured instance of script executor.
+     */
+    public static ScriptsExecutor newExecutor(final URL scriptFileUrl) {
+        return newExecutor(scriptFileUrl, null);
+    }
+
+    /**
+     * Helper method to create a new ScriptExecutor for specified script URL.
+     * @param scriptFileUrl URL of script file.
+     * @param externalProperties see {@link #setExternalProperties(java.util.Map)}
+     * @return
+     * @see ConfigurationFactory
+     */
+    public static ScriptsExecutor newExecutor(final URL scriptFileUrl, final Map<String,String> externalProperties) {
+        ConfigurationFactory cf = new ConfigurationFactory();
+        cf.setResourceURL(scriptFileUrl);
+        ConfigurationEl c = cf.createConfiguration();
+        ScriptsExecutor se = new ScriptsExecutor(c);
+        if (externalProperties!=null) {
+            se.setExternalProperties(externalProperties);
+        }
+        return se;
+    }
+
 }

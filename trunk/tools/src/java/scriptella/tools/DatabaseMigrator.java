@@ -50,7 +50,7 @@ public class DatabaseMigrator {
         final Connection con = jdbcDriver.connect(params).getNativeConnection();
         final Set<String> tables = sortTables(con, params);
         StringBuilder o = new StringBuilder();
-        o.append("<scripts>\n" +
+        o.append("<scriptella>\n" +
                 "    <connection id=\"in\" driver=\"com.sybase.jdbc2.jdbc.SybDriver\" url=\"jdbc:sybase:Tds:localhost:2638\" user=\"DBA\" password=\"SQL\"/>\n" +
                 "    <connection id=\"out\" driver=\"org.hsqldb.jdbcDriver\" url=\"jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm\" user=\"sa\" password=\"\"/>\n");
 
@@ -67,7 +67,7 @@ public class DatabaseMigrator {
             append("\n    </query>\n");
         }
 
-        o.append("</scripts>\n");
+        o.append("</scriptella>\n");
         System.out.println("o = " + o);
 
         //        JDBCUtils.getTableColumns(con, c,)

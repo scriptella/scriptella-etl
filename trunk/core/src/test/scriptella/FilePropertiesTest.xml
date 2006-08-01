@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:fileproptst" user="sa" password=""/>
     <script>
         create table t (
@@ -10,4 +10,4 @@
         insert into t(id, c) values(2,?{this.file('tst://file')});
         insert into t(id, c) values(3,?{this.file('tst://file')})
     </script>
-</scripts>
+</scriptella>

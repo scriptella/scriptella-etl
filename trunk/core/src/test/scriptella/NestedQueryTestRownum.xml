@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         Test script for rownum pseudo-column functionality.
     </description>
@@ -32,4 +32,4 @@
     </query>
 
 
-</scripts>
+</scriptella>

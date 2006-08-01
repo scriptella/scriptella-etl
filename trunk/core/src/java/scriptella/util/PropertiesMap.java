@@ -69,20 +69,19 @@ public class PropertiesMap implements Map<String, String> {
 
     /**
      * Put the property to underlying map.
-     * <p>If the property is already present in the map, it moved to the end of the list.
+     * <p>The properties are immutable, i.e. if the property is already present in the map, the new value is ignored.
      *
      * @param key   property name
      * @param value property value
-     * @return previous value associated with specified key,
+     * @return value associated with specified key,
      *         or null if there was no mapping for key.
-     *         A null return can also indicate that the map previously associated null with the specified key,
-     *         if the implementation supports null values.
      */
     public String put(String key, String value) {
-        if (props.containsKey(key)) {
-            props.remove(key); //the added property becomes last in the list.
+        String old = props.get(key);
+        if (old==null) {
+            props.put(key, value);
         }
-        return props.put(key, value);
+        return old;
     }
 
     public String remove(Object key) {

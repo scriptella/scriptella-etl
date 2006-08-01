@@ -1,11 +1,10 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <properties>
         #a,b and foo
-        <include href="PropertiesTest.properties"/>
         var=1
-        #replaces b
         b=$var|$var|$var|${var}|${var}|${var}
+        <include href="PropertiesTest.properties"/>
         url.prefix=jdbc:hsqldb:mem
         dbname=propertiestest
         driver=org.hsqldb.jdbcDriver
@@ -15,4 +14,4 @@
         password=
     </properties>
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
-</scripts>
+</scriptella>

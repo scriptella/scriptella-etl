@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db1" user="sa" password=""/>
     <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db2" user="sa" password=""/>
     <script connection-id="c1">
@@ -33,4 +33,4 @@
     </query>
 
 
-</scripts>
+</scriptella>

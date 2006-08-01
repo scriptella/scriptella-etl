@@ -139,6 +139,8 @@ public class ScriptsExecuteTask extends Task {
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             runner.setProperties(getProject().getProperties());
+        } else {
+            runner.setProperties(System.getProperties());
         }
 
 

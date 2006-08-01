@@ -1,5 +1,5 @@
-<!DOCTYPE scripts SYSTEM "scriptella.dtd">
-<scripts>
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
     <description>
         Migrates data from Database to LDAP.
         JdbcLdapDriver IMPORTANT NOTES:
@@ -110,4 +110,4 @@
         </query>
     </query>
 
-</scripts>
+</scriptella>
