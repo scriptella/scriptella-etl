@@ -157,7 +157,8 @@ public class ScriptsRunner {
                 } else if (h.getLevel().intValue()<Level.INFO.intValue()) {
                     //Print stack trace of exception in debug mode
                     System.err.println("---------------Debug Stack Trace-----------------");
-                    e.getCause().printStackTrace();
+                    Throwable t = e.getCause()==null?e:e.getCause();
+                    t.getCause().printStackTrace();
                 }
             }
         }
