@@ -73,7 +73,7 @@ public class ScriptsExecutorException extends Exception {
                 pw.print(lastProvider.getErrorStatement());
                 pw.println();
             }
-            pw.println("error codes: " + lastProvider.getErrorCodes());
+            pw.println("Error codes: " + lastProvider.getErrorCodes());
             Throwable nativeException = lastProvider.getNativeException();
             if (nativeException != null) {
                 pw.print("Driver exception: ");

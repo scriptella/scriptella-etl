@@ -80,9 +80,9 @@
 				<p>Elements of this type define connections to different datasources to work with.
                     A set of required attributes depends on driver. For example JDBC drivers require
                     driver, url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
-				<p>id attribute is required if you declare more than one connections inside your script.
+				<p><strong>id</strong> attribute is required if you declare more than one connections inside your script.
                     The value of this attribute is used to reference the connection in scripts and queries.</p>
-				<p>classpath attribute is used specify additional classpath to load driver libraries. Alternatively you may
+				<p><strong>classpath</strong> attribute is used specify additional classpath to load driver libraries. Alternatively you may
                 add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
                     Boot classpath libraries take precedence over libraries specified connection classpath attribute.
                 </p>
