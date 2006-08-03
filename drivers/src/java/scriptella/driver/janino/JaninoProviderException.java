@@ -39,4 +39,10 @@ public class JaninoProviderException extends ProviderException {
     public String getProviderName() {
         return Driver.DIALECT_IDENTIFIER.getName();
     }
+
+    @Override
+    public ProviderException setErrorStatement(String errStmt) {
+        return super.setErrorStatement(errStmt);
+    }
+
 }

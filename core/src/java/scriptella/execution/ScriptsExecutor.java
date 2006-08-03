@@ -154,6 +154,8 @@ public class ScriptsExecutor {
 
     /**
      * Sets additional properties.
+     * <p>External properties takes precedence over properties specified
+     * in scriptella &lt;properties&gt; element.
      * <p>Intended for integration with other systems like ant.
      *
      * @param externalProperties
@@ -176,7 +178,7 @@ public class ScriptsExecutor {
      * Helper method to create a new ScriptExecutor for specified script URL.
      * @param scriptFileUrl URL of script file.
      * @param externalProperties see {@link #setExternalProperties(java.util.Map)}
-     * @return
+     * @return configured instance of script executor.
      * @see ConfigurationFactory
      */
     public static ScriptsExecutor newExecutor(final URL scriptFileUrl, final Map<String,String> externalProperties) {

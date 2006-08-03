@@ -30,6 +30,7 @@ import java.util.TreeMap;
  * <li>{@link #next()} is called to process this row by nested scripting elements.
  * </ul>
  * Additionally a {@link #next(String[], Object[]) helper method} exists to make iterating even simpler.
+ * <p>Virtual rows may also be {@link #set(java.util.Map) constructed} from {@link Map} or {@link java.util.Properties}.
  * <p>Public members of this class are available in Janino scripting elements.
  * <p>Examples:
  * <p>The following query produces two virtual rows:</p>
@@ -58,7 +59,15 @@ import java.util.TreeMap;
  *    next(names, new Object[] {"200", "Mary", null)};
  * &lt;/query&gt;
  * </pre></code>
- *
+ * <p>Assume you have a map(or Properties) with the following mapping:
+ * <br><code>id->123, name->John, age->20</code>
+ * <br>A virtual row is produced using this code:
+ * <code><pre>
+ * &lt;query&gt;
+ *    //fill a map or load properties file
+ *    next(map};
+ * &lt;/query&gt;
+ * </pre></code>
  * @author Fyodor Kupolov
  * @version 1.0
  */
@@ -89,7 +98,7 @@ public class JaninoQuery extends JaninoScript implements ParametersCallback {
 
 
     /**
-     * Sets a value for specified paramter name.
+     * Sets a value for specified parameter name.
      * <p>This parameter becomes visible to nested scripting elements
      * after {@link #next()} method is called.
      * <p>This method is available inside Janino &lt;query&gt; element.
@@ -97,10 +106,24 @@ public class JaninoQuery extends JaninoScript implements ParametersCallback {
      * @param value parameter value.
      */
     public final void set(String name, Object value) {
+        initRow();
+        row.put(name, value);
+    }
+
+    /**
+     * Fills the virtual row using parameters from specified map.
+     * <p>This method is available inside Janino &lt;query&gt; element.
+     * @param parametersMap map of parameters, where key is a variable name
+     */
+    public final void set(Map<String,?> parametersMap) {
+        initRow();
+        row.putAll(parametersMap);
+    }
+
+    private void initRow() {
         if (row == null) {
             row = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
         }
-        row.put(name, value);
     }
 
     /**
@@ -132,6 +155,19 @@ public class JaninoQuery extends JaninoScript implements ParametersCallback {
         }
         next();
     }
+
+    /**
+     * Produces a virtual row based on the specified columns.
+     * <p>Parameters are set via {@link #set(java.util.Map)} method.
+     * After parameters for the current row have been set, {@link #next()} method is invoked.
+     * <p>This method is available inside Janino &lt;query&gt; element.
+     * @param parametersMap map of parameters.
+     */
+    public final void next(Map<String,?> parametersMap) {
+        set(parametersMap);
+        next();
+    }
+
 
 
     public String toString() {

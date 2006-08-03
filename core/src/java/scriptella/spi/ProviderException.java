@@ -107,5 +107,16 @@ public abstract class ProviderException extends SystemException {
      */
     public abstract String getProviderName();
 
+    public String toString() {
+        String es = getErrorStatement();
+        if (es!=null) {
+            StringBuilder res = new StringBuilder(super.toString());
+            res.append(". Error Statement: ").append(es);
+            return res.toString();
+        } else {
+            return super.toString();
+        }
+    }
+
 
 }
