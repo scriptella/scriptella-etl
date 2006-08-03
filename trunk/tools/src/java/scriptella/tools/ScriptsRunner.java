@@ -154,6 +154,10 @@ public class ScriptsRunner {
                         "Script " + file + " execution failed.", e);
                 if (BugReport.isPossibleBug(e)) {
                     LOG.log(Level.SEVERE, new BugReport(e).toString());
+                } else if (h.getLevel().intValue()<Level.INFO.intValue()) {
+                    //Print stack trace of exception in debug mode
+                    System.err.println("---------------Debug Stack Trace-----------------");
+                    e.getCause().printStackTrace();
                 }
             }
         }
