@@ -46,12 +46,7 @@ public class ScriptsExecutorException extends Exception {
 
             if (ex instanceof ProviderException) {
                 ProviderException providerEx = (ProviderException) ex;
-
-                if (providerEx.getErrorStatement() != null) {
-                    lastProvider = providerEx;
-                } else if (lastProvider == null) {
-                    lastProvider = providerEx;
-                }
+                lastProvider = providerEx;
             }
 
             if (ex instanceof ExceptionInterceptor.ExecutionException) {
@@ -74,7 +69,7 @@ public class ScriptsExecutorException extends Exception {
             pw.println(lastProvider.getMessage());
 
             if (lastProvider.getErrorStatement() != null) {
-                pw.print(". Error statement: ");
+                pw.print("Error statement: ");
                 pw.print(lastProvider.getErrorStatement());
                 pw.println();
             }

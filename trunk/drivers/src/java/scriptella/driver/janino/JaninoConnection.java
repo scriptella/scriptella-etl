@@ -20,11 +20,19 @@ import scriptella.expression.ParametersCallback;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
+import scriptella.util.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Scriptella connection adapter for Janino Script Evaluator.
  */
 public class JaninoConnection extends AbstractConnection {
+    private static final Logger LOG = Logger.getLogger(JaninoConnection.class.getName());
     private CodeCompiler compiler = new CodeCompiler();
 
     /**
@@ -40,7 +48,8 @@ public class JaninoConnection extends AbstractConnection {
         try {
             s.eval();
         } catch (Exception e) {
-            throw new JaninoProviderException("Script execution failed due to exception",e);
+            throw guessErrorStatement(new JaninoProviderException(
+                    "Script execution failed due to exception",e), scriptContent, s.getClass());
         } finally {
             //GC unused references
             s.setParametersCallback(null);
@@ -64,13 +73,59 @@ public class JaninoConnection extends AbstractConnection {
         try {
             q.eval();
         } catch (Exception e) {
-            throw new JaninoProviderException("Query execution failed due to exception",e);
+            throw guessErrorStatement(new JaninoProviderException(
+                    "Query execution failed due to exception",e), queryContent, q.getClass());
         } finally {
             //GC unused references
             q.setParametersCallback(null);
             q.setQueryCallback(null);
         }
     }
+
+    /**
+     * Finds an error statement by introspecting the stack trace of exception.
+     * <p>Error statement is fetched from content resource.
+     * @param content
+     * @param e exception to introspect.
+     * @param scriptClass class to use when finding an error statement.
+     * @return the same exception with a guessed error statement.
+     */
+    private JaninoProviderException guessErrorStatement(JaninoProviderException e, Resource content, Class scriptClass) {
+        Throwable ex = e.getCause();
+        StackTraceElement[] trace = ex.getStackTrace();
+        final String scriptClassName = scriptClass.getName();
+        for (StackTraceElement el : trace) { //find the top most instance of generated class
+            String className = el.getClassName();
+            if (scriptClassName.equals(className)) {
+                String st = getLine(content, el.getLineNumber());
+                e.setErrorStatement(st);
+                break;
+            }
+
+        }
+        return e;
+    }
+
+    private String getLine(Resource resource, int line) {
+        Reader r = null;
+        try {
+            r = resource.open();
+            BufferedReader br = new BufferedReader(r);
+            for (int i=0;i<line-1;i++) {
+                if (br.readLine()==null) {
+                    return null;
+                }
+            }
+            return br.readLine();
+        } catch (IOException e) {
+            LOG.log(Level.FINE, "Failed to determine error statement",e);
+        } finally {
+            IOUtils.closeSilently(r);
+        }
+        return null;
+
+    }
+
 
 
     /**

@@ -50,6 +50,7 @@
     <description></description>
     <properties>
         <include href="script.properties"/>
+        driver=org.jdcDriver
     </properties>
     <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678">
         driver.property=value
@@ -85,7 +86,8 @@
                 add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
                     Boot classpath libraries take precedence over libraries specified connection classpath attribute.
                 </p>
-				<p>Use element's content to pass properties into connection.</p>
+				<p>Use element's content to pass properties into connection. Several driver also support
+                connection properties in URL string.</p>
 			</section>
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
