@@ -40,7 +40,7 @@ By default file ${basedir}/script.xml is executed. Use file attribute to specify
 			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
 			Alternatively you can use java launcher:</p>
 			<source><![CDATA[
-java -jar scriptella.jar
+java -jar scriptella.jar [arguments]
                 ]]></source>
 			<note>
                 You may use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar
