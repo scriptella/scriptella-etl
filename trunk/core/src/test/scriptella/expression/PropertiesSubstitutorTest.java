@@ -16,6 +16,7 @@
 package scriptella.expression;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.ParametersCallback;
 
 /**
  * Tests {@link PropertiesSubstitutor}

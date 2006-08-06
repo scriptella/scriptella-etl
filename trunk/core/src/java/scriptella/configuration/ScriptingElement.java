@@ -16,6 +16,7 @@
 package scriptella.configuration;
 
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.Resource;
 
 
 /**
@@ -52,12 +53,12 @@ public abstract class ScriptingElement extends XMLConfigurableBase {
         this.ifExpr = ifExpr;
     }
 
-    public ContentEl getContent() {
+    public Resource getContent() {
         return contentEl.getContent(null);
     }
 
 
-    public ContentEl getDialectContent(DialectIdentifier id) {
+    public Resource getDialectContent(DialectIdentifier id) {
         return contentEl.getContent(id);
     }
 

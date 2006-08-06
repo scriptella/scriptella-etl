@@ -16,9 +16,9 @@
 package scriptella.execution;
 
 import scriptella.core.Session;
-import scriptella.expression.ParametersCallback;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.ThisParameter;
 
 import java.net.URL;

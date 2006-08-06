@@ -43,6 +43,7 @@
         <javadoc destdir="${javadoc.dest.dir}"
                  use="true" windowtitle="Scriptella API Documentation">
             <classpath refid="class.path"/>
+            <classpath path="${ant.jar}"/>
             <packageset dir="core/src/java"/>
             <packageset dir="drivers/src/java"/>
             <packageset dir="tools/src/java"/>
@@ -59,7 +60,7 @@
             <fileset dir="${site.dir}" includes="docs/** dtd/**"/>
         </delete>
     </target>
-    <target name="site" description="Prepares site" depends="codereports">
+    <target name="site" description="Prepares site" depends="codereports, forrest">
         <!--Validation-->
         <condition property="no_forrest">
             <available file="${forrest.dir}"/>
@@ -75,6 +76,9 @@
         <copy todir="${site.dir}/dtd">
             <fileset dir="${dtd.dest.dir}" includes="*.dtd"/>
         </copy>
+    </target>
+
+    <target name="forrest">
         <!--<ant antfile="${forrest.home}/main/forrest.build.xml" dir="forrest"/>-->
         <!--Forrest needs a patched ant ;), so let's call sh/bat file instead -->
         <condition property="ext" value=".bat">
@@ -82,8 +86,6 @@
         </condition>
         <property name="ext" value=""/>
         <exec dir="forrest" executable="${forrest.dir}/bin/forrest${ext}"/>
-
-
     </target>
 
 </project>

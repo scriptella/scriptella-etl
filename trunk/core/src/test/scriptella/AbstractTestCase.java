@@ -19,11 +19,13 @@ import junit.framework.TestCase;
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.ScriptsExecutor;
+import scriptella.spi.Resource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -140,4 +142,27 @@ public abstract class AbstractTestCase extends TestCase {
 
         public int getContentLength(final URL u);
     }
+
+    /**
+     * Converts specified resource to String.
+     * @param content content to convert.
+     * @return resource content as String.
+     */
+    protected static String asString(final Resource content) {
+        char cb[] = new char[4096];
+        StringBuilder sb = new StringBuilder(8192);
+
+        try {
+            Reader reader = content.open();
+
+            for (int c = 0; (c = reader.read(cb)) > 0;) {
+                sb.append(cb, 0, c);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return sb.toString();
+    }
+
 }

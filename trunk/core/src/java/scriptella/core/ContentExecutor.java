@@ -19,6 +19,7 @@ import scriptella.configuration.ContentEl;
 import scriptella.configuration.Location;
 import scriptella.configuration.ScriptingElement;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.Resource;
 
 /**
  * Base class for Script/Query executors.
@@ -27,7 +28,7 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public abstract class ContentExecutor<T extends ScriptingElement> implements ExecutableElement {
-    private ContentEl cachedContent; //initialized on the first execution
+    private Resource cachedContent; //initialized on the first execution
     private T element;
 
     /**
@@ -56,7 +57,7 @@ public abstract class ContentExecutor<T extends ScriptingElement> implements Exe
      * @param dialectIdentifier dialect identifier.
      * @return content for dialect. Not null.
      */
-    public ContentEl getContent(DialectIdentifier dialectIdentifier) {
+    public Resource getContent(DialectIdentifier dialectIdentifier) {
         if (cachedContent == null) {
             cachedContent = element.getDialectContent(dialectIdentifier);
         }

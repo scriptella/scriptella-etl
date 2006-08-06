@@ -17,8 +17,8 @@ package scriptella.configuration;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import scriptella.spi.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,17 +39,9 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
     /**
      * Null-Object to use instead of null if necessary
      */
-    public static final ContentEl NULL_CONTENT = new ContentEl() {
+    public static final Resource NULL_CONTENT = new Resource() {
         public Reader open() {
             return new StringReader("");
-        }
-
-        public void configure(final XMLElement element) {
-            throw new UnsupportedOperationException();
-        }
-
-        ContentEl merge(ContentEl contentEl) {
-            throw new UnsupportedOperationException();
         }
 
         public String toString() {
@@ -69,11 +61,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
     }
 
     public void configure(final XMLElement element) {
-        final NodeList childNodes = element.getElement().getChildNodes();
-        final int n = childNodes.getLength();
-
-        for (int i = 0; i < n; i++) {
-            final Node node = childNodes.item(i);
+        for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
             Resource resource = asResource(element, node);
             if (resource!=null) {
                 content.add(resource);
@@ -112,9 +100,17 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
      * @param contentEl content to merge with.
      * @return this instance with merged content.
      */
-    ContentEl merge(ContentEl contentEl) {
+    final ContentEl merge(final ContentEl contentEl) {
         content.addAll(contentEl.content);
         return this;
+    }
+
+    /**
+     * Appends a resource to this content.
+     * @param resource resource to append.
+     */
+    final void append(final Resource resource) {
+        content.add(resource);
     }
 
     public String toString() {

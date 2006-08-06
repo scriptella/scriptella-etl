@@ -6,15 +6,16 @@
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
+		<notice>Work in progress</notice>
+		<abstract class="pageBreakAfter"><img src="../images/site-logo.png" alt=""/></abstract>
 	</header>
 	<body>
 		<section>
 			<title>Introduction</title>
-			<p>Scriptella is a Java-based ETL and scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge. 
+			<p>Scriptella is a Java-based ETL and scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge.
 			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
-			<p>The following diagram is an overview of the Scriptella execution model:
-			<img src="images/ref-intro.gif" alt="Architecture Overview"/>
-			</p>
+			<p>The following diagram is an overview of the Scriptella execution model:</p>
+			<figure src="../images/reference/intro.gif" alt="Architecture Overview"/>
 			<section>
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarious when Scripella may be a very helpful tool:</p>
@@ -72,17 +73,19 @@
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
                 Ant.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
-                <note>The values of properties defined in this element are overriden by system properties or other
+				<note>The values of properties defined in this element are overriden by system properties or other
                 external properties depending on execution environment, e.g. Ant properties.</note>
-            </section>
+			</section>
 			<section>
 				<title>&lt;connection&gt;</title>
 				<p>Elements of this type define connections to different datasources to work with.
                     A set of required attributes depends on driver. For example JDBC drivers require
                     driver, url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
-				<p><strong>id</strong> attribute is required if you declare more than one connections inside your script.
+				<p>
+					<strong>id</strong> attribute is required if you declare more than one connections inside your script.
                     The value of this attribute is used to reference the connection in scripts and queries.</p>
-				<p><strong>classpath</strong> attribute is used specify additional classpath to load driver libraries. Alternatively you may
+				<p>
+					<strong>classpath</strong> attribute is used specify additional classpath to load driver libraries. Alternatively you may
                 add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
                     Boot classpath libraries take precedence over libraries specified connection classpath attribute.
                 </p>
@@ -112,7 +115,7 @@
             </note>
 			<section>
 				<title>Implicit Variables</title>
-                <p>The following implicit variables are available in scripts and queries:</p>
+				<p>The following implicit variables are available in scripts and queries:</p>
 				<table>
 					<tr>
 						<th>Variable</th>
@@ -278,11 +281,11 @@
 					<td/>
 				</tr>
 			</table>
-            <note>
+			<note>
                 Scriptella driver's package short name is an alias for driver, e.g. h2 is an alias
                 for scriptella.driver.h2.Driver
             </note>
-        </section>
+		</section>
 		<section>
 			<title>Non-relational Datasources Interoperability</title>
 			<p>We plan to include built-in support for CSV files and LDAP directories, so

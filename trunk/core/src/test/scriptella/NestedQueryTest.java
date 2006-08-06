@@ -17,8 +17,8 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.expression.ParametersCallback;
 import scriptella.jdbc.Query;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
@@ -32,6 +32,7 @@ import java.util.Set;
  */
 public class NestedQueryTest extends DBTestCase {
     public void test() throws ScriptsExecutorException {
+        getConnection("nestedquerytestdb1"); //just for shutdown
         final Connection con = getConnection("nestedquerytestdb2");
 
         final ScriptsExecutor se = newScriptsExecutor();
@@ -61,6 +62,7 @@ public class NestedQueryTest extends DBTestCase {
     }
 
     public void test2() throws ScriptsExecutorException {
+        getConnection("nestedquerytest2db1");//just for shutdown
         final Connection con = getConnection("nestedquerytest2db2");
 
         final ScriptsExecutor se = newScriptsExecutor("NestedQueryTest2.xml");

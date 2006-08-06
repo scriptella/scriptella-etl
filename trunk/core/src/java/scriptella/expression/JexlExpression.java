@@ -17,6 +17,7 @@ package scriptella.expression;
 
 import org.apache.commons.jexl.ExpressionFactory;
 import org.apache.commons.jexl.JexlContext;
+import scriptella.spi.ParametersCallback;
 
 import java.util.Collection;
 import java.util.Map;

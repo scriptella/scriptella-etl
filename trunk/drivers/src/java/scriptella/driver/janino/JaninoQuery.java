@@ -15,7 +15,7 @@
  */
 package scriptella.driver.janino;
 
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import java.util.Map;

@@ -20,6 +20,7 @@ import scriptella.configuration.OnErrorEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.spi.Connection;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.Resource;
 import scriptella.util.ExceptionUtils;
 
 import java.util.logging.Level;
@@ -43,7 +44,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         Connection con = ctx.getConnection();
         ScriptEl scriptEl = getElement();
 
-        ContentEl content = getContent(con.getDialectIdentifier());
+        Resource content = getContent(con.getDialectIdentifier());
         if (content == ContentEl.NULL_CONTENT) {
             warnEmptyContent();
             return;
@@ -89,7 +90,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         Connection con = ctx.getConnection();
         DialectIdentifier dialectId = con.getDialectIdentifier();
         if (onErrorEl != null && onErrorEl.getContent(dialectId) != null) { //if error handler present for this case
-            ContentEl content = onErrorEl.getContent(dialectId);
+            Resource content = onErrorEl.getContent(dialectId);
             if (content == null) {
                 LOG.log(Level.WARNING, "Script " + getLocation() + " failed and onError handler has no executable content: " + onErrorEl, t);
                 ExceptionUtils.throwUnchecked(t);

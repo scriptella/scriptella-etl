@@ -16,8 +16,8 @@
 package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.Resource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
