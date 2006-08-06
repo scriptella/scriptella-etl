@@ -60,14 +60,7 @@
             <fileset dir="${site.dir}" includes="docs/** dtd/**"/>
         </delete>
     </target>
-    <target name="site" description="Prepares site" depends="codereports, forrest">
-        <!--Validation-->
-        <condition property="no_forrest">
-            <available file="${forrest.dir}"/>
-        </condition>
-        <fail message="Forrest is required to build a site. Set forrest.dir property.
-        Forrest URL: http://forrest.apache.org" unless="no_forrest"/>
-        <!--End Validation-->
+    <target name="site" description="Prepares site" depends="codereports">
         <!-- Copy generate docs to forrest site-->
         <copy todir="${site.dir}/docs">
             <fileset dir="${docs.dir}"/>
@@ -76,9 +69,17 @@
         <copy todir="${site.dir}/dtd">
             <fileset dir="${dtd.dest.dir}" includes="*.dtd"/>
         </copy>
+        <antcall target="forrest"/>
     </target>
 
     <target name="forrest">
+        <!--Validation-->
+        <condition property="no_forrest">
+            <available file="${forrest.dir}"/>
+        </condition>
+        <fail message="Forrest is required to build a site. Set forrest.dir property.
+        Forrest URL: http://forrest.apache.org" unless="no_forrest"/>
+        <!--End Validation-->
         <!--<ant antfile="${forrest.home}/main/forrest.build.xml" dir="forrest"/>-->
         <!--Forrest needs a patched ant ;), so let's call sh/bat file instead -->
         <condition property="ext" value=".bat">
