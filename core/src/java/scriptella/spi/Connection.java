@@ -15,9 +15,6 @@
  */
 package scriptella.spi;
 
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
-
 /**
  * Represents a connection to the system provided by {@link ScriptellaDriver}.
  * <p>For most cases {@link AbstractConnection} may be used as a base for driver connection implementation.
@@ -48,7 +45,7 @@ public interface Connection {
      * @param queryContent       query content.
      * @param parametersCallback callback to get parameter values.
      * @param queryCallback      callback to call for each result set element produced by this query.
-     * @see #executeScript(scriptella.configuration.Resource, scriptella.expression.ParametersCallback)
+     * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
     void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException;
 

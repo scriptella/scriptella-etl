@@ -15,12 +15,12 @@
  */
 package scriptella.jdbc;
 
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

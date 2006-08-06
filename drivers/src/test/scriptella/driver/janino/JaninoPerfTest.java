@@ -16,9 +16,9 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 
 /**
  * Tests Janino connection class.

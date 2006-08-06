@@ -15,7 +15,7 @@
  */
 package scriptella.jdbc;
 
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.ThisParameter;
 import scriptella.util.IOUtils;
 

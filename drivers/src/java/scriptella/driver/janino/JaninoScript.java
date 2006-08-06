@@ -15,7 +15,7 @@
  */
 package scriptella.driver.janino;
 
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 
 /**
  * A base class for Janino &lt;script&gt; elements.

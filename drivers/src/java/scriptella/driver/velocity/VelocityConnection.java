@@ -17,11 +17,11 @@ package scriptella.driver.velocity;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
 import scriptella.spi.AbstractConnection;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.BufferedWriter;
@@ -109,7 +109,7 @@ public class VelocityConnection extends AbstractConnection {
      * @param queryContent       query content.
      * @param parametersCallback callback to get parameter values.
      * @param queryCallback      callback to call for each result set element produced by this query.
-     * @see #executeScript(scriptella.configuration.Resource, scriptella.expression.ParametersCallback)
+     * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         throw new UnsupportedOperationException("Query execution is not supported yet");

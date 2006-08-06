@@ -16,6 +16,7 @@
 package scriptella.expression;
 
 import scriptella.configuration.ConfigurationException;
+import scriptella.spi.ParametersCallback;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

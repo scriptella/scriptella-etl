@@ -17,10 +17,10 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.CompileException;
 import scriptella.AbstractTestCase;
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 
 import java.io.Reader;
 import java.io.StringReader;

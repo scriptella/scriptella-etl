@@ -16,7 +16,7 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import java.util.HashMap;

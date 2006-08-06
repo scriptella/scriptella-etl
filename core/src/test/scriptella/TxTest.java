@@ -23,8 +23,8 @@ import scriptella.execution.ScriptsContext;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.execution.TestableScriptsExecutor;
-import scriptella.expression.ParametersCallback;
 import scriptella.jdbc.Query;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;

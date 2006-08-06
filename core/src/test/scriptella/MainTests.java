@@ -17,6 +17,7 @@ package scriptella;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import scriptella.configuration.DialectBasedContentElTest;
 import scriptella.configuration.XIncludeTest;
 import scriptella.core.SQLParserBaseTest;
 import scriptella.execution.ExecutionStatisticsTest;
@@ -36,6 +37,7 @@ public class MainTests {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(DBTableCopyTest.class);
         suite.addTestSuite(DialectsTest.class);
+        suite.addTestSuite(DialectBasedContentElTest.class);
         suite.addTestSuite(FilePropertiesTest.class);
         suite.addTestSuite(NestedQueryTest.class);
         suite.addTestSuite(PropertiesTest.class);

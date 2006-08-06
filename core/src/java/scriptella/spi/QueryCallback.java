@@ -15,8 +15,6 @@
  */
 package scriptella.spi;
 
-import scriptella.expression.ParametersCallback;
-
 
 /**
  * Callback interface for query result set iteration.

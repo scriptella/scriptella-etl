@@ -16,8 +16,12 @@
 
 package scriptella.configuration;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.Resource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -28,7 +32,7 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class DialectBasedContentEl extends XMLConfigurableBase {
-    protected List<Dialect> dialects;
+    private List<Dialect> dialects;
 
     public DialectBasedContentEl() {
     }
@@ -38,14 +42,38 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
     }
 
     public void configure(final XMLElement element) {
-        //todo modify parsing to create dialect tree according to position in XML
-        //The following code loads nested dialect elements
-        dialects = load(element.getChildren("dialect"), Dialect.class);
-        //Use element text as a default dialect
-        Dialect d = new Dialect();
-        d.configure(element);
-        dialects.add(d);
+        Dialect defaultDialect = null;
+        dialects=new ArrayList<Dialect>();
+        //iterate through the child nodes of this element
+        for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
+            if (isDialectElement(node)) {
+                Dialect d = new Dialect();
+                d.configure(new XMLElement((Element) node, element));
+                dialects.add(d);
+            } else {
+                //Try to convert the node to resource if possible
+                Resource resource = ContentEl.asResource(element, node);
+                //If it's a text or include
+                if (resource!=null) {
+                    //check if we have default dialect instance
+                    if (defaultDialect==null) {
+                        //if no - create one
+                        defaultDialect=new Dialect();
+                        defaultDialect.configureDefault(element);
+                    }
+                    //append a resource to default dialect
+                    defaultDialect.contentEl.append(resource);
+                }
+            }
+        }
+        if (defaultDialect!=null) {
+            dialects.add(defaultDialect); //
+        }
 
+    }
+
+    private static boolean isDialectElement(Node node) {
+        return node instanceof Element && "dialect".equals(node.getNodeName());
     }
 
     /**
@@ -68,7 +96,14 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
     }
 
 
-    public static class Dialect extends XMLConfigurableBase {
+    /**
+     * For testing purposes
+     */
+    List<Dialect> getDialects() {
+        return dialects;
+    }
+
+    static class Dialect extends XMLConfigurableBase {
         private Pattern name;
         private Pattern version;
         private ContentEl contentEl;
@@ -93,16 +128,22 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
             return contentEl;
         }
 
-        public void setContentEl(final ContentEl contentEl) {
-            this.contentEl = contentEl;
-        }
-
         public void configure(final XMLElement element) {
             setPatternProperty(element, "name");
             setPatternProperty(element, "version");
-
             contentEl = new ContentEl(element);
+            setLocation(element, null);
         }
+
+        /**
+         * Configures default dialect.
+         * @param parent parent element.
+         */
+        public void configureDefault(final XMLElement parent) {
+            setLocation(parent, null);
+            contentEl = new ContentEl();
+        }
+
 
         boolean matches(final DialectIdentifier id) {
             if (id == null) { //if db has no dialect identifier

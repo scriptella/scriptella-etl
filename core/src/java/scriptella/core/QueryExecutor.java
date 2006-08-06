@@ -19,9 +19,10 @@ import scriptella.configuration.ContentEl;
 import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
-import scriptella.expression.ParametersCallback;
 import scriptella.spi.Connection;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
     public void execute(final DynamicContext ctx) {
         final Connection c = ctx.getConnection();
 
-        final ContentEl content = getContent(c.getDialectIdentifier());
+        final Resource content = getContent(c.getDialectIdentifier());
         if (content == ContentEl.NULL_CONTENT) {
             //skip queries without content
             return;

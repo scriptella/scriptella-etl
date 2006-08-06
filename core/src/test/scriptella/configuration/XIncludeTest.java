@@ -17,8 +17,6 @@ package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -49,15 +47,15 @@ public class XIncludeTest extends AbstractTestCase {
         final List<ScriptingElement> scripts = c.getScriptingElements();
         assertEquals(scripts.size(), 4);
 
-        String text = asString(scripts.get(0).getDialectContent(null));
+        String text = asString(scripts.get(0).getContent());
         String str = "insert into test(id, value) values (2,'333');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
-        text = asString(scripts.get(1).getDialectContent(null));
+        text = asString(scripts.get(1).getContent());
         str = "insert into test2(id, value) values (3,'444');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
-        text = asString(scripts.get(2).getDialectContent(null));
+        text = asString(scripts.get(2).getContent());
         str = "insert into test(id, value) values (2,'333');";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
@@ -68,27 +66,10 @@ public class XIncludeTest extends AbstractTestCase {
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         //Fallback test
-        text = asString(scripts.get(3).getDialectContent(null));
+        text = asString(scripts.get(3).getContent());
         str = "Fallback!";
         assertTrue("Script \n" + removeWhitespaceChars(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
 
-    }
-
-    private String asString(final ContentEl content) {
-        char cb[] = new char[4096];
-        StringBuilder sb = new StringBuilder(8192);
-
-        try {
-            Reader reader = content.open();
-
-            for (int c = 0; (c = reader.read(cb)) > 0;) {
-                sb.append(cb, 0, c);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        return sb.toString();
     }
 }

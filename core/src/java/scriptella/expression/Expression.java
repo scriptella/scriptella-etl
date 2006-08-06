@@ -16,6 +16,7 @@
 package scriptella.expression;
 
 import scriptella.core.SystemException;
+import scriptella.spi.ParametersCallback;
 
 import java.util.Map;
 import java.util.WeakHashMap;

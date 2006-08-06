@@ -15,11 +15,11 @@
  */
 package scriptella.jdbc;
 
-import scriptella.configuration.Resource;
 import scriptella.core.StatisticInterceptor;
 import scriptella.expression.Expression;
-import scriptella.expression.ParametersCallback;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;

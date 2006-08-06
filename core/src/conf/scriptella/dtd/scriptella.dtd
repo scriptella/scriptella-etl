@@ -15,11 +15,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 %
-@title Script File DTD
+@title Scriptella File DTD
 -->
 
 <!--
-The scripts is the root element of Scriptella XML file.
+Root element of Scriptella XML file.
 -->
 <!ELEMENT scriptella (description?, properties?, connection*, (script*, query*)*)>
 

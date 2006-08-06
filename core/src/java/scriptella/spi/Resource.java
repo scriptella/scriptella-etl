@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.configuration;
+package scriptella.spi;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -35,4 +35,9 @@ public interface Resource {
      * @throws IOException if I/O error occurs.
      */
     Reader open() throws IOException;
+
+    /**
+     * @return location of content or meaningful description.
+     */
+    String toString();
 }

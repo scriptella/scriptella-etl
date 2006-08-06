@@ -15,11 +15,11 @@
  */
 package scriptella.driver.janino;
 
-import scriptella.configuration.Resource;
-import scriptella.expression.ParametersCallback;
 import scriptella.spi.AbstractConnection;
+import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.BufferedReader;
@@ -63,7 +63,7 @@ public class JaninoConnection extends AbstractConnection {
      * @param queryContent       query content.
      * @param parametersCallback callback to get parameter values.
      * @param queryCallback      callback to call for each result set element produced by this query.
-     * @see #executeScript(scriptella.configuration.Resource, scriptella.expression.ParametersCallback)
+     * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
     public synchronized void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
 

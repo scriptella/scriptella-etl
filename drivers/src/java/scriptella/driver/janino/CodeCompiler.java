@@ -16,7 +16,7 @@
 package scriptella.driver.janino;
 
 import org.codehaus.janino.ScriptEvaluator;
-import scriptella.configuration.Resource;
+import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.Reader;

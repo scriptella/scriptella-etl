@@ -24,7 +24,6 @@
 package scriptella.spi;
 
 import scriptella.execution.ScriptsContext;
-import scriptella.expression.ParametersCallback;
 
 import java.net.MalformedURLException;
 import java.net.URL;
