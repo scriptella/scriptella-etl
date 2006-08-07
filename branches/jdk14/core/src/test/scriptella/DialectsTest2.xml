@@ -1,0 +1,44 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:dialectstest2" user="sa" password=""/>
+    <script>
+        <!--must execute-->
+        CREATE TABLE Test (
+        ID INT
+        );
+        insert into test values (1);
+        insert into test values (2);
+        insert into test values (3);
+        CREATE TABLE Test2 (
+        ID INT
+        );
+    </script>
+    <query>
+        select * from test where id=1
+        <script>
+            <dialect name="FOO"><!--Skipped-->
+                insert into test2 values (3);
+            </dialect>
+            insert into test2 values (?{ID});
+        </script>
+    </query>
+
+    <query>
+        <script>
+            insert into test2 values (?{ID});
+        </script>
+        <dialect name="HSQL.*"><!--executes-->
+            select * from test where id=2;
+        </dialect>
+        <dialect name=".*oracle.*"><!--Skipped-->
+            select * from test where id=3
+        </dialect>
+    </query>
+
+    <script><!--Skipped but not failed-->
+        <dialect name="FOO">
+            select * from test2
+        </dialect>
+    </script>
+
+</scriptella>

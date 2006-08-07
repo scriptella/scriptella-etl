@@ -1,0 +1,64 @@
+<!--
+ Copyright 2006 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<project name="scriptella-template" default="">
+    <description>Base build for submodules</description>
+    <property file="${basedir}/custom.build.properties"/>
+    <property file="${basedir}/build.properties"/>
+    <property file="${basedir}/../custom.build.properties"/>
+    <property file="${basedir}/../build.properties"/>
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="tests.report.dir" value="${build.dir}/tests"/>
+    <property name="jar.name" value="${ant.project.name}.jar"/>
+    <property name="tmp.dir" value="${build.dir}/tmp"/>
+    <property name="classes.dir" value="${tmp.dir}/classes"/>
+    <property name="tests.tmp.dir" value="${tmp.dir}/test"/>
+    <property name="src.dir" value="${basedir}/src"/>
+    <property name="java.dir" value="${src.dir}/java"/>
+    <property name="conf.dir" value="${src.dir}/conf"/>
+    <property name="test.dir" value="${src.dir}/test"/>
+    <property name="classpath" value=""/>
+    <property name="test.classpath" value="${classpath}"/>
+    <property name="root.dir" value="${basedir}/.."/>
+
+    <target name="init" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${tests.tmp.dir}"/>
+        <available file="${conf.dir}" property="resources_present"/>
+    </target>
+
+    <target name="clean" unless="noclean">
+        <delete failonerror="no">
+            <fileset dir="${tmp.dir}" includes="**"/>
+        </delete>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${java.dir}" destdir="${classes.dir}" classpath="${classpath}"
+               debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="resources" if="resources_present" depends="init">
+        <copy todir="${classes.dir}">
+            <fileset dir="${conf.dir}" includes="**"/>
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile, resources">
+        <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}"/>
+    </target>
+
+</project>

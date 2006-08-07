@@ -1,0 +1,41 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <description>
+        Export data from table to CSV file.
+    </description>
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" password=""/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" password=""/>
+    <script connection-id="in">
+        <!-- Creates TEXT table to output CSV data -->
+        CREATE TEXT TABLE Bug (
+            <include href="fields.sql"/>
+        );
+        <!--Specify file to store table results -->
+        SET TABLE Bug SOURCE "bugs-in.csv";
+    </script>
+    <script connection-id="out">
+        <!-- Creates Bug table to output CSV data -->
+        DROP TABLE BUG IF EXISTS;
+        CREATE TABLE Bug (
+            <include href="fields.sql"/>
+        );
+    </script>
+
+    <query connection-id="in">
+        <!--Selects all bugs -->
+        SELECT * from Bug
+        <script connection-id="out">
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        </script>
+    </query>
+
+    <script connection-id="out"><!-- Correctly shutdown the DB -->
+        COMMIT;
+        SHUTDOWN;
+    </script>
+    <script connection-id="in"><!-- Correctly shutdown the DB -->
+        COMMIT;
+        SHUTDOWN;
+    </script>
+
+</scriptella>

@@ -1,0 +1,30 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <description>
+        Simply creates a table with data in one db and copy it to another H2 database.
+    </description>
+    <connection id="c1" driver="h2" user="sa" password=""/>
+    <connection id="c2" driver="org.h2.Driver" url="jdbc:h2:mem:tst"/>
+    <script connection-id="c1">
+        CREATE TABLE Test (
+        ID INT,
+        Data BLOB
+        );
+        insert into Test values (1, '01010101');
+        insert into Test values (2, '02020202');
+        insert into Test values (3, '03030303');
+    </script>
+    <script connection-id="c2">
+        CREATE TABLE Test (
+            ID INT,
+            Data BLOB
+        );
+    </script>
+    <query connection-id="c1">
+        SELECT * FROM Test
+        <script connection-id="c2">
+            INSERT INTO Test VALUES (?1, ?2);
+        </script>
+    </query>
+
+</scriptella>

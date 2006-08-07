@@ -1,0 +1,13 @@
+Copyright (c) 2004-2005, Thomas Mueller. All rights reserved. 
+
+If you modify H2, you need to publish the changes in source code form, you may not charge for these changes, and you may not use your own copyright and/or license terms. Any modified file must carry prominent notices stating what was changed, and that you changed the file. Modifications means changes to H2 itself, this does not include extensions such as Java functions, or an application that uses H2.
+Redistributions in source forms, with or without modification, are permitted provided that the following conditions are met: Redistributions must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+Redistribution and use in binary form, with or without modification, are permitted provided that the following conditions are met: Redistributions must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+The name H2 may not be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS, OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+When something happens to the author of this software so that he can no longer decide what to do with the project, the source code will automatically become public domain.
+

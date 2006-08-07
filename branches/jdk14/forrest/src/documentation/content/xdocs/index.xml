@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+	<header>
+		<title>Welcome to Scriptella Project</title>
+	</header>
+	<body>
+		<section id="overview">
+			<title>About Scriptella</title>
+			<p>Scriptella is an open source Extract-Transform-Load (ETL) and scripts execution tool.</p>
+			<p>Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use SQL(or other
+                scripting language suitable for your datasource) to perform required transformations.</p>
+			<p>
+				<a href="download.html">Download</a>
+                and
+                <a href="tutorial.html">use it</a>
+                ! Scriptella is licensed under the
+                <a href="license.html">Apache License, Version 2.0</a>
+			</p>
+		</section>
+		<section id="usage">
+			<title>Typical use</title>
+			<ul>
+				<li>Database migration.</li>
+				<li>Database creation/update scripts.</li>
+				<li>Cross-database ETL operations, import/export</li>
+				<li>Alternative for Ant &lt;sql&gt; task.</li>
+			</ul>
+		</section>
+		<section id="features">
+			<title>Features</title>
+			<ul>
+				<li>Simple XML syntax for scripts. Add dynamics to your existing SQL scripts by creating a thin
+                    wrapper XML file:
+                    <source><![CDATA[
+<scriptella>
+    <connection driver="$driver" url="$url" user="$user" password="$password"/>
+    <script>
+        <include href="PATH_TO_YOUR_SCRIPT.sql"/>
+        -- And/or directly insert SQL here
+    </script>
+</scriptella>
+    ]]></source>
+				</li>
+				<li>Support for multiple datasources (or multiple connections to a single database) in a script file.</li>
+				<li>Support for many useful JDBC features, e.g. parameters in SQL including file blobs and JDBC
+                    escaping.</li>
+				<li>Support for evaluated expressions and properties (JEXL syntax)</li>
+				<li>Support for cross-database SQL scripts by using &lt;dialect&gt; elements</li>
+				<li>Transactional execution</li>
+				<li>Error handling via &lt;onerror&gt; elements</li>
+				<li>Conditional scripts/queries execution(similar to Ant if/unless attrbutes but more powerful)</li>
+				<li>Easy-to-Use as a standalone tool or Ant task. No deployment/installation required.</li>
+				<li>Service Provider Interface (SPI) for interoperability with non-JDBC Datasources.</li>
+				<li>Velocity and Janino providers. Generate reports with Velocity directly from your script files.
+                For complex tasks embed java code which is compiled and executed by Janino.</li>
+			</ul>
+		</section>
+	</body>
+</document>

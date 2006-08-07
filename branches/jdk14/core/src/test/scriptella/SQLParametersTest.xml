@@ -1,0 +1,22 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<!--
+This suite tests properties substitution.
+-->
+<scriptella>
+    <properties><!-- Registers global property-->
+        global=globalValue
+        global2=global2Value
+        tableName=Test
+        insert=INSERT INTO
+    </properties>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlparamstst" user="sa" password=""/>
+    <script>
+        CREATE TABLE $tableName (
+        ID INT,
+        TEXT VARCHAR(100)
+        );
+        $insert Test(id, text) values (1, ?global);<!-- Must be substituted-->
+        ${insert} Test(id, text) values (2, ?global2+'Three${global}');<!-- Literals are skipped-->
+    </script>
+
+</scriptella>

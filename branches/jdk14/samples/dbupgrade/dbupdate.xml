@@ -1,0 +1,38 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <description>Database creation script</description>
+    <properties>
+        <include href="dbupdate.properties"/>
+    </properties>
+    <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
+    <!-- Upgrade scripts -->
+    <script if="version.from==1 and version.to ge 2"><!--Upgrading from v1 to v2 -->
+        ALTER TABLE Account ADD COLUMN Suspended BOOLEAN DEFAULT FALSE NOT NULL;
+        ALTER TABLE Account ADD COLUMN EMail VARCHAR(20);
+    </script>
+    <script if="version.to>version.from and version.to==3"> <!--Upgrading from v1 or v2 to v3 -->
+        CREATE TABLE Account_Details (
+        Account_ID INT,
+        EMail VARCHAR(20),
+        FOREIGN KEY (Account_ID) REFERENCES Account (Account_ID)
+        );
+        INSERT INTO Account_Details SELECT Account_ID,EMail FROM Account;
+        ALTER TABLE Account DROP COLUMN EMail;
+    </script>
+    <!-- Downgrade scripts -->
+    <script if="version.from>version.to and version.from==3"> <!--Downgrading from v3 to v2-->
+        ALTER TABLE Account ADD COLUMN EMail VARCHAR(20);
+        UPDATE Account a SET EMail=(SELECT EMAIL FROM Account_Details d WHERE d.Account_ID=a.Account_ID);
+        DROP TABLE Account_Details;
+    </script>
+    <script if="version.to==1 and version.from>=2"> <!--Downgrading from v2 to v1-->
+        ALTER TABLE Account DROP COLUMN Suspended;
+    </script>
+
+    <script>
+        COMMIT;
+        SHUTDOWN COMPACT;
+    </script>
+
+
+</scriptella>

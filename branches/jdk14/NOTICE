@@ -1,0 +1,19 @@
+   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Scriptella distribution.                      ==
+   =========================================================================
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+   This product also includes software developed by :
+     - The HSQLDB Development Group (http://www.hsqldb.org)
+
+   Please read the different license files present in the lib directory of
+   this distribution.
+
+   The names "Scriptella" and  "The Scriptella Project Team"  must not be used to
+   endorse  or promote  products derived  from this  software without prior
+   written permission. For written permission, please contact
+   scriptella@dev2dev.info

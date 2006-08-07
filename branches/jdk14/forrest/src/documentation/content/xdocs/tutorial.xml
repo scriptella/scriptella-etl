@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+	<header>
+		<title>Two Minute Tutorial</title>
+	</header>
+	<body>
+		<section>
+			<title>Installation</title>
+			<ul>
+				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
+				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to your system path.</li>
+				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+                    or directly specify classpath attribute in script connection elements.</li>
+			</ul>
+		</section>
+		<section>
+			<title>Use scriptella as Ant task</title>
+			<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+			<source><![CDATA[
+<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar;additional_drivers.jar"/>
+                ]]></source>
+            <note>Additional drivers classpath elements are optional. You may directly specify classpath attribute in
+            connection XML element.</note>
+            <p>Running Scriptella files from Ant is simple:</p>
+			<source><![CDATA[
+<execute/>
+                ]]></source>
+                <p>or</p>
+			<source><![CDATA[
+<execute file="path/to/your/file/>
+                ]]></source>
+
+			<note>
+By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
+            </note>
+		</section>
+		<section>
+			<title>Command-line execution</title>
+			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
+			Alternatively you can use java launcher:</p>
+			<source><![CDATA[
+java -jar scriptella.jar [arguments]
+                ]]></source>
+			<note>
+                You may use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar
+                to specify additional classpath (overcomes -jar option limitation). In this case
+                you don't have to define connection classpath attributes.
+            </note>
+		</section>
+		<section>
+			<title>Examples</title>
+			<section>
+				<title>Copy table to another database</title>
+				<p>Assume Database #1 contains Table Product with id, category and name columns. The following script
+                copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
+				<p>script.xml:</p>
+				<source><![CDATA[
+    <scriptella>
+        <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
+        <connection id="db2" driver="jdbc.Driver.Class2.Name" url="jdbc:database2:sample" user="sa" password=""/>
+        <query connection-id="db1">
+            <!-- Select product from software category in db1-->
+            SELECT * FROM Product WHERE category='software';
+            <!-- for each row execute a script -->
+            <script connection-id="db2">
+                <!-- Insert all selected products to db2
+                     use ? to reference properties, columns or ?{expressions}-->
+                INSERT INTO Product(id, category, product_name) values (?id, ?{category}, ?name);
+            </script>
+        </query>
+    </scriptella>
+                    ]]></source>
+			</section>
+			<section>
+				<title>Working with BLOBs</title>
+				<p>The following sample initializes table of music tracks. Each track has a DATA field containing
+ a file loaded from an external location. File song1.mp3 is stored in the same directory as script.xml and song2.mp3
+ is loaded through the web.</p>
+				<p>script.xml:</p>
+				<source><![CDATA[
+    <scriptella>
+        <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
+        <script>
+            CREATE TABLE Track (
+              ID INT,
+              ALBUM_ID INT,
+              NAME VARCHAR(100),
+              DATA LONGVARBINARY
+            );
+            <!-- Inserts file with path relative to executed script location -->
+            insert into Track(id, album_id, name, data) values
+                   (1, 1, 'Song1.mp3', ?{this.file('song1.mp3')});
+            <!-- Inserts file from URL-->
+            insert into Track(id, album_id, name, data) values
+                   (2, 2, 'Song2.mp3', ?{this.file('http://musicstoresample.com/song2.mp3')});
+        </script>
+    </scriptella>
+                    ]]></source>
+			</section>
+			<section>
+				<title>Supporting several SQL dialects</title>
+				<p>TODO: Add example here</p>
+				<p>script.xml:</p>
+				<source><![CDATA[
+    <scriptella>
+    </scriptella>
+                    ]]></source>
+			</section>
+		</section>
+		<fixme author="ejboy">TODO</fixme>
+	</body>
+</document>

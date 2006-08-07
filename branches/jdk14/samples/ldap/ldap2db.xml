@@ -1,0 +1,49 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <description>
+        Migrates data from LDAP to Database.
+        Creates users and roles tables suitable for Tomcat JDBCRealm authentication.
+        The source data is obtained from LDAP.
+    </description>
+    <!--Connection to the LDAP-->
+    <connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
+                url="jdbc:ldap://localhost:389/dc=scriptella"
+                user="cn=root,dc=scriptella" password="secret">
+        <!--Define connection properties-->
+        SEARCH_SCOPE=subTreeScope
+        ignore_transactions=true
+        <!--You may embed properties into url using driver specific syntax, e.g.
+         jdbc:ldap://localhost:389/dc=scriptella?SEARCH_SCOPE:=subTreeScope&amp;ignore_transactions:=true
+         -->
+    </connection>
+    <!--Connection to the target database -->
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
+    <script connection-id="out">
+        <!--Creates empty database and drops exisiting tables if DB already exisis -->
+        <include href="dbschema.sql"/>
+    </script>
+    <query connection-id="in">
+        <!--Selects users(user attributes) from ou=people,dc=scriptella-->
+        SELECT uid,userPassword,DN FROM ou=people WHERE objectClass = 'inetOrgPerson'
+        <!--For each found user executes the following script-->
+        <script connection-id="out">
+            <!--Inserts user record using parameters from the outer query result set-->
+            INSERT INTO Users VALUES (?uid, ?userPassword);
+        </script>
+        <!--Additionally we need to query a list of groups containing found user-->
+        <query>
+            <!-- ldapsearch.exe -b dc=scriptella "(&(objectClass=groupOfUniqueNames)(uniqueMember=?DN))" -->
+            SELECT cn FROM ou=groups WHERE objectClass = 'groupOfUniqueNames' and uniqueMember=?DN
+            <!-- For each group in the query result set-->
+            <script connection-id="out">
+                <!--Insert User_Role record into database-->
+                INSERT INTO User_Roles VALUES (?uid, ?cn);
+            </script>
+        </query>
+    </query>
+    <script connection-id="out">
+        <!-- Just to shutdown HSQL correctly -->
+        COMMIT;
+        SHUTDOWN;
+    </script>
+</scriptella>

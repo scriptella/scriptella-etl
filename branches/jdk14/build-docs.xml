@@ -1,0 +1,92 @@
+<project name="Scriptella Documentation Build" default="codereports">
+    <property file="custom.build.properties"/>
+    <property file="build.properties"/>
+    <property name="docs.dir" value="${basedir}/build/docs"/>
+    <property name="dtd.dest.dir" value="${docs.dir}/dtd"/>
+    <property name="javadoc.dest.dir" value="${docs.dir}/api"/>
+    <property name="site.dir" value="${basedir}/forrest/src/documentation/content"/>
+    <path id="class.path">
+        <fileset dir="lib" includes="**/*.jar"/>
+    </path>
+
+    <target name="codereports" depends="dtd, javadoc"/>
+    <target name="dtd" depends="clean">
+        <description>Generates DTD using DTDDoc</description>
+        <!--Validation-->
+        <condition property="no_dtddoc">
+            <available file="${dtddoc.dir}"/>
+        </condition>
+        <fail message="DTDDoc is required to build DTD documentation. Set dtddoc.dir property.
+        DTDDoc URL: http://dtddoc.sourceforge.net" unless="no_dtddoc"/>
+        <!--End Validation-->
+        <taskdef name="DTDDoc"
+                 classname="DTDDoc.DTDDocTask">
+            <classpath>
+                <fileset dir="${dtddoc.dir}" includes="*.jar"/>
+            </classpath>
+        </taskdef>
+        <mkdir dir="${dtd.dest.dir}"/>
+        <DTDDoc showHiddenTags="true"
+                showFixmeTags="false"
+                sourceDir="core/src/conf"
+                destDir="${dtd.dest.dir}"
+                docTitle="DTD Documentation">
+            <include name="**/*.dtd"/>
+        </DTDDoc>
+        <copy todir="${dtd.dest.dir}" flatten="true">
+            <fileset dir="${basedir}/core/src/conf" includes="**/*.dtd"/>
+        </copy>
+    </target>
+
+    <target name="javadoc" depends="clean">
+        <mkdir dir="${javadoc.dest.dir}"/>
+        <javadoc destdir="${javadoc.dest.dir}"
+                 use="true" windowtitle="Scriptella API Documentation">
+            <classpath refid="class.path"/>
+            <classpath path="${ant.jar}"/>
+            <packageset dir="core/src/java"/>
+            <packageset dir="drivers/src/java"/>
+            <packageset dir="tools/src/java"/>
+            <doctitle><![CDATA[<h1>Scriptella API Documentation</h1>]]></doctitle>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; Copyright 2006 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    <target name="clean" unless="noclean">
+        <delete dir="${dtd.dest.dir}" failonerror="no"/>
+        <delete dir="${javadoc.dest.dir}" failonerror="no"/>
+        <delete failonerror="no">
+            <fileset dir="${site.dir}" includes="docs/** dtd/**"/>
+        </delete>
+    </target>
+    <target name="site" description="Prepares site" depends="codereports">
+        <!-- Copy generate docs to forrest site-->
+        <copy todir="${site.dir}/docs">
+            <fileset dir="${docs.dir}"/>
+        </copy>
+        <!--Copy DTDs to site dtd directory. Registered URLs for DTDs -->
+        <copy todir="${site.dir}/dtd">
+            <fileset dir="${dtd.dest.dir}" includes="*.dtd"/>
+        </copy>
+        <antcall target="forrest"/>
+    </target>
+
+    <target name="forrest">
+        <!--Validation-->
+        <condition property="no_forrest">
+            <available file="${forrest.dir}"/>
+        </condition>
+        <fail message="Forrest is required to build a site. Set forrest.dir property.
+        Forrest URL: http://forrest.apache.org" unless="no_forrest"/>
+        <!--End Validation-->
+        <!--<ant antfile="${forrest.home}/main/forrest.build.xml" dir="forrest"/>-->
+        <!--Forrest needs a patched ant ;), so let's call sh/bat file instead -->
+        <condition property="ext" value=".bat">
+            <os family="windows"/>
+        </condition>
+        <property name="ext" value=""/>
+        <exec dir="forrest" executable="${forrest.dir}/bin/forrest${ext}"/>
+    </target>
+
+</project>
