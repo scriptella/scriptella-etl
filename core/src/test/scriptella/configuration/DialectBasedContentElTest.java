@@ -34,11 +34,12 @@ import java.util.List;
  */
 public class DialectBasedContentElTest extends AbstractTestCase {
     private static final DocumentBuilder BUILDER;
+
     static {
         try {
             BUILDER = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
@@ -50,14 +51,14 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         String xml = "<query>" +
                 " \nDef1<!--Comment -->De<!--Comment2-->f2\n" +
                 "<dialect name=\"d1\">D<!--Comment-->1</dialect>" +
-                "Def3" +
+                "<![CDATA[De]]>f3" +
                 "<dialect name=\"d2\"><!--Commend-->D2</dialect>" +
                 "<!--Comment-->\nDef4<!--Comment-->  " +
                 "</query>";
         XMLElement xmlElement = asElement(xml);
         DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
         List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
-        assertEquals(3,dialects.size());
+        assertEquals(3, dialects.size());
         DialectBasedContentEl.Dialect dialect = dialects.get(0);
         assertEquals("D1", asString(dialect.getContentEl()));
         dialect = dialects.get(1);
@@ -72,7 +73,7 @@ public class DialectBasedContentElTest extends AbstractTestCase {
             Element el = BUILDER.parse(new InputSource(new StringReader(xml))).getDocumentElement();
             return new XMLElement(el, new URL("file:/test"));
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to create XML element",e);
+            throw new IllegalStateException("Unable to create XML element", e);
         }
     }
 }
