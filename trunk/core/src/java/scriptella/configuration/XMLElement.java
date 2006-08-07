@@ -174,10 +174,6 @@ public class XMLElement {
         return ((a != null) && (a.length() == 0)) ? null : a;
     }
 
-    public String getTextContent() {
-        return element.getTextContent();
-    }
-
     protected boolean getBooleanProperty(final String attribute,
                                          final boolean defaultValue) {
         final String a = getAttribute(attribute);

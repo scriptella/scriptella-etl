@@ -81,7 +81,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
         if (node instanceof Text) {
              return new Resource() {
                  public Reader open() {
-                     return new StringReader(node.getTextContent());
+                     return new StringReader(((Text)node).getData());
                  }
              };
          } else if (node instanceof Element &&
