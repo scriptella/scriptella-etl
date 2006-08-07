@@ -18,6 +18,7 @@ package scriptella.configuration;
 import scriptella.spi.Resource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
@@ -36,7 +37,7 @@ import java.util.logging.Logger;
 public class IncludeEl extends XMLConfigurableBase implements Resource {
     private URL url;
     private String href;
-    private Charset charset;
+    private String charset;
     private static final Logger LOG = Logger.getLogger(IncludeEl.class.getName());
     private FallbackEl fallbackEl;
 
@@ -52,11 +53,11 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
         this.href = href;
     }
 
-    public Charset getCharset() {
+    public String getCharset() {
         return charset;
     }
 
-    public void setCharset(final Charset charset) {
+    public void setCharset(final String charset) {
         this.charset = charset;
     }
 
@@ -72,18 +73,11 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
         url = element.getDocumentURL();
         setRequiredProperty(element, "href");
 
-        final String enc = element.getAttribute("encoding");
-
-        if (enc == null) {
-            charset = Charset.defaultCharset();
-        } else {
-            if (!Charset.isSupported(enc)) {
-                throw new ConfigurationException("Encoding " + enc +
-                        " is not supported", element);
-            }
-
-            charset = Charset.forName(enc);
+        String enc = element.getAttribute("encoding");
+        if (enc != null && !Charset.isSupported(enc)) {
+            throw new ConfigurationException("Encoding " + enc + " is not supported", element);
         }
+        charset = enc;
         final XMLElement fallbackElement = element.getChild("fallback");
         if (fallbackElement != null) {
             fallbackEl = new FallbackEl(fallbackElement);
@@ -93,7 +87,8 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
     public Reader open() throws IOException {
         try {
             URL u = new URL(url, href);
-            return new InputStreamReader(u.openStream(), charset);
+            InputStream in = u.openStream();
+            return charset == null ? new InputStreamReader(in) : new InputStreamReader(in, charset);
         } catch (MalformedURLException e) {
             throw (IOException) new IOException("Malformed include url: " + href).initCause(e);
         } catch (IOException e) {
