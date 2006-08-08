@@ -7,7 +7,9 @@
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
 		<notice>Work in progress</notice>
-		<abstract class="pageBreakAfter"><img src="../images/site-logo.png" alt=""/></abstract>
+		<abstract class="pageBreakAfter">
+			<img src="../images/site-logo.png" alt=""/>
+		</abstract>
 	</header>
 	<body>
 		<section>
@@ -39,9 +41,30 @@
 		</section>
 		<section>
 			<title>Installation</title>
+			<anchor id="INSTALLATION"/>
+			<ul>
+				<li><a href="../download.html">Download</a> Scriptella binary distribution.</li>
+				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to system path variable.</li>
+				<li>Check if JRE has been installed correctly by running java -version. Alternatively JAVA_HOME may be used to specify JDK location.
+				<p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p>
+				</li>
+				<li><em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+                    or directly specify classpath attribute in script connection elements.</li>
+			</ul>
+			<p>The binary distribution of Scriptella consists of the following directory layout:</p>
+            <source>
++-+
+  +--- bin - launch scripts
+  |
+  +--- docs - documentation
+  |      +--- api - API Documentation (in Javadoc format)
+  |      |
+  |      +--- dtd - Scriptella DTD file and documentation in DTDDoc format.
+  +--- lib - scriptella boot class path libraries loaded by launch scripts.
+            </source>
 		</section>
 		<section>
-			<title>XML Script Elements</title>
+			<title>Scripts Syntax</title>
 			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
 			</note>
 			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
@@ -159,6 +182,28 @@
 		</section>
 		<section>
 			<title>Command Line Execution</title>
+			<p>If you followed the <a href="#INSTALLATION">Installation</a> instructions running Scriptella is simple - just type <code>scriptella</code> to execute a <code>script.xml</code> in the current directory.</p>
+			<p>The Scriptella launching script loads all jars from SCRIPTELLA_DIR/lib directory and adds them to exectued script(s) class path.</p>
+			<p>Alternatively a standard java launcher may be used to run a script:
+			<code>java -jar scriptella.jar [options] [file1] [file2] ... [fileN]</code>. It is assumed that the scriptella.jar file from the binary distribution is available in the current directory.</p>
+			<note label="Important">Java launcher does NOT load jars from lib directory so you would have to specify addtional class path elements in script file connection declarations or use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.jar to overcome -jar option limitation.</note>
+			<section>
+				<title>Command Line Options</title>
+				<p>The scriptella launcher has the following invocation syntax:</p>
+				<source>scriptella [options] [file1] [file2] ... [fileN]</source><p>File names/paths are specified after options and separated by spaces.</p>
+				<table>
+					<tr>
+						<td>-help, -h</td><td>display help</td>
+					</tr>
+					<tr>
+						<td>-debug, -d</td><td>print debugging information</td>
+					</tr>
+					<tr>
+						<td>-quiet, -q</td><td>be extra quiet</td>
+					</tr>
+				</table>
+			</section>
+
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>
 		<section>
@@ -176,7 +221,7 @@
 				<p>You may also add paths to database drivers used inside the script:</p>
 				<source><![CDATA[<taskdef resource="antscriptella.properties"
    <classpath>
-       <pathelement location="$SCRIPTELLA_HOME/scriptella.jar">
+       <pathelement location="/path/to/scriptella.jar">
        <pathelement location="lib/hsqldb.jar">
        <pathelement location="lib/jconn2.jar">
    </classpath>
@@ -246,7 +291,7 @@
 		<section>
 			<title>JDBC Adapters</title>
 			<p>Scriptella is bundled with a set of adapters for popular
-            JDBC drivers. You may always use your JDBC vendor drivers, but
+            JDBC drivers. You are free to use any JDBC vendor drivers, but
             the Scriptella adapters provide the following benefits:</p>
 			<ul>
 				<li>Simplified naming. No need to specify a full driver's class
@@ -266,7 +311,7 @@
 				</tr>
 				<tr>
 					<td>
-						<a href="../docs/api/scriptella/drivers/hsqldb/">HSQLDB</a>
+						<a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
 					</td>
 					<td>scriptella.driver.hsqldb.Driver</td>
 					<td>org.hsqldb.jdbcDriver</td>
@@ -274,7 +319,7 @@
 				</tr>
 				<tr>
 					<td>
-						<a href="../docs/api/scriptella/drivers/h2/">H2 Database</a>
+						<a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
 					</td>
 					<td>scriptella.driver.h2.Driver</td>
 					<td>org.h2.Driver</td>

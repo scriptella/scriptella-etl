@@ -80,7 +80,7 @@ public class ScriptsRunner {
     private static void printUsage() {
         System.out.println("scriptella [-options] [<file 1> ... <file N>]");
         System.out.println("Options:");
-        System.out.println("  -help, -h           displays help ");
+        System.out.println("  -help, -h           display help ");
         System.out.println("  -debug, -d          print debugging information");
         System.out.println("  -quiet, -q          be extra quiet");
     }

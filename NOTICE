@@ -9,6 +9,8 @@
 
    This product also includes software developed by :
      - The HSQLDB Development Group (http://www.hsqldb.org)
+     - Thomas Mueller (http://h2database.com)
+     - Arno Unkrig (http://janino.net)
 
    Please read the different license files present in the lib directory of
    this distribution.
@@ -16,4 +18,4 @@
    The names "Scriptella" and  "The Scriptella Project Team"  must not be used to
    endorse  or promote  products derived  from this  software without prior
    written permission. For written permission, please contact
-   scriptella@dev2dev.info
+   kupolov@gmail.com
