@@ -41,9 +41,7 @@
     </target>
 
     <target name="clean" unless="noclean">
-        <delete failonerror="no">
-            <fileset dir="${tmp.dir}" includes="**"/>
-        </delete>
+        <delete dir="${tmp.dir}" failonerror="no"/>
     </target>
 
     <target name="compile" depends="init">
