@@ -39,6 +39,10 @@
     <property name="product.name" value="scriptella-${version}"/>
     <property name="zip.name" value="${product.name}.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
+    <fileset id="src.zip.fileset" dir="${basedir}"
+             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml"
+             excludes="samples/lib/**"/>
+    <property name="src.zip.includes" value=""></property>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
 
 
@@ -120,8 +124,7 @@
         <description>Prepares src distribution</description>
         <delete file="${build.dir}/${src.zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${src.zip.name}">
-            <fileset dir="${basedir}" includes="samples/** lib/** core/src/** tools/src/** **/*build.xml"
-                     excludes="samples/lib/**"/>
+            <fileset refid="src.zip.fileset"/>
         </zip>
     </target>
 
