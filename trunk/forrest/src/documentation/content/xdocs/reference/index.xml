@@ -20,9 +20,9 @@
 			<figure src="../images/reference/intro.gif" alt="Architecture Overview"/>
 			<section>
 				<title>When to use</title>
-				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarious when Scripella may be a very helpful tool:</p>
+				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
 				<ul>
-					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other jdbc features in your scripts.</li>
+					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other JDBC features in your scripts.</li>
 					<li>Working with several datasources. For example gathering statistics from the one database and store it inside the other one</li>
 					<li>If you prefer to write <source>SELECT * FROM Account WHERE login=?name</source> instead of using a "Smart Query Designer GUI"</li>
 					<li>Test data generation. You don't have to store huge random filled test files - produce
@@ -43,16 +43,18 @@
 			<title>Installation</title>
 			<anchor id="INSTALLATION"/>
 			<ul>
-				<li><a href="../download.html">Download</a> Scriptella binary distribution.</li>
+				<li>
+					<a href="../download.html">Download</a> Scriptella binary distribution.</li>
 				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to system path variable.</li>
 				<li>Check if JRE has been installed correctly by running java -version. Alternatively JAVA_HOME may be used to specify JDK location.
 				<p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p>
 				</li>
-				<li><em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+				<li>
+					<em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
                     or directly specify classpath attribute in script connection elements.</li>
 			</ul>
 			<p>The binary distribution of Scriptella consists of the following directory layout:</p>
-            <source>
+			<source>
 +-+
   +--- bin - launch scripts
   |
@@ -96,7 +98,7 @@
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
                 Ant.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
-				<note>The values of properties defined in this element are overriden by system properties or other
+				<note>The values of properties defined in this element are overridden by system properties or other
                 external properties depending on execution environment, e.g. Ant properties.</note>
 			</section>
 			<section>
@@ -183,27 +185,30 @@
 		<section>
 			<title>Command Line Execution</title>
 			<p>If you followed the <a href="#INSTALLATION">Installation</a> instructions running Scriptella is simple - just type <code>scriptella</code> to execute a <code>script.xml</code> in the current directory.</p>
-			<p>The Scriptella launching script loads all jars from SCRIPTELLA_DIR/lib directory and adds them to exectued script(s) class path.</p>
+			<p>The Scriptella launching script loads all jars from SCRIPTELLA_DIR/lib directory and adds them to executed script(s) class path.</p>
 			<p>Alternatively a standard java launcher may be used to run a script:
 			<code>java -jar scriptella.jar [options] [file1] [file2] ... [fileN]</code>. It is assumed that the scriptella.jar file from the binary distribution is available in the current directory.</p>
-			<note label="Important">Java launcher does NOT load jars from lib directory so you would have to specify addtional class path elements in script file connection declarations or use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.jar to overcome -jar option limitation.</note>
+			<note label="Important">Java launcher does NOT load jars from lib directory so you would have to specify additional class path elements in script file connection declarations or use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.jar to overcome -jar option limitation.</note>
 			<section>
 				<title>Command Line Options</title>
 				<p>The scriptella launcher has the following invocation syntax:</p>
-				<source>scriptella [options] [file1] [file2] ... [fileN]</source><p>File names/paths are specified after options and separated by spaces.</p>
+				<source>scriptella [options] [file1] [file2] ... [fileN]</source>
+				<p>File names/paths are specified after options and separated by spaces.</p>
 				<table>
 					<tr>
-						<td>-help, -h</td><td>display help</td>
+						<td>-help, -h</td>
+						<td>display help</td>
 					</tr>
 					<tr>
-						<td>-debug, -d</td><td>print debugging information</td>
+						<td>-debug, -d</td>
+						<td>print debugging information</td>
 					</tr>
 					<tr>
-						<td>-quiet, -q</td><td>be extra quiet</td>
+						<td>-quiet, -q</td>
+						<td>be extra quiet</td>
 					</tr>
 				</table>
 			</section>
-
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>
 		<section>
@@ -339,7 +344,7 @@
 			<p>Currently we recommend various JDBC bridges to work with specific datasources like directories, CSV files, XML files or object databases.
             </p>
 			<section>
-				<title>Accesing directories based on LDAP</title>
+				<title>Accessing directories based on LDAP</title>
 				<p>The freely available
                     <a href="http://www.openldap.org/jdbcldap/">JDBC-LDAP Bridge Driver</a>
                     (JDBC-LDAP) enables you to access information held in directories.
@@ -359,9 +364,37 @@
 				<p>
 					<a href="http://www.hsqldb.org/doc/guide/ch06.html">HSQLDB text tables</a>
                     feature could be used to work
-                    with CSV files.
-                </p>
+                    with CSV files.</p>
 			</section>
+			<section>
+				<title>Using Java Code</title>
+				<p>Although Scriptella was designed for JDBC/SQL datasources under some circumstances it is
+				useful to embed or invoke Java from Scriptella file. The <a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino Provider</a> 
+				is bundled with Scriptella distribution and provides a Java bridge. This driver also exposes a set of properties and methods for <a href="../docs/api/scriptella/driver/janino/JaninoScript.html">&lt;script&gt;</a> and <a href="../docs/api/scriptella/driver/janino/JaninoQuery.html">&lt;query&gt;</a> elements.</p>
+				<p>Scriptella has no equivalent of Ant Task API, although we provide two alternatives to integrate Java solutions:</p>
+				<ul>
+					<li>Writing a Service Provider Implementation (Scriptella Driver). This is the most powerful API, but it is harder to implement.</li>
+					<li>Calling compiled code from Janino scripting elements. Just specify your jar as an additional class-path entry for Janino connection and you can work with any class from this jar. This approach is easy-to-use and do not add dependencies on Scriptella API to your classes/tasks.</li>
+				</ul> 
+				<p>Other Java compilers or interpreters can also be plugged in via custom Scriptella Drivers.</p>
+			</section>
+			<section>
+				<title>Producing Reports with Velocity</title>
+				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on 
+				proven open source solutions instead of reinventing the wheel. The built-in <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity Driver</a> 
+				allows using velocity templates in &lt;script&gt; elements.Typically velocity report is generated in several steps:</p>
+				<ol>
+					<li>Printing a header</li>
+					<li>Query data from datasource(s) and produce a report body.</li>
+					<li>Printing a footer.</li>
+				</ol>
+				<p><em>Primes</em> example demonstrates how to produce a simple report using Velocity.</p>
+				<note>
+				Velocity Driver does not support query element. This limitation may be eliminated in future, but currently we do not see Velocity strengths for querying the data.
+				JDBC or Janino drivers provide more powerful and easy-to-use solutions for queries.
+				</note>
+			</section>
+			
 		</section>
 		<section>
 			<title>Examples</title>
