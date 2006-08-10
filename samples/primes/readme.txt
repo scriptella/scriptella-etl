@@ -6,6 +6,8 @@ a virtual rowset for exporting into a database.
 
 Velocity is used to produce the report based on a SQL query.
 
+Script configuration is specified in script.properties file.
+
 Usage
 -----
 

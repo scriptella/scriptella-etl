@@ -50,7 +50,7 @@ java -jar scriptella.jar [arguments]
 		</section>
 		<section>
 			<title>Examples</title>
-			<section>
+            <section>
 				<title>Copy table to another database</title>
 				<p>Assume Database #1 contains Table Product with id, category and name columns. The following script
                 copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
@@ -107,7 +107,11 @@ java -jar scriptella.jar [arguments]
     </scriptella>
                     ]]></source>
 			</section>
-		</section>
-		<fixme author="ejboy">TODO</fixme>
+            <note>
+                For additional samples <a href="download.html">download</a> 
+                Scriptella examples distribution.
+            </note>
+        </section>
+        <fixme author="ejboy">TODO</fixme>
 	</body>
 </document>

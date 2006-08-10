@@ -375,30 +375,64 @@
 				<ul>
 					<li>Writing a Service Provider Implementation (Scriptella Driver). This is the most powerful API, but it is harder to implement.</li>
 					<li>Calling compiled code from Janino scripting elements. Just specify your jar as an additional class-path entry for Janino connection and you can work with any class from this jar. This approach is easy-to-use and do not add dependencies on Scriptella API to your classes/tasks.</li>
-				</ul> 
+				</ul>
 				<p>Other Java compilers or interpreters can also be plugged in via custom Scriptella Drivers.</p>
 			</section>
 			<section>
 				<title>Producing Reports with Velocity</title>
-				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on 
-				proven open source solutions instead of reinventing the wheel. The built-in <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity Driver</a> 
+				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on
+				proven open source solutions instead of reinventing the wheel. The built-in <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity Driver</a>
 				allows using velocity templates in &lt;script&gt; elements.Typically velocity report is generated in several steps:</p>
 				<ol>
 					<li>Printing a header</li>
 					<li>Query data from datasource(s) and produce a report body.</li>
 					<li>Printing a footer.</li>
 				</ol>
-				<p><em>Primes</em> example demonstrates how to produce a simple report using Velocity.</p>
+				<p>
+					<em>Primes</em> example demonstrates how to produce a simple report using Velocity.</p>
 				<note>
 				Velocity Driver does not support query element. This limitation may be eliminated in future, but currently we do not see Velocity strengths for querying the data.
 				JDBC or Janino drivers provide more powerful and easy-to-use solutions for queries.
 				</note>
 			</section>
-			
 		</section>
 		<section>
 			<title>Examples</title>
-			<fixme author="ejboy">Describe examples here</fixme>
+			<p>Download Scriptella examples from <a href="../download.html">Downloads</a> page.
+            The examples are ready to run, although you may have to download additional third party jars,
+                which cannot be redistributed, e.g. jdbcldap.jar etc. These dependencies are
+                specified in lib/readme.txt file.
+            </p>
+			<table>
+				<tr>
+					<td>Ant</td>
+					<td>This example demonstrates integration with ant.</td>
+				</tr>
+				<tr>
+					<td>CSV</td>
+					<td>Example of working with CSV data using HSQL:DB CSV tables feature.</td>
+				</tr>
+				<tr>
+					<td>DB Upgrade</td>
+					<td>This example shows how Scriptella can be used as a schema evolution tool.</td>
+				</tr>
+				<tr>
+					<td>LDAP</td>
+					<td>Example of migration script to exchange data between a database and LDAP directory.
+                JDBC-LDAP Driver from OctetString is used to work with LDAP.</td>
+				</tr>
+				<tr>
+					<td>Music Store</td>
+					<td>This script create a sample database of music track. This sample shows how to
+                reference BLOB content in external files and use JDBC escaping syntax to pass dates
+                independently from the DB locale/date/time settings.</td>
+				</tr>
+				<tr>
+					<td>Primes</td>
+					<td>Fills the database with prime numbers and produces HTML report.
+                    This example demonstrates a combined usage of Velocity, Janino and SQL.</td>
+				</tr>
+			</table>
 		</section>
 		<section>
 			<title>Best Practices</title>

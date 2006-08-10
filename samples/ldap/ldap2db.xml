@@ -8,7 +8,7 @@
     <!--Connection to the LDAP-->
     <connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
                 url="jdbc:ldap://localhost:389/dc=scriptella"
-                user="cn=root,dc=scriptella" password="secret">
+                user="cn=root,dc=scriptella" password="secret" classpath="../lib/jdbcldap.jar">
         <!--Define connection properties-->
         SEARCH_SCOPE=subTreeScope
         ignore_transactions=true
@@ -17,7 +17,8 @@
          -->
     </connection>
     <!--Connection to the target database -->
-    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb" user="sa" password=""/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:outdb"
+                user="sa" password="" classpath="../lib/hsqldb.jar"/>
     <script connection-id="out">
         <!--Creates empty database and drops exisiting tables if DB already exisis -->
         <include href="dbschema.sql"/>
