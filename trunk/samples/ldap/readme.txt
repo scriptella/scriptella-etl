@@ -3,7 +3,7 @@ In particular this example shows how to migrate users/roles between Tomcat JDBC/
 
 !Important!
     This example needs JDBC-LDAP bridge. Download http://www.qa.octetstring.com/downloads/jdbcldap/jdbcldap20en.zip,
-    extract jdbcLdapJldap.jar and save in this directory with jdbcldap.jar name.
+    extract jdbcLdapJldap.jar and save in examples lib directory given jdbcldap.jar name.
 
 
 OpenLDAP configuration
