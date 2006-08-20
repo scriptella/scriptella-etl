@@ -170,6 +170,7 @@
                 </p>
                 <p>File references are set as prepared statement parameters of stream type, so you can reference
                 LOBs of any size supported by your database driver.</p>
+            </section>
             <section>
 				<title>Examples</title>
 				<p>Execute a SQL query for table specified by TABLE  property and inserts the first row into TABLE2</p>
