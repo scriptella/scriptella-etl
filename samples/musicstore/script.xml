@@ -32,11 +32,11 @@
         <!-- Inserts file with path relative to executed script directory location -->
         INSERT INTO Track(ID, ALBUM_ID, NAME, DATA, CREATED) VALUES
         <!--You may use JDBC Escape Syntax for timestamps, i.e. {ts 'yyyy-mm-dd hh:mm:ss.f...'}-->
-        (1, 1, 'Song1.mp3', ?{this.file(file1)}, {ts '2006-01-15 10:00:00'});
+        (1, 1, 'Song1.mp3', ?{file file1}, {ts '2006-01-15 10:00:00'});
         <!-- Inserts file from URL, 
              other protocols like ftp, http or https are supported too -->
         INSERT INTO Track(ID, ALBUM_ID, NAME, DATA, CREATED) VALUES
-        (2, 2, 'Song2.mp3', ?{this.file(file2)}, now());
+        (2, 2, 'Song2.mp3', ?{file file2}, now());
     </script>
     <script><!-- Correctly shutdown the DB -->
         <dialect name=".*hsql.*">

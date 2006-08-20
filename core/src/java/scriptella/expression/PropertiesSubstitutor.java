@@ -15,7 +15,6 @@
  */
 package scriptella.expression;
 
-import scriptella.configuration.ConfigurationException;
 import scriptella.spi.ParametersCallback;
 
 import java.util.regex.Matcher;
@@ -36,9 +35,10 @@ import java.util.regex.Pattern;
  * Expression is wrapped by braces and evaluated by {@link Expression} engine.
  * Examples:
  * <pre><code>
- * ${name+' '+surname}, :{this.file('index.html')} etc.
+ * ${name+' '+surname} etc.
  * </code></pre>
  * </ul>
+ * <p>This class is not thread safe
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -50,7 +50,7 @@ public class PropertiesSubstitutor {
     public static final Pattern PROP_PTR = Pattern.compile("([a-zA-Z_0-9\\.]+)");
 
     /**
-     * Expression pattern, e.g. ${file 'url'} or ${property} etc.
+     * Expression pattern, e.g. ${property} etc.
      */
     public static final Pattern EXPR_PTR = Pattern.compile("\\{([^\\}]+)\\}");
 
@@ -65,7 +65,7 @@ public class PropertiesSubstitutor {
      * <p>If result of evaluation is null or the property being substitued doesn't have value in callback - the whole
      * expressions is copied into result string as is.
      *
-     * @param s        string to substitute.
+     * @param s string to substitute. Null strings allowed.
      * @param callback callback to obtain paramter values.
      * @return substituted string.
      */
@@ -74,7 +74,10 @@ public class PropertiesSubstitutor {
             return null;
         }
 
-        final int len = s.length()-1; //Last character is not checked - optmization
+        final int len = s.length()-1; //Last character is not checked - optimization
+        if (len <= 0) { //skip empty strings or single characters
+            return s;
+        }
         StringBuilder res = null;
         char[] sChars = s.toCharArray();
         int lastPos=0;
@@ -104,13 +107,9 @@ public class PropertiesSubstitutor {
                         String v = null;
 
                         if (m == m1) {
-                            v = substituteProperty(name, callback);
+                            v = toString(callback.getParameter(name));
                         } else {
-                            final Object o = substituteExpression(name, callback);
-
-                            if (o != null) {
-                                v = o.toString();
-                            }
+                            v = toString(Expression.compile(name).evaluate(callback));
                         }
 
                         lastPos=m.end();
@@ -140,22 +139,14 @@ public class PropertiesSubstitutor {
         return res.toString();
     }
 
-    protected String substituteProperty(final String p,
-                                        final ParametersCallback callback) {
-        Object par = callback.getParameter(p);
-
-        return (par == null) ? null : String.valueOf(par);
-    }
-
-    protected Object substituteExpression(final String expression,
-                                          final ParametersCallback callback) {
-        try {
-            final Object o = Expression.compile(expression).evaluate(callback);
-
-            return o;
-        } catch (Exception e) {
-            throw new ConfigurationException(e);
-        }
+    /**
+     * Converts specified object to string.
+     * <p>Subclasses may provide custom conversion strategy here.
+     * @param o object to convert to String.
+     * @return string representation of object.
+     */
+    protected String toString(final Object o) {
+        return o==null?null:o.toString();
     }
 
 }

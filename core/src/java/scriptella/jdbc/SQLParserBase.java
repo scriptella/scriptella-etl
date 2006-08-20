@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * <p><u>Supported extensions</u>
  * The parser supports extensions described in {@link PropertiesSubstitutor}.<br/>
  * Additionally <b>?</b> prefix is used for expressions which should be injected as prepared statement parameters.
- * Example:
+ * <p>Example:
  * <pre><code>
  * var=_name
  * id=11
@@ -41,12 +41,13 @@ import java.util.regex.Pattern;
  *      --- is transformed to ---
  * select * FROM table_name where id=?  where statement parameter has value of 11
  * </code></pre>
- * <i>Notes:</i><br>
+ * <p><u>Notes:</u><br>
  * SQL quoted expressions and comments are not substituted. Example:
  * <pre><code>
  * SELECT * FROM "Table" WHERE NAME="John${prop}" and SURNAME=?surname; --only SURNAME is handled
  * </code></pre>
  * These extensions are handled by subclasses in {@link #handleParameter(String, boolean, boolean)} method.
+ *
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -155,6 +156,7 @@ public class SQLParserBase {
     private final Matcher emptyMatcher = EMPTY_PTR.matcher("");
     private final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher("");
     private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
+    private final StringBuilder tmpBuf = new StringBuilder();
 
     private void handleStatement(final StringBuilder sql,
                                  final List<Integer> injections) {
@@ -166,7 +168,7 @@ public class SQLParserBase {
             m.reset(sql);
             extM.reset(sql);
 
-            StringBuilder res = new StringBuilder(sql.length());
+            tmpBuf.setLength(0); //clearing the string builder
             int lastPos = 0;
 
             for (Integer index : injections) {
@@ -184,17 +186,17 @@ public class SQLParserBase {
                     int exprStart = ind - 1;
                     //? - jdbcParam, $ - insert value as text
                     boolean jdbcParam = sql.charAt(exprStart) == '?';
-                    res.append(sql.substring(lastPos, exprStart));
+                    tmpBuf.append(sql.substring(lastPos, exprStart));
                     lastPos = found.end();
-                    res.append(handleParameter(found.group(1), expr, jdbcParam));
+                    tmpBuf.append(handleParameter(found.group(1), expr, jdbcParam));
                 }
 
             }
 
             if (lastPos < sql.length()) { //Add right side
-                res.append(sql.substring(lastPos, sql.length()));
+                tmpBuf.append(sql.substring(lastPos, sql.length()));
             }
-            statementParsed(res.toString());
+            statementParsed(tmpBuf.toString());
         } else {
             statementParsed(sql.toString());
         }

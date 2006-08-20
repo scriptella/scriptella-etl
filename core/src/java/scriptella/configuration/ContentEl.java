@@ -78,6 +78,9 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
      * @return parsed resource or null.
      */
     static Resource asResource(final XMLElement parentElement, final Node node) {
+        if (node==null) {
+            return null;
+        }
         if (node instanceof Text) {
              return new Resource() {
                  public Reader open() {

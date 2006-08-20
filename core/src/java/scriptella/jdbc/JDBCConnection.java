@@ -40,6 +40,7 @@ public class JDBCConnection extends AbstractConnection {
     private static final Logger LOG = Logger.getLogger(JDBCConnection.class.getName());
     private boolean transactable = false;
     private StatementCache statementCache;
+    private ParametersParser parametersParser;
 
     public JDBCConnection(Connection con, ConnectionParameters parameters) {
         if (con==null) {
@@ -76,6 +77,7 @@ public class JDBCConnection extends AbstractConnection {
         if (statementCacheSize>0) {
             statementCache=new StatementCache(statementCacheSize);
         }
+        parametersParser =new ParametersParser(parameters.getContext());
     }
 
     public DialectIdentifier getDialectIdentifier() {
@@ -91,15 +93,24 @@ public class JDBCConnection extends AbstractConnection {
         return DialectIdentifier.NULL_DIALECT;
     }
 
+    /**
+     * Sets common parameters specified in connection element.
+     * @param element Script/Query element.
+     */
+    private void prepare(SQLSupport element) {
+        element.setStatementCache(statementCache);
+        element.setParametersParser(parametersParser);
+    }
+
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {
         Script s = new Script(scriptContent);
-        s.setStatementCache(statementCache);
+        prepare(s);
         s.execute(con, parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
         Query q = new Query(queryContent);
-        q.setStatementCache(statementCache);
+        prepare(q);
         q.execute(con, parametersCallback, queryCallback);
     }
 

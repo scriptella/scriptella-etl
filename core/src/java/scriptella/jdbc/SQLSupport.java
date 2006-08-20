@@ -16,7 +16,6 @@
 package scriptella.jdbc;
 
 import scriptella.core.StatisticInterceptor;
-import scriptella.expression.Expression;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
@@ -45,6 +44,7 @@ public class SQLSupport {
     protected Resource resource;
     protected StatementCache statementCache; //may be null, if caching switched off
     private JDBCTypesConverter converter = new JDBCTypesConverter(); //Setter for prepared statement parameters
+    private ParametersParser parametersParser;
 
     public SQLSupport(Resource resource) {
         if (resource == null) {
@@ -62,12 +62,22 @@ public class SQLSupport {
         };
     }
 
+    //Optional elements
+
     public StatementCache getStatementCache() {
         return statementCache;
     }
 
     public void setStatementCache(StatementCache statementCache) {
         this.statementCache = statementCache;
+    }
+
+    public ParametersParser getParametersParser() {
+        return parametersParser;
+    }
+
+    public void setParametersParser(ParametersParser parametersParser) {
+        this.parametersParser = parametersParser;
     }
 
     protected int parseAndExecute(final Connection connection,
@@ -78,7 +88,7 @@ public class SQLSupport {
             final Reader reader = resource.open();
             parser.parse(reader);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new JDBCException("Failed to open resource", e);
         }
         //notify statistic interceptor on number of executed statements
         //Performance Note: this solution may be retrofitted to avoid usage of ThreadLocals
@@ -92,7 +102,7 @@ public class SQLSupport {
         Connection con;
         QueryCallback callback;
         ParametersCallback paramsCallback;
-        List params = new ArrayList();
+        List<Object> params = new ArrayList<Object>();
         private int executedCount;//number of executed statements
 
         public Parser(Connection con, QueryCallback callback,
@@ -108,7 +118,7 @@ public class SQLSupport {
             Object p;
 
             if (expression) {
-                p = Expression.compile(name).evaluate(paramsCallback);
+                p = parametersParser.evaluate(name, paramsCallback);
             } else {
                 p = paramsCallback.getParameter(name);
             }
@@ -145,8 +155,7 @@ public class SQLSupport {
                 executedCount++;
                 return updateCount;
             } catch (SQLException e) {
-                throw new JDBCException("Unable to execute statement", e, sql,
-                        params);
+                throw new JDBCException("Unable to execute statement", e, sql, params);
             } catch (JDBCException e) {
                 //if ProviderException has no SQL - attach it
                 if (e.getErrorStatement() == null) {

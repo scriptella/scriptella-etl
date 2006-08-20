@@ -23,14 +23,12 @@
  */
 package scriptella.spi;
 
-import scriptella.execution.ScriptsContext;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
 
 /**
- * Global  variable available in all expressions.
+ * Context  variable available in all expressions.
  * <p>ThisParameter is obtained by using <code>this</code> variable name in
  * expressions, all public methods/properties may be invoked from expressions using
  * method invocation syntax.
@@ -38,18 +36,8 @@ import java.net.URL;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ThisParameter {
-    public static final String NAME = "this";
-    private final ScriptsContext ctx;
-
-    public ThisParameter(ScriptsContext ctx) {
-        this.ctx = ctx;
-    }
-
-    public URL getBaseURL() {
-        return ctx.getBaseURL();
-    }
-
+public interface DriversContext {
+    public URL getScriptFileURL();
 
 
     /**
@@ -66,24 +54,10 @@ public class ThisParameter {
      * </pre></code>
      * Resolves to: <code>file:///tmp/file.html</code>
      *
-     * @param fileUrl uri to resolve..
+     * @param uri URI to resolve..
      * @return resolved file URL.
-     * @see scriptella.execution.ScriptsContext#getBaseURL()
+     * @see scriptella.execution.ScriptsContext#getScriptFileURL()
+     * @throws MalformedURLException if uri is malformed or cannot be resolved.
      */
-    public URL file(final String fileUrl) {
-        try {
-            return new URL(ctx.getBaseURL(), fileUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * @param callback callback to lookup <code>this</code> parameter.
-     * @return <code>this</code> parameter.
-     */
-    public static ThisParameter get(final ParametersCallback callback) {
-        return (ThisParameter) callback.getParameter(NAME);
-    }
-
+    public URL resolve(final String uri) throws MalformedURLException;
 }
