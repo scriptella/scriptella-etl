@@ -17,6 +17,7 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.CompileException;
 import scriptella.AbstractTestCase;
+import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -65,17 +66,13 @@ public class JaninoConnectionTest extends AbstractTestCase {
                 "set(\"p\", \"//\"+get(\"p\") );" +
                 "next();" +
                 "next(new String[] {\"p\"}, new Object[] {\"v2\"});"),
-                new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return "Param: "+name;
-            }
-        }, new QueryCallback() {
+                MockParametersCallbacks.SIMPLE, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows.add(parameters.getParameter("p").toString());
             }
         });
         c.close();
-        List<String> expected = Arrays.asList("//Param: p", "v2");
+        List<String> expected = Arrays.asList("//*p*", "v2");
         assertEquals(expected, rows);
 
     }

@@ -18,9 +18,10 @@ package scriptella.execution;
 import scriptella.core.Session;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
+import scriptella.spi.DriversContext;
 import scriptella.spi.ParametersCallback;
-import scriptella.spi.ThisParameter;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,20 +37,15 @@ import java.util.TreeMap;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsContext implements ParametersCallback {
+public class ScriptsContext implements ParametersCallback, DriversContext {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = new TreeMap<String,String>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, String> properties = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     Session session; //Connections related stuff is here
     private final PropertiesSubstitutor propertiesSubstitutor = new PropertiesSubstitutor();
-    private ThisParameter thisParameter = new ThisParameter(this);
 
     public Object getParameter(final String name) {
-        if (ThisParameter.NAME.equalsIgnoreCase(name)) {
-            return thisParameter;
-        }
-
         return properties.get(name);
     }
 
@@ -77,13 +73,18 @@ public class ScriptsContext implements ParametersCallback {
         }
     }
 
-    public URL getBaseURL() {
+    public URL getScriptFileURL() {
         return baseURL;
     }
 
     void setBaseURL(final URL baseURL) {
         this.baseURL = baseURL;
     }
+
+    public URL resolve(final String uri) throws MalformedURLException {
+        return new URL(baseURL, uri);
+    }
+
 
     public ExecutionStatisticsBuilder getStatisticsBuilder() {
         return statisticsBuilder;

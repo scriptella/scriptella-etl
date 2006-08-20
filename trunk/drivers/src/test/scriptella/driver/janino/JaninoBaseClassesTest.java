@@ -16,6 +16,7 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -34,13 +35,8 @@ public class JaninoBaseClassesTest extends AbstractTestCase {
      */
     public void testScript() {
         JaninoScript js = new JaninoScript();
-        ParametersCallback pc = new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return "p"+name;
-            }
-        };
-        js.setParametersCallback(pc);
-        assertEquals("p1", js.get("1"));
+        js.setParametersCallback(MockParametersCallbacks.SIMPLE);
+        assertEquals("*1*", js.get("1"));
     }
     /**
      * Tests public API methods provided by {@link JaninoQuery}.

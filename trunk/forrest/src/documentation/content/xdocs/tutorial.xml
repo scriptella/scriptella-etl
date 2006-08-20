@@ -90,10 +90,10 @@ java -jar scriptella.jar [arguments]
             );
             <!-- Inserts file with path relative to executed script location -->
             insert into Track(id, album_id, name, data) values
-                   (1, 1, 'Song1.mp3', ?{this.file('song1.mp3')});
+                   (1, 1, 'Song1.mp3', ?{file 'song1.mp3'});
             <!-- Inserts file from URL-->
             insert into Track(id, album_id, name, data) values
-                   (2, 2, 'Song2.mp3', ?{this.file('http://musicstoresample.com/song2.mp3')});
+                   (2, 2, 'Song2.mp3', ?{file 'http://musicstoresample.com/song2.mp3'});
         </script>
     </scriptella>
                     ]]></source>

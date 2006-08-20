@@ -32,13 +32,13 @@ public class ConnectionParameters {
     private String password;
     private String schema;
     private String catalog;
-    private ThisParameter context;
+    private DriversContext context;
 
     /**
      * Creates connection parameters based on &lt;connection&gt; element..
      */
     public ConnectionParameters(Map<String, String> properties, String url, String user, String password,
-                                String schema, String catalog, ThisParameter context) {
+                                String schema, String catalog, DriversContext context) {
         this.properties = properties;
         this.url = url;
         this.user = user;
@@ -111,10 +111,10 @@ public class ConnectionParameters {
     }
 
     /**
-     * Get a <code>this</code> context variable.
-     * @return script context variable.
+     * Get a drivers context.
+     * @return script context.
      */
-    public ThisParameter getContext() {
+    public DriversContext getContext() {
         return context;
     }
 

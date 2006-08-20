@@ -24,7 +24,6 @@ import scriptella.spi.DialectIdentifier;
 import scriptella.spi.DriversClassLoader;
 import scriptella.spi.DriversFactory;
 import scriptella.spi.ScriptellaDriver;
-import scriptella.spi.ThisParameter;
 import scriptella.util.UrlPathTokenizer;
 
 import java.net.MalformedURLException;
@@ -63,7 +62,7 @@ public class ConnectionManager {
         ClassLoader cl = getClass().getClassLoader();
         if (cp!=null) { //if classpath specified
             //Parse it and create a new classloader
-            UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getBaseURL());
+            UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getScriptFileURL());
             try {
                 URL[] urls = tok.split(cp);
                 if (urls.length>0) {
@@ -73,8 +72,7 @@ public class ConnectionManager {
                 throw new ConfigurationException("Unable to parse classpath parameter for "+connection, e);
             }
         }
-        connectionParameters = new ConnectionParameters(c.getProperties(), url, user, pwd, schema, cat,
-                ThisParameter.get(ctx));
+        connectionParameters = new ConnectionParameters(c.getProperties(), url, user, pwd, schema, cat, ctx);
         try {
             driver = DriversFactory.getDriver(drvClass, cl);
         } catch (ClassNotFoundException e) {

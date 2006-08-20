@@ -17,6 +17,7 @@ package scriptella.expression;
 
 import org.apache.commons.jexl.ExpressionFactory;
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.parser.TokenMgrError;
 import scriptella.spi.ParametersCallback;
 
 import java.util.Collection;
@@ -40,7 +41,9 @@ public class JexlExpression extends Expression {
         try {
             this.expression = ExpressionFactory.createExpression(expression);
         } catch (Exception e) {
-            throw new ParseException(e);
+            throw new ParseException(e.getMessage(),e);
+        } catch (TokenMgrError e) {
+            throw new ParseException(e.getMessage(),e);
         }
     }
 

@@ -16,7 +16,7 @@
 package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
-import scriptella.spi.ParametersCallback;
+import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.Resource;
 
 import java.io.ByteArrayOutputStream;
@@ -47,7 +47,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
         run(c);
         c.close();
         String s = out.toString();
-        assertEquals("valueofv1_///valueofv2_", s);
+        assertEquals("*v1*///*v2*", s);
 
 
     }
@@ -82,10 +82,6 @@ public class VelocityConnectionTest extends AbstractTestCase {
             public Reader open() {
                 return new StringReader("$v1///$v2");
             }
-        }, new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return "valueof"+name+"_";
-            }
-        });
+        }, MockParametersCallbacks.SIMPLE);
     }
 }

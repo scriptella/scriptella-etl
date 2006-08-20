@@ -16,7 +16,6 @@
 package scriptella.jdbc;
 
 import scriptella.spi.ParametersCallback;
-import scriptella.spi.ThisParameter;
 import scriptella.util.IOUtils;
 
 import java.io.Closeable;
@@ -37,12 +36,10 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class ResultSetAdapter implements ParametersCallback, Closeable {
-    public static final String ROWNUM = "rownum";
     private static final Pattern NUM_PTR = Pattern.compile("\\d+"); //Regexp checking is faster than catching exceptions
     private ResultSet resultSet;
     private final Map<String, Integer> namesMap;//map of column names for caching and working with converter
     private final ParametersCallback params; //parent parameters callback to use
-    private int rowNum; //current row number
     private Object[] row;//cache for row elements
     private JDBCTypesConverter converter;
 
@@ -66,9 +63,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
             for (int i = 1; i <= n; i++) {
                 String columnName = m.getColumnName(i);
-                if (!ThisParameter.NAME.equalsIgnoreCase(columnName)) {
-                    namesMap.put(columnName, i);
-                }
+                namesMap.put(columnName, i);
             }
             row = new Object[n];
         } catch (SQLException e) {
@@ -83,7 +78,6 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     public boolean next() {
         try {
             boolean res = resultSet.next();
-            rowNum++;
             Arrays.fill(row, null);
             return res;
         } catch (SQLException e) {
@@ -93,20 +87,13 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
 
     public Object getParameter(final String name) {
-        if (ROWNUM.equalsIgnoreCase(name)) { //return current row number
-            return rowNum;
-        }
         try {
             Integer index = namesMap.get(name);
-            if (index == null) {
-                //Check for "this" parameter
-                if (ThisParameter.NAME.equalsIgnoreCase(name)) {
-                    return ThisParameter.get(params);
-                } else if (NUM_PTR.matcher(name).matches()) {//If name is not a column name and is integer
-                    try {
-                        index = Integer.valueOf(name); //Try to parse name as index
-                    } catch (NumberFormatException e) {
-                    }
+            //If name is not a column name and is integer
+            if (index == null && NUM_PTR.matcher(name).matches()) {
+                try {
+                    index = Integer.valueOf(name); //Try to parse name as index
+                } catch (NumberFormatException e) { //we've checked with regexp
                 }
             }
             if (index != null) { //if index found

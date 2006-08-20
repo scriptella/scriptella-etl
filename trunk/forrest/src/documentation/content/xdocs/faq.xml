@@ -7,9 +7,10 @@
 	</authors>
 	<faqsection>
 		<title>General</title>
-		<faq id="JAVA">
-			<question>Question?</question>
-			<answer>Answer</answer>
+		<faq id="DRIVERS">
+			<question>Where can I find documentation on script syntax for driver FOO/BAR/...?</question>
+			<answer>The up to date drivers documentation is available at <a href="docs/api/scriptella/driver/package-summary.html">Scriptella Drivers Javadoc</a>.
+			<a href="site:reference">Rederence Documentation</a> also covers drivers usage and scripts syntax.</answer>
 		</faq>
 		<!-- More faqs or parts here -->
 	</faqsection>

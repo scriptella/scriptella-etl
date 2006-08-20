@@ -59,7 +59,7 @@ public class DialectIdentifier {
             return true;
         }
 
-        if (!(o instanceof DialectIdentifier)) {
+        if (o==null || !(o instanceof DialectIdentifier)) {
             return false;
         }
 

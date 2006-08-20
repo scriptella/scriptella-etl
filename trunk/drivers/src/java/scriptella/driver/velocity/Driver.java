@@ -79,7 +79,7 @@ public class Driver extends AbstractScriptellaDriver {
         String outEnc = connectionParameters.getProperty(OUTPUT_ENCODING);
         URL url;
         try {
-            url = new URL(connectionParameters.getContext().getBaseURL(), urlStr);
+            url = connectionParameters.getContext().resolve(urlStr);
             return new VelocityConnection(url, outEnc);
         } catch (MalformedURLException e) {
             throw new VelocityProviderException("Invalid URL parameter value: " + urlStr, e);

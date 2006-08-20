@@ -120,60 +120,61 @@
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
 		<section>
-			<title>Expressions and Properties Substitution</title>
-			<p>Scriptella supports properties substitution and expression evaluation based on the following syntax:</p>
+			<title>Expressions and Variables Substitution</title>
+			<p>Scriptella supports variables substitution and expression evaluation based on the following syntax:</p>
 			<ul>
-				<li>$Property_Name - inserts a value of the specified property</li>
+				<li>$Property_Name - inserts a value of the specified property or variable</li>
 				<li>${expression} - inserts a value of the expression evaluation.
                     <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.</li>
-				<li>?Propery_Name or ?{expression} are used only in queries and scripts to set prepared statement parameters</li>
+				<li>?Propery_Name or ?{expression} are used in SQL queries and scripts to set prepared statement parameters</li>
 			</ul>
 			<warning>
-                In sql scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
+                In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
                 In this case prepared statements may be cached thus increasing the performance of hot spot sections evaluated multiple times.
                 Use $ for direct substitution only if you have problems passing prepared statement parameters via ?, ?{} syntax.
             </warning>
 			<note>
-                This syntax is only valid for Scriptella configuration elements and SQL scripts processed by JDBC Provider,
-                other providers may not support properties/expressions substitution.
-                Consult JDBC Provider Javadoc for more details.
+                This syntax is only valid for Scriptella connection element attributes,
+                <code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements
+                and SQL scripts/queries processed by the JDBC Provider,
+                other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
+                you'll have to use get(name) to get value of the variable.
+                For details on variables/expressions syntax consult <a href="../docs/api">Javadoc</a> of your driver.
             </note>
 			<section>
 				<title>Implicit Variables</title>
-				<p>The following implicit variables are available in scripts and queries:</p>
+				<p>Scriptella supports the following implicit variables in scripts and queries:</p>
 				<table>
 					<tr>
 						<th>Variable</th>
 						<th>Description</th>
-						<th>Context</th>
-					</tr>
-					<tr>
-						<td>
-							<code>this</code>
-						</td>
-						<td>This variables provides the following methods and properties:
-                            <ul>
-								<li>scriptFileURL - URL of the script file being executed</li>
-								<li>file(relativeURL) - inserts a file with URL relative to a scriptFileURL. Useful for BLOB parameters.</li>
-							</ul>
-						</td>
-						<td>Query/Script</td>
+						<th>Scope</th>
 					</tr>
 					<tr>
 						<td>
 							<code>rownum</code>
 						</td>
-						<td>Represents row number of query result set. Starts with 1.</td>
+						<td>Represents row number of query row set. Starts with 1.</td>
 						<td>Nested elements of Query</td>
 					</tr>
 				</table>
-				<p>Additionally each query produces a set of implicit variables corresponding to selected column names. These variables are available in nested elements.
+				<p>Additionally SQL queries produce a set of implicit variables corresponding to selected column names.
+                    These variables are available in nested elements.
                 Columns may also be referenced using a result set column number, e.g. ?1, ?2 ,...</p>
 			</section>
-			<section>
+            <section>
+                <title>Adding references to files from SQL scripts</title>
+                <p>The JDBC bridge supports referencing file content via</p>
+                <source>?{file &lt;Expression&gt;}</source> <p>syntax.
+                Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
+                </p>
+                <p>File references are set as prepared statement parameters of stream type, so you can reference
+                LOBs of any size supported by your database driver.</p>
+            <section>
 				<title>Examples</title>
-				<p>Execute a query for table specified by TABLE  property and inserts the first row into TABLE2</p>
+				<p>Execute a SQL query for table specified by TABLE  property and inserts the first row into TABLE2</p>
 				<source><![CDATA[
+    <connection driver="hsqldb"/> <!--JDBC Bridge Driver-->
     <query>
         SELECT V1, V2, V3 from $TABLE;
         <script if="rownum==1">
@@ -434,7 +435,7 @@
 				</tr>
 			</table>
 		</section>
-		<section>
+        <section>
 			<title>Best Practices</title>
 		</section>
 	</body>

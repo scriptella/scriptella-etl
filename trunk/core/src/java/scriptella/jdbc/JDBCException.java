@@ -43,10 +43,21 @@ public class JDBCException extends ProviderException {
         setErrorStatement(sql, parameters);
     }
 
-
-    public ProviderException setErrorStatement(String sql, List<?> params) {
-        return super.setErrorStatement(sql + ". Parameters: " + params);
+    public JDBCException(String message, Throwable cause, String sql) {
+        super(message, cause);
+        initVendorCodes(cause);
+        setErrorStatement(sql, null);
     }
+    public JDBCException(String message, String sql) {
+        super(message);
+        setErrorStatement(sql, null);
+    }
+
+
+    ProviderException setErrorStatement(String sql, List<?> params) {
+        return super.setErrorStatement(sql + ((params == null || params.isEmpty()) ? "" : (". Parameters: " + params)));
+    }
+
 
     protected void initVendorCodes(Throwable t) {
         if (t != null && t instanceof SQLException) {

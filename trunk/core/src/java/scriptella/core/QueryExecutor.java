@@ -76,9 +76,10 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         c.executeQuery(content, ctx,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback params) {
+                        ctxDecorator.rownum++;
                         ctxDecorator.setParams(params);
                         if (LOG.isLoggable(Level.FINE)) {
-                            LOG.fine("Processing row for query "+getLocation());
+                            LOG.fine("Processing row #"+ctxDecorator.rownum+" for query "+getLocation());
                         }
 
                         for (ExecutableElement exec : nestedElements) {
@@ -105,6 +106,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
 
     private static final class QueryCtxDecorator extends DynamicContextDecorator {
         private ParametersCallback params;
+        private int rownum; //current row number
 
         public QueryCtxDecorator(DynamicContext context) {
             super(context);
@@ -116,6 +118,9 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
 
         @Override
         public final Object getParameter(final String name) {
+            if ("rownum".equals(name)) { //return current row number
+                return rownum;
+            }
             return params.getParameter(name);
         }
     }
