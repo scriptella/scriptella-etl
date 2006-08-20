@@ -92,7 +92,7 @@ public final class IOUtils {
     /**
      * Loads an input stream content into a byte array.
      * @param is stream to load. Closed at the end of the operation.
-     * @return
+     * @return stream bytes
      * @throws IOException if I/O error occurs or stream length exceeds the {@link #MAX_LENGTH}.
      */
     public static byte[] toByteArray(InputStream is) throws IOException {
@@ -103,7 +103,7 @@ public final class IOUtils {
      * Loads an input stream content into a byte array.
      * @param is stream to load. Closed at the end of the operation.
      * @param maxLength maxLength max number of bytes to read before throwing a Content Too Long Exception.
-     * @return
+     * @return stream bytes
      * @throws IOException
      */
     public static byte[] toByteArray(InputStream is, long maxLength) throws IOException {
