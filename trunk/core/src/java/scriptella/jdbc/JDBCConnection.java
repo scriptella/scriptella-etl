@@ -152,8 +152,11 @@ public class JDBCConnection extends AbstractConnection {
             } catch (SQLException e) {
                 throw new JDBCException("Unable to close a connection", e);
             }
-            statementCache.close();
-            statementCache=null;
+            if (statementCache!=null) {
+                statementCache.close();
+                statementCache=null;
+            }
+
         }
     }
 
