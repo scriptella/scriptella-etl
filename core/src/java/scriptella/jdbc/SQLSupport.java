@@ -143,8 +143,9 @@ public class SQLSupport {
         }
 
         int executeStatement(final String sql) {
+            PreparedStatement ps=null;
             try {
-                PreparedStatement ps = prepareStatement(sql);
+                ps = prepareStatement(sql);
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("     Executing statement " + sql.trim() + ", Parameters: " + params);
                 }
@@ -163,7 +164,7 @@ public class SQLSupport {
                 }
                 throw e; //rethrow
             } finally {
-                releaseStatement();
+                releaseStatement(ps);
             }
 
         }
@@ -225,9 +226,11 @@ public class SQLSupport {
             return updateCount;
         }
 
-        private void releaseStatement() {
+        private void releaseStatement(PreparedStatement ps) {
             if (statementCache!=null) {
                 statementCache.closeRemovedStatements();
+            } else {
+                JDBCUtils.closeSilent(ps);
             }
             params.clear();
             IOUtils.closeSilently(converter); //closing resources opened by converter

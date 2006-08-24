@@ -128,6 +128,9 @@ public class ConnectionManager {
 
     public void commit() {
         for (Connection c : getAllConnections()) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Commiting connection "+c);
+            }
             c.commit();
         }
     }
