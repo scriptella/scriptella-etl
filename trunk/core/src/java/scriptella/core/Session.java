@@ -105,7 +105,6 @@ public class Session {
             for (ConnectionManager connectionManager : managedConnections.values()) {
                 connectionManager.close();
             }
-
             managedConnections = null;
         }
     }
