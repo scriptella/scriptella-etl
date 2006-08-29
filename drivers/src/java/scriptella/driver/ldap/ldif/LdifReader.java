@@ -462,15 +462,14 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
      *
      * @param entry     The entry where to store the value
      * @param line      The line to parse
-     * @param lowerLine The same line, lowercased
      */
-    public void parseAttributeValue(Entry entry, String line, String lowerLine) {
+    public void parseAttributeValue(Entry entry, String line) {
         int colonIndex = line.indexOf(':');
 
-        String attributeType = lowerLine.substring(0, colonIndex);
+        String attributeType = line.substring(0, colonIndex);
 
         // We should *not* have a DN twice
-        if (attributeType.equals("dn")) {
+        if (attributeType.equalsIgnoreCase("dn")) {
             throw new LdifParseException("A ldif entry should not have two DN", line);
         }
 
@@ -597,7 +596,7 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
                 // A standard AttributeType/AttributeValue pair
                 int colonIndex = line.indexOf(':');
 
-                String attributeType = lowerLine.substring(0, colonIndex);
+                String attributeType = line.substring(0, colonIndex);
 
                 if (!attributeType.equals(modified)) {
                     throw new LdifParseException("Bad modify attribute", line);
@@ -659,8 +658,7 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
                 // We will iterate through all attribute/value pairs
                 while (iter.hasNext()) {
                     String line = (String) iter.next();
-                    String lowerLine = line.toLowerCase();
-                    parseAttributeValue(entry, line, lowerLine);
+                    parseAttributeValue(entry, line);
                 }
 
                 return;
@@ -804,7 +802,7 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
                     throw new LdifParseException("AttributeType misplaced", line);
                 }
 
-                parseAttributeValue(entry, line, lowerLine);
+                parseAttributeValue(entry, line);
                 type = ENTRY;
             } else {
                 // Invalid attribute Value

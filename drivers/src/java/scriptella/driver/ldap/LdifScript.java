@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class LdifScript {
     private static final Logger LOG = Logger.getLogger(LdifScript.class.getName());
-    //Parsing options for DN
+    //Parsing options for DN, TODO maybe replace with a DirCtx name parser?
     static final Properties DN_SYNTAX = new Properties();
 
     static {
@@ -56,7 +56,17 @@ public class LdifScript {
     private final LdapConnection connection;
 
     public LdifScript(LdapConnection connection) {
+        if (connection == null) {
+            throw new IllegalArgumentException("Connection cannot be null");
+        }
         this.connection = connection;
+    }
+
+    /**
+     * For testing purposes
+     */
+    protected LdifScript() {
+        connection = null;
     }
 
     /**
@@ -66,17 +76,29 @@ public class LdifScript {
      * @throws LdapProviderException if directory access failed.
      */
     public void execute(Reader reader, DirContext ctx, ParametersCallback parameters) throws LdapProviderException {
+        if (reader == null) {
+            throw new IllegalArgumentException("Reader cannot be null");
+        }
+        if (ctx == null) {
+            throw new IllegalArgumentException("DirContext cannot be null");
+        }
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameters cannot be null");
+        }
+
         SubstitutingLineReader in = new SubstitutingLineReader(reader, parameters);
         try {
             in.trackLines();
-            LdifIterator it = new LdifIterator(reader);
-            while (it.hasNext()) {
-                in.trackLines();
+            for (LdifIterator it = new LdifIterator(in); it.hasNext(); in.trackLines()) {
                 Entry e = it.next();
-                modify(ctx, e);
+                if (isReadonly()) {
+                    LOG.info("Readonly Mode - "+e+" has been skipped.");
+                } else {
+                    modify(ctx, e);
+                }
             }
         } catch (LdifParseException e) {
-            if (e.getErrorStatement()==null) {
+            if (e.getErrorStatement() == null) {
                 e.setErrorStatement(in.getTrackedLines());
             }
             throw e;
@@ -95,21 +117,22 @@ public class LdifScript {
      * @throws NamingException if operation with directory failed.
      */
     static void modify(DirContext ctx, final Entry e) throws NamingException {
-        //todo add support for renaming
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Processing entry " + e);
+            LOG.fine("Processing " + e);
         }
         Attributes atts = e.getAttributes();
         final String rootDn = ctx.getNameInNamespace();
         if (atts != null) { //If add entry
             ctx.createSubcontext(getRelativeDN(rootDn, e.getDn()), e.getAttributes());
+        } else if (e.isChangeDelete()) {
+            ctx.destroySubcontext(getRelativeDN(rootDn, e.getDn()));
         } else if (e.isChangeModDn() || e.isChangeModRdn()) {
             Name newRdn;
-            if (e.getNewSuperior()!=null) { //If new superior
-                newRdn=getRelativeDN(rootDn, e.getNewSuperior());
+            if (e.getNewSuperior() != null) { //If new superior
+                newRdn = getRelativeDN(rootDn, e.getNewSuperior());
             } else { //otherwise use DN as a base
-                newRdn=getRelativeDN(rootDn, e.getDn());
-                newRdn.remove(newRdn.size()-1);
+                newRdn = getRelativeDN(rootDn, e.getDn());
+                newRdn.remove(newRdn.size() - 1);
             }
             newRdn.add(e.getNewRdn());
             ctx.addToEnvironment("java.naming.ldap.deleteRDN", String.valueOf(e.isDeleteOldRdn()));
@@ -138,12 +161,24 @@ public class LdifScript {
         return entry.getSuffix(root.size());
     }
 
+    /**
+     * Accessor for testing purposes
+     */
+    protected Long getMaxFileLength() {
+        return connection == null ? null : connection.getMaxFileLength();
+    }
+
+    protected boolean isReadonly() {
+        return connection != null && connection.isReadonly();
+    }
+
     private class LdifIterator extends LdifReader {
 
         public LdifIterator(Reader in) {
             super(in);
-            if (connection.getMaxFileLength()!=null) {
-                setSizeLimit(connection.getMaxFileLength()*1024);
+            final Long maxFileLength = getMaxFileLength();
+            if (maxFileLength != null) {
+                setSizeLimit(maxFileLength * 1024);
             }
         }
 

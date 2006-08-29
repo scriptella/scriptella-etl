@@ -28,7 +28,7 @@ import java.net.URL;
  */
 public class UrlPathTokenizerTest extends AbstractTestCase {
     public void testWin() throws MalformedURLException {
-        URL base = new URL("file:/c:/docs/script.xml");
+        URL base = new URL("file:/c:/docs/etl.xml");
         String s = "  1.jar;;;:::: lib/second.jar   ;../third.jar:http://5.jar; file:/file name ;    ";
         UrlPathTokenizer tok = new UrlPathTokenizer(base);
         URL[] actual = tok.split(s);
@@ -41,7 +41,7 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
     }
 
     public void testUnix() throws MalformedURLException {
-        URL base = new URL("file:/var/script.xml");
+        URL base = new URL("file:/var/etl.xml");
         String s = "1.jar: lib/second.jar :third.jar:;http://5.jar;  ::;  ";
         UrlPathTokenizer tok = new UrlPathTokenizer(base);
         URL[] actual = tok.split(s);

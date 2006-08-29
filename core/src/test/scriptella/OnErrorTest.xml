@@ -14,6 +14,7 @@
         insert into test(id, value) values (1,'111');
         insert into test(id, value) values (2,'222');
         insert into test(id, value) values (3,'333');
+        insert into test(id, value) values (5,'555');
         <onerror codes="99999,22222,33333">
             --does nothing so test should fail
         </onerror>
@@ -53,5 +54,10 @@
             UPDATE test set value='Updated4' where ID=4;
         </onerror>
     </script>
+    <script>
+        insert into test(id, value) values (5,'New value');
+        <onerror/><!--means ignoring any exception-->
+    </script>
+
 
 </scriptella>

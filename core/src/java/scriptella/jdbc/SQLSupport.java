@@ -42,9 +42,8 @@ import java.util.logging.Logger;
 public class SQLSupport {
     private static final Logger LOG = Logger.getLogger(SQLSupport.class.getName());
     protected Resource resource;
-    protected StatementCache statementCache; //may be null, if caching switched off
+    protected JDBCConnection connection; //may be null, if caching switched off
     private JDBCTypesConverter converter = new JDBCTypesConverter(); //Setter for prepared statement parameters
-    private ParametersParser parametersParser;
 
     public SQLSupport(Resource resource) {
         if (resource == null) {
@@ -62,22 +61,8 @@ public class SQLSupport {
         };
     }
 
-    //Optional elements
-
-    public StatementCache getStatementCache() {
-        return statementCache;
-    }
-
-    public void setStatementCache(StatementCache statementCache) {
-        this.statementCache = statementCache;
-    }
-
-    public ParametersParser getParametersParser() {
-        return parametersParser;
-    }
-
-    public void setParametersParser(ParametersParser parametersParser) {
-        this.parametersParser = parametersParser;
+    public void setConnection(JDBCConnection connection) {
+        this.connection = connection;
     }
 
     protected int parseAndExecute(final Connection connection,
@@ -95,6 +80,15 @@ public class SQLSupport {
         StatisticInterceptor.statementsExecuted(parser.executedCount);
         return parser.updates ? parser.result : (-1);
     }
+
+    StatementCache getStatementCache() {
+        return connection==null?null:connection.getStatementCache();
+    }
+
+    ParametersParser getParametersParser() {
+        return connection==null?null:connection.getParametersParser();
+    }
+
 
     private class Parser extends SQLParserBase {
         int result = 0;
@@ -118,7 +112,7 @@ public class SQLSupport {
             Object p;
 
             if (expression) {
-                p = parametersParser.evaluate(name, paramsCallback);
+                p = getParametersParser().evaluate(name, paramsCallback);
             } else {
                 p = paramsCallback.getParameter(name);
             }
@@ -178,6 +172,7 @@ public class SQLSupport {
          */
         PreparedStatement prepareStatement(final String sql) throws SQLException {
             //Check if statement has been cached
+            StatementCache statementCache = getStatementCache();
             PreparedStatement ps = statementCache != null ? statementCache.get(sql) : null;
             if (ps == null) { //If not cached
                 ps = con.prepareStatement(sql);
@@ -227,8 +222,8 @@ public class SQLSupport {
         }
 
         private void releaseStatement(PreparedStatement ps) {
-            if (statementCache!=null) {
-                statementCache.closeRemovedStatements();
+            if (getStatementCache()!=null) {
+                getStatementCache().closeRemovedStatements();
             } else {
                 JDBCUtils.closeSilent(ps);
             }

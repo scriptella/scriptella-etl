@@ -18,6 +18,7 @@ package scriptella.driver.ldap;
 import scriptella.AbstractTestCase;
 import scriptella.driver.ldap.ldif.Entry;
 import scriptella.driver.ldap.ldif.LdifReader;
+import scriptella.spi.MockParametersCallbacks;
 import scriptella.util.ProxyAdapter;
 
 import javax.naming.CompoundName;
@@ -29,6 +30,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
+import java.io.Reader;
 import java.io.StringReader;
 
 /**
@@ -161,13 +163,12 @@ public class LdifScriptTest extends AbstractTestCase {
             public DirContext createSubcontext(Name name, Attributes attrs) throws InvalidNameException {
                 assertEquals(newName("cn=ldap"), name);
                 BasicAttributes exp = new BasicAttributes(true);
-                //TODO check why to lowercase attribute names
                 exp.put("cn", "ldap");
-                final BasicAttribute oc = new BasicAttribute("objectclass");
+                final BasicAttribute oc = new BasicAttribute("objectClass");
                 oc.add("top");
                 oc.add("driver");
                 exp.put(oc);
-                exp.put("envvars", null);
+                exp.put("envVars", null);
                 assertEquals(exp, attrs);
                 modified=true;
                 return null;
@@ -177,6 +178,29 @@ public class LdifScriptTest extends AbstractTestCase {
         LdifScript.modify(mock, e);
         assertTrue("DirContext was not modified", modified);
     }
+
+    /**
+     * Tests entry removing
+     */
+    public void testDelete() throws NamingException {
+        final Entry e = readEntry(
+                        "dn: cn=ldap,dc=scriptella\n" +
+                        "changetype: delete\n");
+        DirContext mock = new ProxyAdapter<DirContext>(DirContext.class) {
+            public String getNameInNamespace() {
+                return "dc=scriptella";
+            }
+
+            public void destroySubcontext(Name name) throws NamingException {
+                assertEquals(newName("cn=ldap"), name);
+                modified=true;
+            }
+
+        }.getProxy();
+        LdifScript.modify(mock, e);
+        assertTrue("DirContext was not modified", modified);
+    }
+
 
     /**
      * Tests changetype: modify
@@ -224,6 +248,65 @@ public class LdifScriptTest extends AbstractTestCase {
         }.getProxy();
         LdifScript.modify(mock, e);
         assertTrue("DirContext was not modified", modified);
+    }
+
+    /**
+     * Tests if substituted data goes to LDAP.
+     */
+    public void testExecute() {
+        Reader ldif = new StringReader(
+                "# Rename an entry and move all of its children to a new location in\n" +
+                "# the directory tree (only implemented by LDAPv3 servers).\n" +
+                "dn: ou=$test, dc=scriptella\n" +
+                "ou: $test\n");
+
+        DirContext mock = new ProxyAdapter<DirContext>(DirContext.class) {
+            public String getNameInNamespace() {
+                return "dc=scriptella";
+            }
+
+            public DirContext createSubcontext(Name name, Attributes attrs) throws InvalidNameException {
+                assertEquals(newName("ou=*test*"), name);
+                BasicAttributes exp = new BasicAttributes(true);
+                exp.put("ou", "*test*");
+                assertEquals(exp, attrs);
+                modified=true;
+                return null;
+            }
+
+        }.getProxy();
+        LdifScript ls = new LdifScript();
+        ls.execute(ldif, mock, MockParametersCallbacks.SIMPLE);
+
+        assertTrue("DirContext was not modified", modified);
+    }
+
+    /**
+     * Tests error handling
+     */
+    public void testErrorHadnling() throws NamingException {
+        String ldif = "dn: cn=ldap,dc=scriptella\n" +
+                "changetype: delete\n";
+        Reader reader = new StringReader(ldif);
+        DirContext mock = new ProxyAdapter<DirContext>(DirContext.class) {
+            public String getNameInNamespace() {
+                return "dc=scriptella";
+            }
+
+            public void destroySubcontext(Name name) throws NamingException {
+                throw new NamingException("Failure");
+            }
+        }.getProxy();
+        try {
+            LdifScript ls = new LdifScript();
+            ls.execute(reader, mock, MockParametersCallbacks.UNSUPPORTED);
+
+        } catch (LdapProviderException e) {
+            Throwable ne = e.getNativeException();
+            assertEquals(NamingException.class, ne.getClass());
+            assertEquals("Failure", ne.getMessage());
+            assertEquals(ldif, e.getErrorStatement());
+        }
     }
 
 

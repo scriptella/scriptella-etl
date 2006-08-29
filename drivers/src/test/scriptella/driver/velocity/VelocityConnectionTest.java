@@ -16,6 +16,7 @@
 package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.Resource;
 
@@ -71,7 +72,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
                     };
                 }
             });
-            return new VelocityConnection(u);
+            return new VelocityConnection(u, null, MockConnectionParameters.NULL);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }

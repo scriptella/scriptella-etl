@@ -32,12 +32,12 @@
                 ]]></source>
 
 			<note>
-By default file ${basedir}/script.xml is executed. Use file attribute to specify another path.
+By default file ${basedir}/etl.xml is executed. Use file attribute to specify another path.
             </note>
 		</section>
 		<section>
 			<title>Command-line execution</title>
-			<p>Just type <code>scriptella</code> to run the file named script.xml in the current directory.
+			<p>Just type <code>scriptella</code> to run the file named etl.xml in the current directory.
 			Alternatively you can use java launcher:</p>
 			<source><![CDATA[
 java -jar scriptella.jar [arguments]
@@ -54,7 +54,7 @@ java -jar scriptella.jar [arguments]
 				<title>Copy table to another database</title>
 				<p>Assume Database #1 contains Table Product with id, category and name columns. The following script
                 copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
-				<p>script.xml:</p>
+				<p>etl.xml:</p>
 				<source><![CDATA[
     <scriptella>
         <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
@@ -75,9 +75,9 @@ java -jar scriptella.jar [arguments]
 			<section>
 				<title>Working with BLOBs</title>
 				<p>The following sample initializes table of music tracks. Each track has a DATA field containing
- a file loaded from an external location. File song1.mp3 is stored in the same directory as script.xml and song2.mp3
+ a file loaded from an external location. File song1.mp3 is stored in the same directory as etl.xml and song2.mp3
  is loaded through the web.</p>
-				<p>script.xml:</p>
+				<p>etl.xml:</p>
 				<source><![CDATA[
     <scriptella>
         <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
@@ -101,7 +101,7 @@ java -jar scriptella.jar [arguments]
 			<section>
 				<title>Supporting several SQL dialects</title>
 				<p>TODO: Add example here</p>
-				<p>script.xml:</p>
+				<p>etl.xml:</p>
 				<source><![CDATA[
     <scriptella>
     </scriptella>

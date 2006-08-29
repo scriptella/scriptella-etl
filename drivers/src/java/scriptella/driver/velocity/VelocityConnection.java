@@ -18,6 +18,7 @@ package scriptella.driver.velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import scriptella.spi.AbstractConnection;
+import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -50,19 +51,11 @@ public class VelocityConnection extends AbstractConnection {
      * Instantiates a velocity connection.
      *
      * @param url            URL for output.
-     */
-    public VelocityConnection(URL url) {
-        this(url, null);
-    }
-
-    /**
-     * Instantiates a velocity connection.
-     *
-     * @param url            URL for output.
      * @param outputEncoding charset name for output stream. If null default charset is used.
+     * @param parameters connection parameters.
      */
-    public VelocityConnection(URL url, String outputEncoding) {
-        super(Driver.DIALECT);
+    public VelocityConnection(URL url, String outputEncoding, ConnectionParameters parameters) {
+        super(Driver.DIALECT, parameters);
         this.url = url;
         engine = new VelocityEngine();
         engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, Driver.LOG_SYSTEM);

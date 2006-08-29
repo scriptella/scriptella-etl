@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.driver.janino;
+package scriptella.spi;
 
-import scriptella.spi.AbstractScriptellaDriver;
-import scriptella.spi.Connection;
-import scriptella.spi.ConnectionParameters;
-import scriptella.spi.DialectIdentifier;
+import java.util.HashMap;
 
 /**
- * Scriptella Driver for <a href="http://www.janino.net/">Janino</a> Java Compiler.
+ * Mock implementations of {@link ConnectionParameters} suitable for testing.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Driver extends AbstractScriptellaDriver {
-    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Janino", "2.45"); 
-
-    public Connection connect(ConnectionParameters connectionParameters) {
-        return new JaninoConnection(connectionParameters);
-    }
-
+public abstract class MockConnectionParameters {
+    public static final ConnectionParameters NULL = new ConnectionParameters(
+            new HashMap<String, String>(), null,null,null, null, null, null);
 }

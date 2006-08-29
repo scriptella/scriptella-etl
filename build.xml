@@ -83,7 +83,7 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.ScriptsRunner"/>
-                <attribute name="Specification-Title" value="Scriptella SQL Scripts Tool"/>
+                <attribute name="Specification-Title" value="Scriptella ETL and Scripts Execution Tool."/>
                 <attribute name="Specification-Vendor" value="The Scriptella Project Team"/>
                 <attribute name="Implementation-Title" value="scriptella"/>
                 <attribute name="Implementation-Vendor" value="The Scriptella Project Team"/>

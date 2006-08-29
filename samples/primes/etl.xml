@@ -16,14 +16,14 @@
 <!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <scriptella>
     <description>
-        This script produces prime numbers and builds an HTML report.
+        This script produces prime numbers and builds a HTML report.
     </description>
     <properties>
         <include href="script.properties"/>
     </properties>
 
     <!--Set up a connection to janino compiler.-->
-    <connection id="janino" driver="janino" classpath="../lib/janino.jar"/>
+    <connection id="janino" driver="janino"/>
     <!--Set up a connection to velocity engine.
     url parameter specifies a path to file relative to a script file directory-->
     <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity-dep.jar"/>
@@ -85,10 +85,10 @@
          number is the name of the column in the Primes table-->
         <script connection-id="velocity">
 <![CDATA[
-            <tr>
-                <th>${rownum}</th>
-                <td>${number}</td>
-            </tr>]]>
+                <tr>
+                    <th>${rownum}</th>
+                    <td>${number}</td>
+                </tr>]]>
         </script>
     </query>
     <!--And finally produce a report footer -->

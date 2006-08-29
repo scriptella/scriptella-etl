@@ -16,6 +16,7 @@
 package scriptella.driver.janino;
 
 import scriptella.spi.AbstractConnection;
+import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -37,9 +38,10 @@ public class JaninoConnection extends AbstractConnection {
 
     /**
      * Instantiates a new connection to Janino Script Evaluator.
+     * @param parameters connection parameters.
      */
-    public JaninoConnection() {
-        super(Driver.DIALECT_IDENTIFIER);
+    public JaninoConnection(ConnectionParameters parameters) {
+        super(Driver.DIALECT_IDENTIFIER, parameters);
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {

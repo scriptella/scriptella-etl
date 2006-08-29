@@ -103,16 +103,28 @@ public class OnErrorEl extends XMLConfigurableBase {
     }
 
     public Resource getContent(DialectIdentifier id) {
-        return content.getContent(id);
+        ContentEl content = this.content.getContent(id);
+        if (content==null) {
+            return ContentEl.NULL_CONTENT;
+        } else {
+            return content;
+        }
     }
 
 
     public String toString() {
-        return "OnErrorEl{" +
-                "type=" + type +
-                ", message=" + message +
-                ", codes=" + codes +
-                ", retry=" + retry +
-                '}';
+        StringBuilder res = new StringBuilder("OnError{");
+        if (type!=null) {
+            res.append("type=").append(type).append(", ");
+        }
+        if (message!=null) {
+            res.append("message=").append(message).append(", ");
+        }
+        if (codes!=null) {
+            res.append("codes=").append(codes).append(", ");
+        }
+
+        res.append("retry=").append(retry).append('}');
+        return res.toString();
     }
 }

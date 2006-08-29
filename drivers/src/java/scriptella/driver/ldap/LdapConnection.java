@@ -43,6 +43,7 @@ public class LdapConnection extends AbstractConnection {
     private DirContext ctx;
     private final SearchControls searchControls; //default search controls
     private final Long maxFileLength;
+    private final String baseDn;
     private final DriversContext driversContext;
 
 
@@ -53,6 +54,14 @@ public class LdapConnection extends AbstractConnection {
      * @see SearchControls#setSearchScope(int)
      */
     public static final String SEARCH_SCOPE_KEY = "search.scope";
+
+    /**
+     * Name of the <em>Search base DN</em> connection property.
+     *
+     * @see {@link DirContext#search(String, javax.naming.directory.Attributes)}
+     */
+    public static final String SEARCH_BASEDN_KEY = "search.basedn";
+
 
     /**
      * Name of the <em>Time Limit</em> connection property.
@@ -84,7 +93,7 @@ public class LdapConnection extends AbstractConnection {
      * @param parameters parameters to establish connection.
      */
     public LdapConnection(ConnectionParameters parameters) {
-        super(Driver.DIALECT);
+        super(Driver.DIALECT, parameters);
         Hashtable<String, String> env = new Hashtable<String, String>();
         //Put default settings
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -121,6 +130,8 @@ public class LdapConnection extends AbstractConnection {
                 throw new LdapProviderException("Unsupported " + SEARCH_SCOPE_KEY + "=" + scope);
             }
         }
+        String baseDn = parameters.getProperty(SEARCH_SCOPE_KEY);
+        this.baseDn = baseDn == null ? "" : baseDn;
         String timelimit = parameters.getProperty(SEARCH_TIMELIMIT_KEY);
         if (timelimit != null) {
             try {
@@ -142,13 +153,13 @@ public class LdapConnection extends AbstractConnection {
         String maxFileLength = parameters.getProperty(FILE_MAXLENGTH_KEY);
         if (maxFileLength != null) {
             try {
-                this.maxFileLength=Long.valueOf(countlimit);
+                this.maxFileLength = Long.valueOf(countlimit);
             } catch (NumberFormatException e) {
                 throw new LdapProviderException(FILE_MAXLENGTH_KEY +
                         " property must be a non-negative integer, but was " + maxFileLength);
             }
         } else {
-            this.maxFileLength=null;
+            this.maxFileLength = null;
         }
 
         driversContext = parameters.getContext();
@@ -168,6 +179,10 @@ public class LdapConnection extends AbstractConnection {
 
     DriversContext getDriversContext() {
         return driversContext;
+    }
+
+    String getBaseDn() {
+        return baseDn;
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {

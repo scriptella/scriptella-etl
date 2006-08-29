@@ -24,9 +24,8 @@
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}" classpath="../lib/hsqldb.jar"/>
     <script>
         CREATE TABLE Foo (
-            BAR VARCHAR(100)
+            Bar VARCHAR(100)
         );
         INSERT INTO FOO VALUES (?antproperty);
     </script>
-
 </scriptella>

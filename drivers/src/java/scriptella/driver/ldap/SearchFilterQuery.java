@@ -15,6 +15,7 @@
  */
 package scriptella.driver.ldap;
 
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -45,6 +46,7 @@ public class SearchFilterQuery implements ParametersCallback {
     private SearchResult result;
     private final LdapConnection connection;
     private final ParametersCallback parameters;
+    private final PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
 
 
     /**
@@ -85,17 +87,19 @@ public class SearchFilterQuery implements ParametersCallback {
      * @see DirContext#search(javax.naming.Name, String, javax.naming.directory.SearchControls)
      */
     public void execute(final String filter) {
+        //Using standard properties substitutor, may be change to something similar to JDBC parameters
+        final String sFilter = substitutor.substitute(filter, parameters);
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Running a query for search filter " + filter);
+            LOG.fine("Running a query for search filter " + sFilter);
         }
         try {
-            iterate(query(connection, filter));
+            iterate(query(connection, sFilter));
         } catch (NamingException e) {
             throw new LdapProviderException("Failed to execute query", e);
         } catch (LdapProviderException e2) {
             //Settings a filter as a poblem statement if it has n't been set.
             if (e2.getErrorStatement() != null) {
-                e2.setErrorStatement(filter);
+                e2.setErrorStatement(sFilter);
             }
             throw e2;
         }
@@ -123,7 +127,7 @@ public class SearchFilterQuery implements ParametersCallback {
     }
 
     protected NamingEnumeration<SearchResult> query(final LdapConnection connection, final String filter) throws NamingException {
-        return connection.getCtx().search("", filter, connection.getSearchControls());
+        return connection.getCtx().search(connection.getBaseDn(), filter, connection.getSearchControls());
     }
 
 
