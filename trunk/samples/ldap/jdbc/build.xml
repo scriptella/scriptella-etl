@@ -13,17 +13,18 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project name="Music Store" default="main">
-    <!-- Registers scriptella ant tasks.
-    Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties">
-        <classpath>
-            <pathelement location="../lib/scriptella.jar"/>
-            <pathelement location="../lib/hsqldb.jar"/>
-        </classpath>
-    </taskdef>
-    <target name="main">
-        <!--Executes etl.xml with hsqldb on classpath-->
-        <execute/>
+<project name="JDBC-LDAP/DB Migration" default="help">
+    <taskdef resource="antscriptella.properties" classpath="../../lib/scriptella.jar"/>
+    <target name="help">
+        <echo message="Type ant db2ldap to migrate data from in-memory database to ldap"/>
+        <echo message="Type ant ldap2db to migrate data from ldap to outdb"/>
+        <echo message="OpenLDAP should be running on localhost:389. See readme.txt for more details"/>
     </target>
+    <target name="db2ldap">
+        <execute file="db2ldap.xml"/>
+    </target>
+    <target name="ldap2db">
+        <execute file="ldap2db.xml"/>
+    </target>
+
 </project>

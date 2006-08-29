@@ -19,6 +19,7 @@ import scriptella.AbstractTestCase;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.util.ProxyAdapter;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.BasicAttributes;
@@ -91,5 +92,23 @@ public class SearchFilterQueryTest extends AbstractTestCase {
         q.execute("filter");//in this test case filter doesn't matter
         assertTrue("Naming enumeration must be closed after iteration", closed);
         assertEquals(2, rows);
+    }
+
+    /**
+     * Tests if variables are substituted in a passed filter.
+     */
+    public void testExecuteSubstitution() {
+        SearchFilterQuery q = new SearchFilterQuery(null, MockParametersCallbacks.SIMPLE, null) {
+            protected NamingEnumeration<SearchResult> query(final LdapConnection connection, final String filter) {
+                assertEquals("test *filter* *a**b*", filter);
+                return new ProxyAdapter<NamingEnumeration<SearchResult>>(NamingEnumeration.class) {
+                    public boolean hasMoreElements() {
+                        return false;
+                    }
+                }.getProxy();
+
+            }
+        };
+        q.execute("test $filter ${a+b}");
     }
 }

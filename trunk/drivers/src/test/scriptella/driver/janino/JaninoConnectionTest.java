@@ -17,6 +17,7 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.CompileException;
 import scriptella.AbstractTestCase;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
@@ -42,7 +43,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
      * This test creates a Janino connection that executes simple valid and invalid scripts.
      */
     public void testScript() {
-        JaninoConnection c = new JaninoConnection();
+        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
         field = 0;
         c.executeScript(asResource(JaninoConnectionTest.class.getName() + ".field=1;"), null);
         try {
@@ -58,7 +59,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
     }
 
     public void testQuery() {
-        JaninoConnection c = new JaninoConnection();
+        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
         field = 0;
         final List<String> rows = new ArrayList<String>();
 

@@ -1,6 +1,11 @@
 This example demonstrates migration between LDAP and Database.
 In particular this example shows how to migrate users/roles between Tomcat JDBC/Datasoure And LDAP realms.
 
+!Important!
+    This example needs JDBC-LDAP bridge. Download http://www.qa.octetstring.com/downloads/jdbcldap/jdbcldap20en.zip,
+    extract jdbcLdapJldap.jar and save in examples lib directory given jdbcldap.jar name.
+
+
 OpenLDAP configuration
 ----------------------
 Modify the default slapd.conf with the following snippets:
@@ -16,7 +21,7 @@ rootdn		"cn=root,dc=scriptella"
 
 Migration of LDAP data to database
 ----------------------------------
-We assume the directory is populated with the following data (LDIF format):
+It is assumed that the directory is populated with the following data (LDIF format):
 # top-level entry
 dn: dc=scriptella
 objectclass: dcObject
@@ -69,10 +74,8 @@ You may check for required data presence in LDAP by running:
 ldapsearch -b "dc=scriptella" "(objectclass=*)"
 
 Execute ldap2db.xml script to migrate data from LDAP to HSQLDB database named "outdb".
+Note: Use command line "execute ldap2db.xml" to run the script.
 
 Migration of database data to LDAP.
 -----------------------------------
 db2ldap.xml script migrates users and roles from an in-memory database to LDAP.
-
-
-

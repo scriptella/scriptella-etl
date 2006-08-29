@@ -18,7 +18,7 @@
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
         <property name="antproperty" value="Ant Property"/>
-        <!--Executes script.xml -->
+        <!--Executes etl.xml -->
         <execute inheritAll="true"/>
         <!-- You may reassign classpath just before executing a script-->
         <taskdef resource="antscriptella.properties">
@@ -29,8 +29,8 @@
                 <pathelement location="../lib/hsqldb.jar"/>
             </classpath>
         </taskdef>
-        <execute inheritAll="true">
-            <fileset file="script.xml"/>
+        <execute inheritAll="true" debug="true">
+            <fileset file="etl.xml"/>
         </execute>
     </target>
 

@@ -134,7 +134,7 @@ public class ScriptsRunner {
         Logging.configure(h);
 
         if (files.isEmpty()) { //adding default name if no files specified
-            files.add(new File("script.xml"));
+            files.add(new File("etl.xml"));
         }
         ScriptsRunner runner = new ScriptsRunner();
 
@@ -158,7 +158,7 @@ public class ScriptsRunner {
                     //Print stack trace of exception in debug mode
                     System.err.println("---------------Debug Stack Trace-----------------");
                     Throwable t = e.getCause()==null?e:e.getCause();
-                    t.getCause().printStackTrace();
+                    t.printStackTrace();
                 }
             }
         }

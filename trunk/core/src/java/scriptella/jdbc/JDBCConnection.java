@@ -43,7 +43,8 @@ public class JDBCConnection extends AbstractConnection {
     private ParametersParser parametersParser;
 
     public JDBCConnection(Connection con, ConnectionParameters parameters) {
-        if (con==null) {
+        super(parameters);
+        if (con == null) {
             throw new IllegalArgumentException("Connection cannot be null");
         }
         this.con = con;
@@ -65,19 +66,19 @@ public class JDBCConnection extends AbstractConnection {
      */
     protected void init(ConnectionParameters parameters) {
         String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_SIZE_KEY);
-        int statementCacheSize=100;
-        if (cacheSizeStr!=null && cacheSizeStr.trim().length()>0) {
+        int statementCacheSize = 100;
+        if (cacheSizeStr != null && cacheSizeStr.trim().length() > 0) {
             try {
-                statementCacheSize=Integer.valueOf(cacheSizeStr);
+                statementCacheSize = Integer.valueOf(cacheSizeStr);
             } catch (NumberFormatException e) {
-                throw new JDBCException(STATEMENT_CACHE_SIZE_KEY+" property must be a non negative integer",e);
+                throw new JDBCException(STATEMENT_CACHE_SIZE_KEY + " property must be a non negative integer", e);
             }
         }
 
-        if (statementCacheSize>0) {
-            statementCache=new StatementCache(statementCacheSize);
+        if (statementCacheSize > 0) {
+            statementCache = new StatementCache(statementCacheSize);
         }
-        parametersParser =new ParametersParser(parameters.getContext());
+        parametersParser = new ParametersParser(parameters.getContext());
     }
 
     public DialectIdentifier getDialectIdentifier() {
@@ -93,25 +94,24 @@ public class JDBCConnection extends AbstractConnection {
         return DialectIdentifier.NULL_DIALECT;
     }
 
-    /**
-     * Sets common parameters specified in connection element.
-     * @param element Script/Query element.
-     */
-    private void prepare(SQLSupport element) {
-        element.setStatementCache(statementCache);
-        element.setParametersParser(parametersParser);
-    }
-
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {
         Script s = new Script(scriptContent);
-        prepare(s);
+        s.setConnection(this);
         s.execute(con, parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
         Query q = new Query(queryContent);
-        prepare(q);
+        q.setConnection(this);
         q.execute(con, parametersCallback, queryCallback);
+    }
+
+    public StatementCache getStatementCache() {
+        return statementCache;
+    }
+
+    public ParametersParser getParametersParser() {
+        return parametersParser;
     }
 
     public void commit() {
@@ -152,9 +152,9 @@ public class JDBCConnection extends AbstractConnection {
             } catch (SQLException e) {
                 throw new JDBCException("Unable to close a connection", e);
             }
-            if (statementCache!=null) {
+            if (statementCache != null) {
                 statementCache.close();
-                statementCache=null;
+                statementCache = null;
             }
 
         }

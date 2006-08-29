@@ -1,8 +1,8 @@
 <body>
 <h1>LDAP Driver for Scriptella.</h1>
 This driver allows to execute LDIF scripts and search filter queries.
-<p>Details of LDIF syntax are described in RFC 2849,
-LDAP Search Filters are described in RFC 2254</p>
+<p>Details of LDIF syntax are described in <a href="http://www.ietf.org/rfc/rfc2849.txt">RFC 2849</a>,
+LDAP Search Filters are described in <a href="http://www.ietf.org/rfc/rfc2254.txt">RFC 2254</a></p>
 <p>This driver supports ${} syntax for variables substitution</p>
 
 <h2>General information</h2>
@@ -28,23 +28,35 @@ LDAP Search Filters are described in RFC 2254</p>
     <tr>
         <td>search.scope</td>
         <td>Search scope for queries. The value must be one of the: object, onelevel, subtree</td>
-        <td>No, the default value is object.</td>
+        <td>No, the default value is <code>object</code>.</td>
+    </tr>
+    <tr>
+        <td>search.basedn</td>
+        <td>base dn for search.</td>
+        <td>No, the default value is <code>""</code>. Specifiying may be required for searches using
+        connections to the root directory context.</td>
     </tr>
     <tr>
         <td>search.timelimit</td>
         <td>Time limit for queries.</td>
-        <td>No, the default value is 0(wait indefinitely).</td>
+        <td>No, the default value is <code>0</code>(wait indefinitely).</td>
     </tr>
     <tr>
         <td>search.countlimit</td>
         <td>Maximum number of entries to be returned by queries.</td>
-        <td>No, the default value is 0(all entries will be returned).</td>
+        <td>No, the default value is <code>0</code>(all entries will be returned).</td>
     </tr>
     <tr>
         <td>file.maxlength</td>
         <td>Maximum size in KBs of the external files referenced from LDIFs.</td>
-        <td>No, the default value is 10000 (10MB).</td>
+        <td>No, the default value is <code>10000 (10MB)</code>.</td>
     </tr>
+    <tr>
+        <td>readonly</td>
+        <td>If true, LDIF update statements are logged but not executed. May be helpful for debugging.</td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+
 </table>
 <p>This driver is JNDI-based and uses com.sun.jndi.ldap.LdapCtxFactory LDAP provider. You may specify
 additional JNDI settings as connection properties.
@@ -52,10 +64,26 @@ For a complete list of JNDI properties see
     <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jndi/jndi-ldap.html">LDAP Naming Service Provider for the JNDI</a></p>
 <h2>Example</h2>
 <code><pre>
-&lt;connection driver="ldap" url="ldap://localhost:389" user="cn=root,dc=scriptella" password="secret" &gt;
+&lt;connection driver="ldap" url="ldap://localhost:389/dc=scriptella" user="cn=root,dc=scriptella" password="secret" &gt;
     search.scope=subtree
+    #search.basedn=dc=scriptella
 &lt;/connection&gt;
 
+&lt;query&gt;
+    <!--Search filter -->
+     &lt;![CDATA[(&(objectClass=groupOfUniqueNames)(uniqueMember=$dn))]]&gt;
+&lt;/query&gt;
+
+&lt;script&gt;
+#LDIF add entry
+#Avoid leading whitespaces because LDIF is a whitespace sensitive format.
+dn: ou=people,dc=scriptella
+objectClass: organizationalUnit
+ou: people
+&lt;/script&gt;
 </pre></code>
-Registers an LDAP connection with subtree scope search mode.
+Register an LDAP connection with subtree scope search mode
+and perform a search for entries satisfying specified search filter,
+$ is used for variables/expressions subsitution.
+<p>The script element is used to add ou=people,dc=scriptella entry.
 </body>

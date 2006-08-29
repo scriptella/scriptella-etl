@@ -74,6 +74,10 @@ public class IfInterceptor extends ElementInterceptor {
 
         if (ok) { //if expr evaluated to true
             executeNext(ctx);
+        } else {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("if=\""+expression.getExpression()+"\" is false, element body is skipped.");
+            }
         }
     }
 

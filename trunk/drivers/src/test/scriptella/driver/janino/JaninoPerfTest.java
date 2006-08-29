@@ -16,6 +16,7 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
@@ -31,7 +32,7 @@ public class JaninoPerfTest extends AbstractTestCase {
      * This test creates a Janino connection that executes simple valid and invalid scripts.
      */
     public void testScript() {
-        JaninoConnection c = new JaninoConnection();
+        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
         ParametersCallback pc = new ParametersCallback() {
             public final Object getParameter(final String name) {
                 return name;
@@ -47,7 +48,7 @@ public class JaninoPerfTest extends AbstractTestCase {
     }
 
     public void testQuery() {
-        JaninoConnection c = new JaninoConnection();
+        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
         final int[] r = new int[] {0};
 
         Resource queryContent = JaninoConnectionTest.asResource(

@@ -89,19 +89,14 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         OnErrorEl onErrorEl = errorHandler.onError(t);
         Connection con = ctx.getConnection();
         DialectIdentifier dialectId = con.getDialectIdentifier();
-        if (onErrorEl != null && onErrorEl.getContent(dialectId) != null) { //if error handler present for this case
+        if (onErrorEl != null) { //if error handler present for this case
             Resource content = onErrorEl.getContent(dialectId);
-            if (content == null) {
-                LOG.log(Level.WARNING, "Script " + getLocation() + " failed and onError handler has no executable content: " + onErrorEl, t);
-                ExceptionUtils.throwUnchecked(t);
-                throw new IllegalStateException("Unexpected condition");//previous line always throws exception
-            }
             LOG.log(Level.WARNING, "Script " + getLocation() + " failed. Using onError handler: " + onErrorEl, t);
             try {
                 con.executeScript(content, ctx);
                 return onErrorEl.isRetry();
             } catch (Exception e) {
-                return onError(t, errorHandler, ctx); //calling this method again and triying to find another onerror
+                return onError(e, errorHandler, ctx); //calling this method again and triying to find another onerror
             }
         } else { //if no onError found - rethrow the exception
             ExceptionUtils.throwUnchecked(t);

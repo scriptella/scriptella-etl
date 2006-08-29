@@ -24,6 +24,7 @@ package scriptella.spi;
  */
 public abstract class AbstractConnection implements Connection {
     private DialectIdentifier dialectIdentifier;
+    private boolean readonly;
 
     /**
      * May be used by sublasses to allow full customization
@@ -32,13 +33,33 @@ public abstract class AbstractConnection implements Connection {
     }
 
     /**
-     * Instantiates a connection with dialectIdentifier.
-     *
+     * Instantiates a connection with dialectIdentifier and connection parameters.
      * @param dialectIdentifier dialect identifier.
+     * @param parameters connection parameters to use for general properties.
      */
-    protected AbstractConnection(DialectIdentifier dialectIdentifier) {
+    protected AbstractConnection(DialectIdentifier dialectIdentifier, ConnectionParameters parameters) {
+        this(parameters);
+        if (dialectIdentifier==null) {
+            throw new IllegalArgumentException("Dialect identifier cannot be null");
+        }
         this.dialectIdentifier = dialectIdentifier;
     }
+
+    /**
+     * Instantiates a connection with dialectIdentifier and connection parameters.
+     * @param parameters connection parameters to use for general properties.
+     */
+    protected AbstractConnection(ConnectionParameters parameters) {
+        if (parameters==null) {
+            throw new IllegalArgumentException("Connection parameters cannot be null");
+        }
+        //General Scriptella property for debugging non transactional providers
+        String readonlyStr = parameters.getProperty("readonly");
+        if (readonlyStr!=null) {
+            readonly=Boolean.parseBoolean(readonlyStr);
+        }
+    }
+
 
     public DialectIdentifier getDialectIdentifier() {
         return dialectIdentifier;
@@ -46,6 +67,17 @@ public abstract class AbstractConnection implements Connection {
 
     protected void setDialectIdentifier(DialectIdentifier dialectIdentifier) {
         this.dialectIdentifier = dialectIdentifier;
+    }
+
+    /**
+     * Returns readonly mode.
+     * <p>readonly=true means updates must be skipped by the driver.
+     * This property is configurable by readonly property of connection declaration element.
+     * Drivers are not required to support this feauture.
+     * @return true if connection is in readonly mode.
+     */
+    public boolean isReadonly() {
+        return readonly;
     }
 
     public void commit() throws ProviderException {

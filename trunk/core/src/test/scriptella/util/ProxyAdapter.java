@@ -16,6 +16,7 @@
 package scriptella.util;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -46,7 +47,11 @@ public class ProxyAdapter<T> {
 
                 }
                 //Invoke the method found and return the result
-                return m.invoke(ProxyAdapter.this, args);
+                try {
+                    return m.invoke(ProxyAdapter.this, args);
+                } catch (InvocationTargetException e) {
+                    throw e.getCause();
+                }
             }
         });
     }

@@ -110,8 +110,8 @@ public class ScriptsExecuteTask extends Task {
     public void execute() throws BuildException {
         List<File> files = new ArrayList<File>();
 
-        if (filesets.isEmpty()) { //if no files - script.xml is a default name
-            files.add(new File(getProject().getBaseDir(), "script.xml"));
+        if (filesets.isEmpty()) { //if no files - etl.xml is a default name
+            files.add(new File(getProject().getBaseDir(), "etl.xml"));
         } else {
             for (FileSet fs : filesets) {
                 DirectoryScanner ds = fs.getDirectoryScanner(getProject());

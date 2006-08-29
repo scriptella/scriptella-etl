@@ -42,6 +42,7 @@ public class OnErrorTest extends DBTestCase {
         expected.put(2, "Updated2");
         expected.put(3, "Updated3");
         expected.put(4, "444");
+        expected.put(5, "555");
         q.execute(con, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 Integer id = (Integer) parameters.getParameter("id");
