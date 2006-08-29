@@ -137,9 +137,9 @@
                 </p>
                 <p>
                     <strong>if</strong> attribute is used for conditional execution. The element content is executed
-                    only if the result of this attribute value evaluation is true. Example:<br/>
+                    only if the result of this attribute value evaluation is true. For example <br/>
                     <code>&lt;script if="rownum gt 1 and name!=null and name.length() gt 0"&gt;</code><br/>
-                    <code>--Evaluated only if rownum variable has value greater than 1 and the name variable is not empty.</code>
+                    is evaluated only if rownum variable has value greater than 1 and the name variable is not empty.
                 </p>
                 <p><strong>Example</strong></p>
                 <source>
