@@ -67,7 +67,7 @@
             <p>Among other libraries the Scriptella distribution contains the following jars:</p>
             <ul>
                 <li><code>scriptella-core.jar</code> - Scriptella core classes required to operate</li>
-                <li><code>scriptella-drivers.jar</code> - Build in drivers and adapters for different datasources</li>
+                <li><code>scriptella-drivers.jar</code> - Built in drivers and adapters for different datasources</li>
                 <li><code>scriptella-tools.jar</code> - Misc tools, Ant and command line launchers</li>
                 <li><code>scriptella.jar</code> - All-In-One jar containing all dependencies except the driver specific</li>
             </ul>
