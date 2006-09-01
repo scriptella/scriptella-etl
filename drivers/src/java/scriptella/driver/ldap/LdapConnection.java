@@ -58,7 +58,7 @@ public class LdapConnection extends AbstractConnection {
     /**
      * Name of the <em>Search base DN</em> connection property.
      *
-     * @see {@link DirContext#search(String, javax.naming.directory.Attributes)}
+     * @see DirContext#search(String, javax.naming.directory.Attributes)
      */
     public static final String SEARCH_BASEDN_KEY = "search.basedn";
 
