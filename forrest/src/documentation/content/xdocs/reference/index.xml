@@ -507,6 +507,13 @@
                 reference BLOB content in external files and use JDBC escaping syntax to pass dates
                 independently from the DB locale/date/time settings.</td>
 				</tr>
+                <tr>
+                    <td>ODBC</td>
+                    <td>
+                        Produces a HTML view of the MS Access Northwind Categories table.
+                        This example demonstrates working with ODBC datasources (Northwind.mdb) and producing a report with images.
+                    </td>
+                </tr>
 				<tr>
 					<td>Primes</td>
 					<td>Fills the database with prime numbers and produces HTML report.

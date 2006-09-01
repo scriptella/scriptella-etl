@@ -78,17 +78,23 @@ public final class DriversFactory {
         if (Driver.class.isAssignableFrom(drvClass)) {
             //We must load JDBC driver using the same classloader as drvClass
             try {
-                Class<?> cl = Class.forName("scriptella.jdbc.ScriptellaJDBCDriver", true, drvClass.getClassLoader());
+
+                ClassLoader drvClassLoader = drvClass.getClassLoader();
+                if (drvClassLoader==null) { //if boot classloader is used,
+                    // load scriptella driver using the class loader for this class.
+                    drvClassLoader=DriversFactory.class.getClassLoader();
+                }
+                Class<?> cl = Class.forName("scriptella.jdbc.ScriptellaJDBCDriver", true, drvClassLoader);
                 return (ScriptellaDriver)cl.newInstance();
             } catch (Exception e) {
-                throw new IllegalStateException("Unable to instantiate JDBC driver for class " + drvClass);
+                throw new IllegalStateException("Unable to instantiate JDBC driver for " + drvClass, e);
 
             }
         } else if (ScriptellaDriver.class.isAssignableFrom(drvClass)) {
             try {
                 return (ScriptellaDriver) drvClass.newInstance();
             } catch (Exception e) {
-                throw new IllegalStateException("Unable to instantiate driver for class " + drvClass);
+                throw new IllegalStateException("Unable to instantiate driver for " + drvClass, e);
             }
 
         } else {
