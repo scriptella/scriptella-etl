@@ -3,8 +3,8 @@
     <description>
         Export data from table to CSV file.
     </description>
-    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb" user="sa" password=""/>
-    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" password=""/>
+    <connection id="in" driver="hsqldb" url="jdbc:hsqldb:mem:indb" user="sa" classpath="../../lib/hsqldb.jar"/>
+    <connection id="out" driver="hsqldb" url="jdbc:hsqldb:file:tmp" user="sa" classpath="../../lib/hsqldb.jar"/>
     <script connection-id="in">
         <!--Initialize DEMO database -->
         CREATE TABLE Bug (
@@ -31,9 +31,7 @@
             insert into Bug values (?ID, ?priority, ?summary, ?status);
         </script>
     </query>
-
-    <script connection-id="out"><!-- Correctly shutdown the DB -->
-        COMMIT;
-        SHUTDOWN;
+    <script connection-id="out"><!--Gracefully shutdown HSQLDB-->
+        COMMIT;SHUTDOWN;
     </script>
 </scriptella>

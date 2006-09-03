@@ -440,9 +440,6 @@
 					HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
                     feature could be used to work
                     with CSV files.</p>
-                <p><a href="http://csvjdbc.sourceforge.net">CsvJdbc</a> is a simple read-only JDBC driver
-                    that uses Comma Separated Value (CSV) files as database tables.
-                </p>
                 <p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
             </section>
 			<section>
@@ -489,7 +486,7 @@
 				</tr>
 				<tr>
 					<td>CSV</td>
-					<td>Example of working with CSV data using HSQL:DB CSV tables feature.</td>
+					<td>Example of working with CSV data using HSQLDB CSV tables feature and opencsv library</td>
 				</tr>
 				<tr>
 					<td>DB Upgrade</td>

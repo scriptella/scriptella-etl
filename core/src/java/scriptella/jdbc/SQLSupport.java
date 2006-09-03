@@ -82,11 +82,11 @@ public class SQLSupport {
     }
 
     StatementCache getStatementCache() {
-        return connection==null?null:connection.getStatementCache();
+        return connection == null ? null : connection.getStatementCache();
     }
 
     ParametersParser getParametersParser() {
-        return connection==null?null:connection.getParametersParser();
+        return connection == null ? null : connection.getParametersParser();
     }
 
 
@@ -137,7 +137,7 @@ public class SQLSupport {
         }
 
         int executeStatement(final String sql) {
-            PreparedStatement ps=null;
+            PreparedStatement ps = null;
             try {
                 ps = prepareStatement(sql);
                 if (LOG.isLoggable(Level.FINE)) {
@@ -199,30 +199,31 @@ public class SQLSupport {
          */
         int executeStatement(PreparedStatement ps) throws SQLException {
             int updateCount = -1;
-            if (ps.execute()) {
-                if (callback == null) {
-                    LOG.warning("Missing callback for query with result set. Queries should have nested script elements.");
-                } else {
-                    ResultSetAdapter r = null;
-                    try {
-                        r = new ResultSetAdapter(ps.getResultSet(), paramsCallback, converter);
-                        while (r.next()) {
-                            callback.processRow(r);
-                        }
-                    } finally {
-                        if (r != null) {
-                            r.close();
-                        }
+            if (callback != null) {
+                ResultSetAdapter r = null;
+                try {
+                    r = new ResultSetAdapter(ps.executeQuery(), paramsCallback, converter);
+                    while (r.next()) {
+                        callback.processRow(r);
+                    }
+                } finally {
+                    if (r != null) {
+                        r.close();
                     }
                 }
             } else {
-                updateCount = ps.getUpdateCount();
+                updateCount = ps.executeUpdate();
             }
             return updateCount;
         }
 
         private void releaseStatement(PreparedStatement ps) {
-            if (getStatementCache()!=null) {
+            try {
+                ps.clearParameters(); //Clear parameters for GC
+            } catch (Exception e) {
+                LOG.log(Level.FINE, "Failed to clear statement parameters", e);
+            }
+            if (getStatementCache() != null) {
                 getStatementCache().closeRemovedStatements();
             } else {
                 JDBCUtils.closeSilent(ps);

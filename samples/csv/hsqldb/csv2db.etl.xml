@@ -1,10 +1,12 @@
 <!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <scriptella>
     <description>
-        Export data from table to CSV file.
+        Imports CSV data from a file to a database table.
+        See http://www.hsqldb.org/doc/guide/ch06.html for details about
+        HSQLDB Text Tables.
     </description>
-    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" password=""/>
-    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" password=""/>
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="../../lib/hsqldb.jar"/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" classpath="../../lib/hsqldb.jar"/>
     <script connection-id="in">
         <!-- Creates TEXT table to output CSV data -->
         CREATE TEXT TABLE Bug (
@@ -29,13 +31,11 @@
         </script>
     </query>
 
-    <script connection-id="out"><!-- Correctly shutdown the DB -->
-        COMMIT;
-        SHUTDOWN;
+    <script connection-id="in"><!--Gracefully shutdown HSQLDB-->
+        COMMIT;SHUTDOWN;
     </script>
-    <script connection-id="in"><!-- Correctly shutdown the DB -->
-        COMMIT;
-        SHUTDOWN;
+    <script connection-id="out"><!--Gracefully shutdown HSQLDB-->
+        COMMIT;SHUTDOWN;
     </script>
 
 </scriptella>

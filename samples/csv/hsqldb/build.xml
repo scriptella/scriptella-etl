@@ -14,21 +14,21 @@
  limitations under the License.
 -->
 
-<project name="CSV Import/Export" default="help">
+<project name="CSV HSQLDB Import/Export" default="help">
     <!-- Registers scriptella ant task.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar:..\lib\hsqldb.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../../lib/scriptella.jar"/>
 
     <target name="db2csv" depends="clean">
         <description>Export sample data from in-memory database to bugs-out.csv</description>
         <delete file="bugs-out.csv" failonerror="no"/>
-        <execute file="db2csv.xml"/>
+        <execute file="db2csv.etl.xml"/>
         <antcall target="clean"/>
     </target>
 
     <target name="csv2db" depends="clean">
         <description>Import CSV data from bugs-in.csv to db</description>
-        <execute file="csv2db.xml"/>
+        <execute file="csv2db.etl.xml"/>
         <antcall target="clean"/>
     </target>
 
@@ -41,6 +41,7 @@
 
     <target name="help">
         <echo>
+            Example of CSV Import/Export using HSQLDB Text Tables Feature.
             Type ant db2csv to run sample database export.
             Type ant csv2db to run sample database import.
         </echo>
