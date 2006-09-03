@@ -51,7 +51,7 @@ public class JDBCConnection extends AbstractConnection {
         init(parameters);
         try {
             //Several drivers return -1 which is illegal, but means no TX
-            transactable = con.getTransactionIsolation()>Connection.TRANSACTION_NONE;
+            transactable = con.getTransactionIsolation() > Connection.TRANSACTION_NONE;
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "Unable to determine transaction isolation level for connection " + toString(), e);
         }
@@ -59,7 +59,7 @@ public class JDBCConnection extends AbstractConnection {
             try {
                 con.setAutoCommit(false);
             } catch (Exception e) {
-                throw new JDBCException("Unable to set autocommit=false for "+toString(), e);
+                throw new JDBCException("Unable to set autocommit=false for " + toString(), e);
             }
         }
     }
