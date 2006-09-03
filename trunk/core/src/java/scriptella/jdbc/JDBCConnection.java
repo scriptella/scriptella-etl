@@ -50,14 +50,17 @@ public class JDBCConnection extends AbstractConnection {
         this.con = con;
         init(parameters);
         try {
-            con.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw new JDBCException("Unable to set autocommit=false", e);
-        }
-        try {
-            transactable = Connection.TRANSACTION_NONE != con.getTransactionIsolation();
+            //Several drivers return -1 which is illegal, but means no TX
+            transactable = con.getTransactionIsolation()>Connection.TRANSACTION_NONE;
         } catch (SQLException e) {
             LOG.log(Level.WARNING, "Unable to determine transaction isolation level for connection " + toString(), e);
+        }
+        if (transactable) { //only effective for transactable connections
+            try {
+                con.setAutoCommit(false);
+            } catch (Exception e) {
+                throw new JDBCException("Unable to set autocommit=false for "+toString(), e);
+            }
         }
     }
 
@@ -79,19 +82,26 @@ public class JDBCConnection extends AbstractConnection {
             statementCache = new StatementCache(statementCacheSize);
         }
         parametersParser = new ParametersParser(parameters.getContext());
+        initDialectIdentifier();
     }
 
-    public DialectIdentifier getDialectIdentifier() {
+    /**
+     * Initializes dialect identifier for connection.
+     * If driver doesn't support DatabaseMetaData or other problem occurs,
+     * {@link DialectIdentifier#NULL_DIALECT} is used.
+     * <p>May be overriden by subclasses.
+     */
+    protected void initDialectIdentifier() {
         try {
             final DatabaseMetaData metaData = con.getMetaData();
             if (metaData != null) { //Several drivers violate spec and return null
-                return new DialectIdentifier(metaData.getDatabaseProductName(),
-                        metaData.getDatabaseProductVersion());
+                setDialectIdentifier(new DialectIdentifier(metaData.getDatabaseProductName(),
+                        metaData.getDatabaseProductVersion()));
             }
-        } catch (SQLException e) {
-            LOG.log(Level.WARNING, "Failed to obtain meta data for connection. No dialect checking." + con, e);
+        } catch (Exception e) {
+            setDialectIdentifier(DialectIdentifier.NULL_DIALECT);
+            LOG.log(Level.WARNING, "Failed to obtain meta data for connection. No dialect checking for " + con, e);
         }
-        return DialectIdentifier.NULL_DIALECT;
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {

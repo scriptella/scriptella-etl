@@ -16,6 +16,7 @@
 package scriptella.driver.hsqldb;
 
 import scriptella.jdbc.JDBCConnection;
+import scriptella.jdbc.JDBCException;
 import scriptella.jdbc.ScriptellaJDBCDriver;
 import scriptella.spi.ConnectionParameters;
 
@@ -63,7 +64,7 @@ public class Driver extends ScriptellaJDBCDriver {
         try {
             Class.forName(HSQLDB_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(HSQLDB_DRIVER_NAME + " driver not found. Please check class path settings", e);
+            throw new JDBCException(HSQLDB_DRIVER_NAME + " driver not found. Please check class path settings", e);
         }
     }
 
