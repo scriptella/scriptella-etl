@@ -20,11 +20,11 @@ import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.DriversContext;
 import scriptella.spi.ParametersCallback;
+import scriptella.util.CollectionUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.TreeMap;
 
 
 /**
@@ -39,11 +39,11 @@ import java.util.TreeMap;
  */
 public class ScriptsContext implements ParametersCallback, DriversContext {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, String> properties = CollectionUtils.newCaseInsensitiveAsciiMap();
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     Session session; //Connections related stuff is here
-    private final PropertiesSubstitutor propertiesSubstitutor = new PropertiesSubstitutor();
+    private final PropertiesSubstitutor propertiesSubstitutor = new PropertiesSubstitutor(this);
 
     public Object getParameter(final String name) {
         return properties.get(name);
@@ -104,7 +104,7 @@ public class ScriptsContext implements ParametersCallback, DriversContext {
     }
 
     public String substituteProperties(final String s) {
-        return propertiesSubstitutor.substitute(s, this);
+        return propertiesSubstitutor.substitute(s);
     }
 
 }

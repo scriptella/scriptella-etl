@@ -15,11 +15,20 @@
  */
 package scriptella.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URL;
 
 /**
  * I/O utility methods.
@@ -35,7 +44,7 @@ public final class IOUtils {
     /**
      * Default value of maximum stream size for arrays conversion
      */
-    static final long MAX_LENGTH = 1024*10000; //10Mb
+    static final long MAX_LENGTH = 1024 * 10000; //10Mb
 
     /**
      * Silently closes data.
@@ -47,6 +56,7 @@ public final class IOUtils {
             try {
                 closeable.close();
             } catch (Exception e) {
+                ExceptionUtils.ignoreThrowable(e);
             }
         }
     }
@@ -65,19 +75,19 @@ public final class IOUtils {
     /**
      * Loads a reader content into a string.
      *
-     * @param reader reader to load content from. Closed at the end of the operation.
+     * @param reader    reader to load content from. Closed at the end of the operation.
      * @param maxLength max number of characters to read before throwing a Content Too Long Exception.
      * @return string representation of reader content.
      */
     public static String toString(final Reader reader, final long maxLength) throws IOException {
         char cb[] = new char[4096];
-        StringBuilder sb = new StringBuilder(cb.length*2);
+        StringBuilder sb = new StringBuilder(cb.length * 2);
         long len = 0;
 
         try {
             for (int c; (c = reader.read(cb)) > 0;) {
-                len+=c;
-                if (len>maxLength) {
+                len += c;
+                if (len > maxLength) {
                     throw new IOException("Content too long to fit in memory");
                 }
                 sb.append(cb, 0, c);
@@ -91,6 +101,7 @@ public final class IOUtils {
 
     /**
      * Loads an input stream content into a byte array.
+     *
      * @param is stream to load. Closed at the end of the operation.
      * @return stream bytes
      * @throws IOException if I/O error occurs or stream length exceeds the {@link #MAX_LENGTH}.
@@ -101,23 +112,24 @@ public final class IOUtils {
 
     /**
      * Loads an input stream content into a byte array.
-     * @param is stream to load. Closed at the end of the operation.
+     *
+     * @param is        stream to load. Closed at the end of the operation.
      * @param maxLength maxLength max number of bytes to read before throwing a Content Too Long Exception.
      * @return stream bytes
      * @throws IOException
      */
     public static byte[] toByteArray(InputStream is, long maxLength) throws IOException {
         byte b[] = new byte[4096];
-        ByteArrayOutputStream os = new ByteArrayOutputStream(b.length*2);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(b.length * 2);
         long len = 0;
 
         try {
             for (int n; (n = is.read(b)) > 0;) {
-                len+=n;
-                if (len>maxLength) {
+                len += n;
+                if (len > maxLength) {
                     throw new IOException("Content too long to fit in memory");
                 }
-                os.write(b,0,n);
+                os.write(b, 0, n);
             }
         } finally {
             closeSilently(is);
@@ -125,4 +137,69 @@ public final class IOUtils {
 
         return os.toByteArray();
     }
+
+    /**
+     * Opens output stream for specified URL.
+     * <p>This method is a helper for url.openConnection().getOutputStream().
+     * Additionally a file: URLs are supported,
+     * see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4191800">
+     * FileURLConnection doesn't implement getOutputStream()</a>
+     *
+     * @param url URL to open an output stream.
+     * @return output stream for URL.
+     * @throws IOException if an I/O error occurs while creating the output stream.
+     */
+    public static OutputStream getOutputStream(final URL url) throws IOException {
+        if ("file".equals(url.getProtocol())) {
+            return new FileOutputStream(url.getFile());
+        } else {
+            return url.openConnection().getOutputStream();
+        }
+
+    }
+
+    /**
+     * @return buffered reader for specified input stream.
+     * @see #getReader(java.io.InputStream, String, boolean)
+     *
+     */
+    public static Reader getReader(final InputStream is, final String enc) throws UnsupportedEncodingException {
+        return getReader(is, enc, true);
+    }
+
+    /**
+     * Returns reader for specified input stream and charset name.
+     * @param is source input stream.
+     * @param enc charset name, null means default.
+     * @param buffered true if buffered reader should be used.
+     * @return reader for inputstream.
+     * @throws UnsupportedEncodingException  If the named charset is not supported
+     */
+    public static Reader getReader(final InputStream is, final String enc, final boolean buffered) throws UnsupportedEncodingException {
+        Reader r = enc == null ? new InputStreamReader(is) : new InputStreamReader(is, enc);
+        return buffered ? new BufferedReader(r) : r;
+    }
+
+    /**
+     * @return buffered writer for specified output stream.
+     * @see #getWriter(java.io.OutputStream, String, boolean)
+     *
+     */
+    public static Writer getWriter(final OutputStream os, final String enc) throws IOException {
+        return getWriter(os, enc, true);
+    }
+
+    /**
+     * Returns writer for specified output stream and charset name.
+     * @param os source output stream.
+     * @param enc charset name, null means default.
+     * @param buffered true if buffered reader should be used.
+     * @return reader for inputstream.
+     * @throws UnsupportedEncodingException  If the named charset is not supported
+     */
+    public static Writer getWriter(final OutputStream os, final String enc, final boolean buffered) throws IOException {
+        Writer w = enc == null ? new OutputStreamWriter(os) : new OutputStreamWriter(os, enc);
+        return buffered ? new BufferedWriter(w) : w;
+    }
+
 }

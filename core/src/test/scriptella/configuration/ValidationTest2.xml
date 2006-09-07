@@ -1,0 +1,9 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <connection id="db" driver="---"/>
+    <connection driver="---"/>
+    <script connection-id="db">
+        SHUTDOWN;
+    </script>
+
+</scriptella>

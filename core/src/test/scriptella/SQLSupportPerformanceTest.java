@@ -94,7 +94,6 @@ public class SQLSupportPerformanceTest extends DBTestCase {
         se.execute();
         ti = System.currentTimeMillis()-ti;
         System.out.println("ti = " + ti);
-        System.gc();
         //Now let's test direct HSQL connection
         RepeatingInputStream ris = new RepeatingInputStream("update test set id=?\n".getBytes(), n);
         BufferedReader br = new BufferedReader(new InputStreamReader(ris));

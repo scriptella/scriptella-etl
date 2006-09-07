@@ -36,4 +36,6 @@ public class MockDriversContext implements DriversContext {
     public URL resolve(final String uri) throws MalformedURLException {
         return new URL(getScriptFileURL(),uri);
     }
+
+    public static final DriversContext INSTANCE = new MockDriversContext();
 }

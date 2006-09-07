@@ -16,8 +16,10 @@
 package scriptella.configuration;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -70,7 +72,49 @@ public class ConfigurationEl extends XMLConfigurableBase {
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
+        if (connections.isEmpty()) {
+            throw new ConfigurationException("At least one connection element must be declared", element);
+        }
         scriptingElements = QueryEl.loadScriptingElements(element);
+        validateScriptingElements(element);
+    }
+
+    void validateScriptingElements(final XMLElement element) {
+        //validating scriptingElements
+        Set<String> allowedConIds = new HashSet<String>();
+        for (ConnectionEl connectionEl : connections) {
+            final String cid = connectionEl.getId();
+            if (!allowedConIds.add(cid)) {
+                throw new ConfigurationException("Connection ID must be unique for ETL file", element);
+            }
+            if (ConnectionEl.DEFAULT_ID.equals(cid) && connections.size()>1) {
+                throw new ConfigurationException("Connection ID is required if more than one connection specified in ETL script.", element);
+            }
+        }
+
+        validateScriptingElements(allowedConIds, element, scriptingElements);
+    }
+
+    void validateScriptingElements(final Set<String> allowedConIds, final XMLElement element, final List<ScriptingElement> elements) {
+        for (ScriptingElement se : elements) {
+            //If one connection check
+            final int allowedConSize = allowedConIds.size();
+            final String seConnectionId = se.getConnectionId();
+            if (allowedConSize == 1 && seConnectionId != null &&
+                    !allowedConIds.contains(seConnectionId)) {
+                throw new ConfigurationException("Element " + se.getLocation() + " has invalid connection-id");
+            } else if (allowedConSize > 1 && seConnectionId == null && scriptingElements==elements) {
+                //Nulls are allowed only in nested scripts and queries
+                throw new ConfigurationException("connection-id is a required attribute for element " + se.getLocation());
+            } else
+            if (allowedConSize > 1 && seConnectionId != null && !allowedConIds.contains(seConnectionId))
+            {
+                throw new ConfigurationException("Element " + se.getLocation() + " has invalid connection-id");
+            }
+            if (se instanceof QueryEl) {
+                validateScriptingElements(allowedConIds, element, ((QueryEl) se).getChildScriptinglElements());
+            }
+        }
     }
 
     public String toString() {

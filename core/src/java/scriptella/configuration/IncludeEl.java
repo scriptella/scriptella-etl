@@ -16,10 +16,9 @@
 package scriptella.configuration;
 
 import scriptella.spi.Resource;
+import scriptella.util.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -87,8 +86,7 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
     public Reader open() throws IOException {
         try {
             URL u = new URL(url, href);
-            InputStream in = u.openStream();
-            return charset == null ? new InputStreamReader(in) : new InputStreamReader(in, charset);
+            return IOUtils.getReader(u.openStream(), charset);
         } catch (MalformedURLException e) {
             throw (IOException) new IOException("Malformed include url: " + href).initCause(e);
         } catch (IOException e) {

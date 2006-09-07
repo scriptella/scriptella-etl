@@ -28,13 +28,9 @@ import java.sql.Connection;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Query extends SQLSupport {
-    public Query(final String sql) {
-        super(sql);
-    }
-
-    public Query(Resource resource) {
-        super(resource);
+class Query extends SQLSupport {
+    public Query(Resource resource, JDBCConnection connection) {
+        super(resource, connection);
     }
 
     public void execute(final Connection connection,

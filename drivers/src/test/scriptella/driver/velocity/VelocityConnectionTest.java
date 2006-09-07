@@ -16,15 +16,13 @@
 package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.StringResource;
 import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockParametersCallbacks;
-import scriptella.spi.Resource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -56,7 +54,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
 
     static VelocityConnection createConnection(final OutputStream out) {
         try {
-            URL u =new URL("mem","",0,"memfile",new URLStreamHandler() {
+            URL u = new URL("mem", "", 0, "memfile", new URLStreamHandler() {
                 protected URLConnection openConnection(URL u) {
                     return new URLConnection(u) {
                         public void connect() {
@@ -79,10 +77,6 @@ public class VelocityConnectionTest extends AbstractTestCase {
     }
 
     static void run(VelocityConnection c) {
-        c.executeScript(new Resource() {
-            public Reader open() {
-                return new StringReader("$v1///$v2");
-            }
-        }, MockParametersCallbacks.SIMPLE);
+        c.executeScript(new StringResource(("$v1///$v2")), MockParametersCallbacks.SIMPLE);
     }
 }

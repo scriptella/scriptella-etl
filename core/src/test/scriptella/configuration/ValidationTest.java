@@ -13,26 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.jdbc;
+package scriptella.configuration;
 
-import scriptella.spi.ParametersCallback;
-import scriptella.spi.Resource;
-
-import java.sql.Connection;
-
+import scriptella.AbstractTestCase;
+import scriptella.execution.ScriptsExecutorException;
 
 /**
- * TODO: Add documentation
+ * Tests ETL scripts validation.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Script extends SQLSupport {
-    public Script(Resource resource, JDBCConnection connection) {
-        super(resource, connection);
-    }
+public class ValidationTest extends AbstractTestCase {
+    public void testConnectionId() throws ScriptsExecutorException {
+        try {
+            newScriptsExecutor();
+            fail("No connection id validation error expected");
+        } catch (ConfigurationException e) {
+            //OK
+        }
+        try {
+            newScriptsExecutor("ValidationTest2.xml");
+            fail("Duplicate connection validation error expected");
+        } catch (ConfigurationException e) {
+            //OK
+        }
 
-    public int execute(Connection con, ParametersCallback parametersCallback) {
-        return parseAndExecute(con, parametersCallback, null);
     }
 }

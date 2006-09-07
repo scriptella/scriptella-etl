@@ -16,7 +16,9 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.StringResource;
 import scriptella.spi.MockConnectionParameters;
+import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
@@ -30,6 +32,8 @@ import scriptella.spi.Resource;
 public class JaninoPerfTest extends AbstractTestCase {
     /**
      * This test creates a Janino connection that executes simple valid and invalid scripts.
+     * History:
+     * 06.09.2006 - Duron 1.7Mhz - 656 ms
      */
     public void testScript() {
         JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
@@ -40,30 +44,32 @@ public class JaninoPerfTest extends AbstractTestCase {
         };
 
 
-        Resource scriptContent = JaninoConnectionTest.asResource("int i=1;get(\"1\");");
-        for (int i=0;i<1000000;i++) {
+        Resource scriptContent = new StringResource("int i=1;get(\"1\");");
+        for (int i = 0; i < 1000000; i++) {
             c.executeScript(scriptContent, pc);
         }
         c.close();
     }
 
+    /**
+     * History:
+     * 06.09.2006 - Duron 1.7Mhz - 844 ms
+     */
     public void testQuery() {
         JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
-        final int[] r = new int[] {0};
+        final int[] r = new int[]{0};
 
-        Resource queryContent = JaninoConnectionTest.asResource(
+        Resource queryContent = new StringResource(
                 "for (int i=0;i<1000000;i++) {" +
-                    "set(\"p\", \"value\"+i );" +
-                    "next();" +
-                "}");
+                        "set(\"p\", \"value\"+i );" +
+                        "set(\"extra\", \"value\" );" +
+                        "next();" +
+                        "}");
         c.executeQuery(queryContent,
-                new ParametersCallback() {
-            public final Object getParameter(final String name) {
-                return "Param: "+name;
-            }
-        }, new QueryCallback() {
+                MockParametersCallbacks.SIMPLE, new QueryCallback() {
             public final void processRow(final ParametersCallback parameters) {
                 r[0]++;
+                parameters.getParameter("p");
             }
         });
         c.close();

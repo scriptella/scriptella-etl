@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -42,7 +42,7 @@ public class JDBCEscapingTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor();
         se.execute();
 
-        Query q = new Query("select * from test");
+        QueryHelper q = new QueryHelper("select * from test");
         final Timestamp expectedTs = Timestamp.valueOf("2005-10-10 22:33:44.1");
         q.execute(c,
                 new QueryCallback() {

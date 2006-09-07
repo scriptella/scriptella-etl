@@ -17,9 +17,9 @@ package scriptella.driver.janino;
 
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.util.CollectionUtils;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A base class for Janino &lt;query&gt; elements.
@@ -122,7 +122,7 @@ public class JaninoQuery extends JaninoScript implements ParametersCallback {
 
     private void initRow() {
         if (row == null) {
-            row = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+            row = CollectionUtils.newCaseInsensitiveAsciiMap();
         }
     }
 

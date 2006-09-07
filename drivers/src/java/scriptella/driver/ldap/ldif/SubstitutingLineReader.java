@@ -33,8 +33,7 @@ import java.util.List;
  * @see PropertiesSubstitutor
  */
 public class SubstitutingLineReader extends BufferedReader {
-    private final ParametersCallback callback;
-    private final PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
+    private final PropertiesSubstitutor substitutor;
     private List<String> lines;
     private int len;
 
@@ -47,7 +46,7 @@ public class SubstitutingLineReader extends BufferedReader {
      */
     public SubstitutingLineReader(final Reader in, final ParametersCallback callback) {
         super(in);
-        this.callback = callback;
+        this.substitutor = new PropertiesSubstitutor(callback);
     }
 
     public String readLine() throws IOException {
@@ -55,7 +54,7 @@ public class SubstitutingLineReader extends BufferedReader {
         if (s==null || s.length()==0) {
             return s;
         }
-        s = substitutor.substitute(s, callback);
+        s = substitutor.substitute(s);
         if (lines!=null) { //if track lines
             lines.add(s); //remember the string
             len+=s.length()+1;//and increase the len (\n is included)

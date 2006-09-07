@@ -17,9 +17,8 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
-import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
@@ -40,7 +39,7 @@ public class DBTableCopyTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("DBTableCopyTest.xml");
         se.execute();
 
-        Query s = new Query("select * from test2");
+        QueryHelper s = new QueryHelper("select * from test2");
         final int n[] = new int[]{0};
 
         s.execute(con,
@@ -67,7 +66,7 @@ public class DBTableCopyTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("DBTableCopyTest2.xml");
         se.execute();
 
-        Query s = new Query("select * from test2");
+        QueryHelper s = new QueryHelper("select * from test2");
         final int n[] = new int[]{0};
 
         s.execute(con2,
@@ -80,9 +79,9 @@ public class DBTableCopyTest extends DBTestCase {
         assertEquals(n[0], 3);
 
         try {
-            new Query("select * from test2").execute(con, null);
+            new QueryHelper("select * from test2").execute(con, null);
             fail("Test2 is absent in the 1st database");
-        } catch (ProviderException e) {
+        } catch (IllegalStateException e) {
             //OK
         }
     }

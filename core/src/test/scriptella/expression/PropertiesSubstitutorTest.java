@@ -16,7 +16,7 @@
 package scriptella.expression;
 
 import scriptella.AbstractTestCase;
-import scriptella.spi.ParametersCallback;
+import scriptella.spi.MockParametersCallbacks;
 
 /**
  * Tests {@link PropertiesSubstitutor}
@@ -28,51 +28,26 @@ public class PropertiesSubstitutorTest extends AbstractTestCase {
     public void testVerbatimString() {
         PropertiesSubstitutor ps = new PropertiesSubstitutor();
         String exp = "No $ Params to substitute$$$";
-        String s = ps.substitute(exp, new ParametersCallback() {
-            public Object getParameter(final String name) {
-                fail("No parameters should be asked for. Param name=" + name);
-                return null;
-            }
-
-            ;
-        });
+        ps.setParameters(MockParametersCallbacks.UNSUPPORTED);
+        String s = ps.substitute(exp);
         assertEquals(exp, s);
         exp = "No Params to substitute";
-        s = ps.substitute(exp, new ParametersCallback() {
-            public Object getParameter(final String name) {
-                fail("No parameters should be asked for. Param name=" + name);
-                return null;
-            }
-
-            ;
-        });
+        s = ps.substitute(exp);
         assertEquals(exp, s);
 
 
     }
 
     public void test() {
-        PropertiesSubstitutor ps = new PropertiesSubstitutor();
-
-        ParametersCallback c = new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return "property_" + name;
-            }
-        };
-        String s = ps.substitute("$$ Text${subst1}${subst2}$subst3$subst4 End of test", c);
-        assertEquals("$$ Textproperty_subst1property_subst2property_subst3property_subst4 End of test", s);
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE);
+        String s = ps.substitute("$$ Text${subst1}${subst2}$subst3$subst4 End of test");
+        assertEquals("$$ Text*subst1**subst2**subst3**subst4* End of test", s);
     }
 
     public void testNullProperties() {
-        PropertiesSubstitutor ps = new PropertiesSubstitutor();
-
-        ParametersCallback c = new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return null;
-            }
-        };
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NULL);
         String exp = "$$ Text${subst1}${subst2}$subst3$subst4 End of test";
-        String s = ps.substitute(exp, c);
+        String s = ps.substitute(exp);
         assertEquals(exp, s);
     }
 }

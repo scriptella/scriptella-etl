@@ -16,6 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.spi.ParametersCallback;
+import scriptella.util.ColumnsMap;
 import scriptella.util.IOUtils;
 
 import java.io.Closeable;
@@ -23,9 +24,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 
 /**
@@ -36,10 +34,10 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class ResultSetAdapter implements ParametersCallback, Closeable {
-    private static final Pattern NUM_PTR = Pattern.compile("\\d+"); //Regexp checking is faster than catching exceptions
+
     private ResultSet resultSet;
-    private final Map<String, Integer> namesMap;//map of column names for caching and working with converter
-    private final ParametersCallback params; //parent parameters callback to use
+    private ColumnsMap columnsMap;
+    private ParametersCallback params; //parent parameters callback to use
     private Object[] row;//cache for row elements
     private JDBCTypesConverter converter;
 
@@ -54,7 +52,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
                             ParametersCallback parametersCallback, JDBCTypesConverter converter) {
         this.params = parametersCallback;
         this.resultSet = resultSet;
-        namesMap = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        columnsMap = new ColumnsMap();
         this.converter = converter;
 
         try {
@@ -62,8 +60,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             final int n = m.getColumnCount();
 
             for (int i = 1; i <= n; i++) {
-                String columnName = m.getColumnName(i);
-                namesMap.put(columnName, i);
+                columnsMap.registerColumn(m.getColumnName(i), i);
             }
             row = new Object[n];
         } catch (SQLException e) {
@@ -88,15 +85,8 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
     public Object getParameter(final String name) {
         try {
-            Integer index = namesMap.get(name);
-            //If name is not a column name and is integer
-            if (index == null && NUM_PTR.matcher(name).matches()) {
-                try {
-                    index = Integer.valueOf(name); //Try to parse name as index
-                } catch (NumberFormatException e) { //we've checked with regexp
-                }
-            }
-            if (index != null) { //if index found
+            Integer index = columnsMap.find(name);
+            if (index != null && index > 0 && index <= row.length) { //if index found and in range
                 int ind = index - 1;
                 if (row[ind] == null) { //cache miss
                     row[ind] = converter.getObject(resultSet, ind + 1);
@@ -121,6 +111,8 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             IOUtils.closeSilently(converter);
             resultSet = null;
             row = null;
+            params = null;
+            columnsMap = null;
         }
     }
 }

@@ -37,16 +37,18 @@ class StatementCache implements Closeable {
 
     public StatementCache(final int size) {
         this.maxSize = size;
-        this.map = new LinkedHashMap<String, PreparedStatement>(size, DEFAULT_LOAD_FACTOR, true) {
-            protected boolean removeEldestEntry(Map.Entry<String, PreparedStatement> eldest) {
-                boolean remove = size() > size;
-                if (remove) {
-                    releasedStatements.add(eldest.getValue());
-                }
+        if (maxSize>=0) { //if cache is enabled
+            this.map = new LinkedHashMap<String, PreparedStatement>(size, DEFAULT_LOAD_FACTOR, true) {
+                protected boolean removeEldestEntry(Map.Entry<String, PreparedStatement> eldest) {
+                    boolean remove = size() > size;
+                    if (remove) {
+                        releasedStatements.add(eldest.getValue());
+                    }
 
-                return remove;
-            }
-        };
+                    return remove;
+                }
+            };
+        }
     }
 
     public int getMaxSize() {
@@ -54,11 +56,13 @@ class StatementCache implements Closeable {
     }
 
     public PreparedStatement get(String key) {
-        return map.get(key);
+        return map==null?null:map.get(key);
     }
 
     public void put(String key, PreparedStatement entry) {
-        map.put(key, entry);
+        if (map!=null) {
+            map.put(key, entry);
+        }
     }
 
     /**
@@ -83,5 +87,12 @@ class StatementCache implements Closeable {
             close(map.values());
             map=null;
         }
+    }
+
+    /**
+     * @return true if cache is disabled
+     */
+    public boolean isDisabled() {
+        return map==null;
     }
 }
