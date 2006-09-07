@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -43,7 +43,7 @@ public class SQLParametersTest extends DBTestCase {
         ScriptsExecutor e = newScriptsExecutor();
         e.execute();
 
-        Query q = new Query("select * from test");
+        QueryHelper q = new QueryHelper("select * from test");
         q.execute(c,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback rowEvaluator) {
@@ -67,7 +67,7 @@ public class SQLParametersTest extends DBTestCase {
         ScriptsExecutor e = newScriptsExecutor("SQLParametersTest2.xml");
         e.execute();
 
-        Query q = new Query("select * from test");
+        QueryHelper q = new QueryHelper("select * from test");
         final Set expectedIds = new HashSet(Arrays.asList(
                 new Integer[]{1, 2, 3, 10, 20, 30}));
         q.execute(c,

@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -54,7 +54,7 @@ public class FilePropertiesTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor();
         se.execute();
 
-        Query q = new Query("select (select count(id) from t), c from t");
+        QueryHelper q = new QueryHelper("select (select count(id) from t), c from t");
         q.execute(con,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback rowEvaluator) {

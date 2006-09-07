@@ -25,11 +25,7 @@ import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
@@ -111,23 +107,12 @@ public class VelocityConnection extends AbstractConnection {
     private Writer getWriter() {
         if (writer == null) {
             try {
-                final OutputStream os = getOutputStream(url);
-                writer = new BufferedWriter(encoding == null ? new OutputStreamWriter(os) :
-                        new OutputStreamWriter(os, encoding));
+                writer = IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
             } catch (IOException e) {
-                throw new VelocityProviderException("Unable to open URL " + url, e);
+                throw new VelocityProviderException("Unable to open URL " + url + " for output", e);
             }
-
         }
         return writer;
-    }
-
-    private OutputStream getOutputStream(URL url) throws IOException {
-        if ("file".equals(url.getProtocol())) {
-            return new FileOutputStream(url.getFile());
-        } else {
-            return url.openConnection().getOutputStream();
-        }
     }
 
 

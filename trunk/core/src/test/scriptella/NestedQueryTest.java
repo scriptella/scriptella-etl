@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -38,7 +38,7 @@ public class NestedQueryTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor();
         se.execute();
 
-        Query s = new Query("select * from result");
+        QueryHelper s = new QueryHelper("select * from result");
         final Set<Integer> ids = new HashSet<Integer>();
         Set<Integer> expectedIds = new HashSet<Integer>(Arrays.asList(
                 new Integer[]{1, 3}));
@@ -68,7 +68,7 @@ public class NestedQueryTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("NestedQueryTest2.xml");
         se.execute();
 
-        Query s = new Query("select * from test");
+        QueryHelper s = new QueryHelper("select * from test");
         final Set<Integer> ids = new HashSet<Integer>();
         Set<Integer> expectedIds = new HashSet<Integer>(Arrays.asList(
                 new Integer[]{5, 7, 13, 15, 2, 6}));
@@ -92,7 +92,7 @@ public class NestedQueryTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("NestedQueryTestRownum.xml");
         se.execute();
 
-        Query s = new Query("select * from Result");
+        QueryHelper s = new QueryHelper("select * from Result");
         final Set<Integer> ids = new HashSet<Integer>();
         Set<Integer> expectedIds = new HashSet<Integer>(Arrays.asList(
                 new Integer[]{1, 2, 3, 11, 12, 13}));

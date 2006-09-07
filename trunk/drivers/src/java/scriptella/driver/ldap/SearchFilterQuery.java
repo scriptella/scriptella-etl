@@ -45,8 +45,7 @@ public class SearchFilterQuery implements ParametersCallback {
 
     private SearchResult result;
     private final LdapConnection connection;
-    private final ParametersCallback parameters;
-    private final PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
+    private final PropertiesSubstitutor substitutor;
 
 
     /**
@@ -61,7 +60,7 @@ public class SearchFilterQuery implements ParametersCallback {
 
         this.queryCallback = queryCallback;
         this.connection = connection;
-        this.parameters = parameters;
+        this.substitutor = new PropertiesSubstitutor(parameters);
     }
 
     public Object getParameter(final String name) {
@@ -76,7 +75,7 @@ public class SearchFilterQuery implements ParametersCallback {
         } else if ("dn".equalsIgnoreCase(name)) {
             return result.getNameInNamespace(); //JDK14: use getName
         }
-        return parameters.getParameter(name);
+        return substitutor.getParameters().getParameter(name);
     }
 
     /**
@@ -88,7 +87,7 @@ public class SearchFilterQuery implements ParametersCallback {
      */
     public void execute(final String filter) {
         //Using standard properties substitutor, may be change to something similar to JDBC parameters
-        final String sFilter = substitutor.substitute(filter, parameters);
+        final String sFilter = substitutor.substitute(filter);
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Running a query for search filter " + sFilter);
         }

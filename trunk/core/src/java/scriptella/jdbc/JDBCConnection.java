@@ -78,9 +78,7 @@ public class JDBCConnection extends AbstractConnection {
             }
         }
 
-        if (statementCacheSize > 0) {
-            statementCache = new StatementCache(statementCacheSize);
-        }
+        statementCache = new StatementCache(statementCacheSize);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -105,14 +103,12 @@ public class JDBCConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {
-        Script s = new Script(scriptContent);
-        s.setConnection(this);
+        Script s = new Script(scriptContent, this);
         s.execute(con, parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
-        Query q = new Query(queryContent);
-        q.setConnection(this);
+        Query q = new Query(queryContent, this);
         q.execute(con, parametersCallback, queryCallback);
     }
 
@@ -176,5 +172,9 @@ public class JDBCConnection extends AbstractConnection {
 
     public String toString() {
         return "JDBCConnection{" + (con == null ? "" : con.getClass()) + '}';
+    }
+
+    public JDBCTypesConverter newConverter() {
+        return new JDBCTypesConverter();
     }
 }

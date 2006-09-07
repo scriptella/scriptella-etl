@@ -27,14 +27,17 @@ import java.util.Arrays;
  * @version 1.0
  */
 public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
+    /**
+     * History:
+     * 05.09.2006 - Duron 1700 Mhz - 4078 ms
+     */
     public void test() {
-        PropertiesSubstitutor ps = new PropertiesSubstitutor();
-
-        ParametersCallback c = new ParametersCallback() {
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(new ParametersCallback() {
             public Object getParameter(final String name) {
                 return name;
             }
-        };
+        });
+
         char [] fillC = new char[1000];
         Arrays.fill(fillC,'-');
         String fill = new String(fillC);
@@ -45,7 +48,7 @@ public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
 
 
         for (int i=0;i<100000;i++) {
-            String s = ps.substitute(line, c);
+            String s = ps.substitute(line);
             assertEquals(exp, s);
         }
     }

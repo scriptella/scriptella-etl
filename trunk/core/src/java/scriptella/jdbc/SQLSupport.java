@@ -23,7 +23,6 @@ import scriptella.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,29 +40,20 @@ import java.util.logging.Logger;
  */
 public class SQLSupport {
     private static final Logger LOG = Logger.getLogger(SQLSupport.class.getName());
-    protected Resource resource;
-    protected JDBCConnection connection; //may be null, if caching switched off
-    private JDBCTypesConverter converter = new JDBCTypesConverter(); //Setter for prepared statement parameters
+    protected final Resource resource;
+    protected final JDBCConnection connection;
+    protected final JDBCTypesConverter converter;
 
-    public SQLSupport(Resource resource) {
+    public SQLSupport(Resource resource, JDBCConnection connection) {
         if (resource == null) {
             throw new IllegalArgumentException("Resource cannot be null");
         }
 
         this.resource = resource;
-    }
-
-    public SQLSupport(final String sql) {
-        resource = new Resource() {
-            public Reader open() {
-                return new StringReader(sql);
-            }
-        };
-    }
-
-    public void setConnection(JDBCConnection connection) {
         this.connection = connection;
+        this.converter = connection.newConverter();
     }
+
 
     protected int parseAndExecute(final Connection connection,
                                   final ParametersCallback parametersCallback, final QueryCallback queryCallback) {
@@ -80,15 +70,6 @@ public class SQLSupport {
         StatisticInterceptor.statementsExecuted(parser.executedCount);
         return parser.updates ? parser.result : (-1);
     }
-
-    StatementCache getStatementCache() {
-        return connection == null ? null : connection.getStatementCache();
-    }
-
-    ParametersParser getParametersParser() {
-        return connection == null ? null : connection.getParametersParser();
-    }
-
 
     private class Parser extends SQLParserBase {
         int result = 0;
@@ -112,7 +93,7 @@ public class SQLSupport {
             Object p;
 
             if (expression) {
-                p = getParametersParser().evaluate(name, paramsCallback);
+                p = connection.getParametersParser().evaluate(name, paramsCallback);
             } else {
                 p = paramsCallback.getParameter(name);
             }
@@ -172,13 +153,11 @@ public class SQLSupport {
          */
         PreparedStatement prepareStatement(final String sql) throws SQLException {
             //Check if statement has been cached
-            StatementCache statementCache = getStatementCache();
-            PreparedStatement ps = statementCache != null ? statementCache.get(sql) : null;
+            StatementCache statementCache = connection.getStatementCache();
+            PreparedStatement ps = statementCache.get(sql);
             if (ps == null) { //If not cached
                 ps = con.prepareStatement(sql);
-                if (statementCache != null) { //Put new statement to cache if necessary
-                    statementCache.put(sql, ps);
-                }
+                statementCache.put(sql, ps);
             }
 
             for (int i = 0, n = params.size(); i < n; i++) {
@@ -223,10 +202,11 @@ public class SQLSupport {
             } catch (Exception e) {
                 LOG.log(Level.FINE, "Failed to clear statement parameters", e);
             }
-            if (getStatementCache() != null) {
-                getStatementCache().closeRemovedStatements();
-            } else {
+            StatementCache statementCache = connection.getStatementCache();
+            if (statementCache.isDisabled()) {
                 JDBCUtils.closeSilent(ps);
+            } else {
+                statementCache.closeRemovedStatements();
             }
             params.clear();
             IOUtils.closeSilently(converter); //closing resources opened by converter

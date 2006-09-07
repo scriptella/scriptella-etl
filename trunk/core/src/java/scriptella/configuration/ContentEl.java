@@ -23,7 +23,6 @@ import scriptella.spi.Resource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,15 +38,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
     /**
      * Null-Object to use instead of null if necessary
      */
-    public static final Resource NULL_CONTENT = new Resource() {
-        public Reader open() {
-            return new StringReader("");
-        }
-
-        public String toString() {
-            return "Empty Content";
-        }
-    };
+    public static final Resource NULL_CONTENT = new StringResource("", "Empty Content");
 
     public ContentEl() {
     }
@@ -82,11 +73,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
             return null;
         }
         if (node instanceof Text) {
-             return new Resource() {
-                 public Reader open() {
-                     return new StringReader(((Text)node).getData());
-                 }
-             };
+             return new StringResource(((Text)node).getData());
          } else if (node instanceof Element &&
                  "include".equals(node.getNodeName())) {
              return new IncludeEl(

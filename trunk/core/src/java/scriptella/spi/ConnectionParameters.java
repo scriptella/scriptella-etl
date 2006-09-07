@@ -16,6 +16,8 @@
 
 package scriptella.spi;
 
+import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -66,6 +68,53 @@ public class ConnectionParameters {
      */
     public String getProperty(String name) {
         return properties.get(name);
+    }
+
+
+    /**
+     * @see #getBooleanProperty(String, boolean)
+     */
+    public boolean getBooleanProperty(String name) throws ParseException {
+        return getBooleanProperty(name, false);
+    }
+
+    /**
+     * Parses property value as boolean flag.
+     * @param name property name.
+     * @param defaultValue default value to use if connection has no such property.
+     * @return boolean property value.
+     * @throws ParseException if property has unrecognized value.
+     */
+    public boolean getBooleanProperty(String name, boolean defaultValue) throws ParseException {
+        String a = getProperty(name);
+        if (a==null) {
+            return defaultValue;
+        }
+        if ("true".equalsIgnoreCase(a) || "1".equalsIgnoreCase(a) ||
+                "on".equalsIgnoreCase(a) || "yes".equalsIgnoreCase(a)) {
+            return true;
+        }
+
+        if ("false".equalsIgnoreCase(a) || "0".equalsIgnoreCase(a) ||
+                "off".equalsIgnoreCase(a) || "no".equalsIgnoreCase(a)) {
+            return false;
+        }
+        throw new ParseException("Unrecognized boolean property value "+a,0);
+    }
+
+    /**
+     * Parses property value as a charset encoding name.
+     * @param name property name.
+     * @return value of the property or null if connection has no such property.
+     * @throws ParseException if charset name is unsupported.
+     */
+    public String getCharsetProperty(String name) throws ParseException {
+        String enc = getProperty(name);
+        if (enc != null && !Charset.isSupported(enc)) {
+            throw new ParseException("Specified encoding " +
+                    enc+ " is not supported. Supported encodings are " + Charset.availableCharsets().keySet(),0);
+        }
+        return enc;
     }
 
     /**

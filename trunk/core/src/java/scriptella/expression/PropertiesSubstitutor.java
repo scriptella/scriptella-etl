@@ -57,8 +57,25 @@ public class PropertiesSubstitutor {
     final Matcher m1 = PROP_PTR.matcher("");
     final Matcher m2 = EXPR_PTR.matcher("");
 
+    /**
+     * Creates a properties substitutor.
+     * <p>This constructor is used for performance critical places where multiple instantiation
+     * via {@link #PropertiesSubstitutor(scriptella.spi.ParametersCallback)} is expensive.
+     * <p><b>Note:</b> {@link #setParameters(scriptella.spi.ParametersCallback)} must be called before
+     * {@link #substitute(String)}.
+     */
     public PropertiesSubstitutor() {
     }
+
+    /**
+     * Creates a properties substitutor.
+     * @param parameters parameters callback to use for substitution.
+     */
+    public PropertiesSubstitutor(ParametersCallback parameters) {
+        this.parameters = parameters;
+    }
+
+    private ParametersCallback parameters;
 
     /**
      * Substitutes properties/expressions in s and returns the result string.
@@ -66,12 +83,14 @@ public class PropertiesSubstitutor {
      * expressions is copied into result string as is.
      *
      * @param s string to substitute. Null strings allowed.
-     * @param callback callback to obtain paramter values.
      * @return substituted string.
      */
-    public String substitute(final String s, final ParametersCallback callback) {
+    public String substitute(final String s) {
         if (s == null) {
             return null;
+        }
+        if (parameters==null) {
+            throw new IllegalStateException("setParameters must be called before calling substitute");
         }
 
         final int len = s.length()-1; //Last character is not checked - optimization
@@ -107,9 +126,9 @@ public class PropertiesSubstitutor {
                         String v = null;
 
                         if (m == m1) {
-                            v = toString(callback.getParameter(name));
+                            v = toString(parameters.getParameter(name));
                         } else {
-                            v = toString(Expression.compile(name).evaluate(callback));
+                            v = toString(Expression.compile(name).evaluate(parameters));
                         }
 
                         lastPos=m.end();
@@ -137,6 +156,22 @@ public class PropertiesSubstitutor {
 
 
         return res.toString();
+    }
+
+    /**
+     *
+     * @return parameter callback used for substitution.
+     */
+    public ParametersCallback getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Sets parameters callback used for substitution.
+     * @param parameters not null parameters callback.
+     */
+    public void setParameters(ParametersCallback parameters) {
+        this.parameters = parameters;
     }
 
     /**

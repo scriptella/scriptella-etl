@@ -17,15 +17,13 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.CompileException;
 import scriptella.AbstractTestCase;
+import scriptella.configuration.StringResource;
 import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
-import scriptella.spi.Resource;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,9 +43,9 @@ public class JaninoConnectionTest extends AbstractTestCase {
     public void testScript() {
         JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
         field = 0;
-        c.executeScript(asResource(JaninoConnectionTest.class.getName() + ".field=1;"), null);
+        c.executeScript(new StringResource(JaninoConnectionTest.class.getName() + ".field=1;"), null);
         try {
-            c.executeScript(asResource(JaninoConnectionTest.class.getName() + ".nosuchfield=1;"), null);
+            c.executeScript(new StringResource(JaninoConnectionTest.class.getName() + ".nosuchfield=1;"), null);
             fail("This script should fail");
         } catch (ProviderException e) {
             Throwable ne = e.getNativeException();
@@ -63,7 +61,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
         field = 0;
         final List<String> rows = new ArrayList<String>();
 
-        c.executeQuery(asResource(
+        c.executeQuery(new StringResource(
                 "set(\"p\", \"//\"+get(\"p\") );" +
                 "next();" +
                 "next(new String[] {\"p\"}, new Object[] {\"v2\"});"),
@@ -76,17 +74,5 @@ public class JaninoConnectionTest extends AbstractTestCase {
         List<String> expected = Arrays.asList("//*p*", "v2");
         assertEquals(expected, rows);
 
-    }
-
-
-    /**
-     * @return text as resource
-     */
-    static Resource asResource(final String text) {
-        return new Resource() {
-            public Reader open() {
-                return new StringReader(text);
-            }
-        };
     }
 }

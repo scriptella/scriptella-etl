@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -36,7 +36,7 @@ public class OnErrorTest extends DBTestCase {
         final Connection con = getConnection("onerrortest");
         ScriptsExecutor se = newScriptsExecutor();
         se.execute();
-        Query q = new Query("select * from test");
+        QueryHelper q = new QueryHelper("select * from test");
         final Map<Integer, String> expected = new LinkedHashMap<Integer, String>();
         expected.put(1, "Updated1");
         expected.put(2, "Updated2");

@@ -60,4 +60,11 @@ public final class ExceptionUtils {
         throw new IllegalStateException("Unchecked throwable expected but was " + unchecked.getClass(), unchecked);
     }
 
+    /**
+     * Utility method to ignore non important exceptions.
+     * @param throwable throwable to ignore.
+     */
+    public static void ignoreThrowable(Throwable throwable) {
+    }
+
 }

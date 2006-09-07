@@ -23,7 +23,7 @@ import scriptella.execution.ScriptsContext;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
 import scriptella.execution.TestableScriptsExecutor;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -47,7 +47,7 @@ public class TxTest extends DBTestCase {
             fail("Scripts invoked in new tx must not fail the executor");
         }
 
-        Query s = new Query("select * from test");
+        QueryHelper s = new QueryHelper("select * from test");
         final int n[] = new int[]{0};
 
         s.execute(con,
@@ -71,7 +71,7 @@ public class TxTest extends DBTestCase {
             fail("Scripts invoked in new tx must not fail the executor");
         }
 
-        Query s = new Query("select * from test");
+        QueryHelper s = new QueryHelper("select * from test");
         final int n[] = new int[]{0};
 
         s.execute(con,
@@ -130,7 +130,7 @@ public class TxTest extends DBTestCase {
             fail(failed[0]);
         }
 
-        Query s = new Query("select * from test2");
+        QueryHelper s = new QueryHelper("select * from test2");
 
         s.execute(con,
                 new QueryCallback() {

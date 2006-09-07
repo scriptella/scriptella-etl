@@ -17,7 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.Query;
+import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
@@ -39,7 +39,7 @@ public class DialectsTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("DialectsTest.xml");
         se.execute();
 
-        Query s = new Query("select * from test");
+        QueryHelper s = new QueryHelper("select * from test");
         final Set expected = new HashSet(Arrays.asList(
                 new Integer[]{1, 3, 4, 5, 6, 7, 9}));
         final Set actual = new HashSet<Integer>();
@@ -58,7 +58,7 @@ public class DialectsTest extends DBTestCase {
         final ScriptsExecutor se = newScriptsExecutor("DialectsTest2.xml");
         se.execute();
 
-        Query s = new Query("select * from test2");
+        QueryHelper s = new QueryHelper("select * from test2");
         final Set expected = new HashSet(Arrays.asList(new Integer[]{1, 2}));
         final Set actual = new HashSet<Integer>();
 
