@@ -20,23 +20,21 @@
     <property file="${basedir}/../custom.build.properties"/>
     <property file="${basedir}/../build.properties"/>
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="tests.report.dir" value="${build.dir}/tests"/>
     <property name="jar.name" value="${ant.project.name}.jar"/>
     <property name="tmp.dir" value="${build.dir}/tmp"/>
     <property name="classes.dir" value="${tmp.dir}/classes"/>
-    <property name="tests.tmp.dir" value="${tmp.dir}/test"/>
     <property name="src.dir" value="${basedir}/src"/>
     <property name="java.dir" value="${src.dir}/java"/>
     <property name="conf.dir" value="${src.dir}/conf"/>
     <property name="test.dir" value="${src.dir}/test"/>
-    <property name="classpath" value=""/>
-    <property name="test.classpath" value="${classpath}"/>
     <property name="root.dir" value="${basedir}/.."/>
+    <tstamp/>
+    <property file="${root.dir}/version.properties"/>
+
 
     <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
-        <mkdir dir="${tests.tmp.dir}"/>
         <available file="${conf.dir}" property="resources_present"/>
     </target>
 
@@ -45,7 +43,7 @@
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="${java.dir}" destdir="${classes.dir}" classpath="${classpath}"
+        <javac srcdir="${java.dir}" destdir="${classes.dir}" classpathref="classpath"
                debug="on" debuglevel="lines,vars,source"/>
     </target>
 
@@ -56,7 +54,16 @@
     </target>
 
     <target name="jar" depends="compile, resources">
-        <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}"/>
+        <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}" manifest="../build-templates/MANIFEST.MF">
+            <manifest>
+                <attribute name="Implementation-Title" value="${ant.project.name} Module"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <section name="${package}">
+                    <attribute name="Package-Version" value="${version}"/>
+                    <attribute name="Package-Vendor" value="The Scriptella Project Team"/>
+                </section>
+            </manifest>
+        </jar>
     </target>
 
 </project>

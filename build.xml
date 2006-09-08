@@ -27,7 +27,6 @@
     <property name="tools" value="${basedir}/tools"/>
     <property name="drivers" value="${basedir}/drivers"/>
     <property name="samples" value="${basedir}/samples"/>
-    <property name="version" value="0.1-dev"/>
     <property name="tmp.dir" value="${build.dir}/tmp"/>
     <property name="reports.dir" value="${build.dir}/reports"/>
     <property name="tests.report.dir" value="${reports.dir}/junit"/>
@@ -40,11 +39,11 @@
     <property name="zip.name" value="${product.name}.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
     <fileset id="src.zip.fileset" dir="${basedir}"
-             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml"
+             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**"
              excludes="samples/lib/**"/>
     <property name="src.zip.includes" value=""></property>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
-
+    <tstamp/>
 
     <!--Classpath to use for JUnit tests execution -->
     <path id="tests.classpath">
@@ -72,7 +71,7 @@
             <fileset dir="${drivers}/build" includes="*.jar"/>
         </copy>
         <delete file="${build.dir}/${jar.name}" failonerror="no"/>
-        <jar destfile="${build.dir}/${jar.name}">
+        <jar destfile="${build.dir}/${jar.name}" manifest="build-templates/MANIFEST.MF">
             <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
@@ -83,11 +82,11 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.ScriptsRunner"/>
-                <attribute name="Specification-Title" value="Scriptella ETL and Scripts Execution Tool."/>
-                <attribute name="Specification-Vendor" value="The Scriptella Project Team"/>
-                <attribute name="Implementation-Title" value="scriptella"/>
-                <attribute name="Implementation-Vendor" value="The Scriptella Project Team"/>
-                <attribute name="Implementation-Version" value="${version} (Build ${build})"/>
+                <attribute name="Implementation-Title" value="Scriptella Core Module with Dependencies"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <section name="scriptella">
+                </section>
             </manifest>
         </jar>
         <!-- Update samples libs --> 
