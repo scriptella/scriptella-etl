@@ -1,4 +1,11 @@
 <project name="scriptella-drivers" default="jar">
-    <property name="classpath" value="${basedir}/../core/build/scriptella-core.jar;${basedir}/../lib/velocity-dep.jar;${basedir}/../lib/janino.jar;"/>
-    <import file="..\build-template.xml"/>
+    <path id="classpath">
+        <pathelement location="${basedir}/../core/build/scriptella-core.jar"/>
+        <pathelement location="${basedir}/../lib/velocity-dep.jar"/>
+        <pathelement location="${basedir}/../lib/janino.jar"/>
+        <pathelement location="${basedir}/../lib/opencsv.jar"/>
+    </path>
+    <property name="package" value="scriptella/drivers"/>
+    <import file="../build-templates/build-template.xml"/>
+
 </project>

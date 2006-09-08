@@ -1,5 +1,9 @@
 <project name="scriptella-tools" default="jar">
-    <property name="classpath" value="${basedir}/../core/build/scriptella-core.jar"/>
-    <import file="..\build-template.xml"/>
+    <path id="classpath">
+        <pathelement location="${basedir}/../core/build/scriptella-core.jar"/>
+    </path>
+
+    <property name="package" value="scriptella/tools"/>
+    <import file="../build-templates/build-template.xml"/>
 
 </project>
