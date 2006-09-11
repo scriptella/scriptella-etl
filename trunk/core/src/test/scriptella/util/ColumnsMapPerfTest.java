@@ -46,6 +46,7 @@ public class ColumnsMapPerfTest extends AbstractTestCase {
     /**
      * History:
      * 06.09.2006 - Duron 1.7Mhz - 1046 ms
+     * 11.09.2006 - Duron 1.7Mhz - 422 ms
      */
     public void testNamedSearch() {
         for (int i=1;i<SEARCH_LOOP_COUNT;i++) {
@@ -56,6 +57,7 @@ public class ColumnsMapPerfTest extends AbstractTestCase {
     /**
      * History:
      * 06.09.2006 - Duron 1.7Mhz - 563 ms
+     * 11.09.2006 - Duron 1.7Mhz - 25 ms
      */
     public void testIndexedSearch() {
         for (int i=1;i<SEARCH_LOOP_COUNT;i++) {
@@ -67,6 +69,7 @@ public class ColumnsMapPerfTest extends AbstractTestCase {
     /**
      * History:
      * 06.09.2006 - Duron 1.7Mhz - 891 ms
+     * 11.09.2006 - Duron 1.7Mhz - 359 ms
      */
     public void testFill() {
         for (int k=1;k<700;k++) {

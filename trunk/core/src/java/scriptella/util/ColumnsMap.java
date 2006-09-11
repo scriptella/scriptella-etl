@@ -16,8 +16,6 @@
 package scriptella.util;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Represents a map of columns accessible by name and index.
@@ -27,8 +25,6 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class ColumnsMap {
-    private static final Pattern NUM_PTR = Pattern.compile("\\d+"); //Regexp checking is faster than catching exceptions
-    private Matcher numMatcher = NUM_PTR.matcher("");
     private Map<String, Integer> map;
 
     /**
@@ -39,10 +35,10 @@ public class ColumnsMap {
      * @throws IllegalArgumentException if index has illegal value
      */
     public void registerColumn(String name, int index) throws IllegalArgumentException {
-        if (index<=0) {
+        if (index <= 0) {
             throw new IllegalArgumentException("Index must be positive integer");
         }
-        if (map==null) {
+        if (map == null) {
             map = CollectionUtils.newCaseInsensitiveAsciiMap();
         }
         map.put(name, index);
@@ -55,9 +51,9 @@ public class ColumnsMap {
      * @return column index, or null if column not found.
      */
     public Integer find(String name) {
-        Integer index = map==null?null:map.get(name);
+        Integer index = map == null ? null : map.get(name);
         //If name is not a column name and is integer
-        if (index == null && numMatcher.reset(name).matches()) {
+        if (index == null && StringUtils.isDecimalInt(name)) {
             try {
                 index = Integer.valueOf(name); //Try to parse name as index
             } catch (NumberFormatException e) {
@@ -66,8 +62,6 @@ public class ColumnsMap {
         }
         return index;
     }
-
-
 
 
 }

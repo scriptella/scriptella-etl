@@ -16,6 +16,8 @@
  */
 package scriptella.driver.ldap.ldif;
 
+import scriptella.util.StringUtils;
+
 import javax.naming.directory.DirContext;
 import javax.naming.ldap.BasicControl;
 import javax.naming.ldap.Control;
@@ -134,10 +136,6 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
      * A list of read lines
      */
     private final List<String> lines=new ArrayList<String>();
-
-    private static final Pattern EMPTY_PTR = Pattern.compile("\\s*");
-    private Matcher emptyMatcher = EMPTY_PTR.matcher(""); //matcher to reuse
-
 
     /**
      * The ldif file version default value
@@ -899,7 +897,7 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
 
         try {
             while ((line = ((BufferedReader) in).readLine()) != null) { //while not EOF
-                if (emptyMatcher.reset(line).matches()) { //if line is empty
+                if (StringUtils.isAsciiWhitespacesOnly(line)) { //if line is empty
                     if (isFirstLine) {
                         continue;
                     } else {

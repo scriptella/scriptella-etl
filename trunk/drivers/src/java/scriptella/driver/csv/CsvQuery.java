@@ -117,7 +117,7 @@ public class CsvQuery implements ParametersCallback, Closeable {
      */
     @SuppressWarnings("unchecked")
     List<Pattern[]> compileQueries(final Reader reader) {
-        CSVReader r = new CSVReader(reader);
+        CSVReader r = new CSVReader(reader);//Parsing rules for queries are always default
         List<String[]> list;
         try {
             list = r.readAll();
