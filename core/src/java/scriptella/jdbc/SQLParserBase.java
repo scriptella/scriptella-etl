@@ -17,6 +17,8 @@ package scriptella.jdbc;
 
 import scriptella.configuration.ConfigurationException;
 import scriptella.expression.PropertiesSubstitutor;
+import scriptella.util.ExceptionUtils;
+import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -24,7 +26,6 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -53,7 +54,6 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class SQLParserBase {
-    private static final Pattern EMPTY_PTR = Pattern.compile("\\s*");
 
     /**
      * Parses SQL script.
@@ -71,6 +71,7 @@ public class SQLParserBase {
             try {
                 reader.close();
             } catch (IOException e) {
+                ExceptionUtils.ignoreThrowable(e);
             }
         }
     }
@@ -152,15 +153,13 @@ public class SQLParserBase {
         }
     }
 
-    //Just a small optimization to minimize matcher creation time - please note that these fields are not thread-safe
-    private final Matcher emptyMatcher = EMPTY_PTR.matcher("");
     private final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher("");
     private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
     private final StringBuilder tmpBuf = new StringBuilder();
 
     private void handleStatement(final StringBuilder sql,
                                  final List<Integer> injections) {
-        if (emptyMatcher.reset(sql).matches()) {
+        if (StringUtils.isAsciiWhitespacesOnly(sql)) {
             return;
         }
 

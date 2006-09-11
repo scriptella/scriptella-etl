@@ -1,6 +1,8 @@
 <!DOCTYPE scriptella SYSTEM "scriptella.dtd">
 <scriptella>
-    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:csv" user="sa" password=""/>
+    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:csv" user="sa" password="">
+        shutdown_on_exit=false
+    </connection>
     <connection id="csv" driver="csv" url="tst://testfile"/>
     <script connection-id="db">
         <!-- Test data -->

@@ -54,14 +54,16 @@ public class CsvConnection extends AbstractConnection {
     public static final String ENCODING = "encoding";
     /**
      * Name of the <code>separator</code> connection property.
-     * The delimiter to use for separating entries
+     * The delimiter to use for separating entries when reading from or writing to files.
      */
     public static final String SEPARATOR = "separator";
     /**
-     * Name of the <code>quotechar</code> connection property.
-     * The character to use for quoted elements
+     * Name of the <code>quote</code> connection property.
+     * The character to use for quoted elements when reading from or writing to files. Use empty string to suppress
+     * quoting.
      */
     public static final String QUOTE = "quote";
+
     /**
      * Name of the <code>suppressHeaders</code> connection property.
      * true means the first line contains headers. Default value is true.
@@ -96,11 +98,14 @@ public class CsvConnection extends AbstractConnection {
             separator = ',';
         }
         String q = parameters.getProperty(QUOTE);
-        if (q != null && q.length() > 0) {
+        if (q == null) {
+            quote = '\"'; //default value
+        } else if (q.length() > 0) {
             quote = q.charAt(0);
-        } else {
-            quote = '\"';
+        } else { //otherwise no quoting
+            quote = CSVWriter.NO_QUOTE_CHARACTER;
         }
+
         try {
             headers = parameters.getBooleanProperty(HEADERS, true);
         } catch (ParseException e) {
@@ -136,7 +141,8 @@ public class CsvConnection extends AbstractConnection {
     }
 
     void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
-        CSVReader r = new CSVReader(reader, separator, quote);
+
+        CSVReader r = new CSVReader(reader);//Parsing rules of script in XML is always standard
         CSVWriter out = getOut();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
         for (String[] row; (row = r.readNext()) != null;) {
@@ -168,7 +174,7 @@ public class CsvConnection extends AbstractConnection {
             try {
                 q.execute(queryContent.open(), parametersCallback, queryCallback);
             } catch (IOException e) {
-                throw new CsvProviderException("Cannot read query "+queryContent, e);
+                throw new CsvProviderException("Cannot read query " + queryContent, e);
             } finally {
                 IOUtils.closeSilently(q);
             }

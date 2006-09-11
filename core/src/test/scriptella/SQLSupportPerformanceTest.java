@@ -17,6 +17,7 @@ package scriptella;
 
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
+import scriptella.util.RepeatingInputStream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,8 +41,8 @@ public class SQLSupportPerformanceTest extends DBTestCase {
     private static final byte SQL2[] = "update test set id=?{property};".getBytes();
 
     /**
-     * 5406
-     * 5563
+     * History:
+     * 11.09.2006 - Duron 1.7Mhz - 1578 ms
      */
     public void test() throws ScriptsExecutorException {
         getConnection("sqlsupport");
@@ -64,8 +65,8 @@ public class SQLSupportPerformanceTest extends DBTestCase {
     }
 
     /**
-     * 3703 (2281,875)
-     * 3843 (2312,938)
+     * History:
+     * 11.09.2006 - Duron 1.7Mhz - 2578 ms
      * @throws ScriptsExecutorException
      * @throws SQLException
      * @throws IOException
@@ -119,31 +120,4 @@ public class SQLSupportPerformanceTest extends DBTestCase {
         t.test();
     }
 
-    private static class RepeatingInputStream extends InputStream {
-        private int count;
-        private byte data[];
-        private int pos;
-
-        public RepeatingInputStream(byte data[], int count) {
-            this.data = data;
-            this.count = count;
-        }
-
-        public int read() throws IOException {
-            if (pos >= data.length) {
-                count--;
-
-                if (count > 0) {
-                    pos = 0;
-                } else {
-                    return -1;
-                }
-            }
-
-            int r = data[pos] & 0xff;
-            pos++;
-
-            return r;
-        }
-    }
 }

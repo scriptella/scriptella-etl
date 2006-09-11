@@ -22,8 +22,8 @@ import scriptella.spi.MockDriversContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.util.RepeatingInputStream;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,12 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests for {@link CsvConnection}.
+ * Tests for {@link scriptella.driver.csv.CsvConnection}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class CsvConnectionTest extends AbstractTestCase {
+public class CsvConnectionPerfTest extends AbstractTestCase {
     private int rows;
 
     private ByteArrayOutputStream out;
@@ -46,16 +46,16 @@ public class CsvConnectionTest extends AbstractTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         testURLHandler = new TestURLHandler() {
+            byte[] rows = "c1,c2,c3\nc4,c5,c6\n".getBytes();
+
             public InputStream getInputStream(final URL u) {
-                try {
-                    return new ByteArrayInputStream("c1;c2;c3\nc4;'c''5';c6\u0394".getBytes("UTF8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException(e.getMessage(), e);
-                }
+                return new RepeatingInputStream(rows, 10000);
             }
 
             public OutputStream getOutputStream(final URL u) {
-                out = new ByteArrayOutputStream();
+                if (out == null) {
+                    out = new ByteArrayOutputStream();
+                }
                 return out;
             }
 
@@ -66,71 +66,65 @@ public class CsvConnectionTest extends AbstractTestCase {
 
     }
 
+    /**
+     * History:
+     * 11.09.2006 - Duron 1.7Mhz - 1265 ms
+     * 09.09.2006 - Duron 1.7Mhz - 1400 ms
+     */
     public void testQuery() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
-        props.put(CsvConnection.ENCODING, "UTF8");
-        props.put(CsvConnection.EOL, "\r\n");
-        props.put(CsvConnection.HEADERS, "false");
-        props.put(CsvConnection.QUOTE, "'");
-        props.put(CsvConnection.SEPARATOR, ";");
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
                 MockDriversContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
-        //register handler for tst url
-        rows = 0;
-        con.executeQuery(new StringResource(""), MockParametersCallbacks.UNSUPPORTED, new QueryCallback() {
-            public void processRow(final ParametersCallback parameters) {
-                rows++;
-                switch (rows) {
-                    case 1:
-                        assertEquals("c1", parameters.getParameter("1"));
-                        assertEquals("c2", parameters.getParameter("2"));
-                        assertEquals("c3", parameters.getParameter("3"));
-                        break;
-                    case 2:
-                        assertEquals("c4", parameters.getParameter("1"));
-                        assertEquals("c'5", parameters.getParameter("2"));
-                        assertEquals("c6\u0394", parameters.getParameter("3"));
-                        break;
+        //Quering 20000 lines file 10 times.
+        for (int i=0;i<10;i++) {
+            rows = 0;
+            con.executeQuery(new StringResource(",.*2,"), MockParametersCallbacks.NULL, new QueryCallback() {
+                public void processRow(final ParametersCallback parameters) {
+                    rows++;
+                    parameters.getParameter("c1");
+                    parameters.getParameter("2");
+                    parameters.getParameter("nosuchcolumn");
 
-                    default:
-                        fail("unexpected row " + rows);
                 }
-
-            }
-        });
-        assertEquals(2, rows);
-        assertNull("No output should be produced by a query", out);
+            });
+            assertEquals(10000, rows);
+            assertNull("No output should be produced by a query", out);
+        }
 
 
     }
 
+    /**
+     * History:
+     * 11.09.2006 - Duron 1.7Mhz - 844 ms
+     * 09.09.2006 - Duron 1.7Mhz - 875 ms
+     * @throws UnsupportedEncodingException
+     */
     public void testScript() throws UnsupportedEncodingException {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
-        props.put(CsvConnection.ENCODING, "UTF8");
-        props.put(CsvConnection.EOL, "\r\n");
-        props.put(CsvConnection.QUOTE, "");
-        props.put(CsvConnection.SEPARATOR, ";");
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
                 MockDriversContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
-        //register handler for tst url
-        rows = 0;
-        con.executeScript(new StringResource("$row1,\"value\",val${'ue'}\n$row2,,value\u0394"),
-                MockParametersCallbacks.SIMPLE);
-        con.close();
-        String expected = "*row1*;value;value\r\n*row2*;;value\u0394\r\n";
-        String actual = out.toString("UTF8");
-        assertEquals(expected, actual);
+        String expected = "\"*col1*\",\"col2\",\"col3\"\n\"*col21*\",\"col22\",\"col23\"\n";
+        for (int i = 0; i < 10000; i++) {
+            con.executeScript(new StringResource("$col1,\"col2\",col3\n${col21},col22,col23"),
+                    MockParametersCallbacks.SIMPLE);
+            out.reset();
+        }
 
+        con.close();
+        String actual = out.toString(); //checking if script worked correctly
+        //out is filled partially because we use out.reset() to minimize memory usage
+        //So use indexOf to check
+        assertTrue(actual.indexOf(expected) >= 0);
 
 
     }
-
 
 
 }

@@ -16,7 +16,7 @@
 package scriptella.util;
 
 /**
- * Miscellaneous String utility methods.
+ * Miscellaneous String/CharSequence utility methods.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -26,40 +26,36 @@ public final class StringUtils {
     }
 
     /**
-     * Returns true if string is empty (length=0) or null.
+     * Returns true if characters sequence is empty (length=0) or null.
      *
-     * @param string string to test.
-     * @return true if string is empty (length=0) or null.
+     * @param cs characters sequence to test.
+     * @return true if characters sequence is empty (length=0) or null.
      */
-    public static boolean isEmpty(final String string) {
-        return string == null || string.length() > 0;
+    public static boolean isEmpty(final CharSequence cs) {
+        return cs == null || cs.length() == 0;
     }
 
     /**
-     * Checks if specified string is empty or contains only ascii whitespace characters.
-     * @param string string to check.
-     * @return true if string is empty or contains only ascii whitespace characters.
+     * Checks if specified characters sequence is empty or contains only ascii whitespace characters.
+     * @param cs characters sequence to check.
+     * @return true if characters sequence is empty or contains only ascii whitespace characters.
      */
-    public static boolean isAsciiWhitespacesOnly(final String string) {
-        if (string == null) {
+    public static boolean isAsciiWhitespacesOnly(final CharSequence cs) {
+        if (cs == null) {
             return true;
         }
-        int len = string.length();
+        int len = cs.length();
         if (len == 0) {
             return true;
         }
         for (int i = 0; i < len; i++) {
-            switch (string.charAt(i)) {
-                case 0x09://tab
-                case 0x0A:
-                case 0x0B:
-                case 0x0C:
-                case 0x0D:
-                case 0x1C:
-                case 0x1D:
-                case 0x1E:
-                case 0x1F:
-                case 0x20: break;
+            switch (cs.charAt(i)) {
+                case '\t'://tab
+                case '\r':
+                case '\n':
+                case '\f':
+                case '\b':
+                case ' ': break;
                 default: return false;
             }
         }
@@ -67,20 +63,20 @@ public final class StringUtils {
     }
 
     /**
-     * Checks if specified string represents a decimal number.
-     * @param string string to check.
-     * @return true if specified string represents a decimal number.
+     * Checks if specified characters sequence represents a non negative decimal number.
+     * @param cs characters sequence to check.
+     * @return true if specified characters sequence represents a non negative decimal number.
      */
-    public static boolean isDecimalNumber(final String string) {
-            if (string == null) { //null is not a number.
+    public static boolean isDecimalInt(final CharSequence cs) {
+            if (cs == null) { //null is not a number.
                 return false;
             }
-            int len = string.length();
+            int len = cs.length();
             if (len == 0) { //empty string also
                 return false;
             }
             for (int i = 0; i < len; i++) {
-                int c = string.charAt(i);
+                int c = cs.charAt(i);
                 if (c<0x30 || c>0x39) {
                     return false;
                 }
