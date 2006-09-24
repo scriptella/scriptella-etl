@@ -69,6 +69,7 @@ public class PropertiesSubstitutor {
 
     /**
      * Creates a properties substitutor.
+     *
      * @param parameters parameters callback to use for substitution.
      */
     public PropertiesSubstitutor(ParametersCallback parameters) {
@@ -89,17 +90,17 @@ public class PropertiesSubstitutor {
         if (s == null) {
             return null;
         }
-        if (parameters==null) {
+        if (parameters == null) {
             throw new IllegalStateException("setParameters must be called before calling substitute");
         }
 
-        final int len = s.length()-1; //Last character is not checked - optimization
-        if (len <= 0) { //skip empty strings or single characters
+        final int len = s.length() - 1; //Last character is not checked - optimization
+        if (len <= 0 || s.indexOf('$') < 0) { //skip empty strings, single characters or other strings without $ char
             return s;
         }
         StringBuilder res = null;
         char[] sChars = s.toCharArray();
-        int lastPos=0;
+        int lastPos = 0;
         m1.reset(s);
         m2.reset(s);
         for (int i = 0; i < len; i++) {
@@ -108,22 +109,22 @@ public class PropertiesSubstitutor {
                 case '$':
                     //Start of expression
                     Matcher m;
-                    if (m1.find(i+1) && m1.start()==i+1) {
-                        m=m1;
-                    } else if (m2.find(i+1) && m2.start()==i+1) {
+                    if (m1.find(i + 1) && m1.start() == i + 1) {
+                        m = m1;
+                    } else if (m2.find(i + 1) && m2.start() == i + 1) {
                         m = m2;
                     } else { //not an expression
-                        m=null;
+                        m = null;
                     }
-                    if (m!=null) {
-                        if (res==null) {
+                    if (m != null) {
+                        if (res == null) {
                             res = new StringBuilder(s.length());
                         }
-                        if (i>lastPos) { //if we have unflushed character
-                            res.append(sChars, lastPos,i-lastPos);
+                        if (i > lastPos) { //if we have unflushed character
+                            res.append(sChars, lastPos, i - lastPos);
                         }
                         final String name = m.group(1);
-                        String v = null;
+                        String v;
 
                         if (m == m1) {
                             v = toString(parameters.getParameter(name));
@@ -131,11 +132,11 @@ public class PropertiesSubstitutor {
                             v = toString(Expression.compile(name).evaluate(parameters));
                         }
 
-                        lastPos=m.end();
+                        lastPos = m.end();
                         if (v != null) {
                             res.append(v);
                         } else { //appends the original string
-                            res.append(sChars, i,lastPos-i);
+                            res.append(sChars, i, lastPos - i);
                         }
 
                     }
@@ -147,11 +148,11 @@ public class PropertiesSubstitutor {
 
             }
         }
-        if (res==null) {
+        if (res == null) {
             return s;
         }
-        if (lastPos<=len) {
-            res.append(sChars, lastPos, s.length()-lastPos);
+        if (lastPos <= len) {
+            res.append(sChars, lastPos, s.length() - lastPos);
         }
 
 
@@ -159,7 +160,6 @@ public class PropertiesSubstitutor {
     }
 
     /**
-     *
      * @return parameter callback used for substitution.
      */
     public ParametersCallback getParameters() {
@@ -168,6 +168,7 @@ public class PropertiesSubstitutor {
 
     /**
      * Sets parameters callback used for substitution.
+     *
      * @param parameters not null parameters callback.
      */
     public void setParameters(ParametersCallback parameters) {
@@ -177,11 +178,12 @@ public class PropertiesSubstitutor {
     /**
      * Converts specified object to string.
      * <p>Subclasses may provide custom conversion strategy here.
+     *
      * @param o object to convert to String.
      * @return string representation of object.
      */
     protected String toString(final Object o) {
-        return o==null?null:o.toString();
+        return o == null ? null : o.toString();
     }
 
 }

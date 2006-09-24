@@ -49,14 +49,8 @@ public final class StringUtils {
             return true;
         }
         for (int i = 0; i < len; i++) {
-            switch (cs.charAt(i)) {
-                case '\t'://tab
-                case '\r':
-                case '\n':
-                case '\f':
-                case '\b':
-                case ' ': break;
-                default: return false;
+            if (cs.charAt(i)>' ') {
+                return false;
             }
         }
         return true;

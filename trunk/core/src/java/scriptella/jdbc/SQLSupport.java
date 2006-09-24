@@ -197,10 +197,12 @@ public class SQLSupport {
         }
 
         private void releaseStatement(PreparedStatement ps) {
-            try {
-                ps.clearParameters(); //Clear parameters for GC
-            } catch (Exception e) {
-                LOG.log(Level.FINE, "Failed to clear statement parameters", e);
+            if (ps != null) {
+                try {
+                    ps.clearParameters(); //Clear parameters for GC
+                } catch (Exception e) {
+                    LOG.log(Level.FINE, "Failed to clear statement parameters", e);
+                }
             }
             StatementCache statementCache = connection.getStatementCache();
             if (statementCache.isDisabled()) {

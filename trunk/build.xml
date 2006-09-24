@@ -82,19 +82,16 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.ScriptsRunner"/>
-                <attribute name="Implementation-Title" value="Scriptella Core Module with Dependencies"/>
+                <attribute name="Implementation-Title" value="Scriptella Core and Drivers"/>
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
-                <section name="scriptella">
-                </section>
             </manifest>
         </jar>
         <!-- Update samples libs --> 
         <copy todir="${basedir}/samples/lib">
-            <fileset file="${lib.dir}/hsqldb.jar"/>
-            <fileset file="${lib.dir}/velocity-dep.jar"/>
-            <fileset file="${lib.dir}/janino.jar"/>
+            <fileset dir="${lib.dir}" excludes="h2* *jexl* *logging*"/>
             <fileset file="${build.dir}/${jar.name}"/>
+
         </copy>
     </target>
 

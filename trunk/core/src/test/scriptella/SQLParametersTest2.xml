@@ -9,9 +9,9 @@ This suite tests support of numbered parameters,e.g. ?1,?2 additionally to colum
         ID INT,
         _33 INT <!-- Column name-->
         );
-        insert into Test values (1,0);
-        insert into Test values (2,0);
-        insert into Test values (3,0);
+        insert into Test values (1,-1);
+        insert into Test values (2,-1);
+        insert into Test values (3,-1);
     </script>
     <query>
         ${'select * from Test'}

@@ -23,7 +23,7 @@
     </properties>
 
     <!--Set up a connection to janino compiler.-->
-    <connection id="janino" driver="janino"/>
+    <connection id="janino" driver="janino" classpath="../lib/janino.jar"/>
     <!--Set up a connection to velocity engine.
     url parameter specifies a path to file relative to a script file directory-->
     <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity-dep.jar"/>
@@ -31,6 +31,15 @@
     hsql - driver name is a Scriptella adapter for HSQLDB.
     You may specify org.hsqldb.jdbcDriver directly, see JDBC Adapters in Scriptella reference-->
     <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:mix" user="sa" classpath="../lib/hsqldb.jar"/>
+
+    <!--Set up CSV driver-->
+    <connection id="csv" driver="csv" url="report.csv" classpath="../lib/opencsv.jar">
+        #If necessary use empty quote char to suppress quotes
+        quote=
+        #Use Excel compatible separator for output
+        #Note: the syntax of script is not affected you should use standard CSV syntax
+        separator=;
+    </connection>
 
     <!--Create a database schema. Single table for prime numbers. -->
     <script connection-id="db">
@@ -77,6 +86,12 @@
                 <table border=1>
         ]]>
     </script>
+    <!--Write CSV file header.
+    Please note that standard comma separated CSV syntax is used,
+     commas are transparently converted to semicolumns by CSV driver-->
+    <script connection-id="csv">
+        #,Prime
+    </script>
     <!--Query the database for primes-->
     <query connection-id="db">
         SELECT * FROM Primes
@@ -86,9 +101,12 @@
         <script connection-id="velocity">
 <![CDATA[
                 <tr>
-                    <th>${rownum}</th>
-                    <td>${number}</td>
+                    <th>${rownum}</th><td>${number}</td>
                 </tr>]]>
+        </script>
+        <!--Producing a CSV file-->
+        <script connection-id="csv">
+            ${rownum},${number}
         </script>
     </query>
     <!--And finally produce a report footer -->

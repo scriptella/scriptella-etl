@@ -22,8 +22,6 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -61,10 +59,11 @@ public class SQLParserBase {
      * @param reader reader with SQL script.
      */
     public void parse(final Reader reader) {
-        StreamTokenizer st = new StreamTokenizer(reader);
-
         try {
-            parse(st);
+            SqlTokenizer tok = new SqlTokenizer(reader);
+            for (StringBuilder sb;(sb=tok.nextStatement())!=null;) {
+                handleStatement(sb, tok.getInjections());
+            }
         } catch (IOException e) {
             throw new ConfigurationException(e);
         } finally {
@@ -73,83 +72,6 @@ public class SQLParserBase {
             } catch (IOException e) {
                 ExceptionUtils.ignoreThrowable(e);
             }
-        }
-    }
-
-    private void parse(final StreamTokenizer st) throws IOException {
-        st.resetSyntax();
-        st.wordChars(' ', 255);
-        st.commentChar('/');
-        st.commentChar('-');
-        st.ordinaryChar(';');
-        st.ordinaryChar('$');
-        st.ordinaryChar('?');
-        st.quoteChar('"');
-        st.quoteChar('\'');
-
-        StringBuilder b = new StringBuilder(80);
-        List<Integer> injections = null;
-
-        for (int token; (token = st.nextToken()) != StreamTokenizer.TT_EOF;) {
-            switch (token) {
-                case StreamTokenizer.TT_WORD:
-                    // A word was found; the value is in sval
-                    //                    System.out.println("Word " + st.sval + " line=" + line);
-                    b.append(st.sval);
-
-                    break;
-
-                case '"':
-                    // A double-quoted string was found; sval contains the contents
-                    //                    System.out.println("Quote \"" + st.sval + "\"");
-                    b.append('"');
-                    b.append(st.sval);
-                    b.append('"');
-
-                    break;
-
-                case '\'':
-                    // A single-quoted string was found; sval contains the contents
-                    //                    System.out.println("Quote '" + st.sval + "'");
-                    b.append('\'');
-                    b.append(st.sval);
-                    b.append('\'');
-
-                    break;
-
-                case StreamTokenizer.TT_EOL:
-                    // End of line character found
-                    //                    System.out.println("EOL");
-                    b.append(' ');
-
-                    break;
-
-                default:
-
-                    // A regular character was found; the value is the token itself
-                    char ch = (char) st.ttype;
-
-                    switch (ch) {
-                        case ';':
-                            handleStatement(b, injections);
-                            b.setLength(0);
-                            if (injections != null) {
-                                injections.clear();
-                            }
-                            break;
-                        case '$':
-                        case '?':
-                            if (injections == null) {
-                                injections = new ArrayList<Integer>();
-                            }
-                            injections.add(b.length());
-                            b.append(ch);
-                    }
-            }
-        }
-
-        if (b.length() > 0) {
-            handleStatement(b, injections);
         }
     }
 

@@ -36,7 +36,8 @@ import java.util.regex.Pattern;
  */
 public class CsvQuery implements ParametersCallback, Closeable {
     private CSVReader reader;
-    private boolean headers;
+    private final boolean headers;
+    private final boolean trim;
     private ColumnsMap columnsMap;
     private String[] row;
     private PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
@@ -46,13 +47,15 @@ public class CsvQuery implements ParametersCallback, Closeable {
      *
      * @param reader  CSV reader.
      * @param headers true if first line contains headers.
+     * @param trim    true if if extra whitespaces in the query should be trimmed.
      */
-    public CsvQuery(CSVReader reader, boolean headers) {
+    public CsvQuery(CSVReader reader, boolean headers, boolean trim) {
         if (reader == null) {
             throw new IllegalArgumentException("CSV reader cannot be null");
         }
         this.reader = reader;
         this.headers = headers;
+        this.trim = trim;
     }
 
     public void execute(Reader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback) throws IOException {
@@ -125,11 +128,11 @@ public class CsvQuery implements ParametersCallback, Closeable {
             throw new CsvProviderException("Unable to read CSV query", e);
         }
         List<Pattern[]> res = null;
-        for (String[] row : list) {
-            Pattern[] patterns = new Pattern[row.length];
+        for (String[] columns : list) {
+            Pattern[] patterns = new Pattern[columns.length];
             boolean notEmptyPtr = false;
-            for (int i = 0; i < row.length; i++) {
-                String s = trim(row[i]);
+            for (int i = 0; i < columns.length; i++) {
+                String s = trim(columns[i]);
                 if (s == null || s.length() == 0) {
                     patterns[i] = null;
                 } else {
@@ -153,8 +156,13 @@ public class CsvQuery implements ParametersCallback, Closeable {
 
     }
 
-    private static String trim(String s) {
-        return s == null ? null : s.trim();
+    /**
+     * Trims string if {@link #trim} flag is true.
+     * @param s string to trim. May be null.
+     * @return possibly trimmed string or null.
+     */
+    private String trim(String s) { 
+        return (trim && s != null) ? s.trim() : s;
     }
 
     public Object getParameter(final String name) {
