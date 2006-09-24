@@ -1,3 +1,8 @@
 Specification-Title: Scriptella ETL and Scripts Execution Tool.
 Specification-Vendor: The Scriptella Project Team
 Implementation-Vendor: The Scriptella Project Team
+
+Name: scriptella
+Package-Version: 0.2dev
+Package-Vendor: The Scriptella Project Team
+

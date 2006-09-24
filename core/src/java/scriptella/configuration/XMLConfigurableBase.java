@@ -82,7 +82,8 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
         Pattern ptr = null;
         if (ptrStr != null) {
             try {
-                ptr = Pattern.compile(ptrStr, Pattern.CASE_INSENSITIVE);
+                //We use multiline+case insensitive patterns
+                ptr = Pattern.compile(ptrStr, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
             } catch (Exception e) {
                 throw new ConfigurationException("Attribute " + attribute + " requires valid regular expression, but was: " +
                         ptrStr, e, element);

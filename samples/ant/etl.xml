@@ -26,6 +26,8 @@
         CREATE TABLE Foo (
             Bar VARCHAR(100)
         );
+        --fff?.dfff
         INSERT INTO FOO VALUES (?antproperty);
+        INSERT INTO FOO VALUES ('Q?d');
     </script>
 </scriptella>

@@ -513,8 +513,8 @@
                 </tr>
 				<tr>
 					<td>Primes</td>
-					<td>Fills the database with prime numbers and produces HTML report.
-                    This example demonstrates a combined usage of Velocity, Janino and SQL.</td>
+					<td>Fills the database with prime numbers and produces HTML/CSV reports.
+                    This example demonstrates a combined usage of Velocity, Janino, CSV Driver and SQL.</td>
 				</tr>
 			</table>
 		</section>

@@ -1,10 +1,12 @@
-This example demonstrates a combined usage of Velocity, Janino
-and SQL.
+This example demonstrates a combined usage of Velocity, Janino, 
+CSV driver and SQL.
 
 Janino is used to generate prime numbers and to produce
 a virtual rowset for exporting into a database.
 
-Velocity is used to produce the report based on a SQL query.
+Velocity is used to produce HTML report based on a SQL query.
+
+CSV Driver produces CSV file with prime numbers. 
 
 Script configuration is specified in script.properties file.
 

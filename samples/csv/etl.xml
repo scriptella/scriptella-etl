@@ -1,0 +1,38 @@
+<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
+<scriptella>
+    <description>
+        Quieries CSV data from from file and store the results in a DB and other CSV file.
+    </description>
+    <connection id="in" driver="csv" url="bugs-in.csv" classpath="../lib/opencsv.jar"/>
+    <!--Filtered output to another file -->
+    <connection id="out" driver="csv" url="bugs-out.csv" classpath="../lib/opencsv.jar">
+        #Use empty quote to turn off quoting
+        quote=
+    </connection>
+    <connection id="out2" driver="csv" url="bugs-out-filtered.csv" classpath="../lib/opencsv.jar">
+        separator=;
+    </connection>
+    <!--In memory just for example-->
+    <connection id="outDB" driver="hsqldb" url="jdbc:hsqldb:mem:db" user="sa" classpath="../lib/hsqldb.jar"/>
+    <script connection-id="outDB">
+        <!-- Creates Bug table to output CSV data -->
+        DROP TABLE BUG IF EXISTS;
+        CREATE TABLE Bug (
+        ID INT PRIMARY KEY,
+        PRIORITY VARCHAR(10),
+        SUMMARY VARCHAR(200),
+        STATUS VARCHAR(10)
+        );
+    </script>
+
+    <script connection-id="out"><!--Writing header if necessary-->
+        id,priority, summary,status
+    </script>
+    <query connection-id="in">
+        <!--Empty CSV query means select all-->
+        <script connection-id="out">
+            $id,$priority,$summary,$status
+        </script>
+    </query>
+
+</scriptella>

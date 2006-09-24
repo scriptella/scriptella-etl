@@ -33,7 +33,8 @@
     <query connection-id="db">
         <!-- Produce a report for a query -->
         SELECT * FROM Test
-        <script connection-id="csv">$id,$text</script>
+        <script connection-id="csv">
+            $id,$text</script>
     </query>
 
 </scriptella>

@@ -40,7 +40,7 @@
 
     <target name="javadoc" depends="clean">
         <mkdir dir="${javadoc.dest.dir}"/>
-        <javadoc destdir="${javadoc.dest.dir}"
+        <javadoc destdir="${javadoc.dest.dir}" includenosourcepackages="true"
                  use="true" windowtitle="Scriptella API Documentation">
             <classpath refid="class.path"/>
             <classpath path="${ant.jar}"/>

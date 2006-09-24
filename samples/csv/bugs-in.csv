@@ -1,0 +1,5 @@
+id,priority,summary,status
+1,Critical,NullPointerException in Main class,Open
+5,Low,"Checkstyle, PMD, Findbugs issues",Reopened
+7,Low,Maven integration,Open
+10,High,SPI API,Closed

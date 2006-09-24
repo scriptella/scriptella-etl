@@ -25,6 +25,7 @@ import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
+import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -67,20 +68,30 @@ public class CsvConnection extends AbstractConnection {
     /**
      * Name of the <code>suppressHeaders</code> connection property.
      * true means the first line contains headers. Default value is true.
-     * Only valid for &lt;query&gt; elements.
+     * <p>Only valid for &lt;query&gt; elements.
      */
     public static final String HEADERS = "headers";
     /**
      * Name of the <code>eol</code> connection property.
      * EOL suffix. Default value is \n.
-     * Only valid for &lt;script&gt; elements.
+     * <p>Only valid for &lt;script&gt; elements.
      */
     public static final String EOL = "eol";
+
+    /**
+     * Name of the <code>trim</code> connection property.
+     * Value of <code>true</code> specifies that the leading and trailing
+     * whitespaces in CSV fields should be omitted. Default value is <code>true</code>.
+     * <p>Valid for &lt;script&gt; and &lt;query&gt; elements.
+     */
+    public static final String TRIM = "trim";
+
     private final String encoding;
     private final char separator;
     private final char quote;
     private final String eol;//the line feed terminator to use
     private final boolean headers;
+    private final boolean trim;
 
 
     public CsvConnection(ConnectionParameters parameters) {
@@ -117,6 +128,11 @@ public class CsvConnection extends AbstractConnection {
         } else {
             eol = "\n"; //Default value
         }
+        try {
+            trim = parameters.getBooleanProperty(TRIM, true);
+        } catch (ParseException e) {
+            throw new CsvProviderException(e.getMessage());
+        }
 
         String urlStr = parameters.getUrl();
         if (urlStr == null) {
@@ -147,8 +163,19 @@ public class CsvConnection extends AbstractConnection {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
         for (String[] row; (row = r.readNext()) != null;) {
             for (int i = 0; i < row.length; i++) {
-                row[i] = ps.substitute(row[i]);
+                String field = row[i];
+                if (field != null) {
+                    if (trim) {//removing extra whitespaces by default
+                        field = field.trim();
+                    }
+                    row[i] = ps.substitute(field);
+                }
             }
+            //If only one column and empty - skip this row
+            if (row.length==1 && StringUtils.isAsciiWhitespacesOnly(row[0])) {
+                continue;
+            }
+
             if (isReadonly()) {
                 if (LOG.isLoggable(Level.INFO)) {
                     LOG.info("Readonly Mode - " + Arrays.deepToString(row) + " has been skipped.");
@@ -170,7 +197,7 @@ public class CsvConnection extends AbstractConnection {
         }
         try {
             CSVReader in = new CSVReader(IOUtils.getReader(url.openStream(), encoding), separator, quote);
-            CsvQuery q = new CsvQuery(in, headers);
+            CsvQuery q = new CsvQuery(in, headers, trim);
             try {
                 q.execute(queryContent.open(), parametersCallback, queryCallback);
             } catch (IOException e) {

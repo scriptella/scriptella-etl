@@ -5,7 +5,7 @@
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/opencsv.jar"/>
     </path>
-    <property name="package" value="scriptella/drivers"/>
+    <property name="package" value="scriptella/driver"/>
     <import file="../build-templates/build-template.xml"/>
 
 </project>

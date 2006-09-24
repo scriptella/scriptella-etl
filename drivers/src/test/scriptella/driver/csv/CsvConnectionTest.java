@@ -120,16 +120,43 @@ public class CsvConnectionTest extends AbstractTestCase {
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
         rows = 0;
-        con.executeScript(new StringResource("$row1,\"value\",val${'ue'}\n$row2,,value\u0394"),
+        con.executeScript(new StringResource("  $row1,\"value\",val${'ue'}\n$row2,,value\u0394"),
                 MockParametersCallbacks.SIMPLE);
         con.close();
         String expected = "*row1*;value;value\r\n*row2*;;value\u0394\r\n";
         String actual = out.toString("UTF8");
         assertEquals(expected, actual);
+    }
 
+    /**
+     * Tests CSV processing with trim mode switched off.
+     */
+    public void testNoTrim() throws UnsupportedEncodingException {
+        //Create a configuration with non default values
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(CsvConnection.TRIM, "no");
+        props.put(CsvConnection.QUOTE, "");
+        props.put(CsvConnection.EOL, "\r\n");
+        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
+                MockDriversContext.INSTANCE);
 
+        CsvConnection con = new CsvConnection(cp);
+        con.executeQuery(new StringResource(" c4.*"), //extra leading whitespace
+                MockParametersCallbacks.SIMPLE, new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                fail("Whitespace trimming should be suppressed.");
+            }
+        });
+        con.executeScript(new StringResource(" $a,$b , $c "),
+                MockParametersCallbacks.SIMPLE);
+
+        con.close();
+        String expected = " *a*,*b* , *c* \r\n";
+        String actual = out.toString();
+        assertEquals(expected, actual);
 
     }
+
 
 
 

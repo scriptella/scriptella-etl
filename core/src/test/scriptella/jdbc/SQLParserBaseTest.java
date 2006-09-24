@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.core;
+package scriptella.jdbc;
 
 import scriptella.AbstractTestCase;
-import scriptella.jdbc.SQLParserBase;
 
 import java.io.StringReader;
 import java.util.Set;
@@ -30,7 +29,7 @@ import java.util.TreeSet;
  */
 public class SQLParserBaseTest extends AbstractTestCase {
     public void test() {
-        String s = "--Test\n" +
+        String s = "-not skipped\n--HintOrComment\n" +
                 "     \n" +
                 "     CREATE TABLE Test (\n" +
                 "            ID INT,\n" +
@@ -40,17 +39,18 @@ public class SQLParserBaseTest extends AbstractTestCase {
                 "        insert into test(id, value) values (?1,  '$justatext');\n" +
                 "        insert into test(id, value) values (?value,'A test${justatext}');\n" +
                 "        insert into test(id, value) values (3,?text);\n" +
-                " --comment$justatext ?{justatext} ?justatext";
+                " //comment$justatext ?{justatext} ?justatext\n";
         //comments are ignored and quoted values are not parsed
         final String[] expected = {
-                "CREATE TABLE Test (\n" +
+                "-not skipped\n--HintOrComment\nCREATE TABLE Test (\n" +
                         "            ID INT,\n" +
                         "            $/VALUE/ VARCHAR(255)\n" +
                         "        )",
                 " $/extra/" +
                         "        insert into test(id, value) values (?/1/,  '$justatext')",
                 "        insert into test(id, value) values (?/value/,'A test${justatext}')",
-                "        insert into test(id, value) values (3,?/text/)"};
+                "        insert into test(id, value) values (3,?/text/)",
+                " //comment$justatext ?{justatext} ?justatext\n"};
 
 
         final Set<String> exprSet = new TreeSet<String>();
@@ -61,6 +61,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
         propSet.add("VALUE");
         propSet.add("text");
 
+
         SQLParserBase p = new SQLParserBase() {
             int stInd;
 
@@ -69,7 +70,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
                 if (expression) {
                     assertTrue(exprSet.contains(name));
                 } else {
-                    assertTrue(propSet.contains(name));
+                    assertTrue("Unexpected "+name+" property", propSet.contains(name));
                 }
                 return (jdbcParam ? "?/" : "$/") + name + '/';
             }
@@ -82,5 +83,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
         p.parse(new StringReader(s));
 
     }
+
+
 
 }
