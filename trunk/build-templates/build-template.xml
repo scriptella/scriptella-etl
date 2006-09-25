@@ -58,10 +58,7 @@
             <manifest>
                 <attribute name="Implementation-Title" value="${ant.project.name} Module"/>
                 <attribute name="Build-Date" value="${TODAY}"/>
-                <section name="${package}">
-                    <attribute name="Package-Version" value="${version}"/>
-                    <attribute name="Package-Vendor" value="The Scriptella Project Team"/>
-                </section>
+                <attribute name="Implementation-Version" value="${version}"/>
             </manifest>
         </jar>
     </target>

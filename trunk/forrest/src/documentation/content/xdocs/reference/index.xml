@@ -247,7 +247,11 @@
 						<td>-quiet, -q</td>
 						<td>be extra quiet</td>
 					</tr>
-				</table>
+                    <tr>
+                        <td>-version, -v</td>
+                        <td>print version</td>
+                    </tr>
+                </table>
 			</section>
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>

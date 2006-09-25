@@ -77,12 +77,23 @@ public class ScriptsRunner {
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
 
+
+    private static void printVersion() {
+        Package p = Package.getPackage("scriptella.tools");
+        if (p != null) {
+            System.out.println(p.getSpecificationTitle() + " Version " + p.getImplementationVersion());
+        } else {
+            System.out.println("Scriptella version information unavailable");
+        }
+    }
+
     private static void printUsage() {
         System.out.println("scriptella [-options] [<file 1> ... <file N>]");
         System.out.println("Options:");
-        System.out.println("  -help, -h           display help ");
-        System.out.println("  -debug, -d          print debugging information");
-        System.out.println("  -quiet, -q          be extra quiet");
+        System.out.println("  -help,    -h        display help ");
+        System.out.println("  -debug,   -d        print debugging information");
+        System.out.println("  -quiet,   -q        be extra quiet");
+        System.out.println("  -version, -v        print version");
     }
 
     public void setProperties(final Map<?, ?> props) {
@@ -127,6 +138,10 @@ public class ScriptsRunner {
                 h.setLevel(Level.WARNING);
                 continue;
             }
+            if (arg.startsWith("-v")) {
+                printVersion();
+                return;
+            }
 
             files.add(new File(arg));
         }
@@ -154,10 +169,10 @@ public class ScriptsRunner {
                         "Script " + file + " execution failed.", e);
                 if (BugReport.isPossibleBug(e)) {
                     LOG.log(Level.SEVERE, new BugReport(e).toString());
-                } else if (h.getLevel().intValue()<Level.INFO.intValue()) {
+                } else if (h.getLevel().intValue() < Level.INFO.intValue()) {
                     //Print stack trace of exception in debug mode
                     System.err.println("---------------Debug Stack Trace-----------------");
-                    Throwable t = e.getCause()==null?e:e.getCause();
+                    Throwable t = e.getCause() == null ? e : e.getCause();
                     t.printStackTrace();
                 }
             }
