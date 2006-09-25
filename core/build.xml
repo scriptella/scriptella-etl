@@ -2,7 +2,6 @@
     <path id="classpath">
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
     </path>
-    <property name="package" value="scriptella"/>
     <import file="../build-templates/build-template.xml"/>
 
 </project>
