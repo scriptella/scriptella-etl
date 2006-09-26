@@ -1,0 +1,21 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Simply creates a table with data in one db and copy it to another database.
+    </description>
+    <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
+    <script>
+        DROP TABLE Test IF EXISTS;
+        CREATE TABLE Test (
+            ID $INT,
+            Num $FLOAT,
+            Str $VARCHAR100,
+            Flag $BIT,
+            Ti $DATETIME,
+            Data $BINARY,
+            BData $LONGVARBINARY,
+            CData $LONGVARCHAR
+        );
+    </script>
+
+</etl>

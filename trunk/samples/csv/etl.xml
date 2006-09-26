@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Quieries CSV data from from file and store the results in a DB and other CSV file.
     </description>
@@ -35,4 +35,4 @@
         </script>
     </query>
 
-</scriptella>
+</etl>

@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <properties>
         property=!
     </properties>
@@ -39,4 +39,4 @@
     </query>
 
 
-</scriptella>
+</etl>

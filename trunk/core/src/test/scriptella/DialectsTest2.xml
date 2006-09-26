@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:dialectstest2" user="sa" password=""/>
     <script>
         <!--must execute-->
@@ -41,4 +41,4 @@
         </dialect>
     </script>
 
-</scriptella>
+</etl>

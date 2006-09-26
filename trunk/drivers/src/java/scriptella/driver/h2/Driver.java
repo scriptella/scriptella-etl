@@ -15,6 +15,7 @@
  */
 package scriptella.driver.h2;
 
+import scriptella.jdbc.JDBCException;
 import scriptella.jdbc.ScriptellaJDBCDriver;
 
 import java.sql.Connection;
@@ -34,7 +35,7 @@ public class Driver extends ScriptellaJDBCDriver {
         try {
             Class.forName(Driver.H2_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(H2_DRIVER_NAME + " driver not found. Please check class path settings", e);
+            throw new JDBCException(H2_DRIVER_NAME + " driver not found. Please check class path settings", e);
         }
     }
 

@@ -21,7 +21,6 @@ import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.PreparedStatement;
@@ -75,8 +74,6 @@ class JDBCTypesConverter implements Closeable {
             preparedStatement.setObject(index, null);
         } else if (value instanceof InputStream) {//several drivers(e.g. H2) return streams for BLOBs
             setStreamObject(preparedStatement, index, (InputStream) value);
-        } else if (value instanceof Reader) {//several drivers(e.g. H2) return readers for CLOBs
-            setStreamObject(preparedStatement, index, (InputStream) value);
         } else if (value instanceof URL) {
             setURLObject(preparedStatement, index, (URL) value);
         } else {
@@ -98,6 +95,7 @@ class JDBCTypesConverter implements Closeable {
             throw (SQLException)new SQLException("Failed to check binary stream: "+e.getMessage()).initCause(e);
         }
     }
+
 
     /**
      * Sets a content of the file specified by URL.

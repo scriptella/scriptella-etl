@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:csv" user="sa" password="">
         shutdown_on_exit=false
     </connection>
@@ -37,4 +37,4 @@
             $id,$text</script>
     </query>
 
-</scriptella>
+</etl>

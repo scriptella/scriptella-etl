@@ -36,24 +36,24 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
         for (ExecutionStatistics.ElementInfo info : elements) {
-            if ("/scriptella[1]/script[1]".equals(info.getId())) {
+            if ("/etl[1]/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
                 assertEquals(4, info.getStatementsCount());
-            } else if ("/scriptella[1]/query[1]/query[1]/script[1]".equals(
+            } else if ("/etl[1]/query[1]/query[1]/script[1]".equals(
                     info.getId())) {
                 assertEquals(2, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
                 assertEquals(2, info.getStatementsCount()); //1 statement executed 2 times
-            } else if ("/scriptella[1]/query[1]/query[1]".equals(info.getId())) {
+            } else if ("/etl[1]/query[1]/query[1]".equals(info.getId())) {
                 assertEquals(2, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
                 assertEquals(2, info.getStatementsCount());
-            } else if ("/scriptella[1]/query[1]".equals(info.getId())) {
+            } else if ("/etl[1]/query[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
                 assertEquals(1, info.getStatementsCount());
-            } else if ("/scriptella[1]/script[2]".equals(info.getId())) {
+            } else if ("/etl[1]/script[2]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
                 assertEquals(3, info.getStatementsCount());
@@ -72,19 +72,19 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
         for (ExecutionStatistics.ElementInfo info : elements) {
-            if ("/scriptella[1]/script[1]".equals(info.getId())) {
+            if ("/etl[1]/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
-            } else if ("/scriptella[1]/query[1]/script[1]".equals(info.getId())) {
+            } else if ("/etl[1]/query[1]/script[1]".equals(info.getId())) {
                 assertEquals(0, info.getSuccessfulExecutionCount());
                 assertEquals(2, info.getFailedExecutionCount());
-            } else if ("/scriptella[1]/query[1]/script[2]".equals(info.getId())) {
+            } else if ("/etl[1]/query[1]/script[2]".equals(info.getId())) {
                 assertEquals(2, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
-            } else if ("/scriptella[1]/query[1]".equals(info.getId())) {
+            } else if ("/etl[1]/query[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
-            } else if ("/scriptella[1]/script[2]".equals(info.getId())) {
+            } else if ("/etl[1]/script[2]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
             } else {

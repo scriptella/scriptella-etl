@@ -103,7 +103,7 @@ public class SQLSupport {
                 return "?";
             } else { //otherwise return string representation.
                 //todo we need to defines rules for toString transformations
-                return p == null ? "" : p.toString();
+                return p == null ? super.handleParameter(name, expression, jdbcParam) : p.toString();
             }
         }
 

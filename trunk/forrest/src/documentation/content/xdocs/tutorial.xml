@@ -56,7 +56,7 @@ java -jar scriptella.jar [arguments]
                 copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
 				<p>etl.xml:</p>
 				<source><![CDATA[
-    <scriptella>
+    <etl>
         <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
         <connection id="db2" driver="jdbc.Driver.Class2.Name" url="jdbc:database2:sample" user="sa" password=""/>
         <query connection-id="db1">
@@ -69,7 +69,7 @@ java -jar scriptella.jar [arguments]
                 INSERT INTO Product(id, category, product_name) values (?id, ?{category}, ?name);
             </script>
         </query>
-    </scriptella>
+    </etl>
                     ]]></source>
 			</section>
 			<section>
@@ -79,7 +79,7 @@ java -jar scriptella.jar [arguments]
  is loaded through the web.</p>
 				<p>etl.xml:</p>
 				<source><![CDATA[
-    <scriptella>
+    <etl>
         <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
         <script>
             CREATE TABLE Track (
@@ -95,7 +95,7 @@ java -jar scriptella.jar [arguments]
             insert into Track(id, album_id, name, data) values
                    (2, 2, 'Song2.mp3', ?{file 'http://musicstoresample.com/song2.mp3'});
         </script>
-    </scriptella>
+    </etl>
                     ]]></source>
 			</section>
 			<section>
@@ -103,8 +103,8 @@ java -jar scriptella.jar [arguments]
 				<p>TODO: Add example here</p>
 				<p>etl.xml:</p>
 				<source><![CDATA[
-    <scriptella>
-    </scriptella>
+    <etl>
+    </etl>
                     ]]></source>
 			</section>
             <note>

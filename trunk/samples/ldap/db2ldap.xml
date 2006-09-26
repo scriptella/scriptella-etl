@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Migrates data from Database to LDAP.
         IMPORTANT NOTES:
@@ -101,4 +101,4 @@ uniqueMember: uid=$user_name,ou=people,dc=scriptella
         </query>
     </query>
 
-</scriptella>
+</etl>

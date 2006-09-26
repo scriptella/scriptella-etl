@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Imports CSV data from a file to a database table.
         See http://www.hsqldb.org/doc/guide/ch06.html for details about
@@ -38,4 +38,4 @@
         COMMIT;SHUTDOWN;
     </script>
 
-</scriptella>
+</etl>

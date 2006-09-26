@@ -78,8 +78,8 @@
 			</note>
 			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
 			<source><![CDATA[
-<!DOCTYPE scriptella SYSTEM "http://scriptella.javaforge.com/dtd/scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description></description>
     <properties>
         <include href="script.properties"/>
@@ -98,8 +98,8 @@
             INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
         </script>
     </query>
-</scriptella>]]></source>
-			<p>&lt;scriptella&gt; is a root element of all Scriptella files.</p>
+</etl>]]></source>
+			<p>&lt;etl&gt; is a root element of all Scriptella files.</p>
 			<section>
 				<title>&lt;properties&gt;</title>
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to

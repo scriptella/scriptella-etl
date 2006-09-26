@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <properties>property=1</properties>
     <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlsupport" user="sa" password=""/>
     <script>
@@ -9,4 +9,4 @@
         COMMIT;
         <include href="tst:///hugefile"/>
     </script>
-</scriptella>
+</etl>
