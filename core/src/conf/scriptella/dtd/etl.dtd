@@ -21,7 +21,7 @@
 <!--
 Root element of Scriptella XML file.
 -->
-<!ELEMENT scriptella (description?, properties?, connection*, (script*, query*)*)>
+<!ELEMENT etl (description?, properties?, connection*, (script*, query*)*)>
 
 <!--
 Contains description of scripts file.

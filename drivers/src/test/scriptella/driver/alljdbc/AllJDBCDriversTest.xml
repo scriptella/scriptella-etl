@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Simply creates a table with data in one db and copy it to another database.
     </description>
@@ -7,33 +7,8 @@
     <connection id="c2" driver="${driver2}" url="${url2}" user="${user2}" password="${password2}"/>
     <connection id="c3" driver="janino"/>
     <script connection-id="c1">
-        DROP TABLE Test IF EXISTS;
-        CREATE TABLE Test (
-            ID INT,
-            Num FLOAT,
-            Str VARCHAR(100),
-            Flag BIT,
-            Ti DATETIME,
-            Data BINARY,
-            BData LONGVARBINARY,
-            CData LONGVARCHAR
-        );
         insert into Test values (1, 3.14, 'String', true, {ts '2006-07-21 19:43:00'}, '01010101', '01010101', 'abcdefg');
     </script>
-    <script connection-id="c2">
-        DROP TABLE Test IF EXISTS;
-        CREATE TABLE Test (
-            ID INT,
-            Num FLOAT,
-            Str VARCHAR(100),
-            Flag BIT,
-            Ti DATETIME,
-            Data BINARY,
-            BData LONGVARBINARY,
-            CData LONGVARCHAR
-        );
-    </script>
-
     <query connection-id="c1">
         SELECT * FROM Test
         <script connection-id="c2">
@@ -50,4 +25,4 @@
     </query>
 
 
-</scriptella>
+</etl>

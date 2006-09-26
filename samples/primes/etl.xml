@@ -13,8 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         This script produces prime numbers and builds a HTML report.
     </description>
@@ -120,4 +120,4 @@
     </script>
 
 
-</scriptella>
+</etl>

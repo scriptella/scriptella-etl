@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Migrates data from Database to LDAP.
         JdbcLdapDriver IMPORTANT NOTES:
@@ -111,4 +111,4 @@
         </query>
     </query>
 
-</scriptella>
+</etl>

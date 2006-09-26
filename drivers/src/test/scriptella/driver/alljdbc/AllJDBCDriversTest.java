@@ -18,9 +18,11 @@ package scriptella.driver.alljdbc;
 import scriptella.AbstractTestCase;
 import scriptella.execution.ScriptsExecutor;
 import scriptella.execution.ScriptsExecutorException;
+import scriptella.spi.DriversFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.DriverManager;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,25 +71,44 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
 
-    public void test() throws ScriptsExecutorException {
+    private ScriptsExecutor schema = newScriptsExecutor("schema.xml");
+
+    public void test() throws ScriptsExecutorException, ClassNotFoundException {
         int n = drivers.length;
         //just to make sure properties are valid
         assertTrue(n == urls.length && n == users.length && n == passwords.length);
 
         ScriptsExecutor se = newScriptsExecutor();
-        Map props = new HashMap();
+
+        Map<String,String> props = new HashMap<String, String>();
         //test any combination of drivers in both directions
         for (int i = 0; i < n; i++) {
+            String driver = drivers[i].trim();
+            props.put("driver1", driver);
+            props.put("driver", driver);
+            String url = urls[i].trim();
+            props.put("url1", url);
+            props.put("url", url);
+            props.put("user1", users[i].trim());
+            props.put("user", users[i].trim());
+            props.put("password1", passwords[i].trim());
+            props.put("password", passwords[i].trim());
+
+
+            initDb(props);
             for (int j = 0; j < n; j++) {
                 if (j != i) {
-                    props.put("driver1", drivers[i].trim());
+                    props.put("driver", drivers[j].trim());
                     props.put("driver2", drivers[j].trim());
-                    props.put("url1", urls[i].trim());
+                    props.put("url", urls[j].trim());
                     props.put("url2", urls[j].trim());
-                    props.put("user1", users[i].trim());
+                    props.put("user", users[j].trim());
                     props.put("user2", users[j].trim());
-                    props.put("password1", passwords[i].trim());
+                    props.put("password", passwords[j].trim());
                     props.put("password2", passwords[j].trim());
+                    initDb(props);
+                    schema.setExternalProperties(props);
+                    schema.execute(); //Preparing 2nd connection
                     se.setExternalProperties(props);
                     se.execute();
                     assertEquals(1, rows.size());
@@ -105,6 +126,32 @@ public class AllJDBCDriversTest extends AbstractTestCase {
                 }
             }
         }
+    }
+
+
+    /**
+     * Initialized DB
+     * @param props
+     */
+    private void initDb(Map<String,String> props) throws ScriptsExecutorException {
+        try {
+            Properties p = new Properties();
+            p.load(getClass().getResourceAsStream(props.get("driver")+".types.properties"));
+            props.putAll((Map)p);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        //Initialize a driver and obtain a connection to turn off automatic shutdown on last connection close
+        try {
+            DriversFactory.getDriver(props.get("driver"), getClass().getClassLoader());
+            DriverManager.getConnection(props.get("url"), props.get("user"), props.get("password"));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        schema.setExternalProperties(props);
+        schema.execute();
+
     }
 
     private void checkId(Object id) {

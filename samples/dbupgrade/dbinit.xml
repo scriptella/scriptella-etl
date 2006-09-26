@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>Database creation script</description>
     <properties>
         <include href="dbinit.properties"/>
@@ -50,4 +50,4 @@
     </script>
 
 
-</scriptella>
+</etl>

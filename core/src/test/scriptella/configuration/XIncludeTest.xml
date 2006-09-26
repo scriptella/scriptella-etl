@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <connection driver="---" url="---" user="" password=""/>
     <script>
         <include href="XIncludeTest.sql"/>
@@ -19,4 +19,4 @@
     </script>
 
 
-</scriptella>
+</etl>

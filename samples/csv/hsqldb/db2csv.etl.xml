@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Export data from table to CSV file.
     </description>
@@ -34,4 +34,4 @@
     <script connection-id="out"><!--Gracefully shutdown HSQLDB-->
         COMMIT;SHUTDOWN;
     </script>
-</scriptella>
+</etl>

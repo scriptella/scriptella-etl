@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <properties>
         #a,b and foo
         var=1
@@ -14,4 +14,4 @@
         password=
     </properties>
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
-</scriptella>
+</etl>

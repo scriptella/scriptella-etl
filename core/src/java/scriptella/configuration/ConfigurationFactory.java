@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 public class ConfigurationFactory {
     private static final Logger LOG = Logger.getLogger(ConfigurationFactory.class.getName());
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
-    private static final String DTD_NAME = "scriptella.dtd";
+    private static final String DTD_NAME = "etl.dtd";
     private URL resourceURL;
 
     static {

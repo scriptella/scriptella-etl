@@ -1,5 +1,5 @@
-<!DOCTYPE scriptella SYSTEM "scriptella.dtd">
-<scriptella>
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
     <description>
         Test script for rownum pseudo-column functionality.
     </description>
@@ -32,4 +32,4 @@
     </query>
 
 
-</scriptella>
+</etl>
