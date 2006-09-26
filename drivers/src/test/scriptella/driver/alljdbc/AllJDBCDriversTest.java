@@ -106,9 +106,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
                     props.put("user2", users[j].trim());
                     props.put("password", passwords[j].trim());
                     props.put("password2", passwords[j].trim());
-                    initDb(props);
-                    schema.setExternalProperties(props);
-                    schema.execute(); //Preparing 2nd connection
+                    initDb(props);//Preparing 2nd connection
                     se.setExternalProperties(props);
                     se.execute();
                     assertEquals(1, rows.size());
