@@ -6,7 +6,7 @@
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
-		<notice>Work in progress</notice>
+		<notice>Version 0.2dev. Work in progress</notice>
 		<abstract class="pageBreakAfter">
 			<img src="../images/site-logo.png" alt=""/>
 		</abstract>
@@ -64,14 +64,18 @@
   |      +--- dtd - Scriptella DTD file and documentation in DTDDoc format.
   +--- lib - scriptella boot class path libraries loaded by launch scripts.
             </source>
-            <p>Among other libraries the Scriptella distribution contains the following jars:</p>
-            <ul>
-                <li><code>scriptella-core.jar</code> - Scriptella core classes required to operate</li>
-                <li><code>scriptella-drivers.jar</code> - Built in drivers and adapters for different datasources</li>
-                <li><code>scriptella-tools.jar</code> - Misc tools, Ant and command line launchers</li>
-                <li><code>scriptella.jar</code> - All-In-One jar containing all dependencies except the driver specific</li>
-            </ul>
-        </section>
+			<p>Among other libraries the Scriptella distribution contains the following jars:</p>
+			<ul>
+				<li>
+					<code>scriptella-core.jar</code> - Scriptella core classes required to operate</li>
+				<li>
+					<code>scriptella-drivers.jar</code> - Built in drivers and adapters for different datasources</li>
+				<li>
+					<code>scriptella-tools.jar</code> - Misc tools, Ant and command line launchers</li>
+				<li>
+					<code>scriptella.jar</code> - All-In-One jar containing all dependencies except the driver specific</li>
+			</ul>
+		</section>
 		<section>
 			<title>Scripts Syntax</title>
 			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
@@ -124,25 +128,28 @@
 				<p>Use element's content to pass properties into connection. Several driver also support
                 connection properties in URL string.</p>
 			</section>
-            <section>
-                <title>&lt;script&gt;</title>
-                <p>Elements of this type contain executable content. The script language is connection specific.
+			<section>
+				<title>&lt;script&gt;</title>
+				<p>Elements of this type contain executable content. The script language is connection specific.
                     This element supports the following optional attributes:</p>
-                <p>
-                    <strong>connection-id</strong> attribute specifies a connection identifier.
+				<p>
+					<strong>connection-id</strong> attribute specifies a connection identifier.
                     Connection ID is inherited for child elements.</p>
-                <p>
-                    <strong>new-tx</strong> attribute specifies transaction semantics. If new-tx=true a dedicated
+				<p>
+					<strong>new-tx</strong> attribute specifies transaction semantics. If new-tx=true a dedicated
                     connection is used instead of the global one.
                 </p>
-                <p>
-                    <strong>if</strong> attribute is used for conditional execution. The element content is executed
+				<p>
+					<strong>if</strong> attribute is used for conditional execution. The element content is executed
                     only if the result of this attribute value evaluation is true. For example <br/>
-                    <code>&lt;script if="rownum gt 1 and name!=null and name.length() gt 0"&gt;</code><br/>
+					<code>&lt;script if="rownum gt 1 and name!=null and name.length() gt 0"&gt;</code>
+					<br/>
                     is evaluated only if rownum variable has value greater than 1 and the name variable is not empty.
                 </p>
-                <p><strong>Example</strong></p>
-                <source>
+				<p>
+					<strong>Example</strong>
+				</p>
+				<source>
                     &lt;--A script executed in a separate connection(new-tx=true)
                     if drop_tables property has been set to true. --&gt;
                     &lt;connection id="in" ...&gt;
@@ -152,9 +159,8 @@
                         DROP TABLE Table2;
                     &lt;/script&gt;
                 </source>
-            </section>
-
-            <fixme author="ejboy">Describe all elements</fixme>
+			</section>
+			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
 		<section>
 			<title>Expressions and Variables Substitution</title>
@@ -199,17 +205,18 @@
                     These variables are available in nested elements.
                 Columns may also be referenced using a result set column number, e.g. ?1, ?2 ,...</p>
 			</section>
-            <section>
-                <title>Adding references to files from SQL scripts</title>
-                <p>The JDBC bridge supports referencing file content via</p>
-                <source>?{file &lt;Expression&gt;}</source> <p>syntax.
+			<section>
+				<title>Adding references to files from SQL scripts</title>
+				<p>The JDBC bridge supports referencing file content via</p>
+				<source>?{file &lt;Expression&gt;}</source>
+				<p>syntax.
                 Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
-                </p>
-                <p>File references are set as prepared statement parameters of stream type, so you can reference
+				</p>
+				<p>File references are set as prepared statement parameters of stream type, so you can reference
                 LOBs of any size supported by your database driver.</p>
-                <note>Music Store example demonstrates usage of file references</note>
-            </section>
-            <section>
+				<note>Music Store example demonstrates usage of file references</note>
+			</section>
+			<section>
 				<title>Examples</title>
 				<p>Execute a SQL query for table specified by TABLE  property and inserts the first row into TABLE2</p>
 				<source><![CDATA[
@@ -247,11 +254,11 @@
 						<td>-quiet, -q</td>
 						<td>be extra quiet</td>
 					</tr>
-                    <tr>
-                        <td>-version, -v</td>
-                        <td>print version</td>
-                    </tr>
-                </table>
+					<tr>
+						<td>-version, -v</td>
+						<td>print version</td>
+					</tr>
+				</table>
 			</section>
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>
@@ -350,39 +357,7 @@
                 you can specify a generic JDBC property, but using adapters simplifies
                 switching between drivers and even a target platform e.g. Java/.Net</li>
 			</ul>
-			<p>Currently Scriptella provides the following adapters:</p>
-			<table>
-				<tr>
-					<th>Adapter Name</th>
-					<th>Scriptella Driver Name</th>
-					<th>Native Driver</th>
-					<th>Notes</th>
-				</tr>
-				<tr>
-					<td>
-						<a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
-					</td>
-					<td>scriptella.driver.hsqldb.Driver</td>
-					<td>org.hsqldb.jdbcDriver</td>
-					<td/>
-				</tr>
-				<tr>
-					<td>
-						<a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
-					</td>
-					<td>scriptella.driver.h2.Driver</td>
-					<td>org.h2.Driver</td>
-					<td/>
-				</tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/jndi/package-summary.html">JNDI</a>
-                    </td>
-                    <td>scriptella.driver.jndi.Driver</td>
-                    <td>Any JDBC driver</td>
-                    <td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE environment</td>
-                </tr>
-            </table>
+			<p>See <a href="drivers.html#jdbcbridge">JDBC Bridge Drivers Matrix</a> for the complete list of supported adapters.</p>
 			<note>
                 Scriptella driver's package short name is an alias for driver, e.g. h2 is an alias
                 for scriptella.driver.h2.Driver
@@ -390,45 +365,18 @@
 		</section>
 		<section>
 			<title>Non-relational Datasources Interoperability</title>
-            <p>Scriptella has built-in support for the following non JDBC drivers:</p>
-            <table>
-                <tr>
-                    <th>Adapter Name</th>
-                    <th>Scriptella Driver Name</th>
-                    <th>Notes</th>
-                </tr>
-                <tr>
-                    <td><a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
-                    </td>
-                    <td>scriptella.driver.ldap.Driver</td>
-                    <td>This driver allows to execute LDIF scripts and search filter queries.</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino</a>
-                    </td>
-                    <td>scriptella.driver.janino.Driver</td>
-                    <td>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>
-                    </td>
-                    <td>scriptella.driver.velocity.Driver</td>
-                    <td>This driver allows to integrate velocity templates into script files.</td>
-                </tr>
-            </table>
-
-            <p>We recommend various JDBC bridge drivers to work with specific datasources like LDAP directories,
+            <p>See <a href="drivers.html#nonjdbc">Non-JDBC Drivers Matrix</a> for the complete list of drivers.</p>
+			<p>Additionally various JDBC bridge drivers can be used to work with specific datasources like LDAP directories,
                 CSV files, XML files or object databases.
             </p>
 			<section>
 				<title>Accessing directories based on LDAP</title>
-                <p>The feature of Scriptella is a possibility to write transformations
-                    in a language suitable for the datasource you operate,
-                    so we've added built-in support for LDIF scripts and RFC 2254 search filter queries.
+				<p>The feature of Scriptella is a possibility to write transformations
+                    in a language suitable for the datasource you operate, so we've added a
+                    <a href="../docs/api/scriptella/driver/ldap/package-summary.html">built-in support</a>
+                    for LDIF scripts and RFC 2254 search filter queries.
                 </p>
-                <p>Alternatively you can use the freely available
+				<p>Alternatively you can use the freely available
                     <a href="http://www.openldap.org/jdbcldap/">JDBC-LDAP Bridge Driver</a>
                     (JDBC-LDAP) to access information held in directories.
 				This driver uses SQL-like syntax for scripts and queries. See
@@ -440,16 +388,16 @@
 			</section>
 			<section>
 				<title>Working with CSV data</title>
-                <p>
-					HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
+				<p>The <a href="../docs/api/scriptella/driver/csv/package-summary.html">built-in CSV driver</a> allows to easily query and generate CSV files.</p>
+				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
                     feature could be used to work
                     with CSV files.</p>
-                <p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
-            </section>
+				<p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
+			</section>
 			<section>
 				<title>Using Java Code</title>
 				<p>Although Scriptella was designed for JDBC/SQL datasources under some circumstances it is
-				useful to embed or invoke Java from Scriptella file. The <a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino Provider</a> 
+				useful to embed or invoke Java from Scriptella file. The <a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino Provider</a>
 				is bundled with Scriptella distribution and provides a Java bridge. This driver also exposes a set of properties and methods for <a href="../docs/api/scriptella/driver/janino/JaninoScript.html">&lt;script&gt;</a> and <a href="../docs/api/scriptella/driver/janino/JaninoQuery.html">&lt;query&gt;</a> elements.</p>
 				<p>Scriptella has no equivalent of Ant Task API, although we provide two alternatives to integrate Java solutions:</p>
 				<ul>
@@ -508,13 +456,13 @@
                 reference BLOB content in external files and use JDBC escaping syntax to pass dates
                 independently from the DB locale/date/time settings.</td>
 				</tr>
-                <tr>
-                    <td>ODBC</td>
-                    <td>
+				<tr>
+					<td>ODBC</td>
+					<td>
                         Produces a HTML view of the MS Access Northwind Categories table.
                         This example demonstrates working with ODBC datasources (Northwind.mdb) and producing a report with images.
                     </td>
-                </tr>
+				</tr>
 				<tr>
 					<td>Primes</td>
 					<td>Fills the database with prime numbers and produces HTML/CSV reports.
@@ -522,7 +470,7 @@
 				</tr>
 			</table>
 		</section>
-        <section>
+		<section>
 			<title>Best Practices</title>
 		</section>
 	</body>

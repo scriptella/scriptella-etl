@@ -28,16 +28,16 @@ See http://forrest.apache.org/docs/linking.html for more info
         <tutorial label="Two Minute Tutotial" href="tutorial.html" description="Two Minute Tutorial"/>
         <faq label="FAQ" href="faq.html" description="Frequently Asked Questions"/>
     </getstart>
-	<doc label="Documentation">
-		<!--The href must be wholesite.html/pdf  You can change the labels and node names-->
-        <reference tab="reference" label="Reference" href="reference/index.html" description="Scriptella Reference Documentation"/>
+	<doc label="Documentation" tab="reference" description="Scriptella Documentation">
+        <index label="Reference Documentation" href="reference/index.html" description="Scriptella Reference Documentation"/>
+        <index label="Drivers Matrix" href="reference/drivers.html"/>
         <!-- Temprorary solution to avoid broken links. See forrest FAQ for solution on apidocs links-->
         <api label="API Docs" href="docs/api/"/>
         <dtd label="DTD Reference" href="docs/dtd/"/>
         <!--For now API Docs links breaks wholesite generation, resolve the problem and uncomment 
         <whole_site_html label="Whole Site HTML" href="wholesite.html"/>
         <whole_site_pdf label="Whole Site PDF" href="wholesite.pdf"/>-->
-        </doc>
+    </doc>
     <external-refs>
 		<forrest href="http://forrest.apache.org/">
 			<linking href="docs/linking.html"/>
