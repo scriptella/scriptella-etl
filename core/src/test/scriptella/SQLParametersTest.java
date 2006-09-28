@@ -54,7 +54,7 @@ public class SQLParametersTest extends DBTestCase {
                         if (id.equals(1)) {
                             assertEquals("globalValue", text);
                         } else if (id.equals(2)) {
-                            assertEquals("global2ValueThree${global}", text);
+                            assertEquals("global2ValueThreeglobalValue", text);
                         } else {
                             fail("Unexpected id: " + id);
                         }

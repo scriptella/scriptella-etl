@@ -16,7 +16,7 @@ This suite tests properties substitution.
         TEXT VARCHAR(100)
         );
         $insert Test(id, text) values (1, ?global);<!-- Must be substituted-->
-        ${insert} Test(id, text) values (2, ?global2+'Three${global}');<!-- Literals are skipped-->
+        ${insert} Test(id, text) values (2, ?global2+'Three${global}');<!-- ? in literals is skipped, $ is processed-->
     </script>
 
 </etl>
