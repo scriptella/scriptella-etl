@@ -20,7 +20,6 @@ import scriptella.configuration.ConnectionEl;
 import scriptella.execution.ScriptsContext;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.DialectIdentifier;
 import scriptella.spi.DriversClassLoader;
 import scriptella.spi.DriversFactory;
 import scriptella.spi.ScriptellaDriver;
@@ -45,7 +44,6 @@ public class ConnectionManager {
     Connection connection;
     List<Connection> newConnections;
     private ScriptellaDriver driver;
-    private DialectIdentifier dialectIdentifier;
     ConnectionParameters connectionParameters;
 
     public ConnectionManager(ScriptsContext ctx, ConnectionEl c) {
@@ -89,13 +87,6 @@ public class ConnectionManager {
         }
 
         return connection;
-    }
-
-    public DialectIdentifier getDialectIdentifier() {
-        if (dialectIdentifier == null) {
-            dialectIdentifier = getConnection().getDialectIdentifier();
-        }
-        return dialectIdentifier;
     }
 
     public Connection newConnection() {

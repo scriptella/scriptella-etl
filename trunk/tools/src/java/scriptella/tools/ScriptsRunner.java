@@ -124,7 +124,7 @@ public class ScriptsRunner {
         h.setLevel(Level.INFO);
         boolean failed = false;
         List<File> files = new ArrayList<File>();
-        ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Scripts execution");
+        ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Execution Progress");
         for (String arg : args) {
             if (arg.startsWith("-h")) {
                 printUsage();

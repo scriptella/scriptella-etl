@@ -23,6 +23,7 @@ import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
 import scriptella.execution.ScriptsContext;
 import scriptella.interactive.ProgressCallback;
+import scriptella.spi.Connection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,17 +64,17 @@ public class Session {
                      final ScriptsContext ctx) {
         final List<ConnectionEl> connections = configuration.getConnections();
 
+        ProgressCallback progressCallback = ctx.getProgressCallback().fork(50, connections.size());
         for (ConnectionEl c : connections) {
             final ConnectionManager con = new ConnectionManager(ctx, c);
-            con.getConnection();
+            Connection connection = con.getConnection();
+            progressCallback.step(1, "Connection "+connection.toString()+" registered");
             registerConnection(c.getId(), con);
         }
 
-        ctx.getProgressCallback().step(5, "Registering database connections");
-
-        ctx.getProgressCallback().step(5, "Parsing row sets");
-
         final List<ScriptingElement> scripts = configuration.getScriptingElements();
+        progressCallback = ctx.getProgressCallback().fork(50, scripts.size());
+
         executors = new ArrayList<ExecutableElement>(scripts.size());
         locations = new ArrayList<Location>(scripts.size());
 
@@ -85,6 +86,7 @@ public class Session {
             } else if (s instanceof ScriptEl) {
                 executors.add(ScriptExecutor.prepare((ScriptEl) s));
             }
+            progressCallback.step(1, s.getLocation()+" prepared");
         }
     }
 
