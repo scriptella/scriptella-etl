@@ -20,6 +20,7 @@ import scriptella.AbstractTestCase;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Tests for {@link SqlTokenizer}.
@@ -51,12 +52,36 @@ public class SqlTokenizerTest extends AbstractTestCase {
         assertEquals("UPDATE test set value='Updated1' where ID=1", actual.toString());
         actual = tok.nextStatement();
         assertNull(actual);
-
-
-
-
-
-
-
     }
+
+    public void testComments() throws IOException {
+        String s="insert into table values 1,?v--$comment\n;" +
+                "-notacomment$v/**fdfdfd$comment\n$comment.v$$???\n;;;*/;stmt${var};\n" +
+                "//$comment";
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(s));
+        tok.nextStatement();
+        assertEquals(Arrays.asList(new Integer[] {27}), tok.getInjections());
+        tok.nextStatement();
+        assertEquals(Arrays.asList(new Integer[] {12}), tok.getInjections());
+        assertEquals("stmt${var}", tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {4}), tok.getInjections());
+        tok.nextStatement();
+        assertEquals(Collections.EMPTY_LIST, tok.getInjections());
+    }
+
+    public void testQuotes() throws IOException {
+        String data = "INSERT INTO \"$TBL\" VALUES (\"?V\")";
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(data));
+        tok.nextStatement();
+        assertEquals(Arrays.asList(new Integer[] {13}), tok.getInjections());
+    }
+
+    /**
+     * Test correct handling of empty files.
+     */
+    public void testEmpty() throws IOException {
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(""));
+        assertNull(tok.nextStatement());
+    }
+
 }

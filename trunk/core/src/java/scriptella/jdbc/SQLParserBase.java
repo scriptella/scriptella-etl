@@ -41,9 +41,15 @@ import java.util.regex.Matcher;
  * select * FROM table_name where id=?  where statement parameter has value of 11
  * </code></pre>
  * <p><u>Notes:</u><br>
- * SQL quoted expressions and comments are not substituted. Example:
+ * <ul>
+ * <li>$ prefixed expressions are substituted in all parts except comments.
+ * <li>? prefixed expressions are not substituted inside quotes and comments.
+ * </ul>
+ * Example:
+ *
  * <pre><code>
- * SELECT * FROM "Table" WHERE NAME="John${prop}" and SURNAME=?surname; --only SURNAME is handled
+ * --only ${prop} and ?surname are handled
+ * SELECT * FROM "Table" WHERE NAME="?John${prop}" and SURNAME=?surname;
  * </code></pre>
  * These extensions are handled by subclasses in {@link #handleParameter(String, boolean, boolean)} method.
  *

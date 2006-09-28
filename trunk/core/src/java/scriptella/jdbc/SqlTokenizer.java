@@ -25,7 +25,8 @@ import java.util.List;
  * Tokenizer for SQL statements.
  * <p>This class splits sql statements using a specifed
  * {@link #setSeparator(char) separator char}.
- * <p>The $,? injections in quoted literals and comments are skipped.
+ * <p>The ? injections in quoted literals and comments are skipped.
+ * The $ substitutions are skipped only in comments.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -81,11 +82,11 @@ public class SqlTokenizer {
                     }
                     break;
                 case '"':
-                    i+=seekQuote(sb, '\"');
+                    i=seekQuote(sb, '\"', i);
                     prevChar=(char) -1;
                     continue;
                 case '\'':
-                    i+=seekQuote(sb, '\'');
+                    i=seekQuote(sb, '\'', i);
                     prevChar=(char) -1;
                     continue;
                 case '?':
@@ -107,12 +108,14 @@ public class SqlTokenizer {
     public List<Integer> getInjections() {
         return injections;
     }
-    private int seekQuote(StringBuilder sb, char q) throws IOException {
-        int i=0;
-        for (int n; (n = reader.read()) >= 0; i++) {
+    private int seekQuote(StringBuilder sb, char q, int pos) throws IOException {
+        int i=pos+1;
+        for (int n; (n = reader.read()) >= 0;i++) {
             sb.append((char) n);
-            if (q == n) {  //quote
-                return i+1;
+            if ('$'==n) { //$ expressions are substituted in quotes
+                injections.add(i);
+            } else if (q == n) {  //quote
+                return i;
             }
         }
         return i;

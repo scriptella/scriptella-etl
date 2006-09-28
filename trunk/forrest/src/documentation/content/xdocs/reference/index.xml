@@ -166,10 +166,12 @@
 			<title>Expressions and Variables Substitution</title>
 			<p>Scriptella supports variables substitution and expression evaluation based on the following syntax:</p>
 			<ul>
-				<li>$Property_Name - inserts a value of the specified property or variable</li>
+				<li>$Property_Name - inserts a value of the specified property or variable.
+                    $ prefixed expressions are substituted in all parts except comments.</li>
 				<li>${expression} - inserts a value of the expression evaluation.
                     <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.</li>
-				<li>?Propery_Name or ?{expression} are used in SQL queries and scripts to set prepared statement parameters</li>
+				<li>?Propery_Name or ?{expression} are used in SQL queries and scripts to set prepared statement parameters.
+                ? prefixed expressions are not substituted inside quotes and comments.</li>
 			</ul>
 			<warning>
                 In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.

@@ -36,8 +36,8 @@ public class SQLParserBaseTest extends AbstractTestCase {
                 "            $VALUE VARCHAR(255)\n" +
                 "        );\n" +
                 " ${extra}\n" +
-                "        insert into test(id, value) values (?1,  '$justatext');\n" +
-                "        insert into test(id, value) values (?value,'A test${justatext}');\n" +
+                "        insert into test(id, value) values (?1,  '?justatext');\n" +
+                "        insert into test(id, value) values (?value,'A test?{justatext}');\n" +
                 "        insert into test(id, value) values (3,?text);\n" +
                 " //comment$justatext ?{justatext} ?justatext\n";
         //comments are ignored and quoted values are not parsed
@@ -47,8 +47,8 @@ public class SQLParserBaseTest extends AbstractTestCase {
                         "            $/VALUE/ VARCHAR(255)\n" +
                         "        )",
                 " $/extra/" +
-                        "        insert into test(id, value) values (?/1/,  '$justatext')",
-                "        insert into test(id, value) values (?/value/,'A test${justatext}')",
+                        "        insert into test(id, value) values (?/1/,  '?justatext')",
+                "        insert into test(id, value) values (?/value/,'A test?{justatext}')",
                 "        insert into test(id, value) values (3,?/text/)",
                 " //comment$justatext ?{justatext} ?justatext\n"};
 
