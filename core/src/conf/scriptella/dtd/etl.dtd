@@ -20,6 +20,18 @@
 
 <!--
 Root element of Scriptella XML file.
+<p><u>Example:</u><br>
+A simple example of the script file with only one connection obtained via
+JNDI bound datasource.
+%
+<etl>
+    <connection driver="jndi" url="java:projectDS"/>
+    <script>
+        INSERT INTO Test VALUES (1, "One")
+    </script>
+</etl>
+
+%
 -->
 <!ELEMENT etl (description?, properties?, connection*, (script*, query*)*)>
 
@@ -36,7 +48,7 @@ This element may contain plain text or includes.
 <!--
 The connection element specifies connection to a database or other system.
 This element may contain properties as plain text with includes.
-Examples:
+<p><u>Example:</u>
 %
 <connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
             url="jdbc:ldap://localhost:389/dc=scriptella"
@@ -74,7 +86,7 @@ classpath CDATA #IMPLIED
 <!--
 The fallback element contains alternate content to be used if the requested resource cannot be found.
 This element may contain plain text or includes.
-Example:
+<p><u>Example:</u>
 %
 <include href="http://no-such-url/file.txt">
     <fallback>Failed to retrieve full text</fallback>
@@ -99,6 +111,12 @@ encoding CDATA #IMPLIED
 <!--
 The dialect element defines a vendor specific script. Scripting elements may contain any number of nested dialects.
 This element may contain plain text or includes.
+<u>Example:</u>
+%
+<dialect name=".*oracle.*" version="10.*">
+//Statements executed only for Oracle 10 and higher
+</dialect>
+%
 -->
 <!ELEMENT dialect (#PCDATA | include)*>
 <!--
@@ -113,7 +131,7 @@ version CDATA #IMPLIED
 <!--
 The onerror element defines fallback script to execute if error occurs.
 This element may contain plain text or includes.
-Example:
+<p><u>Example:</u>
 %
 <onerror type=".*SQLException">
     DROP TABLE MYTABLE
@@ -140,6 +158,16 @@ retry (true | false) "false"
 <!--
 The query element is used to specify a query producing a result set.
 This element may contain queries, scripts, plain text, includes and dialects.
+<p><u>Example:</u><br/>
+Queries a table and writes the result into CSV file
+%
+<query connection-id="in">
+   SELECT * FROM Test WHERE id=&#063;id
+   <script connection-id="csv">
+        $id,$value
+   </script>
+</query>
+%
 -->
 <!ELEMENT query (#PCDATA | include | dialect | query | script)*>
 <!--
@@ -156,8 +184,14 @@ id ID #IMPLIED
 <!--
 The script element is used to specify a script.
 This element may contain plain text,onerror handlers, includes and dialects.
+<p><u>Example:</u></br>
+Inserts a row into Test table if id>0
+%
+<script if="id>0">
+    INSERT INTO Test VALUES(&#063;id, &#063;name)
+</script>
+%
 -->
-
 <!ELEMENT script (#PCDATA | include | dialect | onerror)*>
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
