@@ -94,7 +94,7 @@ public abstract class AbstractConnection implements Connection {
 
     public String toString() {
         String simpleName = getClass().getSimpleName();
-        return simpleName.length() == 0 ? "connection" : simpleName + '{' +
-                dialectIdentifier + '}';
+        return simpleName.length() == 0 ? "connection" : simpleName + ", " +
+                dialectIdentifier;
     }
 }

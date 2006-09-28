@@ -171,7 +171,7 @@ public class JDBCConnection extends AbstractConnection {
     }
 
     public String toString() {
-        return "JDBCConnection{" + (con == null ? "" : con.getClass()) + '}';
+        return "JDBCConnection{" + (con == null ? "" : con.getClass().getName()) + "}, "+getDialectIdentifier();
     }
 
     public JDBCTypesConverter newConverter() {
