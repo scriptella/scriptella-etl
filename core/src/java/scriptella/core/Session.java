@@ -68,7 +68,9 @@ public class Session {
         for (ConnectionEl c : connections) {
             final ConnectionManager con = new ConnectionManager(ctx, c);
             Connection connection = con.getConnection();
-            progressCallback.step(1, "Connection "+connection.toString()+" registered");
+            String id = connections.size() > 1 ? ("id=" + c.getId() + ", ") : "";//print an ID if more than one connection
+            progressCallback.step(1, "Connection " + id + connection.toString() +
+                    ", " + connection.getDialectIdentifier() + " registered");
             registerConnection(c.getId(), con);
         }
 
@@ -86,7 +88,7 @@ public class Session {
             } else if (s instanceof ScriptEl) {
                 executors.add(ScriptExecutor.prepare((ScriptEl) s));
             }
-            progressCallback.step(1, s.getLocation()+" prepared");
+            progressCallback.step(1, s.getLocation() + " prepared");
         }
     }
 

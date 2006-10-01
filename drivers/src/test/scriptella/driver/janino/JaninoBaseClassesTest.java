@@ -63,12 +63,8 @@ public class JaninoBaseClassesTest extends AbstractTestCase {
         jq.set("1", "v1");
         jq.next();//1st row
         //now multiple columns in a row
-        jq.setParametersCallback(new ParametersCallback() {
-            public Object getParameter(final String name) {
-                fail("Query provide enough columns - no need to get parameters from parent");
-                return null;
-            }
-        });
+        //Query provide enough columns - no need to get parameters from parent
+        jq.setParametersCallback(MockParametersCallbacks.UNSUPPORTED);
 
         jq.setQueryCallback(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {

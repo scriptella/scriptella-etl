@@ -3,6 +3,11 @@
     <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:csv" user="sa" password="">
         shutdown_on_exit=false
     </connection>
+    <!--Connection to a test file:
+    f1,f2,f3
+    1,2,3
+    Col4,5,6
+    7,8,9-->
     <connection id="csv" driver="csv" url="tst://testfile"/>
     <script connection-id="db">
         <!-- Test data -->
@@ -24,10 +29,10 @@
         <script connection-id="db">INSERT INTO Result VALUES(?rownum, ?f1+' '+?f2+' '+?f3)</script>
     </query>
     <query connection-id="csv">
-        1,<!--Filters rows having 1 in a first column -->
-        ,4,
+        1,<!--Select rows having 1 in a first column -->
+        col4,
         6<!--All rows-->
-        <script connection-id="db">INSERT INTO Result VALUES(100+?rownum, 'q'+?f1)</script>
+        <script connection-id="db">INSERT INTO Result VALUES(100+?rownum, 'q'+?F1)</script>
     </query>
 
     <query connection-id="db">

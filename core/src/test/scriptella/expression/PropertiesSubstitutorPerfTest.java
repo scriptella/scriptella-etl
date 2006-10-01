@@ -16,7 +16,7 @@
 package scriptella.expression;
 
 import scriptella.AbstractTestCase;
-import scriptella.spi.ParametersCallback;
+import scriptella.spi.MockParametersCallbacks;
 
 import java.util.Arrays;
 
@@ -32,11 +32,7 @@ public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
      * 05.09.2006 - Duron 1700 Mhz - 4078 ms
      */
     public void test() {
-        PropertiesSubstitutor ps = new PropertiesSubstitutor(new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return name;
-            }
-        });
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NAME);
 
         char [] fillC = new char[1000];
         Arrays.fill(fillC,'-');

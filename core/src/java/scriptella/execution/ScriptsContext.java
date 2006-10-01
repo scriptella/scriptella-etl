@@ -49,10 +49,6 @@ public class ScriptsContext implements ParametersCallback, DriversContext {
         return properties.get(name);
     }
 
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
     public ProgressCallback getProgressCallback() {
         return progressCallback;
     }

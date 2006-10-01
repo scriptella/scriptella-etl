@@ -23,7 +23,6 @@ import java.io.Closeable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 
 /**
@@ -38,8 +37,8 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     private ResultSet resultSet;
     private ColumnsMap columnsMap;
     private ParametersCallback params; //parent parameters callback to use
-    private Object[] row;//cache for row elements
     private JDBCTypesConverter converter;
+    private final int columnsCount;
 
     /**
      * Instantiates an adapter, prepares a cache and builds a map of column names.
@@ -57,12 +56,11 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
         try {
             final ResultSetMetaData m = resultSet.getMetaData();
-            final int n = m.getColumnCount();
+            columnsCount = m.getColumnCount();
 
-            for (int i = 1; i <= n; i++) {
+            for (int i = 1; i <= columnsCount; i++) {
                 columnsMap.registerColumn(m.getColumnName(i), i);
             }
-            row = new Object[n];
         } catch (SQLException e) {
             throw new JDBCException("Unable to process result set ", e);
         }
@@ -74,9 +72,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
      */
     public boolean next() {
         try {
-            boolean res = resultSet.next();
-            Arrays.fill(row, null);
-            return res;
+            return resultSet.next();
         } catch (SQLException e) {
             throw new JDBCException("Unable to move cursor to the next row", e);
         }
@@ -86,12 +82,9 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     public Object getParameter(final String name) {
         try {
             Integer index = columnsMap.find(name);
-            if (index != null && index > 0 && index <= row.length) { //if index found and in range
+            if (index != null && index > 0 && index <= columnsCount) { //if index found and in range
                 int ind = index - 1;
-                if (row[ind] == null) { //cache miss
-                    row[ind] = converter.getObject(resultSet, ind + 1);
-                }
-                return row[ind];
+                return converter.getObject(resultSet, ind + 1);
             } else { //otherwise call uppper level params
                 return params.getParameter(name);
             }
@@ -110,7 +103,6 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             JDBCUtils.closeSilent(resultSet);
             IOUtils.closeSilently(converter);
             resultSet = null;
-            row = null;
             params = null;
             columnsMap = null;
         }

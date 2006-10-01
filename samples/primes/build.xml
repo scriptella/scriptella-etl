@@ -16,6 +16,7 @@
 <project name="Prime numbers" default="main">
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
+        <!--Use debug="true" to see more execution details-->
         <execute/>
     </target>
 

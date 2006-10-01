@@ -126,6 +126,11 @@ public class ScriptsExecutor {
         ctx.setProgressCallback(oldProgress);
     }
 
+    /**
+     * Prepares the scripts context.
+     * @param indicator progress indicator to use.
+     * @return prepared scripts context.
+     */
     protected ScriptsContext prepare(final ProgressIndicator indicator) {
         ScriptsContext ctx = new ScriptsContext();
         ctx.setBaseURL(configuration.getDocumentUrl());
@@ -148,6 +153,10 @@ public class ScriptsExecutor {
         return ctx;
     }
 
+    /**
+     * A getter for external Properties.
+     * @return external properties set by {@link #setExternalProperties}.
+     */
     public Map<String, String> getExternalProperties() {
         return externalProperties;
     }
@@ -160,7 +169,7 @@ public class ScriptsExecutor {
      *
      * @param externalProperties
      */
-    public void setExternalProperties(final Map<?, ?> externalProperties) {
+    public void setExternalProperties(final Map<String, String> externalProperties) {
         this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
     }
 

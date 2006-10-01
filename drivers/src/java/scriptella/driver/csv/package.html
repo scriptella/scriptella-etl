@@ -58,7 +58,8 @@ The driver to write and query CSV files.
 <h2>Query Syntax</h2>
 The driver utilizes query by example approach for CSV content filtering.
 If you want to read the whole CSV simply use empty query element, otherwise
-specify a set of lines containing comma-separated regular expressions. Example:
+specify a set of lines containing comma-separated case insensitive regular expressions.
+<br><u>Example:</u>
 <code>
     <pre>
 ,.*food.*
@@ -69,7 +70,7 @@ This query selects rows where the second column equals "Beverages" or
 contains "food" substring.
 <h2>Script Syntax</h2>
 The script syntax is simple, just specify a comma-separated set of columns.
-Example:
+<br><u>Example:</u>
 <code>
     <pre>
 &lt;script&gt;

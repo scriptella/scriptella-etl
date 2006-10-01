@@ -4,6 +4,7 @@
         <pathelement location="${basedir}/../lib/velocity-dep.jar"/>
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/opencsv.jar"/>
+        <pathelement location="${basedir}/../lib/spring.jar"/>
     </path>
     <import file="../build-templates/build-template.xml"/>
 

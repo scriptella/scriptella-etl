@@ -18,6 +18,7 @@
     <target name="main">
         <available file="Northwind.mdb" property="db_present"/>
         <fail unless="db_present">In order to run this example copy Northwind.mdb from Microsoft Access Samples to the sample odbc directory.</fail>
+        <!--Use debug="true" to see more execution details-->
         <execute/>
     </target>
 

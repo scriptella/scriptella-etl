@@ -1,0 +1,68 @@
+<body>
+<h1>Spring Framework Driver for Scriptella.</h1>
+This driver allows to work in <a href="http://www.springframework.org">The Spring Framework</a> environment.
+<p><u>Important:</u></p>
+The driver requires <a href="ScriptsExecutorBean.html">ScriptsExecutorBean</a>
+to operate, see examples below.
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.spi.spring.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>Name of the DataSource bean specified in the bean factory/application context</td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code><a href="http://www.springframework.org">Spring Framework</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+</table>
+<h2>Example</h2>
+This example creates a table Spring_Table using a connection from Spring Datasource.
+<p><b>Spring Application Context</b>
+Spring application context declares a datasource and an executor. Additional
+properties and dependencies like progress indicator may also be injected.
+<code><pre>
+&lt;beans&gt;
+    &lt;bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;
+        &lt;property name="driverClassName"&gt;&lt;value&gt;org.hsqldb.jdbcDriver&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="url"&gt;&lt;value&gt;jdbc:hsqldb:mem:spring&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="username"&gt;&lt;value&gt;sa&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="password"&gt;&lt;value&gt;&lt;/value&gt;&lt;/property&gt;
+    &lt;/bean>
+    &lt;bean id="progress" class="scriptella.interactive.ConsoleProgressIndicator"/&gt;
+    &lt;bean id="executor" class="<b>scriptella.driver.spring.ScriptsExecutorBean</b>">
+        &lt;property name="configLocation">&lt;value>etl.xml&lt;/value>&lt;/property>
+        &lt;property name="progressIndicator">&lt;ref local="progress"/>&lt;/property>
+        &lt;property name="externalProperties">&lt;map>
+            &lt;entry key="tableName">&lt;value>Spring_Table&lt;/value>&lt;/entry>
+            &lt;/map>
+        &lt;/property>
+    &lt;/bean>
+&lt;/beans>
+</pre></code>
+<b>ETL file etl.xml</b>
+<code><pre>
+&lt;etl>
+    &lt;connection driver="spring" url="datasource"/>
+    &lt;script>
+        CREATE TABLE ${tableName} (
+            ID INT
+        )
+    &lt;/script>
+&lt;/etl>
+</pre></code>
+The usage of <code>executor</code> is straightforward:
+<code><pre>
+ScriptsExecutor exec = (ScriptsExecutor) beanFactory.getBean("executor");
+exec.execute();
+</pre></code>
+
+</body>

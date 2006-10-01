@@ -30,6 +30,13 @@ public class MockParametersCallbacks {
         }
     };
 
+    public static final ParametersCallback NAME = new ParametersCallback() {
+        public Object getParameter(final String name) {
+            return name;
+        }
+    };
+
+
     public static final ParametersCallback NULL = new ParametersCallback() {
         public Object getParameter(final String name) {
             return null;

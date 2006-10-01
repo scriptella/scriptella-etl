@@ -129,22 +129,21 @@ public class CsvQuery implements ParametersCallback, Closeable {
         }
         List<Pattern[]> res = null;
         for (String[] columns : list) {
-            Pattern[] patterns = new Pattern[columns.length];
-            boolean notEmptyPtr = false;
+            Pattern[] patterns = null;
             for (int i = 0; i < columns.length; i++) {
                 String s = trim(columns[i]);
-                if (s == null || s.length() == 0) {
-                    patterns[i] = null;
-                } else {
-                    notEmptyPtr = true;
+                if (s != null && s.length() > 0) {
+                    if (patterns == null) {
+                        patterns = new Pattern[columns.length];
+                    }
                     try {
-                        patterns[i] = Pattern.compile(substitutor.substitute(s));
+                        patterns[i] = Pattern.compile(substitutor.substitute(s), Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
                     } catch (Exception e) {
                         throw new CsvProviderException("Illegal regular expression syntax for query.", e, s);
                     }
                 }
             }
-            if (notEmptyPtr) { //if the line has at least on not empty pattern
+            if (patterns != null) { //if the line has at least on not empty pattern
                 if (res == null) {
                     res = new ArrayList<Pattern[]>();
                 }
@@ -158,10 +157,11 @@ public class CsvQuery implements ParametersCallback, Closeable {
 
     /**
      * Trims string if {@link #trim} flag is true.
+     *
      * @param s string to trim. May be null.
      * @return possibly trimmed string or null.
      */
-    private String trim(String s) { 
+    private String trim(String s) {
         return (trim && s != null) ? s.trim() : s;
     }
 
