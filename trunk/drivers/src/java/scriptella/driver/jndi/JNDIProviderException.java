@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.driver.jndi;
 
-
-
+import scriptella.jdbc.JDBCException;
 
 /**
- * Callback interface to obtain parameter values.
+ * Thrown to indicate JNDI provider failure.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public interface ParametersCallback {
-    /**
-     * Returns the value of parameter specified by name.
-     * <p>The callback internally delegates a call to parent callbacks if the parameter cannot be found.
-     * @param name parameter name. Name may be case insensitive depending on the provider.
-     * @return parameter value or null if parameter doesn't exist.
-     */
-    Object getParameter(final String name);
+public class JndiProviderException extends JDBCException {
+    public JndiProviderException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public JndiProviderException(String message) {
+        super(message);
+    }
+
+    public String getProviderName() {
+        return "JNDI";
+    }
 }

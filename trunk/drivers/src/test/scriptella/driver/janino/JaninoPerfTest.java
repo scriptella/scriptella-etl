@@ -37,11 +37,7 @@ public class JaninoPerfTest extends AbstractTestCase {
      */
     public void testScript() {
         JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
-        ParametersCallback pc = new ParametersCallback() {
-            public final Object getParameter(final String name) {
-                return name;
-            }
-        };
+        ParametersCallback pc = MockParametersCallbacks.NAME;
 
 
         Resource scriptContent = new StringResource("int i=1;get(\"1\");");

@@ -42,7 +42,7 @@ public class CsvScriptTest extends DBTestCase {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
-                return new ByteArrayInputStream("f1,f2,f3\n1,2,3\n4,5,6\n7,8,9".getBytes());
+                return new ByteArrayInputStream("f1,f2,f3\n1,2,3\nCol4,5,6\n7,8,9".getBytes());
             }
 
             public OutputStream getOutputStream(final URL u) {
@@ -58,14 +58,15 @@ public class CsvScriptTest extends DBTestCase {
         final Connection connection = getConnection("csv");
         QueryHelper q = new QueryHelper("SELECT * from Result");
         final Set<String> expected = new HashSet<String>();
-        expected.add("1 2 3");expected.add("4 5 6");expected.add("7 8 9");
-        expected.add("q1"); expected.add("q4");//second query filter only first and second rows
+        expected.add("1 2 3");expected.add("Col4 5 6");expected.add("7 8 9");
+        expected.add("q1"); expected.add("qCol4");//second query filter only first and second rows
         q.execute(connection, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 final Object parameter = parameters.getParameter("text");
                 assertTrue("Row "+parameter+" is not expected", expected.remove(parameter));
             }
         });
+        assertTrue("Expected row(s) were not selected: "+expected, expected.isEmpty());
         final String s = out.toString();
         assertEquals("\"1\",\"One\"\n" +
                 "\"2\",\" ;,-Two\"\" \"\n" +

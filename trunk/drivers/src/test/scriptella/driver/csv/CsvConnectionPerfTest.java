@@ -81,7 +81,7 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         //Quering 20000 lines file 10 times.
         for (int i=0;i<10;i++) {
             rows = 0;
-            con.executeQuery(new StringResource(",.*2,"), MockParametersCallbacks.NULL, new QueryCallback() {
+            con.executeQuery(new StringResource(" ,.*2, "), MockParametersCallbacks.NULL, new QueryCallback() {
                 public void processRow(final ParametersCallback parameters) {
                     rows++;
                     parameters.getParameter("c1");

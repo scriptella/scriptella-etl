@@ -46,15 +46,14 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("", params.getPassword());
 
         //check substituted properties in a context
-        final Map<String, String> props = ctx.getProperties();
-        assertEquals("1", props.get("a"));
-        assertEquals("bar", props.get("foo"));
-        assertEquals("1", props.get("var"));
-        assertEquals("1|1|1|1|1|1", props.get("b"));
-        assertEquals("jdbc:hsqldb:mem", props.get("url.prefix"));
-        assertEquals("propertiestest", props.get("dbname"));
-        assertEquals("org.hsqldb.jdbcDriver", props.get("driver"));
-        assertEquals("org.hsqldb.jdbcDriver", props.get("driver"));
+        assertEquals("1", ctx.getParameter("a"));
+        assertEquals("bar", ctx.getParameter("foo"));
+        assertEquals("1", ctx.getParameter("var"));
+        assertEquals("1|1|1|1|1|1", ctx.getParameter("b"));
+        assertEquals("jdbc:hsqldb:mem", ctx.getParameter("url.prefix"));
+        assertEquals("propertiestest", ctx.getParameter("dbname"));
+        assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
+        assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
         assertEquals("jdbc:hsqldb:mem:propertiestest", ctx.getParameter("url"));
         assertEquals("sa", ctx.getParameter("user"));
         assertEquals("", ctx.getParameter("password"));

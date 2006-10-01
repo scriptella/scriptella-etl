@@ -112,7 +112,7 @@
         <description>Prepares examples distribution</description>
         <delete file="${build.dir}/${examples.zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${examples.zip.name}">
-            <fileset dir="${basedir}/samples" includes="**"/>
+            <fileset dir="${basedir}/samples" excludes="lib/spring.jar"/>
         </zip>
     </target>
 

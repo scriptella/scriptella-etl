@@ -96,7 +96,7 @@ public class ScriptsRunner {
         System.out.println("  -version, -v        print version");
     }
 
-    public void setProperties(final Map<?, ?> props) {
+    public void setProperties(final Map<String, String> props) {
         exec.setExternalProperties(props);
     }
 
@@ -156,7 +156,8 @@ public class ScriptsRunner {
         if (indicator != null) {
             runner.setProgressIndicator(indicator);
         }
-        runner.setProperties(System.getProperties());
+
+        runner.setProperties((Map)System.getProperties());
         for (File file : files) {
             try {
                 final ExecutionStatistics st = runner.execute(file);

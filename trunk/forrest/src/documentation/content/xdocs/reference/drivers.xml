@@ -54,6 +54,17 @@
                     <td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
                         environment</td>
                 </tr>
+                <tr>
+                    <td>
+                        <a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
+                    </td>
+                    <td>scriptella.driver.spring.Driver</td>
+                    <td>Any JDBC driver</td>
+                    <td>This driver allows to work with <a href="http://www.springframework.org">Spring</a> managed datasource connections, useful in Spring Framework
+                        projects.<br/>
+                        The driver requires <code>scriptella.driver.spring.ScriptsExecutorBean</code> to be used in Spring configuration.
+                    </td>
+                </tr>
             </table>
         </section>
         <anchor id="nonjdbc"/>

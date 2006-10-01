@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class JDBCConnection extends AbstractConnection {
-    public static final String STATEMENT_CACHE_SIZE_KEY = "statement.cache.size";
+    public static final String STATEMENT_CACHE_KEY = "statement.cache";
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JDBCConnection.class.getName());
     private boolean transactable = false;
@@ -68,17 +68,17 @@ public class JDBCConnection extends AbstractConnection {
      * Called in constructor
      */
     protected void init(ConnectionParameters parameters) {
-        String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_SIZE_KEY);
+        String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_KEY);
         int statementCacheSize = 100;
         if (cacheSizeStr != null && cacheSizeStr.trim().length() > 0) {
             try {
                 statementCacheSize = Integer.valueOf(cacheSizeStr);
             } catch (NumberFormatException e) {
-                throw new JDBCException(STATEMENT_CACHE_SIZE_KEY + " property must be a non negative integer", e);
+                throw new JDBCException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
             }
         }
 
-        statementCache = new StatementCache(statementCacheSize);
+        statementCache = new StatementCache(con, statementCacheSize);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -152,15 +152,13 @@ public class JDBCConnection extends AbstractConnection {
 
     public void close() {
         if (con != null) {
+            statementCache.close();
+            statementCache = null;
             try {
                 con.close();
                 con = null;
             } catch (SQLException e) {
                 throw new JDBCException("Unable to close a connection", e);
-            }
-            if (statementCache != null) {
-                statementCache.close();
-                statementCache = null;
             }
 
         }
@@ -171,7 +169,7 @@ public class JDBCConnection extends AbstractConnection {
     }
 
     public String toString() {
-        return "JDBCConnection{" + (con == null ? "" : con.getClass().getName()) + "}, "+getDialectIdentifier();
+        return "JDBCConnection{" + (con == null ? "" : con.getClass().getName()) + '}';
     }
 
     public JDBCTypesConverter newConverter() {

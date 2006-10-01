@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.driver.jndi;
+package scriptella.driver.spring;
 
+import org.springframework.beans.factory.BeanFactory;
 import scriptella.jdbc.ScriptellaJDBCDriver;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Scriptella driver for JNDI datasources.
+ * Scriptella driver for <a href="http://www.springframework.org">The Spring Framework</a>
+ * Bean Factory(or Application Context) registered datasources.
  * <p>This driver relies on {@link scriptella.jdbc.ScriptellaJDBCDriver} functionality.
- * <p><em>Note:</em>Currently this driver does not support JTA transactions
- * and simply use connections provided by datasource.
- * In this case new-tx has no effect if code is runned inside a transaction.
+ * <p><em>Note:</em>Use Spring transaction proxies for
+ * {@link ScriptsExecutorBean} to support Spring transactions.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -37,15 +36,19 @@ public class Driver extends ScriptellaJDBCDriver {
     @Override
     protected java.sql.Connection getConnection(String url, Properties props) throws SQLException {
         if (url == null) {
-            throw new JndiProviderException("JNDI name must be specified in an url attribute of connection element.");
+            throw new SpringProviderException("Name of the spring bean must be specified in an url attribute of connection element.");
         }
         try {
-            InitialContext ctx = new InitialContext(props);
-            DataSource ds = (DataSource) ctx.lookup(url);
+            BeanFactory beanFactory = ScriptsExecutorBean.getContextBeanFactory();
+            DataSource ds = (DataSource) beanFactory.getBean(url);
             return ds.getConnection();
-        } catch (NamingException e) {
-            throw new JndiProviderException("A problem occured while trying to lookup a datasource with name " + url, e);
+        } catch (Exception e) {
+            throw new SpringProviderException("A problem occured while trying to lookup a datasource with name " + url, e);
         }
 
     }
+
+
+
+
 }

@@ -28,6 +28,7 @@ import scriptella.tools.ScriptsRunner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -140,7 +141,7 @@ public class ScriptsExecuteTask extends Task {
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             runner.setProperties(getProject().getProperties());
         } else {
-            runner.setProperties(System.getProperties());
+            runner.setProperties((Map)System.getProperties());
         }
 
 

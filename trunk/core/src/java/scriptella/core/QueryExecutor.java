@@ -24,8 +24,12 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +75,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         }
         final QueryCtxDecorator ctxDecorator = new QueryCtxDecorator(ctx);
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Executing query "+getLocation());
+            LOG.fine("Executing query " + getLocation());
         }
         c.executeQuery(content, ctx,
                 new QueryCallback() {
@@ -79,7 +83,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
                         ctxDecorator.rownum++;
                         ctxDecorator.setParams(params);
                         if (LOG.isLoggable(Level.FINE)) {
-                            LOG.fine("Processing row #"+ctxDecorator.rownum+" for query "+getLocation());
+                            LOG.fine("Processing row #" + ctxDecorator.rownum + " for query " + getLocation());
                         }
 
                         for (ExecutableElement exec : nestedElements) {
@@ -88,7 +92,12 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
                     }
                 });
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Query "+getLocation()+" process completed");
+            if (ctxDecorator.rownum == 0) {
+                LOG.fine("Query " + getLocation() + " returned no results.");
+            } else {
+                LOG.fine("Query " + getLocation() + " processed.");
+            }
+
         }
 
     }
@@ -105,8 +114,11 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
     }
 
     private static final class QueryCtxDecorator extends DynamicContextDecorator {
+        private static final Object NULL = new Object(); //NULL object flag
         private ParametersCallback params;
         private int rownum; //current row number
+        private Map<String, Object> cachedParams;
+
 
         public QueryCtxDecorator(DynamicContext context) {
             super(context);
@@ -114,6 +126,9 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
 
         void setParams(final ParametersCallback params) {
             this.params = params;
+            if (cachedParams != null) {
+                cachedParams.clear();
+            }
         }
 
         @Override
@@ -121,7 +136,30 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
             if ("rownum".equals(name)) { //return current row number
                 return rownum;
             }
-            return params.getParameter(name);
+            Object res = cachedParams==null?null:cachedParams.get(name);
+            if (res == null) {
+                res = params.getParameter(name);
+                if (res == null) {
+                    res = NULL;
+                }
+                if (isCacheable(res)) {
+                    if (cachedParams==null) {
+                        cachedParams=new HashMap<String, Object>();
+                    }
+                    cachedParams.put(name, res);
+                }
+            }
+            return res == NULL ? null : res;
         }
+
+        /**
+         * Check if object is cacheable, i.e. no need to fetch it again.
+         * @param o object to check.
+         * @return true if object is cacheable.
+         */
+        private boolean isCacheable(Object o) {
+            return !(o instanceof InputStream || o instanceof Reader);
+        }
+
     }
 }

@@ -16,33 +16,43 @@
 package scriptella.jdbc;
 
 import java.io.Closeable;
-import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
- * TODO: Add documentation
+ * Statements cache for {@link JDBCConnection}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 class StatementCache implements Closeable {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private Map<String, PreparedStatement> map;
-    private int maxSize;
-    private List<PreparedStatement> releasedStatements = new ArrayList<PreparedStatement>();
+    private static final Logger LOG = Logger.getLogger(StatementCache.class.getName());
+    private Map<String, StatementWrapper.Prepared> map;
+    private List<StatementWrapper.Prepared> disposeQueue = new LinkedList<StatementWrapper.Prepared>();
+    private final Connection connection;
 
-    public StatementCache(final int size) {
-        this.maxSize = size;
-        if (maxSize>=0) { //if cache is enabled
-            this.map = new LinkedHashMap<String, PreparedStatement>(size, DEFAULT_LOAD_FACTOR, true) {
-                protected boolean removeEldestEntry(Map.Entry<String, PreparedStatement> eldest) {
+    /**
+     * Creates a statement cache for specified connection.
+     * @param connection connection to create cache for.
+     * @param size cache size, 0 or negative means disable cache.
+     */
+    public StatementCache(Connection connection, final int size) {
+        this.connection = connection;
+        if (size > 0) { //if cache is enabled
+            this.map = new LinkedHashMap<String, StatementWrapper.Prepared>(size, DEFAULT_LOAD_FACTOR, true) {
+                protected boolean removeEldestEntry(Map.Entry<String, StatementWrapper.Prepared> eldest) {
                     boolean remove = size() > size;
                     if (remove) {
-                        releasedStatements.add(eldest.getValue());
+                        disposeQueue.add(eldest.getValue());
                     }
 
                     return remove;
@@ -51,48 +61,95 @@ class StatementCache implements Closeable {
         }
     }
 
-    public int getMaxSize() {
-        return maxSize;
+    /**
+     * Prepares a statement.
+     * <p>The sql is used as a key to lookup a {@link StatementWrapper},
+     * if cache miss the statement is created and put to cache.
+     *
+     * @param sql statement SQL.
+     * @param params parameters for SQL.
+     * @param converter types converter to use.
+     * @return a wrapper for specified SQL.
+     * @throws SQLException
+     * @see StatementWrapper
+     */
+    public StatementWrapper prepare(final String sql, final List<Object> params, final JDBCTypesConverter converter) throws SQLException {
+        if (params==null || params.isEmpty()) {
+            return create(sql, converter);
+        }
+        StatementWrapper.Prepared sw = map == null ? null : map.get(sql);
+
+        if (sw == null) { //If not cached
+            put(sql, sw = prepare(sql, converter));
+        }
+        sw.setParameters(params);
+        sw.lock();
+        return sw;
     }
 
-    public PreparedStatement get(String key) {
-        return map==null?null:map.get(key);
+    /**
+     * Testable template method to create simple statement
+     */
+    protected StatementWrapper.Simple create(final String sql, final JDBCTypesConverter converter) throws SQLException {
+        return new StatementWrapper.Simple(connection.createStatement(), sql, converter);
     }
 
-    public void put(String key, PreparedStatement entry) {
-        if (map!=null) {
+    /**
+     * Testable template method to create prepared statement
+     */
+    protected StatementWrapper.Prepared prepare(final String sql, final JDBCTypesConverter converter) throws SQLException {
+        return new StatementWrapper.Prepared(connection.prepareStatement(sql), converter);
+    }
+
+
+    private void put(String key, StatementWrapper.Prepared entry) {
+        if (map != null) {
             map.put(key, entry);
         }
     }
 
     /**
-     * Invoke close method on statements pending release after removing from cache.
+     * Notifies cache that specified statement is no longer in use.
+     * Close method is invoked on statements pending release after removing from cache.
+     *
+     * @param sw released statement.
      */
-    public void closeRemovedStatements() {
-        if (!releasedStatements.isEmpty()) {
-            close(releasedStatements);
-            releasedStatements.clear();
+    public void releaseStatement(StatementWrapper sw) {
+        if (sw == null) {
+            throw new IllegalArgumentException("Released statement cannot be null");
+        }
+        //if caching disabled or simple statement - close it
+        if (map == null) {
+            sw.close();
+        } else {
+            sw.clear();
+            close(disposeQueue);
         }
     }
 
-    private static void close(Collection<PreparedStatement> list) {
-        for (PreparedStatement ps: list) {
-            JDBCUtils.closeSilent(ps);
+    protected void close(Collection<StatementWrapper.Prepared> list) {
+        for (Iterator<StatementWrapper.Prepared> it = list.iterator(); it.hasNext();) {
+            StatementWrapper.Prepared sw = it.next();
+            if (!sw.isLocked()) { //If statement is not used - close and remove it
+                sw.close();
+                it.remove();
+            }
         }
     }
 
     public void close() {
-        if (map!=null) {
-            closeRemovedStatements();
+        if (map != null) {
+            //closing statements
+            close(disposeQueue);
             close(map.values());
-            map=null;
+            if (!disposeQueue.isEmpty() || !map.isEmpty()) {
+                List<StatementWrapper> unclosed = new ArrayList<StatementWrapper>(disposeQueue);
+                unclosed.addAll(map.values());
+                LOG.info("The following statements were not closed because they are in use " + unclosed);
+            }
+            map = null;
+            disposeQueue.clear();
         }
     }
 
-    /**
-     * @return true if cache is disabled
-     */
-    public boolean isDisabled() {
-        return map==null;
-    }
 }

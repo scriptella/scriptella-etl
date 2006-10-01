@@ -9,19 +9,17 @@
         #Use empty quote to turn off quoting
         quote=
     </connection>
-    <connection id="out2" driver="csv" url="bugs-out-filtered.csv" classpath="../lib/opencsv.jar">
+    <!--Connection to output a filtered list of bugs as an Excel CSV file -->
+    <connection id="outFiltered" driver="csv" url="bugs-out-filtered.csv" classpath="../lib/opencsv.jar">
         separator=;
     </connection>
     <!--In memory just for example-->
-    <connection id="outDB" driver="hsqldb" url="jdbc:hsqldb:mem:db" user="sa" classpath="../lib/hsqldb.jar"/>
-    <script connection-id="outDB">
+    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:db" user="sa" classpath="../lib/hsqldb.jar"/>
+    <script connection-id="db">
         <!-- Creates Bug table to output CSV data -->
         DROP TABLE BUG IF EXISTS;
         CREATE TABLE Bug (
-        ID INT PRIMARY KEY,
-        PRIORITY VARCHAR(10),
-        SUMMARY VARCHAR(200),
-        STATUS VARCHAR(10)
+            <include href="hsqldb/fields.sql"/>
         );
     </script>
 
@@ -34,5 +32,19 @@
             $id,$priority,$summary,$status
         </script>
     </query>
+    <query connection-id="in">
+        <!--Select bugs with status open or reopened.
+        Unfortunately I don't know how to specify negation,e.g. !closed-->
+        ,,,open|reopened
+        <script connection-id="outFiltered">
+            $id,$priority,$summary,$status
+        </script>
+        <!--Inserts imported rows into a database using additional if filter-->
+        <script connection-id="db" if="!priority.equalsIgnoreCase('Low')">
+            INSERT INTO BUG VALUES (?id, ?priority, ?summary, ?status);
+        </script>
+
+    </query>
+
 
 </etl>

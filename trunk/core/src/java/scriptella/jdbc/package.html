@@ -1,6 +1,69 @@
 <body>
-JDBC Bridge classes.
+Scriptella JDBC Bridge.
 <p>As specified in Service Provider API all JDBC drivers are registered
     via this bridge. This procedure is transparent to end user,
-    he only have to specify jdbc driver class name.</p>
+    he only have to specify jdbc driver class name or an alias.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>JDBC driver class name</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>JDBC driver URL.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>Set of libraries required by the JDBC driver.</code></td>
+    </tr>
+</table>
+<h2>JDBC Bridge Properties</h2>
+<p>JDBC bridge makes the following configuration properties available in configuration element:</p>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>statement.cache</td>
+        <td>Size of prepared statements cache or 0 to disable statement caching.</td>
+        <td>No, the default value is 100.</td>
+    </tr>
+</table>
+<h2>Properties Substitution</h2>
+The bridge supports standard ${} variables expansion and
+allows to set prepared statement parameters via ?{} syntax.
+<p>Example:
+<pre><code>
+var=_name
+id=11
+--------------------------------------
+select * FROM table${var} where id=?id
+-- is transformed to a JDBC prepared statement---
+select * FROM table_name where id=?
+-- where parameter id=11
+</code></pre>
+<p><u>Notes:</u>
+<ul>
+    <li>$ prefixed expressions are substituted in all parts except comments.
+    <li>? prefixed expressions are not substituted inside quotes and comments.
+    <br>Example:
+    <code>
+    <pre>--only ${prop} and ?surname are handled
+     SELECT * FROM "Table" WHERE NAME="?John${prop}" and SURNAME=?surname;
+    </pre></code>
+
+</ul>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="hsqldb.jar"/&gt;
+    &lt;connection id="out" driver="h2" url="jdbc:h2:file:out" user="sa"/&gt;
+    &lt;query connection-id="in"&gt;
+        SELECT * from Bug
+        &lt;script connection-id="out"&gt;
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        &lt;/script&gt;
+    &lt;/query&gt;
+</pre></code>
+
 </body>
