@@ -24,9 +24,13 @@ to operate, see examples below.
         <th>Required</th>
     </tr>
 </table>
+<h2>ScriptsExecutorBean Configuration</h2>
+ScriptsExecutorBean is intended to be configured from Spring XML configuration files.
+See <a href="ScriptsExecutorBean.html">ScriptsExecutorBean Javadoc</a> for details on
+how to configure the executor in Spring.
 <h2>Example</h2>
 This example creates a table Spring_Table using a connection from Spring Datasource.
-<p><b>Spring Application Context</b>
+<p><b>Spring Application Context</b></p>
 Spring application context declares a datasource and an executor. Additional
 properties and dependencies like progress indicator may also be injected.
 <code><pre>
@@ -64,5 +68,12 @@ The usage of <code>executor</code> is straightforward:
 ScriptsExecutor exec = (ScriptsExecutor) beanFactory.getBean("executor");
 exec.execute();
 </pre></code>
+Additionally you can use <code>java.util.concurrent.Callable</code> invocation interface to avoid
+    unnecessary dependency on Scriptella in application code:
+<code><pre>
+Callable exec = (Callable) beanFactory.getBean("executor");
+exec.call();
+</pre></code>
+
 
 </body>
