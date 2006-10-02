@@ -18,6 +18,7 @@ package scriptella.driver.spring;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.ExecutionStatistics;
@@ -27,18 +28,23 @@ import scriptella.interactive.ProgressIndicator;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 /**
  * Implementation of {@link ScriptsExecutor} for Spring IoC container.
+ * <p>This class exposes a set of configurable properties and provides
+ * a {@link Callable} invocation interface to avoid dependency on Scriptella
+ * in application code.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecutorBean extends ScriptsExecutor implements BeanFactoryAware {
+public class ScriptsExecutorBean extends ScriptsExecutor implements InitializingBean, BeanFactoryAware, Callable<ExecutionStatistics> {
 
     private static final ThreadLocal<BeanFactory> LOCAL_BEAN_FACTORY = new ThreadLocal<BeanFactory>();
     private BeanFactory beanFactory;
     private ProgressIndicator progressIndicator;
+    private boolean autostart;
 
     /**
      * Creates scripts executor.
@@ -48,6 +54,15 @@ public class ScriptsExecutorBean extends ScriptsExecutor implements BeanFactoryA
 
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
+    }
+
+    /**
+     * Sets autostart property.
+     * @param autostart true if executor must be automatically runned after initialization.
+     * Default value is <code>false</code>.
+     */
+    public void setAutostart(boolean autostart) {
+        this.autostart = autostart;
     }
 
     /**
@@ -77,6 +92,23 @@ public class ScriptsExecutorBean extends ScriptsExecutor implements BeanFactoryA
         cf.setResourceURL(url);
         setConfiguration(cf.createConfiguration());
     }
+
+    public void afterPropertiesSet() throws Exception {
+        if (getConfiguration()==null) {
+            throw new IllegalStateException("configLocation must be specified");
+        }
+        if (autostart) {
+            execute();
+        }
+    }
+
+    /**
+     * Simply calls {@link #execute()}.
+     */
+    public ExecutionStatistics call() throws ScriptsExecutorException {
+        return execute();
+    }
+
 
     @Override
     public ExecutionStatistics execute() throws ScriptsExecutorException {
