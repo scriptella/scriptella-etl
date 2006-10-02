@@ -28,8 +28,8 @@ import java.sql.Connection;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-class Query extends SQLSupport {
-    public Query(Resource resource, JDBCConnection connection) {
+class Query extends SqlSupport {
+    public Query(Resource resource, JdbcConnection connection) {
         super(resource, connection);
     }
 
@@ -44,7 +44,7 @@ class Query extends SQLSupport {
         r = parseAndExecute(connection, parametersCallback, queryCallback);
 
         if (r > 0) {
-            throw new JDBCException("Query cannot make updates.");
+            throw new JdbcException("Query cannot make updates.");
         }
     }
 }

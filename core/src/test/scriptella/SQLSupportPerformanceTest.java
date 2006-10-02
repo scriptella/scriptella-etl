@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.util.RepeatingInputStream;
 
 import java.io.BufferedReader;
@@ -44,7 +44,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
      * History:
      * 11.09.2006 - Duron 1.7Mhz - 1578 ms
      */
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         getConnection("sqlsupport");
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
@@ -60,18 +60,18 @@ public class SQLSupportPerformanceTest extends DBTestCase {
             }
         };
 
-        ScriptsExecutor se = newScriptsExecutor();
+        EtlExecutor se = newEtlExecutor();
         se.execute();
     }
 
     /**
      * History:
      * 11.09.2006 - Duron 1.7Mhz - 2578 ms
-     * @throws ScriptsExecutorException
+     * @throws EtlExecutorException
      * @throws SQLException
      * @throws IOException
      */
-    public void testCompare() throws ScriptsExecutorException, SQLException, IOException {
+    public void testCompare() throws EtlExecutorException, SQLException, IOException {
         final int n = 20000;
         Connection con = getConnection("sqlsupport");
         con.setAutoCommit(false);
@@ -90,7 +90,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
             }
         };
 
-        ScriptsExecutor se = newScriptsExecutor();
+        EtlExecutor se = newEtlExecutor();
         long ti = System.currentTimeMillis();
         se.execute();
         ti = System.currentTimeMillis()-ti;
@@ -115,7 +115,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
 
 
     public static void main(final String args[])
-            throws ScriptsExecutorException {
+            throws EtlExecutorException {
         SQLSupportPerformanceTest t = new SQLSupportPerformanceTest();
         t.test();
     }

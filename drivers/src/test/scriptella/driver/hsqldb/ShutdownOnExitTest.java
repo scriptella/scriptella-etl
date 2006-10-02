@@ -16,8 +16,8 @@
 package scriptella.driver.hsqldb;
 
 import scriptella.AbstractTestCase;
-import scriptella.jdbc.JDBCConnection;
-import scriptella.jdbc.JDBCUtils;
+import scriptella.jdbc.JdbcConnection;
+import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
@@ -41,7 +41,7 @@ public class ShutdownOnExitTest extends AbstractTestCase {
 
         final String url = "jdbc:hsqldb:mem:shutdowntest";
         ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
-        JDBCConnection con = drv.connect(params);
+        JdbcConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         Statement st = nc.createStatement();
 
@@ -49,7 +49,7 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         props.put("ifexists", "true"); //do not create new database if not exists
         ConnectionParameters params2 = new ConnectionParameters(props, url, "sa", null, null, null, null);
 
-        JDBCConnection con2 = drv.connect(params2);
+        JdbcConnection con2 = drv.connect(params2);
         con2.close();
         con.close();
         Driver.HOOK.run(); //emulates shutdown hook
@@ -62,7 +62,7 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         props.put("user", "sa");
         try {
             final Connection con = DriverManager.getConnection(url, props);
-            JDBCUtils.closeSilent(con);
+            JdbcUtils.closeSilent(con);
         } catch (SQLException e) {
             assertTrue("Driver.HOOK must shutdown the database " + url, e.getErrorCode() == -94);
             return; //OK
@@ -84,7 +84,7 @@ public class ShutdownOnExitTest extends AbstractTestCase {
 
         final String url = "jdbc:hsqldb:mem:alreadyClosed";
         ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
-        JDBCConnection con = drv.connect(params);
+        JdbcConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         nc.createStatement().execute("SHUTDOWN;");
         con.close();
@@ -104,13 +104,13 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         //Create first db and obtain 2 connections
         String url1 = "jdbc:hsqldb:mem:DifferentDbs1";
         ConnectionParameters params = new ConnectionParameters(props, url1, "sa", null, null, null, null);
-        JDBCConnection con1 = drv.connect(params);
-        JDBCConnection con11 = drv.connect(params);
+        JdbcConnection con1 = drv.connect(params);
+        JdbcConnection con11 = drv.connect(params);
         //Create second db and obtain 2 connections
         String url2 = "jdbc:hsqldb:mem:DifferentDbs2";
         params = new ConnectionParameters(props, url2, "sa", null, null, null, null);
-        JDBCConnection con2 = drv.connect(params);
-        JDBCConnection con22 = drv.connect(params);
+        JdbcConnection con2 = drv.connect(params);
+        JdbcConnection con22 = drv.connect(params);
         //close everything
         con1.close();
         con2.close();

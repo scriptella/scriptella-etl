@@ -15,7 +15,7 @@
  */
 package scriptella.spi;
 
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
 
 import java.sql.Driver;
 
@@ -25,9 +25,9 @@ import java.sql.Driver;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public final class DriversFactory {
+public final class DriverFactory {
     //singleton
-    private DriversFactory() {
+    private DriverFactory() {
     }
 
     /**
@@ -66,7 +66,7 @@ public final class DriversFactory {
 
     /**
      * Creates a Scriptella Driver using specified class.
-     * <p>If class is a {@link Driver} {@link ScriptellaJDBCDriver JDBC Bridge} is used.
+     * <p>If class is a {@link Driver} {@link GenericDriver JDBC Bridge} is used.
      * <p>To be successfully instantiated the driver class must implement {@link ScriptellaDriver} class
      * and has no-arg public constructor.
      *
@@ -82,9 +82,9 @@ public final class DriversFactory {
                 ClassLoader drvClassLoader = drvClass.getClassLoader();
                 if (drvClassLoader==null) { //if boot classloader is used,
                     // load scriptella driver using the class loader for this class.
-                    drvClassLoader=DriversFactory.class.getClassLoader();
+                    drvClassLoader=DriverFactory.class.getClassLoader();
                 }
-                Class<?> cl = Class.forName("scriptella.jdbc.ScriptellaJDBCDriver", true, drvClassLoader);
+                Class<?> cl = Class.forName("scriptella.jdbc.GenericDriver", true, drvClassLoader);
                 return (ScriptellaDriver)cl.newInstance();
             } catch (Exception e) {
                 throw new IllegalStateException("Unable to instantiate JDBC driver for " + drvClass, e);

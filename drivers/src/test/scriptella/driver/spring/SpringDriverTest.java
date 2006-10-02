@@ -19,8 +19,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
 import scriptella.AbstractTestCase;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -33,11 +33,11 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class SpringDriverTest extends AbstractTestCase {
-    public void test() throws SQLException, ClassNotFoundException, ScriptsExecutorException {
+    public void test() throws SQLException, ClassNotFoundException, EtlExecutorException {
         BeanFactory bf = new XmlBeanFactory(new ClassPathResource("springbeans.xml", getClass()));
         DataSource ds = (DataSource) bf.getBean("datasource"); //Test if bean factory contain correct data
         Connection con = ds.getConnection();
-        ScriptsExecutor exec = (ScriptsExecutor) bf.getBean("executor");
+        EtlExecutor exec = (EtlExecutor) bf.getBean("executor");
         exec.execute();
         con.createStatement().executeQuery("select * from SpringTable"); //A table should be created
         con.createStatement().execute("SHUTDOWN");

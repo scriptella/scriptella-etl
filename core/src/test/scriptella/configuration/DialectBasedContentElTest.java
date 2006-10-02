@@ -55,7 +55,7 @@ public class DialectBasedContentElTest extends AbstractTestCase {
                 "<dialect name=\"d2\"><!--Commend-->D2</dialect>" +
                 "<!--Comment-->\nDef4<!--Comment-->  " +
                 "</query>";
-        XMLElement xmlElement = asElement(xml);
+        XmlElement xmlElement = asElement(xml);
         DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
         List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
         assertEquals(3, dialects.size());
@@ -68,10 +68,10 @@ public class DialectBasedContentElTest extends AbstractTestCase {
 
     }
 
-    private static XMLElement asElement(String xml) {
+    private static XmlElement asElement(String xml) {
         try {
             Element el = BUILDER.parse(new InputSource(new StringReader(xml))).getDocumentElement();
-            return new XMLElement(el, new URL("file:/test"));
+            return new XmlElement(el, new URL("file:/test"));
         } catch (Exception e) {
             throw new IllegalStateException("Unable to create XML element", e);
         }

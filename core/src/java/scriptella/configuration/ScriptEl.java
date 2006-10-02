@@ -31,7 +31,7 @@ public class ScriptEl extends ScriptingElement {
     public ScriptEl() {
     }
 
-    public ScriptEl(XMLElement element) {
+    public ScriptEl(XmlElement element) {
         configure(element);
     }
 
@@ -51,7 +51,7 @@ public class ScriptEl extends ScriptingElement {
         onerrors = list;
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         super.configure(element);
         newTx = element.getBooleanProperty("new-tx", false);
         setLocation(element, "scripts");

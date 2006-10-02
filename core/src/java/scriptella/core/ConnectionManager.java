@@ -17,11 +17,11 @@ package scriptella.core;
 
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
-import scriptella.execution.ScriptsContext;
+import scriptella.execution.EtlContext;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.DriversClassLoader;
-import scriptella.spi.DriversFactory;
+import scriptella.spi.DriverClassLoader;
+import scriptella.spi.DriverFactory;
 import scriptella.spi.ScriptellaDriver;
 import scriptella.util.UrlPathTokenizer;
 
@@ -46,7 +46,7 @@ public class ConnectionManager {
     private ScriptellaDriver driver;
     ConnectionParameters connectionParameters;
 
-    public ConnectionManager(ScriptsContext ctx, ConnectionEl c) {
+    public ConnectionManager(EtlContext ctx, ConnectionEl c) {
 
         String cat = ctx.substituteProperties(c.getCatalog());
         String drvClass = ctx.substituteProperties(c.getDriver());
@@ -64,7 +64,7 @@ public class ConnectionManager {
             try {
                 URL[] urls = tok.split(cp);
                 if (urls.length>0) {
-                    cl = new DriversClassLoader(urls);
+                    cl = new DriverClassLoader(urls);
                 }
             } catch (MalformedURLException e) {
                 throw new ConfigurationException("Unable to parse classpath parameter for "+connection, e);
@@ -72,7 +72,7 @@ public class ConnectionManager {
         }
         connectionParameters = new ConnectionParameters(c.getProperties(), url, user, pwd, schema, cat, ctx);
         try {
-            driver = DriversFactory.getDriver(drvClass, cl);
+            driver = DriverFactory.getDriver(drvClass, cl);
         } catch (ClassNotFoundException e) {
             throw new ConfigurationException("Driver class " + drvClass + " not found for " + connectionParameters +
                     ".Please check if the class name is correct and required libraries available on classpath", e);

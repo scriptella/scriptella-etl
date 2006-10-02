@@ -18,7 +18,7 @@ package scriptella.spi;
 import scriptella.AbstractTestCase;
 
 /**
- * Tests for {@link DriversFactory}.
+ * Tests for {@link DriverFactory}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -29,16 +29,16 @@ public class DriversFactoryTest extends AbstractTestCase {
      */
     public void testGetBootstrapDriver() throws ClassNotFoundException {
         //JDBC-ODBC
-        DriversFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", null);
+        DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", null);
     }
 
     /**
      * Tests correct handling of drivers in classpath(e.g. lib directory).
      */
     public void testClassPathDriver() throws ClassNotFoundException {
-        DriversFactory.getDriver("org.hsqldb.jdbcDriver", getClass().getClassLoader());
+        DriverFactory.getDriver("org.hsqldb.jdbcDriver", getClass().getClassLoader());
         //Bootstrap classes should also be loaded using the classloader scriptella jars.
-        DriversFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", getClass().getClassLoader());
+        DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", getClass().getClassLoader());
     }
 
 

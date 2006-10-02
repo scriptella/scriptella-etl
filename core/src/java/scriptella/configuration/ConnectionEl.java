@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ConnectionEl extends XMLConfigurableBase {
+public class ConnectionEl extends XmlConfigurableBase {
     public static final String DEFAULT_ID = "\"DEFAULT\"";
     private String id;
     private String url;
@@ -110,7 +110,7 @@ public class ConnectionEl extends XMLConfigurableBase {
     }
 
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         setProperty(element, "id");
         setProperty(element, "url");
         setRequiredProperty(element, "driver");

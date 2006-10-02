@@ -26,29 +26,29 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JDBCException extends ProviderException {
+public class JdbcException extends ProviderException {
 
-    public JDBCException(String message) {
+    public JdbcException(String message) {
         super(message);
     }
 
-    public JDBCException(String message, Throwable cause) {
+    public JdbcException(String message, Throwable cause) {
         super(message, cause);
         initVendorCodes(cause);
     }
 
-    public JDBCException(String message, Throwable cause, String sql, List<?> parameters) {
+    public JdbcException(String message, Throwable cause, String sql, List<?> parameters) {
         super(message, cause);
         initVendorCodes(cause);
         setErrorStatement(sql, parameters);
     }
 
-    public JDBCException(String message, Throwable cause, String sql) {
+    public JdbcException(String message, Throwable cause, String sql) {
         super(message, cause);
         initVendorCodes(cause);
         setErrorStatement(sql, null);
     }
-    public JDBCException(String message, String sql) {
+    public JdbcException(String message, String sql) {
         super(message);
         setErrorStatement(sql, null);
     }

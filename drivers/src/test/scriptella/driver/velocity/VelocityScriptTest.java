@@ -16,8 +16,8 @@
 package scriptella.driver.velocity;
 
 import scriptella.DBTestCase;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class VelocityScriptTest extends DBTestCase {
      * This test runs a script and checks the output produces by the velocity connection.
      * In-memory test URL tst:// is used to avoid file system operations.
      */
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
@@ -51,7 +51,7 @@ public class VelocityScriptTest extends DBTestCase {
             }
         };
         getConnection("velocity");//just to shutdown at the end of the test
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
         final String s = out.toString();
         assertEquals("102030",s);

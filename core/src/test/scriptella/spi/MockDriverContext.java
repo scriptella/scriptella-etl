@@ -24,7 +24,7 @@ import java.net.URL;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class MockDriversContext implements DriversContext {
+public class MockDriverContext implements DriverContext {
     public URL getScriptFileURL() {
         try {
             return new URL("file:/mock");
@@ -37,5 +37,5 @@ public class MockDriversContext implements DriversContext {
         return new URL(getScriptFileURL(),uri);
     }
 
-    public static final DriversContext INSTANCE = new MockDriversContext();
+    public static final DriverContext INSTANCE = new MockDriverContext();
 }

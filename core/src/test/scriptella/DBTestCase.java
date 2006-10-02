@@ -16,8 +16,8 @@
 package scriptella;
 
 import junit.framework.AssertionFailedError;
-import scriptella.jdbc.JDBCException;
-import scriptella.jdbc.JDBCUtils;
+import scriptella.jdbc.JdbcException;
+import scriptella.jdbc.JdbcUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,7 +55,7 @@ public abstract class DBTestCase extends AbstractTestCase {
 
             return c;
         } catch (SQLException e) {
-            throw new JDBCException(e.getMessage(), e);
+            throw new JdbcException(e.getMessage(), e);
         }
     }
 
@@ -71,7 +71,7 @@ public abstract class DBTestCase extends AbstractTestCase {
         }
 
         for (Connection connection : connections) {
-            JDBCUtils.closeSilent(connection);
+            JdbcUtils.closeSilent(connection);
         }
 
         dbNames.clear();

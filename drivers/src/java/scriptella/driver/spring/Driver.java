@@ -16,7 +16,7 @@
 package scriptella.driver.spring;
 
 import org.springframework.beans.factory.BeanFactory;
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -25,21 +25,21 @@ import java.util.Properties;
 /**
  * Scriptella driver for <a href="http://www.springframework.org">The Spring Framework</a>
  * Bean Factory(or Application Context) registered datasources.
- * <p>This driver relies on {@link scriptella.jdbc.ScriptellaJDBCDriver} functionality.
+ * <p>This driver relies on {@link scriptella.jdbc.GenericDriver} functionality.
  * <p><em>Note:</em>Use Spring transaction proxies for
- * {@link ScriptsExecutorBean} to support Spring transactions.
+ * {@link EtlExecutorBean} to support Spring transactions.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Driver extends ScriptellaJDBCDriver {
+public class Driver extends GenericDriver {
     @Override
     protected java.sql.Connection getConnection(String url, Properties props) throws SQLException {
         if (url == null) {
             throw new SpringProviderException("Name of the spring bean must be specified in an url attribute of connection element.");
         }
         try {
-            BeanFactory beanFactory = ScriptsExecutorBean.getContextBeanFactory();
+            BeanFactory beanFactory = EtlExecutorBean.getContextBeanFactory();
             DataSource ds = (DataSource) beanFactory.getBean(url);
             return ds.getConnection();
         } catch (Exception e) {

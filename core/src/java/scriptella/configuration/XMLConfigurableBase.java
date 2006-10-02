@@ -26,19 +26,19 @@ import java.util.regex.Pattern;
 /**
  * Base class for configuration elements.
  */
-public abstract class XMLConfigurableBase implements XMLConfigurable {
+public abstract class XmlConfigurableBase implements XmlConfigurable {
     private Location location;
 
-    protected void setRequiredProperty(final XMLElement element,
+    protected void setRequiredProperty(final XmlElement element,
                                        final String attribute, final String property) {
         setProperty(element, attribute, property);
         assertRequiredFieldPresent(element, attribute, property);
     }
 
     /**
-     * @see #setProperty(XMLElement, String, String)
+     * @see #setProperty(XmlElement, String, String)
      */
-    protected void setProperty(final XMLElement element, final String attribute) {
+    protected void setProperty(final XmlElement element, final String attribute) {
         setProperty(element, attribute, attribute);
     }
 
@@ -49,7 +49,7 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
      * @param attribute attribute name
      * @param property  property name.
      */
-    protected void setProperty(final XMLElement element,
+    protected void setProperty(final XmlElement element,
                                final String attribute, final String property) {
         String attributeValue = element.getAttribute(attribute);
 
@@ -63,9 +63,9 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
     }
 
     /**
-     * @see #setPatternProperty(XMLElement, String, String)
+     * @see #setPatternProperty(XmlElement, String, String)
      */
-    protected void setPatternProperty(final XMLElement element, final String property) {
+    protected void setPatternProperty(final XmlElement element, final String property) {
         setPatternProperty(element, property, property);
     }
 
@@ -76,7 +76,7 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
      * @param attribute attribute name
      * @param property  property name.
      */
-    protected void setPatternProperty(final XMLElement element,
+    protected void setPatternProperty(final XmlElement element,
                                       final String attribute, final String property) {
         String ptrStr = element.getAttribute(attribute);
         Pattern ptr = null;
@@ -115,12 +115,12 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
                 .getMethod("get" + Character.toUpperCase(property.charAt(0)) + property.substring(1));
     }
 
-    protected void setRequiredProperty(final XMLElement element,
+    protected void setRequiredProperty(final XmlElement element,
                                        final String attribute) {
         setRequiredProperty(element, attribute, attribute);
     }
 
-    protected <T> T loadClass(final XMLElement element, final String attribute,
+    protected <T> T loadClass(final XmlElement element, final String attribute,
                               final Class<T> spec) {
         final String h = element.getAttribute(attribute);
 
@@ -150,15 +150,15 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
         }
     }
 
-    protected <T extends XMLConfigurable> List<T> load(
-            final List<XMLElement> elements, final Class<T> clazz) {
+    protected <T extends XmlConfigurable> List<T> load(
+            final List<XmlElement> elements, final Class<T> clazz) {
         if (elements == null) {
             return null;
         }
 
         List<T> l = new ArrayList<T>(elements.size());
 
-        for (XMLElement element : elements) {
+        for (XmlElement element : elements) {
             try {
                 T t = clazz.newInstance();
                 t.configure(element);
@@ -173,7 +173,7 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
         return l;
     }
 
-    protected void assertRequiredFieldPresent(final XMLElement element,
+    protected void assertRequiredFieldPresent(final XmlElement element,
                                               final String attribute, final String property) {
         try {
             final Method getter = findGetter(property);
@@ -188,7 +188,7 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
         }
     }
 
-    protected void assertRequiredFieldPresent(final XMLElement element,
+    protected void assertRequiredFieldPresent(final XmlElement element,
                                               final String property) {
         assertRequiredFieldPresent(element, property, property);
     }
@@ -199,7 +199,7 @@ public abstract class XMLConfigurableBase implements XMLConfigurable {
      * @param element  element to calculate location
      * @param category optional category name (used in statistics).
      */
-    protected void setLocation(XMLElement element, String category) {
+    protected void setLocation(XmlElement element, String category) {
         location = new Location(element.getXPath(), category);
     }
 

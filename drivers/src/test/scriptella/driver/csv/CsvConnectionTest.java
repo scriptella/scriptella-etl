@@ -18,7 +18,7 @@ package scriptella.driver.csv;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.MockDriversContext;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -75,7 +75,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.QUOTE, "'");
         props.put(CsvConnection.SEPARATOR, ";");
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriversContext.INSTANCE);
+                MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -115,7 +115,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.SEPARATOR, ";");
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriversContext.INSTANCE);
+                MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -138,7 +138,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.EOL, "\r\n");
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriversContext.INSTANCE);
+                MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         con.executeQuery(new StringResource(" c4.*"), //extra leading whitespace

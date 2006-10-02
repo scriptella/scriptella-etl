@@ -28,15 +28,11 @@ import java.net.URL;
 
 
 /**
- * Context  variable available in all expressions.
- * <p>ThisParameter is obtained by using <code>this</code> variable name in
- * expressions, all public methods/properties may be invoked from expressions using
- * method invocation syntax.
- *
+ * Global ETL Context available to drivers.
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public interface DriversContext {
+public interface DriverContext {
     public URL getScriptFileURL();
 
 
@@ -56,7 +52,7 @@ public interface DriversContext {
      *
      * @param uri URI to resolve..
      * @return resolved file URL.
-     * @see scriptella.execution.ScriptsContext#getScriptFileURL()
+     * @see scriptella.execution.EtlContext#getScriptFileURL()
      * @throws MalformedURLException if uri is malformed or cannot be resolved.
      */
     public URL resolve(final String uri) throws MalformedURLException;

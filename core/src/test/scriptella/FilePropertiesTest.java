@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -35,7 +35,7 @@ import java.util.Arrays;
 public class FilePropertiesTest extends DBTestCase {
     private static final byte FILE[] = "test file/////".getBytes();
 
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final Connection con = getConnection("fileproptst");
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
@@ -51,7 +51,7 @@ public class FilePropertiesTest extends DBTestCase {
             }
         };
 
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
 
         QueryHelper q = new QueryHelper("select (select count(id) from t), c from t");

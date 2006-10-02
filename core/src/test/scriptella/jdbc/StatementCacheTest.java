@@ -41,7 +41,7 @@ public class StatementCacheTest extends DBTestCase {
     protected void setUp() {
         sc = new StatementCache(null, 100) {
             @Override
-            protected StatementWrapper.Simple create(final String sql, final JDBCTypesConverter converter) {
+            protected StatementWrapper.Simple create(final String sql, final JdbcTypesConverter converter) {
                 return new StatementWrapper.Simple(sql) {
                     public void close() {
                         simpleClosed++;
@@ -50,7 +50,7 @@ public class StatementCacheTest extends DBTestCase {
             }
 
             @Override
-            protected StatementWrapper.Prepared prepare(final String sql, final JDBCTypesConverter converter) {
+            protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) {
                 return new StatementWrapper.Prepared() {
                     @Override
                     public void close() {
@@ -85,7 +85,7 @@ public class StatementCacheTest extends DBTestCase {
         preparedCleared = 0;
         preparedParamsSet = 0;
         StringBuilder sb = new StringBuilder();
-        JDBCTypesConverter converter = new JDBCTypesConverter();
+        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
         for (int i = 0; i < 105; i++) {
@@ -113,7 +113,7 @@ public class StatementCacheTest extends DBTestCase {
 
 
         StringBuilder sb = new StringBuilder();
-        JDBCTypesConverter converter = new JDBCTypesConverter();
+        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
         for (int i = 0; i < 20; i++) {

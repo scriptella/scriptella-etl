@@ -42,7 +42,7 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-class JDBCTypesConverter implements Closeable {
+class JdbcTypesConverter implements Closeable {
     private List<InputStream> streams;
 
     /**
@@ -61,7 +61,7 @@ class JDBCTypesConverter implements Closeable {
 
     /**
      * Sets the value of the designated parameter using the given object.
-     * <p>Depending on the value type the concrete subclass of JDBCTypesConverter is chosen.
+     * <p>Depending on the value type the concrete subclass of JdbcTypesConverter is chosen.
      *
      * @param preparedStatement prepared statement to set object.
      * @param index he first parameter is 1, the second is 2, ...

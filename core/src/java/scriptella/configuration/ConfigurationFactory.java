@@ -117,7 +117,7 @@ public class ConfigurationFactory {
             final InputSource inputSource = new InputSource(resourceURL.toString());
             final Document document = db.parse(inputSource);
 
-            return new ConfigurationEl(new XMLElement(
+            return new ConfigurationEl(new XmlElement(
                     document.getDocumentElement(), resourceURL));
         } catch (IOException e) {
             throw new ConfigurationException("Unable to load document: " + e.getMessage(), e);

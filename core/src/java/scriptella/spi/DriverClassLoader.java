@@ -29,9 +29,9 @@ import java.net.URLClassLoader;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class DriversClassLoader extends URLClassLoader {
-    public DriversClassLoader(URL[] urls) {
-        super(urls, DriversClassLoader.class.getClassLoader());
+public class DriverClassLoader extends URLClassLoader {
+    public DriverClassLoader(URL[] urls) {
+        super(urls, DriverClassLoader.class.getClassLoader());
     }
 
     /**
@@ -85,7 +85,7 @@ public class DriversClassLoader extends URLClassLoader {
      */
     private static byte[] getClassBytes(final String name) {
         String path = "/" + name.replace('.', '/') + ".class";
-        InputStream is = DriversClassLoader.class.getResourceAsStream(path);
+        InputStream is = DriverClassLoader.class.getResourceAsStream(path);
         if (is == null) {
             return null;
         }

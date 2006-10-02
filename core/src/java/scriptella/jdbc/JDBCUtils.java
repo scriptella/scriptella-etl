@@ -29,8 +29,8 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public final class JDBCUtils {
-    private JDBCUtils() {
+public final class JdbcUtils {
+    private JdbcUtils() {
     }
 
     /**
@@ -86,7 +86,7 @@ public final class JDBCUtils {
                 l.add(rs.getString(columnPos));
             }
         } catch (SQLException e) {
-            throw new JDBCException("Unable to get column #" + columnPos, e);
+            throw new JdbcException("Unable to get column #" + columnPos, e);
         }
 
         return l;

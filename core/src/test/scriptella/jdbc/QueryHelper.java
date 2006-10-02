@@ -47,7 +47,7 @@ public class QueryHelper {
         try {
             st=con.createStatement();
             ra = new ResultSetAdapter(st.executeQuery(sql),
-                    MockParametersCallbacks.UNSUPPORTED, new JDBCTypesConverter());
+                    MockParametersCallbacks.UNSUPPORTED, new JdbcTypesConverter());
             while (ra.next()) {
                 callback.processRow(ra);
             }
@@ -55,7 +55,7 @@ public class QueryHelper {
             throw new IllegalStateException(e.getMessage(), e);
         } finally {
             IOUtils.closeSilently(ra);
-            JDBCUtils.closeSilent(st);
+            JdbcUtils.closeSilent(st);
         }
 
     }

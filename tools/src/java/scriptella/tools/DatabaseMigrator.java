@@ -15,9 +15,9 @@
  */
 package scriptella.tools;
 
-import scriptella.jdbc.JDBCException;
-import scriptella.jdbc.JDBCUtils;
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
+import scriptella.jdbc.JdbcException;
+import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
@@ -44,7 +44,7 @@ public class DatabaseMigrator {
         //Rewite it
 
         ConnectionParameters params = new ConnectionParameters(null, "jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm", "sa", "", null, null, null);
-        ScriptellaJDBCDriver jdbcDriver = new ScriptellaJDBCDriver();
+        GenericDriver jdbcDriver = new GenericDriver();
 
 
         final Connection con = jdbcDriver.connect(params).getNativeConnection();
@@ -70,7 +70,7 @@ public class DatabaseMigrator {
         o.append("</etl>\n");
         System.out.println("o = " + o);
 
-        //        JDBCUtils.getTableColumns(con, c,)
+        //        JdbcUtils.getTableColumns(con, c,)
     }
 
     private static StringBuilder appendColumnNames(
@@ -178,7 +178,7 @@ public class DatabaseMigrator {
 
             return res;
         } catch (SQLException e) {
-            throw new JDBCException(e.getMessage(), e);
+            throw new JdbcException(e.getMessage(), e);
         }
     }
 
@@ -194,22 +194,22 @@ public class DatabaseMigrator {
 
     private static List<String> getTables(Connection con, ConnectionParameters params) {
         try {
-            return JDBCUtils.getColumn(con.getMetaData()
+            return JdbcUtils.getColumn(con.getMetaData()
                     .getTables(con.getCatalog(),
                     params.getSchema(), null, new String[]{"TABLE"}), 3);
         } catch (SQLException e) {
-            throw new JDBCException(e.getMessage(), e);
+            throw new JdbcException(e.getMessage(), e);
         }
     }
 
     private static Set<String> getTableColumns(Connection con, ConnectionParameters params, final String tableName) {
         try {
-            return new HashSet<String>(JDBCUtils.getColumn(
+            return new HashSet<String>(JdbcUtils.getColumn(
                     con.getMetaData()
                             .getColumns(params.getCatalog(), params.getSchema(), tableName, null),
                     4));
         } catch (SQLException e) {
-            throw new JDBCException(e.getMessage(), e);
+            throw new JdbcException(e.getMessage(), e);
         }
     }
 

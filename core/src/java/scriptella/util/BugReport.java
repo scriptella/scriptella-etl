@@ -17,7 +17,7 @@ package scriptella.util;
 
 import scriptella.core.ExceptionInterceptor;
 import scriptella.core.SystemException;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutorException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -52,11 +52,11 @@ public class BugReport {
             } else {
                 return true; //intercepted exceptions must have cause
             }
-        } else if (throwable instanceof ScriptsExecutorException) {
+        } else if (throwable instanceof EtlExecutorException) {
             if (throwable.getCause() != null) {
                 return isPossibleBug(throwable.getCause());
             } else {
-                return true; //ScriptsExecutorException must have cause
+                return true; //EtlExecutorException must have cause
             }
         }
         return !(throwable instanceof SystemException);

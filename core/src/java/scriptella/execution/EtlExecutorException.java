@@ -30,13 +30,13 @@ import java.io.StringWriter;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecutorException extends Exception {
+public class EtlExecutorException extends Exception {
     private ProviderException lastProvider;
     private Throwable lastExpression;
     private Location lastElementLocation;
     private String message;
 
-    public ScriptsExecutorException(Throwable cause) {
+    public EtlExecutorException(Throwable cause) {
         super(cause);
 
         for (Throwable ex = cause; ex != null; ex = ex.getCause()) {

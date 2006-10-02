@@ -34,7 +34,7 @@ import java.util.List;
  * @version 1.0
  */
 abstract class StatementWrapper<T extends Statement> implements Closeable {
-    protected final JDBCTypesConverter converter;
+    protected final JdbcTypesConverter converter;
     protected final T statement;
 
     /**
@@ -45,7 +45,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
         statement=null;
     }
 
-    protected StatementWrapper(T statement, JDBCTypesConverter converter) {
+    protected StatementWrapper(T statement, JdbcTypesConverter converter) {
         if (statement == null) {
             throw new IllegalArgumentException("statement cannot be null");
         }
@@ -60,7 +60,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      * Release any resources opened by this statement.
      */
     public void close() {
-        JDBCUtils.closeSilent(statement);
+        JdbcUtils.closeSilent(statement);
     }
 
 
@@ -122,7 +122,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             this.sql = sql;
         }
 
-        public Simple(Statement s, String sql, JDBCTypesConverter converter) {
+        public Simple(Statement s, String sql, JdbcTypesConverter converter) {
             super(s, converter);
             this.sql = sql;
         }
@@ -149,7 +149,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
         protected Prepared() {
         }
 
-        public Prepared(PreparedStatement s, JDBCTypesConverter converter) {
+        public Prepared(PreparedStatement s, JdbcTypesConverter converter) {
             super(s, converter);
         }
 

@@ -18,6 +18,7 @@ package scriptella.execution;
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
 import scriptella.core.Session;
+import scriptella.core.ThreadSafe;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
 
@@ -29,12 +30,12 @@ import java.util.logging.Logger;
 
 
 /**
- * Executor for script files.
+ * Executor for ETL files.
  * <p>Use {@link ConfigurationFactory} to parse script files and to configure
  * the executor.
  * <p>The usage scenario of this class may be described using the following steps:
  * <ul>
- * <li>{@link #ScriptsExecutor(ConfigurationEl)} Create an instance of this class
+ * <li>{@link #EtlExecutor(scriptella.configuration.ConfigurationEl)} Create an instance of this class
  * and pass a {@link scriptella.configuration.ConfigurationFactory#createConfiguration() script file configuration} .
  * <li>Optionally {@link #setExternalProperties(java.util.Map) set external properties}.
  * <li>{@link #execute() Execute} the script
@@ -51,15 +52,15 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecutor {
-    private static final Logger LOG = Logger.getLogger(ScriptsExecutor.class.getName());
+public class EtlExecutor {
+    private static final Logger LOG = Logger.getLogger(EtlExecutor.class.getName());
     private ConfigurationEl configuration;
     private Map<String, String> externalProperties;
 
-    public ScriptsExecutor() {
+    public EtlExecutor() {
     }
 
-    public ScriptsExecutor(ConfigurationEl configuration) {
+    public EtlExecutor(ConfigurationEl configuration) {
         this.configuration = configuration;
     }
 
@@ -71,13 +72,22 @@ public class ScriptsExecutor {
         this.configuration = configuration;
     }
 
-    public ExecutionStatistics execute() throws ScriptsExecutorException {
+    /**
+     * Executes ETL based on a specified configuration.
+     */
+    @ThreadSafe
+    public ExecutionStatistics execute() throws EtlExecutorException {
         return execute((ProgressIndicator) null);
     }
 
+    /**
+     * Executes ETL based on a specified configuration.
+     * @param indicator progress indicator to use.
+     */
+    @ThreadSafe
     public ExecutionStatistics execute(final ProgressIndicator indicator)
-            throws ScriptsExecutorException {
-        ScriptsContext ctx = null;
+            throws EtlExecutorException {
+        EtlContext ctx = null;
 
         try {
             ctx = prepare(indicator);
@@ -88,7 +98,7 @@ public class ScriptsExecutor {
             if (ctx != null) {
                 rollbackAll(ctx);
             }
-            throw new ScriptsExecutorException(e);
+            throw new EtlExecutorException(e);
         } finally {
             if (ctx != null) {
                 closeAll(ctx);
@@ -99,7 +109,7 @@ public class ScriptsExecutor {
         return ctx.getStatisticsBuilder().getStatistics();
     }
 
-    void rollbackAll(final ScriptsContext ctx) {
+    void rollbackAll(final EtlContext ctx) {
         try {
             ctx.session.rollback();
         } catch (Exception e) {
@@ -107,15 +117,15 @@ public class ScriptsExecutor {
         }
     }
 
-    void commitAll(final ScriptsContext ctx) {
+    void commitAll(final EtlContext ctx) {
         ctx.session.commit();
     }
 
-    void closeAll(final ScriptsContext ctx) {
+    void closeAll(final EtlContext ctx) {
         ctx.session.close();
     }
 
-    private void execute(final ScriptsContext ctx) {
+    private void execute(final EtlContext ctx) {
         final ProgressCallback oldProgress = ctx.getProgressCallback();
 
         final ProgressCallback p = oldProgress.fork(85, 100);
@@ -131,10 +141,9 @@ public class ScriptsExecutor {
      * @param indicator progress indicator to use.
      * @return prepared scripts context.
      */
-    protected ScriptsContext prepare(final ProgressIndicator indicator) {
-        ScriptsContext ctx = new ScriptsContext();
+    protected EtlContext prepare(final ProgressIndicator indicator) {
+        EtlContext ctx = new EtlContext();
         ctx.setBaseURL(configuration.getDocumentUrl());
-        ctx.session = new Session();
         ctx.setProgressCallback(new ProgressCallback(100, indicator));
 
         final ProgressCallback progress = ctx.getProgressCallback();
@@ -146,7 +155,7 @@ public class ScriptsExecutor {
 
         ctx.addProperties(configuration.getProperties());
         ctx.setProgressCallback(progress.fork(9, 100));
-        ctx.session.init(configuration, ctx);
+        ctx.session=new Session(configuration, ctx);
         ctx.getProgressCallback().complete();
         ctx.setProgressCallback(progress); //Restoring
 
@@ -157,6 +166,7 @@ public class ScriptsExecutor {
      * A getter for external Properties.
      * @return external properties set by {@link #setExternalProperties}.
      */
+    @ThreadSafe
     public Map<String, String> getExternalProperties() {
         return externalProperties;
     }
@@ -169,6 +179,7 @@ public class ScriptsExecutor {
      *
      * @param externalProperties
      */
+    @ThreadSafe
     public void setExternalProperties(final Map<String, String> externalProperties) {
         this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
     }
@@ -179,7 +190,8 @@ public class ScriptsExecutor {
      * @param scriptFileUrl URL of script file.
      * @return configured instance of script executor.
      */
-    public static ScriptsExecutor newExecutor(final URL scriptFileUrl) {
+    @ThreadSafe
+    public static EtlExecutor newExecutor(final URL scriptFileUrl) {
         return newExecutor(scriptFileUrl, null);
     }
 
@@ -190,11 +202,12 @@ public class ScriptsExecutor {
      * @return configured instance of script executor.
      * @see ConfigurationFactory
      */
-    public static ScriptsExecutor newExecutor(final URL scriptFileUrl, final Map<String,String> externalProperties) {
+    @ThreadSafe
+    public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String,String> externalProperties) {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(scriptFileUrl);
         ConfigurationEl c = cf.createConfiguration();
-        ScriptsExecutor se = new ScriptsExecutor(c);
+        EtlExecutor se = new EtlExecutor(c);
         if (externalProperties!=null) {
             se.setExternalProperties(externalProperties);
         }

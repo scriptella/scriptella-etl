@@ -33,7 +33,7 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ContentEl extends XMLConfigurableBase implements Resource {
+public class ContentEl extends XmlConfigurableBase implements Resource {
     private List<Resource> content = new ArrayList<Resource>();
     /**
      * Null-Object to use instead of null if necessary
@@ -43,7 +43,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
     public ContentEl() {
     }
 
-    public ContentEl(XMLElement element) {
+    public ContentEl(XmlElement element) {
         configure(element);
     }
 
@@ -51,7 +51,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
         return new BufferedReader(new MultipartReader());
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
             Resource resource = asResource(element, node);
             if (resource!=null) {
@@ -68,7 +68,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
      * @param node node to get content from.
      * @return parsed resource or null.
      */
-    static Resource asResource(final XMLElement parentElement, final Node node) {
+    static Resource asResource(final XmlElement parentElement, final Node node) {
         if (node==null) {
             return null;
         }
@@ -77,7 +77,7 @@ public class ContentEl extends XMLConfigurableBase implements Resource {
          } else if (node instanceof Element &&
                  "include".equals(node.getNodeName())) {
              return new IncludeEl(
-                     new XMLElement((Element) node, parentElement));
+                     new XmlElement((Element) node, parentElement));
          }
         return null;
 

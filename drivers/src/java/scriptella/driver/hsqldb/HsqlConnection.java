@@ -15,8 +15,8 @@
  */
 package scriptella.driver.hsqldb;
 
-import scriptella.jdbc.JDBCConnection;
-import scriptella.jdbc.JDBCUtils;
+import scriptella.jdbc.JdbcConnection;
+import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class HsqlConnection extends JDBCConnection {
+public class HsqlConnection extends JdbcConnection {
     /**
      * True if SHUTDOWN command should be executed before last connection closed. Default value is true.
      * In 1.7.2, in-process databases are no longer closed when the last connection to the database
@@ -69,11 +69,11 @@ public class HsqlConnection extends JDBCConnection {
             }
             Statement st = con.createStatement();
             st.execute("SHUTDOWN");
-            JDBCUtils.closeSilent(st);
+            JdbcUtils.closeSilent(st);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB", e);
         } finally {
-            JDBCUtils.closeSilent(con);
+            JdbcUtils.closeSilent(con);
         }
     }
 

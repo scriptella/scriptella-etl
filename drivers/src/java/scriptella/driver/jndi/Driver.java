@@ -15,7 +15,7 @@
  */
 package scriptella.driver.jndi;
 
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -25,7 +25,7 @@ import java.util.Properties;
 
 /**
  * Scriptella driver for JNDI datasources.
- * <p>This driver relies on {@link scriptella.jdbc.ScriptellaJDBCDriver} functionality.
+ * <p>This driver relies on {@link scriptella.jdbc.GenericDriver} functionality.
  * <p><em>Note:</em>Currently this driver does not support JTA transactions
  * and simply use connections provided by datasource.
  * In this case new-tx has no effect if code is runned inside a transaction.
@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Driver extends ScriptellaJDBCDriver {
+public class Driver extends GenericDriver {
     @Override
     protected java.sql.Connection getConnection(String url, Properties props) throws SQLException {
         if (url == null) {

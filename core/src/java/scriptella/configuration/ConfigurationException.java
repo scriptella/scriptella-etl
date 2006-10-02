@@ -25,7 +25,7 @@ import scriptella.core.SystemException;
  * @version 1.0
  */
 public class ConfigurationException extends SystemException {
-    private XMLElement element;
+    private XmlElement element;
 
     /**
      * Constructs a new runtime exception with <code>null</code> as its
@@ -35,7 +35,7 @@ public class ConfigurationException extends SystemException {
     public ConfigurationException() {
     }
 
-    public ConfigurationException(XMLElement element) {
+    public ConfigurationException(XmlElement element) {
         this.element = element;
     }
 
@@ -43,7 +43,7 @@ public class ConfigurationException extends SystemException {
         super(message);
     }
 
-    public ConfigurationException(String message, XMLElement element) {
+    public ConfigurationException(String message, XmlElement element) {
         super(message);
         this.element = element;
     }
@@ -67,7 +67,7 @@ public class ConfigurationException extends SystemException {
     }
 
     public ConfigurationException(String message, Throwable cause,
-                                  XMLElement element) {
+                                  XmlElement element) {
         super(message, cause);
         this.element = element;
     }
@@ -89,7 +89,7 @@ public class ConfigurationException extends SystemException {
         super(cause);
     }
 
-    public ConfigurationException(Throwable cause, XMLElement element) {
+    public ConfigurationException(Throwable cause, XmlElement element) {
         super(cause);
         this.element = element;
     }

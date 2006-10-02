@@ -16,8 +16,8 @@
 package scriptella.driver.csv;
 
 import scriptella.DBTestCase;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -38,7 +38,7 @@ import java.util.Set;
  * @version 1.0
  */
 public class CsvScriptTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
@@ -53,7 +53,7 @@ public class CsvScriptTest extends DBTestCase {
                 throw new UnsupportedOperationException();
             }
         };
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
         final Connection connection = getConnection("csv");
         QueryHelper q = new QueryHelper("SELECT * from Result");

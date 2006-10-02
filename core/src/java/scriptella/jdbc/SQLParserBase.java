@@ -57,7 +57,7 @@ import java.util.regex.Matcher;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SQLParserBase {
+public class SqlParserBase {
 
     /**
      * Parses SQL script.

@@ -21,7 +21,7 @@ import scriptella.configuration.Location;
 import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
-import scriptella.execution.ScriptsContext;
+import scriptella.execution.EtlContext;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.Connection;
 
@@ -32,8 +32,8 @@ import java.util.Map;
 
 
 /**
- * A helper class for ScriptsContext to store and work with connections/executors.
- * <p>Available from {@link ScriptsContext}
+ * A helper class for EtlContext to store and work with connections/executors.
+ * <p>Available from {@link EtlContext}
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -43,25 +43,7 @@ public class Session {
     private List<ExecutableElement> executors;
     private List<Location> locations;
 
-    void registerConnection(final String id, final ConnectionManager con) {
-        managedConnections.put(id, con);
-    }
-
-    ConnectionManager getConnection(final String id) {
-        if (managedConnections.size() == 1) {
-            return managedConnections.values().iterator().next();
-        } else {
-            if (id == null) {
-                throw new IllegalArgumentException(
-                        "Connection id must be specified");
-            }
-
-            return managedConnections.get(id);
-        }
-    }
-
-    public void init(final ConfigurationEl configuration,
-                     final ScriptsContext ctx) {
+    public Session(final ConfigurationEl configuration, final EtlContext ctx) {
         final List<ConnectionEl> connections = configuration.getConnections();
 
         ProgressCallback progressCallback = ctx.getProgressCallback().fork(50, connections.size());
@@ -71,7 +53,7 @@ public class Session {
             String id = connections.size() > 1 ? ("id=" + c.getId() + ", ") : "";//print an ID if more than one connection
             progressCallback.step(1, "Connection " + id + connection.toString() +
                     ", " + connection.getDialectIdentifier() + " registered");
-            registerConnection(c.getId(), con);
+            managedConnections.put(c.getId(), con);
         }
 
         final List<ScriptingElement> scripts = configuration.getScriptingElements();
@@ -90,9 +72,23 @@ public class Session {
             }
             progressCallback.step(1, s.getLocation() + " prepared");
         }
+        
     }
 
-    public void execute(final ScriptsContext ctx) {
+    ConnectionManager getConnection(final String id) {
+        if (managedConnections.size() == 1) {
+            return managedConnections.values().iterator().next();
+        } else {
+            if (id == null) {
+                throw new IllegalArgumentException(
+                        "Connection id must be specified");
+            }
+
+            return managedConnections.get(id);
+        }
+    }
+
+    public void execute(final EtlContext ctx) {
         final ProgressCallback progress = ctx.getProgressCallback()
                 .fork(executors.size());
         DynamicContext dynCtx = new DynamicContext(ctx);

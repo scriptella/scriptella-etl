@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 /**
  * Represents script execution statistics
- * <p>The statistics is groupped by script elements i.e. sql script or query.
+ * <p>The statistics is groupped by script elements i.e. script or query.
  *
  * @author Fyodor Kupolov
  * @version 1.0

@@ -62,7 +62,7 @@
                     <td>Any JDBC driver</td>
                     <td>This driver allows to work with <a href="http://www.springframework.org">Spring</a> managed datasource connections, useful in Spring Framework
                         projects.<br/>
-                        The driver requires <code>scriptella.driver.spring.ScriptsExecutorBean</code> to be used in Spring configuration.
+                        The driver requires <code>scriptella.driver.spring.EtlExecutorBean</code> to be used in Spring configuration.
                     </td>
                 </tr>
             </table>

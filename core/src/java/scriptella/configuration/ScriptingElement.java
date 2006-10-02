@@ -25,7 +25,7 @@ import scriptella.spi.Resource;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public abstract class ScriptingElement extends XMLConfigurableBase {
+public abstract class ScriptingElement extends XmlConfigurableBase {
     private String connectionId;
     private String ifExpr;
     private DialectBasedContentEl contentEl;
@@ -62,7 +62,7 @@ public abstract class ScriptingElement extends XMLConfigurableBase {
         return contentEl.getContent(id);
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         setProperty(element, "connection-id", "connectionId");
         setProperty(element, "if");
         contentEl = new DialectBasedContentEl(element);

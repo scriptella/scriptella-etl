@@ -27,8 +27,8 @@ import java.sql.Connection;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Script extends SQLSupport {
-    public Script(Resource resource, JDBCConnection connection) {
+public class Script extends SqlSupport {
+    public Script(Resource resource, JdbcConnection connection) {
         super(resource, connection);
     }
 

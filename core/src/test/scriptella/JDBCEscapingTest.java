@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -35,11 +35,11 @@ public class JDBCEscapingTest extends DBTestCase {
     /**
      * Tests correct execution of scripts with jdbc escaped timestamp data.
      *
-     * @throws ScriptsExecutorException
+     * @throws EtlExecutorException
      */
-    public void testTimestamps() throws ScriptsExecutorException {
+    public void testTimestamps() throws EtlExecutorException {
         final Connection c = getConnection("jdbcet");
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
 
         QueryHelper q = new QueryHelper("select * from test");

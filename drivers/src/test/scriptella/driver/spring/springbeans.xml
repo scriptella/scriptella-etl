@@ -8,7 +8,7 @@
         <property name="username"><value>sa</value></property>
         <property name="password"><value></value></property>
     </bean>
-    <bean id="executor" class="scriptella.driver.spring.ScriptsExecutorBean">
+    <bean id="executor" class="scriptella.driver.spring.EtlExecutorBean">
         <property name="configLocation"><value>/scriptella/driver/spring/SpringDriverTest.xml</value></property>
         <property name="externalProperties"><map>
             <entry key="tableName"><value>SpringTable</value></entry>

@@ -31,24 +31,24 @@ import java.util.regex.Pattern;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class DialectBasedContentEl extends XMLConfigurableBase {
+public class DialectBasedContentEl extends XmlConfigurableBase {
     private List<Dialect> dialects;
 
     public DialectBasedContentEl() {
     }
 
-    public DialectBasedContentEl(final XMLElement element) {
+    public DialectBasedContentEl(final XmlElement element) {
         configure(element);
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         Dialect defaultDialect = null;
         dialects=new ArrayList<Dialect>();
         //iterate through the child nodes of this element
         for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
             if (isDialectElement(node)) {
                 Dialect d = new Dialect();
-                d.configure(new XMLElement((Element) node, element));
+                d.configure(new XmlElement((Element) node, element));
                 dialects.add(d);
             } else {
                 //Try to convert the node to resource if possible
@@ -103,7 +103,7 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
         return dialects;
     }
 
-    static class Dialect extends XMLConfigurableBase {
+    static class Dialect extends XmlConfigurableBase {
         private Pattern name;
         private Pattern version;
         private ContentEl contentEl;
@@ -128,7 +128,7 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
             return contentEl;
         }
 
-        public void configure(final XMLElement element) {
+        public void configure(final XmlElement element) {
             setPatternProperty(element, "name");
             setPatternProperty(element, "version");
             contentEl = new ContentEl(element);
@@ -139,7 +139,7 @@ public class DialectBasedContentEl extends XMLConfigurableBase {
          * Configures default dialect.
          * @param parent parent element.
          */
-        public void configureDefault(final XMLElement parent) {
+        public void configureDefault(final XmlElement parent) {
             setLocation(parent, null);
             contentEl = new ContentEl();
         }
