@@ -18,7 +18,7 @@ package scriptella.driver.spring;
 import scriptella.jdbc.JDBCException;
 
 /**
- * Thrown to indicate JNDI provider failure.
+ * Thrown to indicate Spring provider failure.
  *
  * @author Fyodor Kupolov
  * @version 1.0
