@@ -33,14 +33,14 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class IncludeEl extends XMLConfigurableBase implements Resource {
+public class IncludeEl extends XmlConfigurableBase implements Resource {
     private URL url;
     private String href;
     private String charset;
     private static final Logger LOG = Logger.getLogger(IncludeEl.class.getName());
     private FallbackEl fallbackEl;
 
-    public IncludeEl(XMLElement element) {
+    public IncludeEl(XmlElement element) {
         configure(element);
     }
 
@@ -68,7 +68,7 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
         this.fallbackEl = fallbackEl;
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         url = element.getDocumentURL();
         setRequiredProperty(element, "href");
 
@@ -77,7 +77,7 @@ public class IncludeEl extends XMLConfigurableBase implements Resource {
             throw new ConfigurationException("Encoding " + enc + " is not supported", element);
         }
         charset = enc;
-        final XMLElement fallbackElement = element.getChild("fallback");
+        final XmlElement fallbackElement = element.getChild("fallback");
         if (fallbackElement != null) {
             fallbackEl = new FallbackEl(fallbackElement);
         }

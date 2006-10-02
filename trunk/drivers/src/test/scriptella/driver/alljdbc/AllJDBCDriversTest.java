@@ -16,10 +16,10 @@
 package scriptella.driver.alljdbc;
 
 import scriptella.AbstractTestCase;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.JDBCUtils;
-import scriptella.spi.DriversFactory;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
+import scriptella.jdbc.JdbcUtils;
+import scriptella.spi.DriverFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,14 +82,14 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
 
-    private ScriptsExecutor schema = newScriptsExecutor("schema.xml");
+    private EtlExecutor schema = newEtlExecutor("schema.xml");
 
-    public void test() throws ScriptsExecutorException, ClassNotFoundException {
+    public void test() throws EtlExecutorException, ClassNotFoundException {
         int n = drivers.length;
         //just to make sure properties are valid
         assertTrue(n == urls.length && n == users.length && n == passwords.length);
 
-        ScriptsExecutor se = newScriptsExecutor();
+        EtlExecutor se = newEtlExecutor();
 
         Map<String,String> props = new HashMap<String, String>();
         //test any combination of drivers in both directions
@@ -144,7 +144,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
             }
             //Initialize a driver and obtain a connection to turn off automatic shutdown on last connection close
             try {
-                DriversFactory.getDriver(driver, getClass().getClassLoader());
+                DriverFactory.getDriver(driver, getClass().getClassLoader());
                 connections.add(DriverManager.getConnection(url, user,password));
             } catch (Exception e) {
                 throw new IllegalStateException(e);
@@ -156,7 +156,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
 
     protected void tearDown() throws Exception {
         for (Connection connection : connections) {
-            JDBCUtils.closeSilent(connection);
+            JdbcUtils.closeSilent(connection);
         }
     }
 

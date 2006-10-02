@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class OnErrorEl extends XMLConfigurableBase {
+public class OnErrorEl extends XmlConfigurableBase {
     private static final Pattern CODES_SEPARATOR = Pattern.compile("\\s*\\,\\s*");
     private Pattern type;
     private Pattern message;
@@ -41,11 +41,11 @@ public class OnErrorEl extends XMLConfigurableBase {
     public OnErrorEl() {
     }
 
-    public OnErrorEl(final XMLElement element) {
+    public OnErrorEl(final XmlElement element) {
         configure(element);
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         setPatternProperty(element, "type");
         setPatternProperty(element, "message");
         String codestr = element.getAttribute("codes");

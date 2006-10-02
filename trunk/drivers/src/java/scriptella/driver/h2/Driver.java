@@ -15,8 +15,8 @@
  */
 package scriptella.driver.h2;
 
-import scriptella.jdbc.JDBCException;
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
+import scriptella.jdbc.JdbcException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -28,14 +28,14 @@ import java.util.Properties;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Driver extends ScriptellaJDBCDriver {
+public class Driver extends GenericDriver {
     public static final String H2_DRIVER_NAME = "org.h2.Driver";
 
     static {
         try {
             Class.forName(Driver.H2_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
-            throw new JDBCException(H2_DRIVER_NAME + " driver not found. Please check class path settings", e);
+            throw new JdbcException(H2_DRIVER_NAME + " driver not found. Please check class path settings", e);
         }
     }
 

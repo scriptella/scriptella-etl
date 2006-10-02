@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -38,9 +38,9 @@ public class SQLParametersTest extends DBTestCase {
      * Tests substitution of global and local properties.
      * See <a href="/resources/SQLParametersTest.xml">SQLParametersTest.xml</a> for details.
      */
-    public void testSubstitution() throws ScriptsExecutorException {
+    public void testSubstitution() throws EtlExecutorException {
         final Connection c = getConnection("sqlparamstst");
-        ScriptsExecutor e = newScriptsExecutor();
+        EtlExecutor e = newEtlExecutor();
         e.execute();
 
         QueryHelper q = new QueryHelper("select * from test");
@@ -62,9 +62,9 @@ public class SQLParametersTest extends DBTestCase {
                 });
     }
 
-    public void testNumberedParameters() throws ScriptsExecutorException {
+    public void testNumberedParameters() throws EtlExecutorException {
         final Connection c = getConnection("sqlparamstst2");
-        ScriptsExecutor e = newScriptsExecutor("SQLParametersTest2.xml");
+        EtlExecutor e = newEtlExecutor("SQLParametersTest2.xml");
         e.execute();
 
         QueryHelper q = new QueryHelper("select * from test");

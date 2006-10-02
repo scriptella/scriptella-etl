@@ -16,12 +16,12 @@
 package scriptella.spi;
 
 import scriptella.AbstractTestCase;
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
 
 import java.net.URL;
 
 /**
- * Tests {@link DriversClassLoader}.
+ * Tests {@link DriverClassLoader}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -32,8 +32,8 @@ public class DriversClassLoaderTest extends AbstractTestCase {
      */
     public void testDelegation() throws ClassNotFoundException {
         Class bootClass = ScriptellaDriver.class;
-        Class jdbcClass = ScriptellaJDBCDriver.class;
-        DriversClassLoader loader = new DriversClassLoader(new URL[0]);
+        Class jdbcClass = GenericDriver.class;
+        DriverClassLoader loader = new DriverClassLoader(new URL[0]);
         Class newClass = Class.forName(bootClass.getName(), false, loader);
         //boot classes show be the same
         assertEquals(bootClass, newClass);

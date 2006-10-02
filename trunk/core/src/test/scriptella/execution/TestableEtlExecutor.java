@@ -19,21 +19,21 @@ import scriptella.configuration.ConfigurationEl;
 
 
 /**
- * A testable version of ScriptsExecutor.
+ * A testable version of EtlExecutor.
  */
-public class TestableScriptsExecutor extends ScriptsExecutor {
-    public TestableScriptsExecutor() {
+public class TestableEtlExecutor extends EtlExecutor {
+    public TestableEtlExecutor() {
     }
 
-    public TestableScriptsExecutor(ConfigurationEl configuration) {
+    public TestableEtlExecutor(ConfigurationEl configuration) {
         super(configuration);
     }
 
-    public void rollbackAll(final ScriptsContext ctx) {
+    public void rollbackAll(final EtlContext ctx) {
         super.rollbackAll(ctx);
     }
 
-    public void closeAll(final ScriptsContext ctx) {
+    public void closeAll(final EtlContext ctx) {
         super.closeAll(ctx);
     }
 }

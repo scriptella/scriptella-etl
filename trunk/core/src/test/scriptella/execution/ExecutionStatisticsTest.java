@@ -27,8 +27,8 @@ import java.util.Collection;
  * @version 1.0
  */
 public class ExecutionStatisticsTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException {
-        final ScriptsExecutor se = newScriptsExecutor();
+    public void test() throws EtlExecutorException {
+        final EtlExecutor se = newEtlExecutor();
         final ExecutionStatistics s = se.execute();
         assertEquals(2, s.categories.size());
         assertEquals(12, s.getExecutedStatementsCount()); //4+2+2+1+3
@@ -63,8 +63,8 @@ public class ExecutionStatisticsTest extends DBTestCase {
         }
     }
 
-    public void test2() throws ScriptsExecutorException {
-        final ScriptsExecutor se = newScriptsExecutor(
+    public void test2() throws EtlExecutorException {
+        final EtlExecutor se = newEtlExecutor(
                 "ExecutionStatisticsTest2.xml");
         final ExecutionStatistics s = se.execute();
         assertEquals(2, s.categories.size());

@@ -15,7 +15,7 @@
  */
 package scriptella.core;
 
-import scriptella.execution.ScriptsContext;
+import scriptella.execution.EtlContext;
 import scriptella.spi.Connection;
 import scriptella.spi.ParametersCallback;
 
@@ -29,12 +29,12 @@ import scriptella.spi.ParametersCallback;
 public
 @ThreadSafe
 class DynamicContext implements ParametersCallback {
-    protected ScriptsContext globalContext;
+    protected EtlContext globalContext;
 
     protected DynamicContext() {
     }
 
-    public DynamicContext(ScriptsContext globalContext) {
+    public DynamicContext(EtlContext globalContext) {
         this.globalContext = globalContext;
     }
 
@@ -57,7 +57,7 @@ class DynamicContext implements ParametersCallback {
     }
 
 
-    protected ScriptsContext getGlobalContext() {
+    protected EtlContext getGlobalContext() {
         return globalContext;
     }
 

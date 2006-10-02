@@ -28,13 +28,13 @@ import java.util.Set;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ConfigurationEl extends XMLConfigurableBase {
+public class ConfigurationEl extends XmlConfigurableBase {
     private List<ConnectionEl> connections;
     private List<ScriptingElement> scriptingElements;
     private PropertiesEl properties;
     private URL documentUrl;
 
-    public ConfigurationEl(XMLElement element) {
+    public ConfigurationEl(XmlElement element) {
         configure(element);
     }
 
@@ -66,7 +66,7 @@ public class ConfigurationEl extends XMLConfigurableBase {
         this.documentUrl = documentUrl;
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         documentUrl = element.getDocumentURL();
         properties = new PropertiesEl(element.getChild("properties"));
 
@@ -79,7 +79,7 @@ public class ConfigurationEl extends XMLConfigurableBase {
         validateScriptingElements(element);
     }
 
-    void validateScriptingElements(final XMLElement element) {
+    void validateScriptingElements(final XmlElement element) {
         //validating scriptingElements
         Set<String> allowedConIds = new HashSet<String>();
         for (ConnectionEl connectionEl : connections) {
@@ -95,7 +95,7 @@ public class ConfigurationEl extends XMLConfigurableBase {
         validateScriptingElements(allowedConIds, element, scriptingElements);
     }
 
-    void validateScriptingElements(final Set<String> allowedConIds, final XMLElement element, final List<ScriptingElement> elements) {
+    void validateScriptingElements(final Set<String> allowedConIds, final XmlElement element, final List<ScriptingElement> elements) {
         for (ScriptingElement se : elements) {
             //If one connection check
             final int allowedConSize = allowedConIds.size();

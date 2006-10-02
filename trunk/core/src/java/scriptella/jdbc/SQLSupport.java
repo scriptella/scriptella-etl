@@ -36,13 +36,13 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SQLSupport {
-    private static final Logger LOG = Logger.getLogger(SQLSupport.class.getName());
+public class SqlSupport {
+    private static final Logger LOG = Logger.getLogger(SqlSupport.class.getName());
     protected final Resource resource;
-    protected final JDBCConnection connection;
-    protected final JDBCTypesConverter converter;
+    protected final JdbcConnection connection;
+    protected final JdbcTypesConverter converter;
 
-    public SQLSupport(Resource resource, JDBCConnection connection) {
+    public SqlSupport(Resource resource, JdbcConnection connection) {
         if (resource == null) {
             throw new IllegalArgumentException("Resource cannot be null");
         }
@@ -61,7 +61,7 @@ public class SQLSupport {
             final Reader reader = resource.open();
             parser.parse(reader);
         } catch (IOException e) {
-            throw new JDBCException("Failed to open resource", e);
+            throw new JdbcException("Failed to open resource", e);
         }
         //notify statistic interceptor on number of executed statements
         //Performance Note: this solution may be retrofitted to avoid usage of ThreadLocals
@@ -69,7 +69,7 @@ public class SQLSupport {
         return parser.updates ? parser.result : (-1);
     }
 
-    private class Parser extends SQLParserBase {
+    private class Parser extends SqlParserBase {
         int result = 0;
         boolean updates = false;
         Connection con;
@@ -133,8 +133,8 @@ public class SQLSupport {
                 executedCount++;
                 return updateCount;
             } catch (SQLException e) {
-                throw new JDBCException("Unable to execute statement", e, sql, params);
-            } catch (JDBCException e) {
+                throw new JdbcException("Unable to execute statement", e, sql, params);
+            } catch (JdbcException e) {
                 //if ProviderException has no SQL - attach it
                 if (e.getErrorStatement() == null) {
                     e.setErrorStatement(sql, params);

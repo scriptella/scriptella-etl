@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -31,11 +31,11 @@ import java.util.Set;
  * This class provides several tests for checking transaction attributes processing.
  */
 public class NestedQueryTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         getConnection("nestedquerytestdb1"); //just for shutdown
         final Connection con = getConnection("nestedquerytestdb2");
 
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from result");
@@ -61,11 +61,11 @@ public class NestedQueryTest extends DBTestCase {
         assertEquals(texts, expectedTexts);
     }
 
-    public void test2() throws ScriptsExecutorException {
+    public void test2() throws EtlExecutorException {
         getConnection("nestedquerytest2db1");//just for shutdown
         final Connection con = getConnection("nestedquerytest2db2");
 
-        final ScriptsExecutor se = newScriptsExecutor("NestedQueryTest2.xml");
+        final EtlExecutor se = newEtlExecutor("NestedQueryTest2.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test");
@@ -86,10 +86,10 @@ public class NestedQueryTest extends DBTestCase {
     /**
      * Tests rownum pseudo-column.
      */
-    public void testRownum() throws ScriptsExecutorException {
+    public void testRownum() throws EtlExecutorException {
         final Connection con = getConnection("nestedquerytestrownum");
 
-        final ScriptsExecutor se = newScriptsExecutor("NestedQueryTestRownum.xml");
+        final EtlExecutor se = newEtlExecutor("NestedQueryTestRownum.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from Result");

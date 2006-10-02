@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -34,9 +34,9 @@ public class DBTableCopyTest extends DBTestCase {
     /**
      * This test copies a data from Table ot Table2
      */
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final Connection con = getConnection("test");
-        final ScriptsExecutor se = newScriptsExecutor("DBTableCopyTest.xml");
+        final EtlExecutor se = newEtlExecutor("DBTableCopyTest.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test2");
@@ -60,10 +60,10 @@ public class DBTableCopyTest extends DBTestCase {
     /**
      * This test copies data from db1.Table to db2.Table2
      */
-    public void test2() throws ScriptsExecutorException {
+    public void test2() throws EtlExecutorException {
         final Connection con = getConnection("test");
         final Connection con2 = getConnection("test2");
-        final ScriptsExecutor se = newScriptsExecutor("DBTableCopyTest2.xml");
+        final EtlExecutor se = newEtlExecutor("DBTableCopyTest2.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test2");

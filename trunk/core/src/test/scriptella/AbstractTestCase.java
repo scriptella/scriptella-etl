@@ -18,7 +18,7 @@ package scriptella;
 import junit.framework.TestCase;
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
-import scriptella.execution.ScriptsExecutor;
+import scriptella.execution.EtlExecutor;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
@@ -98,17 +98,17 @@ public abstract class AbstractTestCase extends TestCase {
         return new File(resourceBaseDir, path);
     }
 
-    protected ScriptsExecutor newScriptsExecutor() {
+    protected EtlExecutor newEtlExecutor() {
         String name = getClass().getSimpleName()+".xml";
-        return newScriptsExecutor(name);
+        return newEtlExecutor(name);
     }
 
-    protected ScriptsExecutor newScriptsExecutor(final String path) {
-        return newScriptsExecutor(loadConfiguration(path));
+    protected EtlExecutor newEtlExecutor(final String path) {
+        return newEtlExecutor(loadConfiguration(path));
     }
 
-    protected ScriptsExecutor newScriptsExecutor(final ConfigurationEl configuration) {
-        return new ScriptsExecutor(configuration);
+    protected EtlExecutor newEtlExecutor(final ConfigurationEl configuration) {
+        return new EtlExecutor(configuration);
     }
 
     protected ConfigurationEl loadConfiguration(final String path) {

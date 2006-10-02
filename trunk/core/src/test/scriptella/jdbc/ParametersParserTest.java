@@ -17,7 +17,7 @@ package scriptella.jdbc;
 
 import junit.framework.TestCase;
 import scriptella.expression.Expression;
-import scriptella.spi.MockDriversContext;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 
 import java.net.MalformedURLException;
@@ -35,7 +35,7 @@ public class ParametersParserTest extends TestCase {
      */
     public void testValid() throws MalformedURLException {
 
-        final MockDriversContext dc = new MockDriversContext();
+        final MockDriverContext dc = new MockDriverContext();
         ParametersParser p = new ParametersParser(dc);
 
         String expr = "file 'myfile'";
@@ -53,7 +53,7 @@ public class ParametersParserTest extends TestCase {
      */
     public void testInvalid() throws MalformedURLException {
 
-        final MockDriversContext dc = new MockDriversContext();
+        final MockDriverContext dc = new MockDriverContext();
         ParametersParser p = new ParametersParser(dc);
 
         try {

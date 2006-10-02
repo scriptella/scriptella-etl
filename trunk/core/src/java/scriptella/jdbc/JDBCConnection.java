@@ -34,15 +34,15 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JDBCConnection extends AbstractConnection {
+public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
     private Connection con;
-    private static final Logger LOG = Logger.getLogger(JDBCConnection.class.getName());
+    private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
     private boolean transactable = false;
     private StatementCache statementCache;
     private ParametersParser parametersParser;
 
-    public JDBCConnection(Connection con, ConnectionParameters parameters) {
+    public JdbcConnection(Connection con, ConnectionParameters parameters) {
         super(parameters);
         if (con == null) {
             throw new IllegalArgumentException("Connection cannot be null");
@@ -59,7 +59,7 @@ public class JDBCConnection extends AbstractConnection {
             try {
                 con.setAutoCommit(false);
             } catch (Exception e) {
-                throw new JDBCException("Unable to set autocommit=false for " + toString(), e);
+                throw new JdbcException("Unable to set autocommit=false for " + toString(), e);
             }
         }
     }
@@ -74,7 +74,7 @@ public class JDBCConnection extends AbstractConnection {
             try {
                 statementCacheSize = Integer.valueOf(cacheSizeStr);
             } catch (NumberFormatException e) {
-                throw new JDBCException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
+                throw new JdbcException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
             }
         }
 
@@ -130,7 +130,7 @@ public class JDBCConnection extends AbstractConnection {
             try {
                 con.commit();
             } catch (Exception e) {
-                throw new JDBCException("Unable to commit transaction", e);
+                throw new JdbcException("Unable to commit transaction", e);
             }
         }
     }
@@ -145,7 +145,7 @@ public class JDBCConnection extends AbstractConnection {
             try {
                 con.rollback();
             } catch (Exception e) {
-                throw new JDBCException("Unable to roll back transaction", e);
+                throw new JdbcException("Unable to roll back transaction", e);
             }
         }
     }
@@ -158,7 +158,7 @@ public class JDBCConnection extends AbstractConnection {
                 con.close();
                 con = null;
             } catch (SQLException e) {
-                throw new JDBCException("Unable to close a connection", e);
+                throw new JdbcException("Unable to close a connection", e);
             }
 
         }
@@ -169,10 +169,10 @@ public class JDBCConnection extends AbstractConnection {
     }
 
     public String toString() {
-        return "JDBCConnection{" + (con == null ? "" : con.getClass().getName()) + '}';
+        return "JdbcConnection{" + (con == null ? "" : con.getClass().getName()) + '}';
     }
 
-    public JDBCTypesConverter newConverter() {
-        return new JDBCTypesConverter();
+    public JdbcTypesConverter newConverter() {
+        return new JdbcTypesConverter();
     }
 }

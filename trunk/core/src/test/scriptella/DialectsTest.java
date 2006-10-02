@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -34,9 +34,9 @@ import java.util.Set;
  * @version 1.0
  */
 public class DialectsTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final Connection con = getConnection("dialectstest");
-        final ScriptsExecutor se = newScriptsExecutor("DialectsTest.xml");
+        final EtlExecutor se = newEtlExecutor("DialectsTest.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test");
@@ -53,9 +53,9 @@ public class DialectsTest extends DBTestCase {
         assertEquals(expected, actual);
     }
 
-    public void test2() throws ScriptsExecutorException {
+    public void test2() throws EtlExecutorException {
         final Connection con = getConnection("dialectstest2");
-        final ScriptsExecutor se = newScriptsExecutor("DialectsTest2.xml");
+        final EtlExecutor se = newEtlExecutor("DialectsTest2.xml");
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test2");

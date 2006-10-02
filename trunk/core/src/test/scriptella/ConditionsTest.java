@@ -15,9 +15,9 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
-import scriptella.jdbc.JDBCUtils;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
+import scriptella.jdbc.JdbcUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,9 +36,9 @@ import java.util.Set;
  * @version 1.0
  */
 public class ConditionsTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException, SQLException {
+    public void test() throws EtlExecutorException, SQLException {
         final Connection con = getConnection("conditionstest");
-        final ScriptsExecutor se = newScriptsExecutor();
+        final EtlExecutor se = newEtlExecutor();
         se.execute();
 
         PreparedStatement ps = null;
@@ -63,8 +63,8 @@ public class ConditionsTest extends DBTestCase {
             assertEquals("Set must be " + expected, 3, actual.size());
             assertTrue("Set must be " + expected, expected.containsAll(actual));
         } finally {
-            JDBCUtils.closeSilent(rs);
-            JDBCUtils.closeSilent(ps);
+            JdbcUtils.closeSilent(rs);
+            JdbcUtils.closeSilent(ps);
         }
     }
 }

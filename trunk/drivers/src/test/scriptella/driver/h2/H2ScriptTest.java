@@ -16,8 +16,8 @@
 package scriptella.driver.h2;
 
 import scriptella.AbstractTestCase;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,15 +39,15 @@ public class H2ScriptTest extends AbstractTestCase {
     /**
      * Runs the script and checks if transformations has been made.
      *
-     * @throws ScriptsExecutorException
+     * @throws EtlExecutorException
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void test() throws ScriptsExecutorException, SQLException, ClassNotFoundException, IOException {
+    public void test() throws EtlExecutorException, SQLException, ClassNotFoundException, IOException {
         Class.forName("org.h2.Driver");
         //Opening a connection before executing a script to disable shutdown on last connection close.
         Connection con = DriverManager.getConnection("jdbc:h2:mem:tst");
-        ScriptsExecutor se = newScriptsExecutor();
+        EtlExecutor se = newEtlExecutor();
         se.execute();
         ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Test ORDER BY ID");
         List actual = new ArrayList();

@@ -22,7 +22,7 @@ package scriptella.configuration;
  * @version 1.0
  */
 public class FallbackEl extends ContentEl {
-    public FallbackEl(XMLElement element) {
+    public FallbackEl(XmlElement element) {
         super(element);
     }
 }

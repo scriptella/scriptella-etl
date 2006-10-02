@@ -15,8 +15,8 @@
  */
 package scriptella;
 
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -32,9 +32,9 @@ import java.util.Map;
  * @version 1.0
  */
 public class OnErrorTest extends DBTestCase {
-    public void test() throws ScriptsExecutorException {
+    public void test() throws EtlExecutorException {
         final Connection con = getConnection("onerrortest");
-        ScriptsExecutor se = newScriptsExecutor();
+        EtlExecutor se = newEtlExecutor();
         se.execute();
         QueryHelper q = new QueryHelper("select * from test");
         final Map<Integer, String> expected = new LinkedHashMap<Integer, String>();

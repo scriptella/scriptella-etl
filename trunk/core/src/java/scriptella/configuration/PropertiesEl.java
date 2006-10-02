@@ -29,17 +29,17 @@ import java.util.Map;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class PropertiesEl extends XMLConfigurableBase {
+public class PropertiesEl extends XmlConfigurableBase {
     Map<String, String> map = Collections.emptyMap();
 
     public PropertiesEl() {
     }
 
-    public PropertiesEl(XMLElement element) {
+    public PropertiesEl(XmlElement element) {
         configure(element);
     }
 
-    public void configure(final XMLElement element) {
+    public void configure(final XmlElement element) {
         if (element == null) {
             return; //Properties is not a mandatory element
         }

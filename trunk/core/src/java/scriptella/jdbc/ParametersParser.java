@@ -16,7 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.expression.Expression;
-import scriptella.spi.DriversContext;
+import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
 
 import java.net.MalformedURLException;
@@ -41,15 +41,15 @@ import java.net.URL;
  * @version 1.0
  */
 public class ParametersParser {
-    private DriversContext driversContext;
+    private DriverContext driverContext;
 
 
     /**
      * Creates a file reference parser.
-     * @param driversContext drivers content to use for URL resolution.
+     * @param driverContext drivers content to use for URL resolution.
      */
-    public ParametersParser(DriversContext driversContext) {
-        this.driversContext = driversContext;
+    public ParametersParser(DriverContext driverContext) {
+        this.driverContext = driverContext;
     }
 
     /**
@@ -64,15 +64,15 @@ public class ParametersParser {
                 final Expression ex = Expression.compile(expression.substring(5));//file prefix removed
                 final Object o = ex.evaluate(parameters);
                 if (o==null) {
-                    throw new JDBCException("Failed to evaluate file URL", expression);
+                    throw new JdbcException("Failed to evaluate file URL", expression);
                 }
                 if (o instanceof URL) {
                     return (URL) o;
                 } else {
                     try {
-                        return driversContext.resolve(String.valueOf(o));
+                        return driverContext.resolve(String.valueOf(o));
                     } catch (MalformedURLException e) {
-                        throw new JDBCException("Wrong file URL \""+o+"\"", e, expression);
+                        throw new JdbcException("Wrong file URL \""+o+"\"", e, expression);
                     }
                 }
             } catch (Expression.ParseException e) {

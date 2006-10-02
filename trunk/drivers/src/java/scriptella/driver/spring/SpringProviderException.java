@@ -15,7 +15,7 @@
  */
 package scriptella.driver.spring;
 
-import scriptella.jdbc.JDBCException;
+import scriptella.jdbc.JdbcException;
 
 /**
  * Thrown to indicate Spring provider failure.
@@ -23,7 +23,7 @@ import scriptella.jdbc.JDBCException;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SpringProviderException extends JDBCException {
+public class SpringProviderException extends JdbcException {
     public SpringProviderException(String message, Throwable cause) {
         super(message, cause);
     }

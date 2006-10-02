@@ -22,11 +22,11 @@ package scriptella.configuration;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public interface XMLConfigurable {
+public interface XmlConfigurable {
     /**
      * Configures the class using specified XML element.
      *
      * @param element XML element.
      */
-    public void configure(final XMLElement element);
+    public void configure(final XmlElement element);
 }

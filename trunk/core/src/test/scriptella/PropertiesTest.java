@@ -18,9 +18,9 @@ package scriptella;
 import scriptella.configuration.ConfigurationEl;
 import scriptella.core.ConnectionManager;
 import scriptella.core.SqlTestHelper;
-import scriptella.execution.ScriptsContext;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlContext;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.spi.ConnectionParameters;
 
@@ -34,11 +34,11 @@ import java.util.Map;
  * @version 1.0
  */
 public class PropertiesTest extends AbstractTestCase {
-    private ScriptsContext ctx; //execution context
+    private EtlContext ctx; //execution context
     private ConnectionParameters params;
 
-    public void test() throws ScriptsExecutorException {
-        final ScriptsExecutor se = newScriptsExecutor("PropertiesTest.xml");
+    public void test() throws EtlExecutorException {
+        final EtlExecutor se = newEtlExecutor("PropertiesTest.xml");
         se.execute();
 
         assertEquals("jdbc:hsqldb:mem:propertiestest", params.getUrl());
@@ -60,11 +60,11 @@ public class PropertiesTest extends AbstractTestCase {
     }
 
     @Override
-    protected ScriptsExecutor newScriptsExecutor(
+    protected EtlExecutor newEtlExecutor(
             final ConfigurationEl configuration) {
-        return new ScriptsExecutor(configuration) {
+        return new EtlExecutor(configuration) {
             //overrides prepare method to get ctx and params for connection
-            protected ScriptsContext prepare(
+            protected EtlContext prepare(
                     final ProgressIndicator indicator) {
                 ctx = super.prepare(indicator); //store ctx for assertions
                 Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());

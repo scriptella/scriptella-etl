@@ -32,16 +32,16 @@ import java.util.Set;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class XMLElement {
+public class XmlElement {
     private Element element;
     private URL documentURL;
 
-    public XMLElement(Element element, URL documentURI) {
+    public XmlElement(Element element, URL documentURI) {
         this.element = element;
         this.documentURL = documentURI;
     }
 
-    public XMLElement(Element element, XMLElement parent) {
+    public XmlElement(Element element, XmlElement parent) {
         this.element = element;
         documentURL = parent.documentURL;
     }
@@ -58,7 +58,7 @@ public class XMLElement {
         return documentURL;
     }
 
-    protected List<XMLElement> getChildren() {
+    protected List<XmlElement> getChildren() {
         return asList(element.getChildNodes());
     }
 
@@ -103,14 +103,14 @@ public class XMLElement {
         return res.toString();
     }
 
-    public List<XMLElement> getChildren(final String name) {
-        List<XMLElement> res = new ArrayList<XMLElement>();
+    public List<XmlElement> getChildren(final String name) {
+        List<XmlElement> res = new ArrayList<XmlElement>();
         Node node = element.getFirstChild();
 
         while (node != null) {
             if (node instanceof Element) {
                 if (name.equals(((Element) node).getTagName())) {
-                    res.add(new XMLElement((Element) node, documentURL));
+                    res.add(new XmlElement((Element) node, documentURL));
                 }
             }
 
@@ -120,14 +120,14 @@ public class XMLElement {
         return res;
     }
 
-    public List<XMLElement> getChildren(final Set<String> names) {
-        List<XMLElement> res = new ArrayList<XMLElement>();
+    public List<XmlElement> getChildren(final Set<String> names) {
+        List<XmlElement> res = new ArrayList<XmlElement>();
         Node node = element.getFirstChild();
 
         while (node != null) {
             if (node instanceof Element) {
                 if (names.contains(((Element) node).getTagName())) {
-                    res.add(new XMLElement((Element) node, documentURL));
+                    res.add(new XmlElement((Element) node, documentURL));
                 }
             }
 
@@ -137,13 +137,13 @@ public class XMLElement {
         return res;
     }
 
-    public XMLElement getChild(final String name) {
+    public XmlElement getChild(final String name) {
         Node node = element.getFirstChild();
 
         while (node != null) {
             if (node instanceof Element) {
                 if (name.equals(((Element) node).getTagName())) {
-                    return new XMLElement((Element) node, documentURL);
+                    return new XmlElement((Element) node, documentURL);
                 }
             }
 
@@ -153,13 +153,13 @@ public class XMLElement {
         return null;
     }
 
-    protected List<XMLElement> asList(final NodeList list) {
-        List<XMLElement> result = new ArrayList<XMLElement>();
+    protected List<XmlElement> asList(final NodeList list) {
+        List<XmlElement> result = new ArrayList<XmlElement>();
         Node node = element.getFirstChild();
 
         while (node != null) {
             if (node instanceof Element) {
-                result.add(new XMLElement((Element) node, documentURL));
+                result.add(new XmlElement((Element) node, documentURL));
             }
 
             node = node.getNextSibling();

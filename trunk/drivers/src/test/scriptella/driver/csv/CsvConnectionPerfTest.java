@@ -18,7 +18,7 @@ package scriptella.driver.csv;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.MockDriversContext;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -75,7 +75,7 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriversContext.INSTANCE);
+                MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //Quering 20000 lines file 10 times.
@@ -107,7 +107,7 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriversContext.INSTANCE);
+                MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         String expected = "\"*col1*\",\"col2\",\"col3\"\n\"*col21*\",\"col22\",\"col23\"\n";

@@ -17,7 +17,7 @@ package scriptella.driver.ldap;
 
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.DriversContext;
+import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -44,7 +44,7 @@ public class LdapConnection extends AbstractConnection {
     private final SearchControls searchControls; //default search controls
     private final Long maxFileLength;
     private final String baseDn;
-    private final DriversContext driversContext;
+    private final DriverContext driverContext;
 
 
     /**
@@ -162,7 +162,7 @@ public class LdapConnection extends AbstractConnection {
             this.maxFileLength = null;
         }
 
-        driversContext = parameters.getContext();
+        driverContext = parameters.getContext();
     }
 
     DirContext getCtx() {
@@ -177,8 +177,8 @@ public class LdapConnection extends AbstractConnection {
         return maxFileLength;
     }
 
-    DriversContext getDriversContext() {
-        return driversContext;
+    DriverContext getDriversContext() {
+        return driverContext;
     }
 
     String getBaseDn() {

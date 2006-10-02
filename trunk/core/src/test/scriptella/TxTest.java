@@ -19,10 +19,10 @@ import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConnectionEl;
 import scriptella.core.ConnectionManager;
 import scriptella.core.SqlTestHelper;
-import scriptella.execution.ScriptsContext;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
-import scriptella.execution.TestableScriptsExecutor;
+import scriptella.execution.EtlContext;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
+import scriptella.execution.TestableEtlExecutor;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -38,11 +38,11 @@ import java.util.Map;
 public class TxTest extends DBTestCase {
     public void test() {
         final Connection con = getConnection("txtest");
-        final ScriptsExecutor se = newScriptsExecutor("TxTest.xml");
+        final EtlExecutor se = newEtlExecutor("TxTest.xml");
 
         try {
             se.execute();
-        } catch (ScriptsExecutorException e) {
+        } catch (EtlExecutorException e) {
             e.printStackTrace();
             fail("Scripts invoked in new tx must not fail the executor");
         }
@@ -62,11 +62,11 @@ public class TxTest extends DBTestCase {
 
     public void test2() {
         final java.sql.Connection con = getConnection("txtest2");
-        final ScriptsExecutor se = newScriptsExecutor("TxTest2.xml");
+        final EtlExecutor se = newEtlExecutor("TxTest2.xml");
 
         try {
             se.execute();
-        } catch (ScriptsExecutorException e) {
+        } catch (EtlExecutorException e) {
             e.printStackTrace();
             fail("Scripts invoked in new tx must not fail the executor");
         }
@@ -92,15 +92,15 @@ public class TxTest extends DBTestCase {
         final Connection con = getConnection("txtest3");
         ConfigurationEl conf = loadConfiguration("TxTest3.xml");
         final String failed[] = new String[1];
-        final ScriptsExecutor se = new TestableScriptsExecutor(conf) {
+        final EtlExecutor se = new TestableEtlExecutor(conf) {
             @Override
-            public void rollbackAll(final ScriptsContext ctx) {
+            public void rollbackAll(final EtlContext ctx) {
                 failed[0] = "Script should not be rolled back";
                 super.rollbackAll(ctx);
             }
 
             @Override
-            public void closeAll(final ScriptsContext ctx) {
+            public void closeAll(final EtlContext ctx) {
                 final Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());
                 final ConnectionManager cf = connections.get(ConnectionEl.DEFAULT_ID);
                 final List<scriptella.spi.Connection> newConnections = SqlTestHelper.getNewConnections(cf);
@@ -120,7 +120,7 @@ public class TxTest extends DBTestCase {
 
         try {
             se.execute();
-        } catch (ScriptsExecutorException e) {
+        } catch (EtlExecutorException e) {
             e.printStackTrace();
             fail("Scripts invoked in new tx must not fail the executor: " +
                     e.getMessage());

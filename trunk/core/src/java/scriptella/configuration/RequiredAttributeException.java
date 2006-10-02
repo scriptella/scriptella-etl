@@ -22,12 +22,12 @@ package scriptella.configuration;
  * @version 1.0
  */
 public class RequiredAttributeException extends ConfigurationException {
-    public RequiredAttributeException(String attribute, XMLElement element) {
+    public RequiredAttributeException(String attribute, XmlElement element) {
         super("Attribute " + attribute + " is required", element);
     }
 
     public RequiredAttributeException(String attribute, Throwable cause,
-                                      XMLElement element) {
+                                      XmlElement element) {
         super("Attribute " + attribute + " is required", cause, element);
     }
 }

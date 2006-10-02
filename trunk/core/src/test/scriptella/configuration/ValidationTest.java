@@ -16,7 +16,7 @@
 package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
-import scriptella.execution.ScriptsExecutorException;
+import scriptella.execution.EtlExecutorException;
 
 /**
  * Tests ETL scripts validation.
@@ -25,15 +25,15 @@ import scriptella.execution.ScriptsExecutorException;
  * @version 1.0
  */
 public class ValidationTest extends AbstractTestCase {
-    public void testConnectionId() throws ScriptsExecutorException {
+    public void testConnectionId() throws EtlExecutorException {
         try {
-            newScriptsExecutor();
+            newEtlExecutor();
             fail("No connection id validation error expected");
         } catch (ConfigurationException e) {
             //OK
         }
         try {
-            newScriptsExecutor("ValidationTest2.xml");
+            newEtlExecutor("ValidationTest2.xml");
             fail("Duplicate connection validation error expected");
         } catch (ConfigurationException e) {
             //OK

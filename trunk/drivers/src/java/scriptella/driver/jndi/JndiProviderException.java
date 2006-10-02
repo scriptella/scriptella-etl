@@ -15,7 +15,7 @@
  */
 package scriptella.driver.jndi;
 
-import scriptella.jdbc.JDBCException;
+import scriptella.jdbc.JdbcException;
 
 /**
  * Thrown to indicate JNDI provider failure.
@@ -23,7 +23,7 @@ import scriptella.jdbc.JDBCException;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JndiProviderException extends JDBCException {
+public class JndiProviderException extends JdbcException {
     public JndiProviderException(String message, Throwable cause) {
         super(message, cause);
     }

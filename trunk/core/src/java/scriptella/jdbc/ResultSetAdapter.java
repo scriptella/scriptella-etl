@@ -37,7 +37,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     private ResultSet resultSet;
     private ColumnsMap columnsMap;
     private ParametersCallback params; //parent parameters callback to use
-    private JDBCTypesConverter converter;
+    private JdbcTypesConverter converter;
     private final int columnsCount;
 
     /**
@@ -48,7 +48,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
      * @param converter          type converter to use for getting column values as object.
      */
     public ResultSetAdapter(ResultSet resultSet,
-                            ParametersCallback parametersCallback, JDBCTypesConverter converter) {
+                            ParametersCallback parametersCallback, JdbcTypesConverter converter) {
         this.params = parametersCallback;
         this.resultSet = resultSet;
         columnsMap = new ColumnsMap();
@@ -62,7 +62,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
                 columnsMap.registerColumn(m.getColumnName(i), i);
             }
         } catch (SQLException e) {
-            throw new JDBCException("Unable to process result set ", e);
+            throw new JdbcException("Unable to process result set ", e);
         }
     }
 
@@ -74,7 +74,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
         try {
             return resultSet.next();
         } catch (SQLException e) {
-            throw new JDBCException("Unable to move cursor to the next row", e);
+            throw new JdbcException("Unable to move cursor to the next row", e);
         }
     }
 
@@ -90,7 +90,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             }
 
         } catch (SQLException e) {
-            throw new JDBCException("Unable to get parameter " + name, e);
+            throw new JdbcException("Unable to get parameter " + name, e);
         }
     }
 
@@ -100,7 +100,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
      */
     public void close() {
         if (resultSet != null) {
-            JDBCUtils.closeSilent(resultSet);
+            JdbcUtils.closeSilent(resultSet);
             IOUtils.closeSilently(converter);
             resultSet = null;
             params = null;

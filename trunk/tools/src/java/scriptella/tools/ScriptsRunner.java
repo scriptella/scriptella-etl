@@ -17,9 +17,9 @@ package scriptella.tools;
 
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.util.BugReport;
@@ -73,7 +73,7 @@ public class ScriptsRunner {
         }
     };
 
-    private ScriptsExecutor exec = new ScriptsExecutor();
+    private EtlExecutor exec = new EtlExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
 
@@ -105,7 +105,7 @@ public class ScriptsRunner {
     }
 
     public ExecutionStatistics execute(final File file)
-            throws ScriptsExecutorException {
+            throws EtlExecutorException {
         try {
             factory.setResourceURL(file.toURL());
         } catch (MalformedURLException e) {

@@ -21,9 +21,9 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import scriptella.configuration.ConfigurationFactory;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
-import scriptella.execution.ScriptsExecutor;
-import scriptella.execution.ScriptsExecutorException;
 import scriptella.interactive.ProgressIndicator;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 /**
- * Implementation of {@link ScriptsExecutor} for Spring IoC container.
+ * Implementation of {@link EtlExecutor} for Spring IoC container.
  * <p>This class exposes a set of configurable properties and provides
  * a {@link Callable} invocation interface to avoid dependency on Scriptella
  * in application code.
@@ -39,7 +39,7 @@ import java.util.concurrent.Callable;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecutorBean extends ScriptsExecutor implements InitializingBean, BeanFactoryAware, Callable<ExecutionStatistics> {
+public class EtlExecutorBean extends EtlExecutor implements InitializingBean, BeanFactoryAware, Callable<ExecutionStatistics> {
 
     private static final ThreadLocal<BeanFactory> LOCAL_BEAN_FACTORY = new ThreadLocal<BeanFactory>();
     private BeanFactory beanFactory;
@@ -49,7 +49,7 @@ public class ScriptsExecutorBean extends ScriptsExecutor implements Initializing
     /**
      * Creates scripts executor.
      */
-    public ScriptsExecutorBean() {
+    public EtlExecutorBean() {
     }
 
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -105,13 +105,13 @@ public class ScriptsExecutorBean extends ScriptsExecutor implements Initializing
     /**
      * Simply calls {@link #execute()}.
      */
-    public ExecutionStatistics call() throws ScriptsExecutorException {
+    public ExecutionStatistics call() throws EtlExecutorException {
         return execute();
     }
 
 
     @Override
-    public ExecutionStatistics execute() throws ScriptsExecutorException {
+    public ExecutionStatistics execute() throws EtlExecutorException {
         if (progressIndicator!=null) {
             return execute(progressIndicator);
         } else {
@@ -120,7 +120,7 @@ public class ScriptsExecutorBean extends ScriptsExecutor implements Initializing
     }
 
     @Override
-    public ExecutionStatistics execute(final ProgressIndicator indicator) throws ScriptsExecutorException {
+    public ExecutionStatistics execute(final ProgressIndicator indicator) throws EtlExecutorException {
         LOCAL_BEAN_FACTORY.set(beanFactory);
         try {
             return super.execute(indicator);

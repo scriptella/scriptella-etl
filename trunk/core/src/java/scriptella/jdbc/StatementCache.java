@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Statements cache for {@link JDBCConnection}.
+ * Statements cache for {@link JdbcConnection}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -73,7 +73,7 @@ class StatementCache implements Closeable {
      * @throws SQLException
      * @see StatementWrapper
      */
-    public StatementWrapper prepare(final String sql, final List<Object> params, final JDBCTypesConverter converter) throws SQLException {
+    public StatementWrapper prepare(final String sql, final List<Object> params, final JdbcTypesConverter converter) throws SQLException {
         if (params==null || params.isEmpty()) {
             return create(sql, converter);
         }
@@ -90,14 +90,14 @@ class StatementCache implements Closeable {
     /**
      * Testable template method to create simple statement
      */
-    protected StatementWrapper.Simple create(final String sql, final JDBCTypesConverter converter) throws SQLException {
+    protected StatementWrapper.Simple create(final String sql, final JdbcTypesConverter converter) throws SQLException {
         return new StatementWrapper.Simple(connection.createStatement(), sql, converter);
     }
 
     /**
      * Testable template method to create prepared statement
      */
-    protected StatementWrapper.Prepared prepare(final String sql, final JDBCTypesConverter converter) throws SQLException {
+    protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) throws SQLException {
         return new StatementWrapper.Prepared(connection.prepareStatement(sql), converter);
     }
 

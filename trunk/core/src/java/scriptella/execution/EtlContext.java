@@ -18,7 +18,7 @@ package scriptella.execution;
 import scriptella.core.Session;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
-import scriptella.spi.DriversContext;
+import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
 import scriptella.util.CollectionUtils;
 
@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsContext implements ParametersCallback, DriversContext {
+public class EtlContext implements ParametersCallback, DriverContext {
     private ProgressCallback progressCallback;
     private Map<String, String> properties = CollectionUtils.newCaseInsensitiveAsciiMap();
     private URL baseURL;
@@ -86,17 +86,8 @@ public class ScriptsContext implements ParametersCallback, DriversContext {
         return statisticsBuilder;
     }
 
-    void setStatisticsBuilder(
-            final ExecutionStatisticsBuilder statisticsBuilder) {
-        this.statisticsBuilder = statisticsBuilder;
-    }
-
     public Session getSession() {
         return session;
-    }
-
-    void setSession(final Session session) {
-        this.session = session;
     }
 
     public String substituteProperties(final String s) {

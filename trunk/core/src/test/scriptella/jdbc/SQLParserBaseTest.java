@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Tests {@link scriptella.jdbc.SQLParserBase}.
+ * Tests {@link scriptella.jdbc.SqlParserBase}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -62,7 +62,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
         propSet.add("text");
 
 
-        SQLParserBase p = new SQLParserBase() {
+        SqlParserBase p = new SqlParserBase() {
             int stInd;
 
             @Override

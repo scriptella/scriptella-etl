@@ -15,9 +15,9 @@
  */
 package scriptella.driver.hsqldb;
 
-import scriptella.jdbc.JDBCConnection;
-import scriptella.jdbc.JDBCException;
-import scriptella.jdbc.ScriptellaJDBCDriver;
+import scriptella.jdbc.GenericDriver;
+import scriptella.jdbc.JdbcConnection;
+import scriptella.jdbc.JdbcException;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.SQLException;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Driver extends ScriptellaJDBCDriver {
+public class Driver extends GenericDriver {
     private static final Logger LOG = Logger.getLogger(Driver.class.getName());
     public static final String HSQLDB_DRIVER_NAME = "org.hsqldb.jdbcDriver";
 
@@ -64,12 +64,12 @@ public class Driver extends ScriptellaJDBCDriver {
         try {
             Class.forName(HSQLDB_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
-            throw new JDBCException(HSQLDB_DRIVER_NAME + " driver not found. Please check class path settings", e);
+            throw new JdbcException(HSQLDB_DRIVER_NAME + " driver not found. Please check class path settings", e);
         }
     }
 
     @Override
-    protected JDBCConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
+    protected JdbcConnection connect(ConnectionParameters parameters, Properties props) throws SQLException {
         return new HsqlConnection(getConnection(parameters.getUrl(), props), parameters);
     }
 

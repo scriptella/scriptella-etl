@@ -16,8 +16,8 @@
 package scriptella.driver.jndi;
 
 import scriptella.AbstractTestCase;
-import scriptella.jdbc.JDBCConnection;
-import scriptella.jdbc.JDBCException;
+import scriptella.jdbc.JdbcConnection;
+import scriptella.jdbc.JdbcException;
 import scriptella.spi.ConnectionParameters;
 
 import javax.naming.Context;
@@ -57,10 +57,10 @@ public class JNDIDriverTest extends AbstractTestCase {
         CtxFactory.lookups = 0;
         ConnectionParameters params = new ConnectionParameters(env, CtxFactory.jndiName, null, null, null, null, null);
         Driver drv = new Driver();
-        JDBCConnection con1 = drv.connect(params);
+        JdbcConnection con1 = drv.connect(params);
         con1.close();
         assertNotNull(con1);
-        JDBCConnection con2 = drv.connect(params);
+        JdbcConnection con2 = drv.connect(params);
         con2.close();
         assertNotNull(con2);
         assertTrue("con1 and con2 must be different connections", con1 != con2);
@@ -78,7 +78,7 @@ public class JNDIDriverTest extends AbstractTestCase {
         Driver drv = new Driver();
         try {
             drv.getConnection(null , null);
-        } catch (JDBCException e) {
+        } catch (JdbcException e) {
             //ok
         }
 
