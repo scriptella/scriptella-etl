@@ -24,6 +24,7 @@ import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.util.BugReport;
+import scriptella.util.CollectionUtils;
 import scriptella.util.StringUtils;
 
 import java.io.File;
@@ -142,7 +143,7 @@ public class EtlLauncher {
         }
 
         LoggingConfigurer.configure(h);
-        setProperties(System.getProperties());
+        setProperties(CollectionUtils.asMap(System.getProperties()));
         for (File file : files) {
             try {
                 execute(file);
@@ -182,8 +183,7 @@ public class EtlLauncher {
         out.println("  -version, -v        print version");
     }
 
-    @SuppressWarnings("unchecked")
-    public void setProperties(final Map props) {
+    public void setProperties(final Map<String,String> props) {
         exec.setExternalProperties(props);
     }
 

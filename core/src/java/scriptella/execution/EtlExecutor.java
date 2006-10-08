@@ -21,6 +21,7 @@ import scriptella.core.Session;
 import scriptella.core.ThreadSafe;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
+import scriptella.util.CollectionUtils;
 
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -46,8 +47,6 @@ import java.util.logging.Logger;
  * <li>{@link #newExecutor(java.net.URL)}
  * <li>{@link #newExecutor(java.net.URL, java.util.Map)}
  * </ul>
- *
- *
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -82,6 +81,7 @@ public class EtlExecutor {
 
     /**
      * Executes ETL based on a specified configuration.
+     *
      * @param indicator progress indicator to use.
      */
     @ThreadSafe
@@ -138,6 +138,7 @@ public class EtlExecutor {
 
     /**
      * Prepares the scripts context.
+     *
      * @param indicator progress indicator to use.
      * @return prepared scripts context.
      */
@@ -155,7 +156,7 @@ public class EtlExecutor {
 
         ctx.addProperties(configuration.getProperties());
         ctx.setProgressCallback(progress.fork(9, 100));
-        ctx.session=new Session(configuration, ctx);
+        ctx.session = new Session(configuration, ctx);
         ctx.getProgressCallback().complete();
         ctx.setProgressCallback(progress); //Restoring
 
@@ -164,6 +165,7 @@ public class EtlExecutor {
 
     /**
      * A getter for external Properties.
+     *
      * @return external properties set by {@link #setExternalProperties}.
      */
     @ThreadSafe
@@ -186,29 +188,32 @@ public class EtlExecutor {
 
     /**
      * Helper method to create a new ScriptExecutor for specified script URL.
-     * <p>Calls {@link #newExecutor(java.net.URL, java.util.Map)}.
+     * <p>Calls {@link #newExecutor(java.net.URL, java.util.Map)} and passes {@link System#getProperties() System properties}
+     * as external properties.
+     *
      * @param scriptFileUrl URL of script file.
      * @return configured instance of script executor.
      */
     @ThreadSafe
     public static EtlExecutor newExecutor(final URL scriptFileUrl) {
-        return newExecutor(scriptFileUrl, null);
+        return newExecutor(scriptFileUrl, CollectionUtils.asMap(System.getProperties()));
     }
 
     /**
      * Helper method to create a new ScriptExecutor for specified script URL.
-     * @param scriptFileUrl URL of script file.
+     *
+     * @param scriptFileUrl      URL of script file.
      * @param externalProperties see {@link #setExternalProperties(java.util.Map)}
      * @return configured instance of script executor.
      * @see ConfigurationFactory
      */
     @ThreadSafe
-    public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String,String> externalProperties) {
+    public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String, String> externalProperties) {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(scriptFileUrl);
         ConfigurationEl c = cf.createConfiguration();
         EtlExecutor se = new EtlExecutor(c);
-        if (externalProperties!=null) {
+        if (externalProperties != null) {
             se.setExternalProperties(externalProperties);
         }
         return se;

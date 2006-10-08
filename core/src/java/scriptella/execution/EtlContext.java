@@ -20,7 +20,7 @@ import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
-import scriptella.util.CollectionUtils;
+import scriptella.util.PropertiesMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class EtlContext implements ParametersCallback, DriverContext {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = CollectionUtils.newCaseInsensitiveAsciiMap();
+    private Map<String, String> properties = new PropertiesMap();
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     Session session; //Connections related stuff is here
