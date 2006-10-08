@@ -15,15 +15,8 @@
  */
 package scriptella.configuration;
 
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 import scriptella.AbstractTestCase;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.StringReader;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -33,16 +26,6 @@ import java.util.List;
  * @version 1.0
  */
 public class DialectBasedContentElTest extends AbstractTestCase {
-    private static final DocumentBuilder BUILDER;
-
-    static {
-        try {
-            BUILDER = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-    }
-
 
     /**
      * Tests handling of mixed dialogs content.
@@ -55,7 +38,7 @@ public class DialectBasedContentElTest extends AbstractTestCase {
                 "<dialect name=\"d2\"><!--Commend-->D2</dialect>" +
                 "<!--Comment-->\nDef4<!--Comment-->  " +
                 "</query>";
-        XmlElement xmlElement = asElement(xml);
+        XmlElement xmlElement = XmlElementTest.asElement(xml);
         DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
         List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
         assertEquals(3, dialects.size());
@@ -68,12 +51,4 @@ public class DialectBasedContentElTest extends AbstractTestCase {
 
     }
 
-    private static XmlElement asElement(String xml) {
-        try {
-            Element el = BUILDER.parse(new InputSource(new StringReader(xml))).getDocumentElement();
-            return new XmlElement(el, new URL("file:/test"));
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to create XML element", e);
-        }
-    }
 }

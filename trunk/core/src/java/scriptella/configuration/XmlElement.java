@@ -69,7 +69,7 @@ public class XmlElement {
 
         while (!(cur instanceof Document)) {
             int pos = 1;
-            Node sib = element;
+            Node sib = cur;
             final String curTagName = ((Element) cur).getTagName();
 
             while (sib != null) {

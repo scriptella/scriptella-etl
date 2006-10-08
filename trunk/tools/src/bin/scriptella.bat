@@ -41,4 +41,4 @@ if "%JAVACMD%" == "" set JAVACMD=%JAVA_HOME%\bin\java.exe
 if "%JAVACMD%" == "" set JAVACMD=java.exe
 
 rem ---- run scriptella
-%JAVACMD% -cp %_SCRIPTELLA_CP% scriptella.tools.ScriptsRunner %1 %2 %3 %4 %5 %6 %7 %8 %9
+%JAVACMD% -cp %_SCRIPTELLA_CP% scriptella.tools.launcher.EtlLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9

@@ -20,14 +20,14 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * Progress indicator to send out
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class ConsoleProgressIndicator extends ProgressIndicatorBase {
     private static final Logger LOG = Logger.getLogger(ConsoleProgressIndicator.class.getName());
-    private static final DecimalFormat DF = new DecimalFormat("###");
+    private final DecimalFormat decimalFormat = new DecimalFormat("###");
     private String title;
 
     public ConsoleProgressIndicator(String title) {
@@ -54,16 +54,12 @@ public class ConsoleProgressIndicator extends ProgressIndicatorBase {
 
         r.append(": ");
 
-        r.append(DF.format(100 * percentage));
+        r.append(decimalFormat.format(100 * percentage));
         r.append('%');
-        println(r);
-    }
-
-    protected void println(final Object o) {
-        LOG.info(String.valueOf(o));
+        LOG.info(r.toString());
     }
 
     protected void onComplete(final String label) {
-        println((title == null) ? "" : (title + " Complete"));
+        LOG.info(((title == null) ? "" : title + ".") + "Complete");
     }
 }

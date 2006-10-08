@@ -20,9 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -36,8 +34,8 @@ import java.util.logging.Logger;
 class StatementCache implements Closeable {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private static final Logger LOG = Logger.getLogger(StatementCache.class.getName());
-    private Map<String, StatementWrapper.Prepared> map;
-    private List<StatementWrapper.Prepared> disposeQueue = new LinkedList<StatementWrapper.Prepared>();
+    private Map<String, StatementWrapper> map;
+    private List<StatementWrapper> disposeQueue = new ArrayList<StatementWrapper>();
     private final Connection connection;
 
     /**
@@ -48,8 +46,8 @@ class StatementCache implements Closeable {
     public StatementCache(Connection connection, final int size) {
         this.connection = connection;
         if (size > 0) { //if cache is enabled
-            this.map = new LinkedHashMap<String, StatementWrapper.Prepared>(size, DEFAULT_LOAD_FACTOR, true) {
-                protected boolean removeEldestEntry(Map.Entry<String, StatementWrapper.Prepared> eldest) {
+            this.map = new LinkedHashMap<String, StatementWrapper>(size, DEFAULT_LOAD_FACTOR, true) {
+                protected boolean removeEldestEntry(Map.Entry<String, StatementWrapper> eldest) {
                     boolean remove = size() > size;
                     if (remove) {
                         disposeQueue.add(eldest.getValue());
@@ -74,16 +72,21 @@ class StatementCache implements Closeable {
      * @see StatementWrapper
      */
     public StatementWrapper prepare(final String sql, final List<Object> params, final JdbcTypesConverter converter) throws SQLException {
-        if (params==null || params.isEmpty()) {
-            return create(sql, converter);
-        }
-        StatementWrapper.Prepared sw = map == null ? null : map.get(sql);
+        StatementWrapper sw = map == null ? null : map.get(sql);
 
         if (sw == null) { //If not cached
+            if (params==null || params.isEmpty()) {
+                sw = create(sql, converter);
+            } else {
+                sw = prepare(sql, converter);
+            }
+            put(sql, sw);
+        } else if (sw instanceof StatementWrapper.Simple) {
+            //If simple statement is obtained second time - use prepared to improve performance
+            disposeQueue.add(sw);
             put(sql, sw = prepare(sql, converter));
         }
         sw.setParameters(params);
-        sw.lock();
         return sw;
     }
 
@@ -102,7 +105,7 @@ class StatementCache implements Closeable {
     }
 
 
-    private void put(String key, StatementWrapper.Prepared entry) {
+    private void put(String key, StatementWrapper entry) {
         if (map != null) {
             map.put(key, entry);
         }
@@ -127,13 +130,12 @@ class StatementCache implements Closeable {
         }
     }
 
-    protected void close(Collection<StatementWrapper.Prepared> list) {
-        for (Iterator<StatementWrapper.Prepared> it = list.iterator(); it.hasNext();) {
-            StatementWrapper.Prepared sw = it.next();
-            if (!sw.isLocked()) { //If statement is not used - close and remove it
-                sw.close();
-                it.remove();
+    protected void close(Collection<StatementWrapper> list) {
+        if (!list.isEmpty()) {
+            for (StatementWrapper st: list) {
+                st.close();
             }
+            list.clear();
         }
     }
 
@@ -142,11 +144,6 @@ class StatementCache implements Closeable {
             //closing statements
             close(disposeQueue);
             close(map.values());
-            if (!disposeQueue.isEmpty() || !map.isEmpty()) {
-                List<StatementWrapper> unclosed = new ArrayList<StatementWrapper>(disposeQueue);
-                unclosed.addAll(map.values());
-                LOG.info("The following statements were not closed because they are in use " + unclosed);
-            }
             map = null;
             disposeQueue.clear();
         }

@@ -22,13 +22,13 @@
     <target name="db2csv" depends="clean">
         <description>Export sample data from in-memory database to bugs-out.csv</description>
         <delete file="bugs-out.csv" failonerror="no"/>
-        <execute file="db2csv.etl.xml"/>
+        <etl file="db2csv.etl.xml"/>
         <antcall target="clean"/>
     </target>
 
     <target name="csv2db" depends="clean">
         <description>Import CSV data from bugs-in.csv to db</description>
-        <execute file="csv2db.etl.xml"/>
+        <etl file="csv2db.etl.xml"/>
         <antcall target="clean"/>
     </target>
 

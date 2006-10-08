@@ -49,26 +49,26 @@ public class XIncludeTest extends AbstractTestCase {
 
         String text = asString(scripts.get(0).getContent());
         String str = "insert into test(id, value) values (2,'333');";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         text = asString(scripts.get(1).getContent());
         str = "insert into test2(id, value) values (3,'444');";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         text = asString(scripts.get(2).getContent());
         str = "insert into test(id, value) values (2,'333');";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         str = "--Sample1--";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         str = "--Sample2--";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
         //Fallback test
         text = asString(scripts.get(3).getContent());
         str = "Fallback!";
-        assertTrue("Script \n" + removeWhitespaceChars(text) +
+        assertTrue("Script \n" + removeExtraWhitespaces(text) +
                 "\n must contain substring: " + str, text.indexOf(str) > 0);
 
     }

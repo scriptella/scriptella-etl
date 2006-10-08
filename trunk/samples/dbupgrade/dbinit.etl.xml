@@ -6,8 +6,8 @@
     </properties>
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
     <script>
-        DROP TABLE Account IF EXISTS;
         DROP TABLE Account_Details IF EXISTS;
+        DROP TABLE Account IF EXISTS;
     </script>
     <script if="version==1">
         CREATE TABLE Account (

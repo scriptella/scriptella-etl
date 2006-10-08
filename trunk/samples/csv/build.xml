@@ -21,6 +21,6 @@
 
     <target name="execute" description="runs the ETL">
         <!--Use debug="true" to see more execution details-->
-        <execute/>
+        <etl/>
     </target>
 </project>

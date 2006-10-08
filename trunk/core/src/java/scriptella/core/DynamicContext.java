@@ -45,17 +45,8 @@ class DynamicContext implements ParametersCallback {
     public Connection getConnection() {
         final ConnectionManager cf = globalContext.getSession()
                 .getConnection(null);
-
         return cf.getConnection();
     }
-
-    public Connection getNewConnection() {
-        final ConnectionManager cf = globalContext.getSession()
-                .getConnection(null);
-
-        return cf.newConnection();
-    }
-
 
     protected EtlContext getGlobalContext() {
         return globalContext;

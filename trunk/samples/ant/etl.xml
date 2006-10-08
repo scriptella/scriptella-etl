@@ -16,13 +16,14 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
     <properties>
-        <include href="script.properties"/>
+        <include href="etl.properties"/>
     </properties>
     <!--<connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>-->
     <!-- You may specify driver's jars location using classpath attribute. In this case
     there is no need to specify additional classpath in Ant task declaration.-->
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}" classpath="../lib/hsqldb.jar"/>
     <script>
+        DROP TABLE Foo IF EXISTS; 
         CREATE TABLE Foo (
             Bar VARCHAR(100)
         );

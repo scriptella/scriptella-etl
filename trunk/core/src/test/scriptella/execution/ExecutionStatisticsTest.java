@@ -16,12 +16,15 @@
 package scriptella.execution;
 
 import scriptella.DBTestCase;
+import scriptella.configuration.QueryEl;
+import scriptella.configuration.ScriptEl;
 
 import java.util.Collection;
+import java.util.Map;
 
 
 /**
- * TODO: Add documentation
+ * Tests for {@link ExecutionStatistics} and {@link ExecutionStatisticsBuilder}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -30,12 +33,16 @@ public class ExecutionStatisticsTest extends DBTestCase {
     public void test() throws EtlExecutorException {
         final EtlExecutor se = newEtlExecutor();
         final ExecutionStatistics s = se.execute();
-        assertEquals(2, s.categories.size());
+        Map<String, Integer> cats = s.getCategoriesStatistics();
+        assertEquals(2, cats.size());
+        assertEquals(3, cats.get(ScriptEl.TAG_NAME).intValue());
+        assertEquals(2, cats.get(QueryEl.TAG_NAME).intValue());
         assertEquals(12, s.getExecutedStatementsCount()); //4+2+2+1+3
 
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
         for (ExecutionStatistics.ElementInfo info : elements) {
+            assertTrue(info.getWorkingTime()>=0);
             if ("/etl[1]/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
@@ -67,7 +74,10 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final EtlExecutor se = newEtlExecutor(
                 "ExecutionStatisticsTest2.xml");
         final ExecutionStatistics s = se.execute();
-        assertEquals(2, s.categories.size());
+        Map<String, Integer> cats = s.getCategoriesStatistics();
+        assertEquals(2, cats.size());
+        assertEquals(4, cats.get("script").intValue());
+        assertEquals(1, cats.get("query").intValue());
 
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 

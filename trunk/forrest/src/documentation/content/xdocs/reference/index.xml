@@ -288,7 +288,7 @@
 			<p>These drivers will be available on the boot classpath.
                 In this case you don't have to specify classpath in &lt;connection&gt; elements.</p>
 			<section>
-				<title>Scriptella &quot;Execute&quot; Task</title>
+				<title>Scriptella &quot;etl&quot; Task</title>
 				<section>
 					<title>Parameters</title>
 					<table>
@@ -305,7 +305,7 @@
 						<tr>
 							<td>inheritAll</td>
 							<td>If true, pass Ant project properties to the Script Executor.</td>
-							<td>No, default value is false.</td>
+							<td>No, default value is <code>true</code>.</td>
 						</tr>
 						<tr>
 							<td>debug</td>
@@ -329,20 +329,18 @@
 				<section>
 					<title>Examples</title>
 					<p>
-						<em>Executes etl.xml file in the current directory:</em>
-					</p>
-					<source>&lt;execute/&gt;</source>
-					<p>
-						<em>Executes sql.xml file in the current directory:</em>
-					</p>
-					<source>&lt;execute file="sql.xml"/&gt;
+					<strong>Executes etl.xml file in the current directory:</strong></p>
+					<source>&lt;etl/&gt;</source>
+					<p><strong>Executes name.etl.xml file in the current directory:</strong></p>
+					<source><![CDATA[<etl file="name" />;
+<!--Or explicitly specifying the full name-->
+<etl file="name.etl.xml" >]]>
                     </source>
-					<p>
-						<em>Executes all xml files in db directory:</em>
-					</p>
-					<source>&lt;execute&gt;
-   &lt;fileset dir="db" includes="*.xml"/&gt;
-&lt;/execute&gt;</source>
+					<p><strong>Executes all .etl.xml files in db directory:</strong></p>
+					<source><![CDATA[<etl>
+<fileset dir="db" includes="*.etl.xml"/>;
+</etl>]]>
+                    </source>
 				</section>
 			</section>
 		</section>
@@ -367,7 +365,7 @@
 		</section>
 		<section>
 			<title>Non-relational Datasources Interoperability</title>
-            <p>See <a href="drivers.html#nonjdbc">Non-JDBC Drivers Matrix</a> for the complete list of drivers.</p>
+			<p>See <a href="drivers.html#nonjdbc">Non-JDBC Drivers Matrix</a> for the complete list of drivers.</p>
 			<p>Additionally various JDBC bridge drivers can be used to work with specific datasources like LDAP directories,
                 CSV files, XML files or object databases.
             </p>

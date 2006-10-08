@@ -1,7 +1,8 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:txtest3" user="sa" password=""/>
-    <script>
+    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:txtest3" user="sa" password=""/>
+    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:txtest3_" user="sa" password=""/>
+    <script connection-id="c1">
         CREATE TABLE Test (
         ID INT NOT NULL PRIMARY KEY,
         VALUE CHAR(11)
@@ -15,7 +16,7 @@
         commit;
     </script>
 
-    <query>
+    <query connection-id="c1">
         select * from Test
         <script new-tx="true"><!--Should fail after 1st iteration-->
             insert into Test2(id, value) values (1,?VALUE);

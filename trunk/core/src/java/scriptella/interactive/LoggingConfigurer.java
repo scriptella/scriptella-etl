@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.tools;
+package scriptella.interactive;
 
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-
 /**
- * TODO: Add documentation
+ * Scriptella runtime configurer for java.util.Logging.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Logging {
-    private Logging() {
+public class LoggingConfigurer {
+    private LoggingConfigurer() {
     }
 
     /**
      * Configures logging messages to use specified handler
-     * todo Add another method for outputting to swing application
      */
     public static void configure(Handler handler) {
         final Logger l = Logger.getLogger("scriptella");
@@ -44,6 +42,4 @@ public class Logging {
         final Logger l = Logger.getLogger("scriptella");
         l.removeHandler(handler);
     }
-
-
 }

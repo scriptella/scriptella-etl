@@ -45,18 +45,13 @@ public class StatementCachePerfTest extends DBTestCase {
             protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) {
                 return new StatementWrapper.Prepared() {
                     @Override
-                    public void close() {
-                        locked = false;
-                    }
-
-                    @Override
                     public void setParameters(List<Object> params) {
                     }
 
                     @Override
                     public void clear() {
-                        locked = false;
                     }
+
                 };
             }
         };

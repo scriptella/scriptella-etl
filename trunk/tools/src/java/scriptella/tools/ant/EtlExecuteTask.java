@@ -22,29 +22,30 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
 import scriptella.interactive.ConsoleProgressIndicator;
-import scriptella.tools.Logging;
-import scriptella.tools.ScriptsRunner;
+import scriptella.interactive.LoggingConfigurer;
+import scriptella.tools.launcher.EtlLauncher;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 
 /**
- * Ant task for scripts execution.
+ * Ant task for STL scripts execution.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptsExecuteTask extends Task {
+public class EtlExecuteTask extends Task {
     private List<FileSet> filesets = new ArrayList<FileSet>();
+    private final EtlLauncher launcher = new EtlLauncher();
     private String maxmemory;
     private boolean fork;
-    private boolean inheritAll;
+    private boolean inheritAll=true;
     private boolean debug;
     private boolean quiet;
 
@@ -102,29 +103,33 @@ public class ScriptsExecuteTask extends Task {
         filesets.add(set);
     }
 
-    public void setFile(final File file) {
+    public void setFile(final String fileName) throws FileNotFoundException {
         FileSet f = new FileSet();
-        f.setFile(file);
+        f.setFile(launcher.resolveFile(null, fileName));
         filesets.add(f);
     }
 
     public void execute() throws BuildException {
         List<File> files = new ArrayList<File>();
 
-        if (filesets.isEmpty()) { //if no files - etl.xml is a default name
-            files.add(new File(getProject().getBaseDir(), "etl.xml"));
-        } else {
-            for (FileSet fs : filesets) {
-                DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-                File srcDir = fs.getDir(getProject());
+        try {
+            if (filesets.isEmpty()) { //if no files - use file default name
+                files.add(launcher.resolveFile(getProject().getBaseDir(), null));
+            } else {
+                for (FileSet fs : filesets) {
+                    DirectoryScanner ds = fs.getDirectoryScanner(getProject());
+                    File srcDir = fs.getDir(getProject());
 
-                String srcFiles[] = ds.getIncludedFiles();
+                    String srcFiles[] = ds.getIncludedFiles();
 
-                for (String fName : srcFiles) {
-                    final File file = new File(srcDir, fName);
-                    files.add(file);
+                    for (String fName : srcFiles) {
+                        File file = launcher.resolveFile(srcDir, fName);
+                        files.add(file);
+                    }
                 }
             }
+        } catch (FileNotFoundException e) {
+            throw new BuildException(e.getMessage(), e);
         }
 
         if (fork) {
@@ -135,15 +140,11 @@ public class ScriptsExecuteTask extends Task {
     }
 
     private void execute(final List<File> files) {
-        ScriptsRunner runner = new ScriptsRunner();
-        runner.setProgressIndicator(new ConsoleProgressIndicator());
+        launcher.setProgressIndicator(new ConsoleProgressIndicator());
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
-            runner.setProperties(getProject().getProperties());
-        } else {
-            runner.setProperties((Map)System.getProperties());
+            launcher.setProperties(getProject().getProperties());
         }
-
 
         Handler h = new AntHandler();
         h.setLevel(Level.INFO);
@@ -153,18 +154,16 @@ public class ScriptsExecuteTask extends Task {
         if (quiet) {
             h.setLevel(Level.WARNING);
         }
-        Logging.configure(h);
+        LoggingConfigurer.configure(h);
         for (File file : files) {
             try {
-                runner.execute(file);
-                log("Script " + file.getPath() +
-                        " has been executed successfully");
+                launcher.execute(file);
             } catch (Exception e) {
                 throw new BuildException("Unable to execute file " + file +
                         ": " + e.getMessage(), e);
             }
         }
-        Logging.remove(h);
+        LoggingConfigurer.remove(h);
     }
 
     /**
@@ -177,7 +176,7 @@ public class ScriptsExecuteTask extends Task {
         j.setProject(getProject());
 //        j.setClasspath(getClasspath());
 
-        j.setClassname(ScriptsRunner.class.getName());
+        j.setClassname(EtlLauncher.class.getName());
 
         StringBuilder line = new StringBuilder();
 

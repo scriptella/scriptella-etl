@@ -19,7 +19,7 @@
         This script produces prime numbers and builds a HTML report.
     </description>
     <properties>
-        <include href="script.properties"/>
+        <include href="etl.properties"/>
     </properties>
 
     <!--Set up a connection to janino compiler.-->

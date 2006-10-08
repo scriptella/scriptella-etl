@@ -130,7 +130,7 @@ public abstract class AbstractTestCase extends TestCase {
      * @param s string to replace.
      * @return s with extra whitespace chars removed.
      */
-    protected String removeWhitespaceChars(String s) {
+    protected String removeExtraWhitespaces(String s) {
         return s.replaceAll("\\s+", " ").trim();
     }
 

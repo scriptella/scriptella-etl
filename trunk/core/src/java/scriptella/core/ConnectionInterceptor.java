@@ -26,8 +26,8 @@ import scriptella.spi.Connection;
  * @version 1.0
  */
 public class ConnectionInterceptor extends ElementInterceptor {
-    public ConnectionInterceptor(ExecutableElement next, ScriptingElement s) {
-        super(next, new ConnectionDecorator(s.getConnectionId()));
+    private ConnectionInterceptor(ExecutableElement next, String conId) {
+        super(next, new ConnectionDecorator(conId));
     }
 
     public void execute(final DynamicContext ctx) {
@@ -37,11 +37,20 @@ public class ConnectionInterceptor extends ElementInterceptor {
     }
 
     public static ExecutableElement prepare(
-            final ExecutableElement next, final ScriptingElement s) {
-        if (s.getConnectionId() == null) {
+            final ExecutableElement next, final ScriptingElement se) {
+        final String cid = se.getConnectionId();
+        if (cid == null) {
             return next;
         } else {
-            return new ConnectionInterceptor(next, s);
+            for (ScriptingElement s = se; (s = s.getParent()) != null;) {
+                if (s.getConnectionId() != null) {
+                    if (cid.equals(s.getConnectionId())) {
+                        return next;
+                    }
+                    break;
+                }
+            }
+            return new ConnectionInterceptor(next, cid);
         }
     }
 
@@ -57,12 +66,5 @@ public class ConnectionInterceptor extends ElementInterceptor {
             return getGlobalContext().getSession().getConnection(connectionId)
                     .getConnection();
         }
-
-        @Override
-        public Connection getNewConnection() {
-            return getGlobalContext().getSession().getConnection(connectionId)
-                    .newConnection();
-        }
-
     }
 }

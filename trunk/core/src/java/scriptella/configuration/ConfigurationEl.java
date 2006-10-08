@@ -75,7 +75,7 @@ public class ConfigurationEl extends XmlConfigurableBase {
         if (connections.isEmpty()) {
             throw new ConfigurationException("At least one connection element must be declared", element);
         }
-        scriptingElements = QueryEl.loadScriptingElements(element);
+        scriptingElements = QueryEl.loadScriptingElements(element, null);
         validateScriptingElements(element);
     }
 
@@ -87,7 +87,7 @@ public class ConfigurationEl extends XmlConfigurableBase {
             if (!allowedConIds.add(cid)) {
                 throw new ConfigurationException("Connection ID must be unique for ETL file", element);
             }
-            if (ConnectionEl.DEFAULT_ID.equals(cid) && connections.size()>1) {
+            if (cid==null && connections.size()>1) {
                 throw new ConfigurationException("Connection ID is required if more than one connection specified in ETL script.", element);
             }
         }

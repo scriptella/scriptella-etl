@@ -24,15 +24,15 @@
             connection XML element.</note>
             <p>Running Scriptella files from Ant is simple:</p>
 			<source><![CDATA[
-<execute/>
+<etl/>
                 ]]></source>
                 <p>or</p>
 			<source><![CDATA[
-<execute file="path/to/your/file/>
+<etl file="path/to/your/file/>
                 ]]></source>
 
 			<note>
-By default file ${basedir}/etl.xml is executed. Use file attribute to specify another path.
+By default the current directory file etl.xml is executed. Use file attribute to specify another path.
             </note>
 		</section>
 		<section>

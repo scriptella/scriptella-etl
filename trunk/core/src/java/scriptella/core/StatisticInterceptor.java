@@ -35,22 +35,24 @@ public class StatisticInterceptor extends ElementInterceptor {
 
     public void execute(final DynamicContext ctx) {
         boolean ok = false;
+        final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
         try {
+            statisticsBuilder.elementStarted(location);
             executeNext(ctx);
             ok = true;
         } finally {
             if (ok) {
                 Integer count = STATEMENTS_INFO.get();//Obtain statistics of executed statements (if any)
                 STATEMENTS_INFO.remove(); //Clear threalocal state
-                final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
+                
                 if (count == null) { //no information available
-                    statisticsBuilder.elementExecuted(location);
+                    statisticsBuilder.elementExecuted();
                 } else {
-                    statisticsBuilder.elementExecuted(location, count);
+                    statisticsBuilder.elementExecuted(count);
                 }
             } else {
                 STATEMENTS_INFO.remove(); //Clear threalocal state
-                ctx.getGlobalContext().getStatisticsBuilder().elementFailed(location);
+                statisticsBuilder.elementFailed();
             }
         }
 

@@ -1,5 +1,5 @@
 <antlib>
-    <taskdef name="execute" classname="scriptella.tools.ant.ScriptsExecuteTask" uri="org.scriptella">
+    <taskdef name="etl" classname="scriptella.tools.ant.EtlExecuteTask" uri="org.scriptella">
 
     </taskdef>
 </antlib>

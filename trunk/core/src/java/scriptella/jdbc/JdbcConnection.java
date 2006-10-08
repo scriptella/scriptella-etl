@@ -25,6 +25,8 @@ import scriptella.spi.Resource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,8 +41,9 @@ public class JdbcConnection extends AbstractConnection {
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
     private boolean transactable = false;
-    private StatementCache statementCache;
     private ParametersParser parametersParser;
+    private int statementCacheSize = 100;
+    private final Map<Resource, SqlSupport> resourcesMap = new IdentityHashMap<Resource, SqlSupport>();
 
     public JdbcConnection(Connection con, ConnectionParameters parameters) {
         super(parameters);
@@ -69,7 +72,6 @@ public class JdbcConnection extends AbstractConnection {
      */
     protected void init(ConnectionParameters parameters) {
         String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_KEY);
-        int statementCacheSize = 100;
         if (cacheSizeStr != null && cacheSizeStr.trim().length() > 0) {
             try {
                 statementCacheSize = Integer.valueOf(cacheSizeStr);
@@ -77,8 +79,6 @@ public class JdbcConnection extends AbstractConnection {
                 throw new JdbcException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
             }
         }
-
-        statementCache = new StatementCache(con, statementCacheSize);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -103,20 +103,26 @@ public class JdbcConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) {
-        Script s = new Script(scriptContent, this);
+        Script s = (Script) resourcesMap.get(scriptContent);
+        if (s == null) {
+            resourcesMap.put(scriptContent, s = new Script(scriptContent, this));
+        }
         s.execute(con, parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
-        Query q = new Query(queryContent, this);
+        Query q = (Query) resourcesMap.get(queryContent);
+        if (q == null) {
+            resourcesMap.put(queryContent, q = new Query(queryContent, this));
+        }
         q.execute(con, parametersCallback, queryCallback);
     }
 
-    public StatementCache getStatementCache() {
-        return statementCache;
+    StatementCache newStatementCache() {
+        return new StatementCache(con, statementCacheSize);
     }
 
-    public ParametersParser getParametersParser() {
+    ParametersParser getParametersParser() {
         return parametersParser;
     }
 
@@ -152,8 +158,11 @@ public class JdbcConnection extends AbstractConnection {
 
     public void close() {
         if (con != null) {
-            statementCache.close();
-            statementCache = null;
+            //Closing resources
+            for (SqlSupport element : resourcesMap.values()) {
+                element.close();
+            }
+            resourcesMap.clear();
             try {
                 con.close();
                 con = null;
