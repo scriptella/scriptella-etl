@@ -21,10 +21,10 @@
         <echo message="OpenLDAP should be running on localhost:389. See readme.txt for more details"/>
     </target>
     <target name="db2ldap">
-        <execute file="db2ldap.xml"/>
+        <etl file="db2ldap"/>
     </target>
     <target name="ldap2db">
-        <execute file="ldap2db.xml"/>
+        <etl file="ldap2db"/>
     </target>
 
 </project>

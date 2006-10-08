@@ -24,11 +24,11 @@
             <fileset dir="." includes="db.*"/>
         </delete>
         <!--Use debug="true" to see more execution details-->
-        <execute file="dbinit.xml"/>
+        <etl file="dbinit"/><!--.etl.xml suffix is checked automatically, so the full name is dbinit.etl.xml-->
 
     </target>
     <target name="update">
         <!--Use debug="true" to see more execution details-->
-        <execute file="dbupdate.xml"/>
+        <etl file="dbupdate"/>
     </target>
 </project>

@@ -50,9 +50,6 @@ public class DynamicContextDecorator extends DynamicContext {
         return context.getConnection();
     }
 
-    public Connection getNewConnection() {
-        return context.getNewConnection();
-    }
 
     /**
      * Dynamically changes context beign decorated.

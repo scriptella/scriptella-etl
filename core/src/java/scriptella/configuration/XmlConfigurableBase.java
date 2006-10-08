@@ -197,10 +197,9 @@ public abstract class XmlConfigurableBase implements XmlConfigurable {
      * Called by elements wishing to report their location in XML.
      *
      * @param element  element to calculate location
-     * @param category optional category name (used in statistics).
      */
-    protected void setLocation(XmlElement element, String category) {
-        location = new Location(element.getXPath(), category);
+    protected void setLocation(XmlElement element) {
+        location = new Location(element.getXPath());
     }
 
     protected Location getLocation() {

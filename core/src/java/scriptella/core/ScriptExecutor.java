@@ -49,17 +49,16 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
             warnEmptyContent();
             return;
         }
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Executing script " + getLocation());
+        }
         boolean repeat;
-
         do {
             repeat = false;
             try {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Executing script "+getLocation());
-                }
                 con.executeScript(content, ctx);
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Script "+getLocation()+" completed");
+                    LOG.fine("Script " + getLocation() + " completed");
                 }
 
             } catch (Throwable t) {
@@ -70,7 +69,6 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
                 }
             }
         } while (repeat); //repeat while onError returns retry
-
     }
 
     private void warnEmptyContent() {

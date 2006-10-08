@@ -42,11 +42,11 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
 
     public void testUnix() throws MalformedURLException {
         URL base = new URL("file:/var/etl.xml");
-        String s = "1.jar: lib/second.jar :third.jar:;http://5.jar;  ::;  ";
+        String s = "1.jar: lib/second.jar :third.jar:;http://5.jar;  ::;  http://ftp:/user";
         UrlPathTokenizer tok = new UrlPathTokenizer(base);
         URL[] actual = tok.split(s);
         String[] expected = new String[] {"file:/var/1.jar", "file:/var/lib/second.jar",
-                "file:/var/third.jar", "http://5.jar"};
+                "file:/var/third.jar", "http://5.jar", "http://ftp:/user"};
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i].toString());

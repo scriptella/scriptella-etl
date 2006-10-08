@@ -54,7 +54,6 @@ public class StatementCacheTest extends DBTestCase {
                 return new StatementWrapper.Prepared() {
                     @Override
                     public void close() {
-                        locked = false;
                         preparedClosed++;
                     }
 
@@ -65,7 +64,6 @@ public class StatementCacheTest extends DBTestCase {
 
                     @Override
                     public void clear() {
-                        locked = false;
                         preparedCleared++;
                     }
                 };

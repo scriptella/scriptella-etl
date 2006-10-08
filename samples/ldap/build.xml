@@ -22,11 +22,11 @@
     </target>
     <target name="db2ldap">
         <!--Use debug="true" to see more execution details-->
-        <execute file="db2ldap.xml"/>
+        <etl file="db2ldap"/>
     </target>
     <target name="ldap2db">
         <!--Use debug="true" to see more execution details-->
-        <execute file="ldap2db.xml"/>
+        <etl file="ldap2db"/>
     </target>
 
 </project>

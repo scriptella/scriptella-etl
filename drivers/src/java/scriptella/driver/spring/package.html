@@ -65,7 +65,7 @@ properties and dependencies like progress indicator may also be injected.
 </pre></code>
 The usage of <code>executor</code> is straightforward:
 <code><pre>
-ScriptsExecutor exec = (ScriptsExecutor) beanFactory.getBean("executor");
+EtlExecutor exec = (EtlExecutor) beanFactory.getBean("executor");
 exec.execute();
 </pre></code>
 Additionally you can use <code>java.util.concurrent.Callable</code> invocation interface to avoid

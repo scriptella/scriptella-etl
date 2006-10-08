@@ -33,10 +33,8 @@ public class QueryEl extends ScriptingElement {
     public static final String TAG_NAME = "query";
     private List<ScriptingElement> childScriptinglElements;
 
-    public QueryEl() {
-    }
-
-    public QueryEl(XmlElement element) {
+    public QueryEl(XmlElement element, ScriptingElement parent) {
+        super(parent);
         configure(element);
     }
 
@@ -50,7 +48,7 @@ public class QueryEl extends ScriptingElement {
         this.childScriptinglElements = childScriptinglElements;
     }
 
-    static List<ScriptingElement> loadScriptingElements(final XmlElement element) {
+    static List<ScriptingElement> loadScriptingElements(final XmlElement element, QueryEl parent) {
         final List<XmlElement> elements = element.getChildren(new HashSet<String>(
                 Arrays.asList(QueryEl.TAG_NAME, ScriptEl.TAG_NAME)));
         List<ScriptingElement> scripts = new ArrayList<ScriptingElement>(elements.size());
@@ -59,10 +57,10 @@ public class QueryEl extends ScriptingElement {
             final Element e = xmlElement.getElement();
 
             if (ScriptEl.TAG_NAME.equals(e.getTagName())) {
-                final ScriptEl s = new ScriptEl(xmlElement);
+                final ScriptEl s = new ScriptEl(xmlElement, parent);
                 scripts.add(s);
             } else if (QueryEl.TAG_NAME.equals(e.getTagName())) {
-                final QueryEl q = new QueryEl(xmlElement);
+                final QueryEl q = new QueryEl(xmlElement, parent);
                 scripts.add(q);
             }
         }
@@ -72,7 +70,7 @@ public class QueryEl extends ScriptingElement {
 
     public void configure(final XmlElement element) {
         super.configure(element);
-        setChildScriptinglElements(loadScriptingElements(element));
-        setLocation(element, "queries");
+        setChildScriptinglElements(loadScriptingElements(element, this));
+        setLocation(element);
     }
 }

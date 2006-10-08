@@ -16,7 +16,6 @@
 package scriptella;
 
 import scriptella.configuration.ConfigurationEl;
-import scriptella.configuration.ConnectionEl;
 import scriptella.core.ConnectionManager;
 import scriptella.core.SqlTestHelper;
 import scriptella.execution.EtlContext;
@@ -102,7 +101,7 @@ public class TxTest extends DBTestCase {
             @Override
             public void closeAll(final EtlContext ctx) {
                 final Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());
-                final ConnectionManager cf = connections.get(ConnectionEl.DEFAULT_ID);
+                final ConnectionManager cf = connections.get("c1");
                 final List<scriptella.spi.Connection> newConnections = SqlTestHelper.getNewConnections(cf);
 
                 if ((newConnections == null) ||

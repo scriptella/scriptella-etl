@@ -25,6 +25,6 @@
     <target name="main">
         <!--Executes etl.xml with hsqldb on classpath-->
         <!--Use debug="true" to see more execution details-->
-        <execute/>
+        <etl/>
     </target>
 </project>

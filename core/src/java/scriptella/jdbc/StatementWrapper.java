@@ -65,14 +65,6 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
 
 
     /**
-     * Clear any transient state variables, e.g. statement parameters etc.
-     */
-    public void clear() {
-        close();
-    }
-
-
-    /**
      * Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement
      * or an SQL statement that returns nothing, such as an SQL DDL statement.
      *
@@ -91,6 +83,15 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
         } finally {
             IOUtils.closeSilently(r);
         }
+    }
+
+    public void setParameters(List<Object> params) throws SQLException {
+    }
+
+    /**
+     * Clears any transient state variables, e.g. statement parameters etc.
+     */
+    public void clear() {
     }
 
     /**
@@ -141,8 +142,6 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      * {@link PreparedStatement} wrapper.
      */
     static class Prepared extends StatementWrapper<PreparedStatement> {
-        protected boolean locked;
-
         /**
          * For testing only.
          */
@@ -159,7 +158,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
          * @param params parameters to set.
          * @throws SQLException
          */
-        public void setParameters(List<Object> params) throws SQLException {
+        @Override public void setParameters(List<Object> params) throws SQLException {
             for (int i = 0, n = params.size(); i < n; i++) {
                 Object o = params.get(i);
                 converter.setObject(statement, i + 1, o);
@@ -178,24 +177,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             return statement.executeQuery();
         }
 
-        public boolean isLocked() {
-            return locked;
-        }
-
-        /**
-         * Sets the inUse lock to prevent disposing during execution.
-         */
-        public void lock() {
-            locked = true;
-        }
-
-        public void close() {
-            locked = false;
-            super.close();
-        }
-
         @Override public void clear() {
-            locked = false;
             try {
                 statement.clearParameters();
             } catch (SQLException e) {

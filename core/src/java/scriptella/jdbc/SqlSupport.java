@@ -20,6 +20,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
@@ -36,11 +37,12 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SqlSupport {
+public class SqlSupport implements Closeable {
     private static final Logger LOG = Logger.getLogger(SqlSupport.class.getName());
     protected final Resource resource;
     protected final JdbcConnection connection;
     protected final JdbcTypesConverter converter;
+    protected final StatementCache cache;
 
     public SqlSupport(Resource resource, JdbcConnection connection) {
         if (resource == null) {
@@ -49,7 +51,8 @@ public class SqlSupport {
 
         this.resource = resource;
         this.connection = connection;
-        this.converter = connection.newConverter();
+        converter = connection.newConverter();
+        cache = connection.newStatementCache();
     }
 
 
@@ -118,7 +121,7 @@ public class SqlSupport {
         int executeStatement(final String sql) {
             StatementWrapper sw = null;
             try {
-                sw = connection.getStatementCache().prepare(sql, params, converter);
+                sw = cache.prepare(sql, params, converter);
                 int updateCount = -1;
                 if (callback != null) {
                     sw.query(callback, paramsCallback);
@@ -143,12 +146,16 @@ public class SqlSupport {
             } finally {
                 params.clear();
                 if (sw != null) {
-                    connection.getStatementCache().releaseStatement(sw);
+                    cache.releaseStatement(sw);
                 }
             }
 
         }
 
 
+    }
+
+    public void close() {
+        cache.close();
     }
 }

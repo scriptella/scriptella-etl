@@ -81,7 +81,7 @@
             <zipfileset dir="${lib.dir}" includes="*license*" prefix="META-INF"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
-                <attribute name="Main-Class" value="scriptella.tools.ScriptsRunner"/>
+                <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
                 <attribute name="Implementation-Title" value="Scriptella Core and Drivers"/>
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Build-Date" value="${TODAY}"/>

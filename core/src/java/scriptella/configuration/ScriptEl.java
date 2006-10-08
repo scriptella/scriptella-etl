@@ -28,10 +28,8 @@ public class ScriptEl extends ScriptingElement {
     private boolean newTx;
     protected List<OnErrorEl> onerrors;
 
-    public ScriptEl() {
-    }
-
-    public ScriptEl(XmlElement element) {
+    public ScriptEl(XmlElement element, ScriptingElement parent) {
+        super(parent);
         configure(element);
     }
 
@@ -54,7 +52,7 @@ public class ScriptEl extends ScriptingElement {
     public void configure(final XmlElement element) {
         super.configure(element);
         newTx = element.getBooleanProperty("new-tx", false);
-        setLocation(element, "scripts");
+        setLocation(element);
         //The following code loads nested onerror elements
         onerrors = load(element.getChildren("onerror"), OnErrorEl.class);
     }

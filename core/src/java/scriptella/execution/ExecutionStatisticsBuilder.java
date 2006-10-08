@@ -17,24 +17,53 @@ package scriptella.execution;
 
 import scriptella.configuration.Location;
 
+import java.util.Stack;
+
 
 /**
- * TODO: Add documentation
+ * A builder for execution statistics.
+ * <p>This class collects runtime ETL execution statistics, the usage contract is the following:</p>
+ * <ul>
+ * <li>Call {@link #elementStarted(scriptella.configuration.Location)} before executing an element.
+ * <li>Call {@link #elementExecuted()} or {@link #elementFailed()} after executing an element.
+ * <li>{@link #getStatistics() Obtain statistics} when ETL completes.
+ * </ul>
+ * <em>Notes:</em>
+ * <ul>
+ * <li>Start/End element callbacks sequence must comply with executing elements position in a XML file.
+*  <li>This class is not thread safe.
+ * </ul>
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class ExecutionStatisticsBuilder {
     private ExecutionStatistics executionStatistics = new ExecutionStatistics();
+    //assume that instantiation time is the start time
+    private long started = System.currentTimeMillis();
 
-    public void elementExecuted(final Location loc) {
-        elementExecuted(loc, 0);
+    //Execution stack for nested elements
+    private Stack<ExecutionStatistics.ElementInfo> executionStack = new Stack<ExecutionStatistics.ElementInfo>();
+
+    /**
+     * Called when new element execution started.
+     *
+     * @param loc element location.
+     */
+    public void elementStarted(final Location loc) {
+        ExecutionStatistics.ElementInfo ei = getInfo(loc);
+        executionStack.push(ei);
+        ei.started=System.nanoTime();
     }
 
-    public void elementExecuted(final Location loc, final int statements) {
+    public void elementExecuted() {
+        elementExecuted(0);
+    }
+
+    public void elementExecuted(final int statements) {
         executionStatistics.statements += statements;
 
-        ExecutionStatistics.ElementInfo ei = getInfo(loc);
+        ExecutionStatistics.ElementInfo ei = getLastStartedElement();
         ei.okCount++;
 
         if (statements != 0) {
@@ -42,9 +71,25 @@ public class ExecutionStatisticsBuilder {
         }
     }
 
-    public void elementFailed(final Location loc) {
-        ExecutionStatistics.ElementInfo ei = getInfo(loc);
-        ei.failedCount++;
+    /**
+     * Calculates execution time and return the last started element.
+     *
+     * @return last started element.
+     */
+    private ExecutionStatistics.ElementInfo getLastStartedElement() {
+        ExecutionStatistics.ElementInfo ended = executionStack.pop();
+        long ti = System.nanoTime() - ended.started;
+        ended.workingTime += ti; //increase the total working time for element
+        //Now substract the execution time from parent element.
+        //Because query time must not include children
+        if (!executionStack.isEmpty()) {
+            executionStack.peek().workingTime -= ti;
+        }
+        return ended;
+    }
+
+    public void elementFailed() {
+        getLastStartedElement().failedCount++;
     }
 
     private ExecutionStatistics.ElementInfo getInfo(final Location loc) {
@@ -54,38 +99,33 @@ public class ExecutionStatisticsBuilder {
             ei = new ExecutionStatistics.ElementInfo();
             ei.id = loc.getXpath();
             executionStatistics.elements.put(loc.getXpath(), ei);
-            getCategory(loc.getCategory()).count++; //Increment script's category only once
         }
 
         return ei;
     }
 
-    private ExecutionStatistics.CategoryInfo getCategory(final String name) {
-        ExecutionStatistics.CategoryInfo ci = executionStatistics.categories.get(name);
-
-        if (ci == null) {
-            ci = new ExecutionStatistics.CategoryInfo();
-            executionStatistics.categories.put(name, ci);
-        }
-
-        return ci;
-    }
-
     public ExecutionStatistics getStatistics() {
+        //assume that statistics is obtained immediately after the execution
+        executionStatistics.setTotalTime(System.currentTimeMillis() - started);
         return executionStatistics;
     }
 
     public static void main(final String args[]) {
-        Location e1 = new Location("Script #1", "Scripts");
-        Location e2 = new Location("Script #2", "Scripts");
-        Location e3 = new Location("Query #1", "Queries");
+        Location e1 = new Location("Script #1");
+        Location e2 = new Location("Script #2");
+        Location e3 = new Location("Query #1");
 
         ExecutionStatisticsBuilder b = new ExecutionStatisticsBuilder();
-        b.elementExecuted(e1, 10);
-        b.elementExecuted(e1, 10);
-        b.elementFailed(e1);
-        b.elementExecuted(e3);
-        b.elementFailed(e2);
+        b.elementStarted(e1);
+        b.elementExecuted(10);
+        b.elementStarted(e1);
+        b.elementExecuted(10);
+        b.elementStarted(e1);
+        b.elementFailed();
+        b.elementStarted(e3);
+        b.elementExecuted();
+        b.elementStarted(e2);
+        b.elementFailed();
 
         final ExecutionStatistics s = b.getStatistics();
         System.out.println("s = " + s);

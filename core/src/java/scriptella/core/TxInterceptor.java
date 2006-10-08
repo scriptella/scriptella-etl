@@ -15,7 +15,9 @@
  */
 package scriptella.core;
 
+import scriptella.configuration.Location;
 import scriptella.configuration.ScriptEl;
+import scriptella.configuration.ScriptingElement;
 import scriptella.spi.Connection;
 
 import java.util.logging.Level;
@@ -30,9 +32,11 @@ import java.util.logging.Logger;
  */
 public class TxInterceptor extends ElementInterceptor {
     private static final Logger LOG = Logger.getLogger(TxInterceptor.class.getName());
+    private Location location;
 
     public TxInterceptor(ExecutableElement next, ScriptEl scriptEl) {
         super(next, new TxDecorator(scriptEl));
+        location=scriptEl.getLocation();
     }
 
     public void execute(final DynamicContext ctx) {
@@ -47,10 +51,8 @@ public class TxInterceptor extends ElementInterceptor {
             } catch (Exception e1) {
                 LOG.log(Level.WARNING, "Unable to rollback transaction", e1);
             }
-
             LOG.log(Level.INFO,
-                    "Script " + ctxDecorator.scriptEl.getLocation() +
-                            " failed during invocation in a separate transaction", e);
+                    "Script " + location + " failed during invocation in a separate transaction", e);
         }
     }
 
@@ -58,25 +60,35 @@ public class TxInterceptor extends ElementInterceptor {
             final ExecutableElement next, final ScriptEl s) {
         if (s.isNewTx()) {
             return new TxInterceptor(next, s);
+
         } else {
             return next;
         }
     }
 
     private static class TxDecorator extends DynamicContextDecorator {
-        private ScriptEl scriptEl;
         private Connection c;
+        private String connectionId;
 
-        public TxDecorator(ScriptEl scriptEl) {
-            this.scriptEl = scriptEl;
+        public TxDecorator(ScriptEl script) {
+            String cid = script.getConnectionId();
+            //if connection id is null, iterate parents to get connection
+            if (cid == null) {
+                for (ScriptingElement s = script; (s = s.getParent()) != null;) {
+                    cid = s.getConnectionId();
+                    if (cid != null) {
+                        break;
+                    }
+                }
+            }
+            connectionId=cid; //If single connection script
         }
 
         @Override
         public Connection getConnection() {
-            if (c == null) {
-                c = getNewConnection();
+            if (c==null) {
+                c=getGlobalContext().getSession().getConnection(connectionId).newConnection();
             }
-
             return c;
         }
     }

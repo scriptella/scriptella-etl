@@ -1,7 +1,7 @@
 <body>
 Ant tasks.
 
-<h2>ScriptsExecuteTask</h2>
+<h2>EtlExecuteTask(etl)</h2>
 
 <h3>How to register</h3>
 To use the task in a build file, the following taskdef declaration should be added:
@@ -22,10 +22,12 @@ To use the task in a build file, the following taskdef declaration should be add
         <th>Attribute</th><th>Description</th><th>Required</th>
     </tr>
     <tr>
-        <td>file</td><td>The script file to execute.</td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
+        <td>file</td><td>The script file to execute.<p>
+        The .etl.xml file extension part may be ommited.
+        </p></td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
     </tr>
     <tr>
-        <td>inheritAll</td><td>If true, pass all properties to the Script Executor. Defaults to false.</td><td>No</td>
+        <td>inheritAll</td><td>If true, pass all properties to the Script Executor. Defaults to <code>true</code>.</td><td>No</td>
     </tr>
     <tr>
         <td>debug</td><td>If true print debugging information.</td><td>No, default value is false.</td>
@@ -52,15 +54,17 @@ The task supports nested <a href="http://ant.apache.org/manual/CoreTypes/fileset
 <p>
 
 <h3>Examples</h3>
-<b>Executes script.xml file in the current directory:</b>
-<pre><code>&lt;execute/&gt;</code></pre>
-<b>Executes sql.xml file in the current directory:</b>
-<pre><code>&lt;execute file="sql.xml" /&gt;
+<b>Executes etl.xml file in the current directory:</b>
+<pre><code>&lt;etl/&gt;</code></pre>
+<b>Executes name.etl.xml file in the current directory:</b>
+<pre><code>&lt;etl file="name" /&gt;
+&lt;!--Or explicitly specifying the full name--&gt;
+&lt;etl file="name.etl.xml" /&gt;
 </code></pre>
-<b>Executes all xml files in db directory:</b>
-<pre><code>&lt;execute&gt;
-    &lt;fileset dir="db" includes="*.xml" /&gt;
-    &lt;/execute&gt;
+<b>Executes all .etl.xml files in db directory:</b>
+<pre><code>&lt;etl&gt;
+    &lt;fileset dir="db" includes="*.etl.xml" /&gt;
+    &lt;/etl&gt;
 </code></pre>
 
 

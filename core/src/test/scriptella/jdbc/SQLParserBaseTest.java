@@ -76,7 +76,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
             }
 
             protected void statementParsed(final String sql) {
-                assertEquals(removeWhitespaceChars(expected[stInd]), removeWhitespaceChars(sql));
+                assertEquals(removeExtraWhitespaces(expected[stInd]), removeExtraWhitespaces(sql));
                 stInd++;
             }
         };

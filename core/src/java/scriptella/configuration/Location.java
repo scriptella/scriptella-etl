@@ -26,17 +26,14 @@ package scriptella.configuration;
 public class Location {
     private int row;
     private int column;
-    private String category;
     private String xpath;
 
-    public Location(int row, int column, String category) {
+    public Location(int row, int column) {
         this.row = row;
         this.column = column;
-        this.category = category;
     }
 
-    public Location(String xpath, String category) {
-        this.category = category;
+    public Location(String xpath) {
         this.xpath = xpath;
     }
 
@@ -58,10 +55,6 @@ public class Location {
 
     public String getXpath() {
         return xpath;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public String toString() {

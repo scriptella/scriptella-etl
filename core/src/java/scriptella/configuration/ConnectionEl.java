@@ -24,7 +24,6 @@ import java.util.Map;
  * @version 1.0
  */
 public class ConnectionEl extends XmlConfigurableBase {
-    public static final String DEFAULT_ID = "\"DEFAULT\"";
     private String id;
     private String url;
     private String driver;
@@ -120,10 +119,6 @@ public class ConnectionEl extends XmlConfigurableBase {
         setProperty(element, "schema");
         setProperty(element, "classpath");
         properties = new PropertiesEl(element);
-
-        if (id == null) {
-            id = DEFAULT_ID;
-        }
     }
 
     public String toString() {

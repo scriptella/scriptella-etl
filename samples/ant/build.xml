@@ -19,7 +19,7 @@
     <target name="main">
         <property name="antproperty" value="Ant Property"/>
         <!--Executes etl.xml -->
-        <execute inheritAll="true"/>
+        <etl/>
         <!-- You may reassign classpath just before executing a script-->
         <taskdef resource="antscriptella.properties">
             <classpath>
@@ -29,9 +29,11 @@
                 <pathelement location="../lib/hsqldb.jar"/>
             </classpath>
         </taskdef>
-        <execute inheritAll="true" debug="true">
+        <etl debug="true">
             <fileset file="etl.xml"/>
-        </execute>
+        </etl>
+        <!--Do not pass Ant properties-->
+        <etl inheritAll="false"/>
     </target>
 
 </project>

@@ -132,7 +132,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
             setPatternProperty(element, "name");
             setPatternProperty(element, "version");
             contentEl = new ContentEl(element);
-            setLocation(element, null);
+            setLocation(element);
         }
 
         /**
@@ -140,7 +140,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
          * @param parent parent element.
          */
         public void configureDefault(final XmlElement parent) {
-            setLocation(parent, null);
+            setLocation(parent);
             contentEl = new ContentEl();
         }
 

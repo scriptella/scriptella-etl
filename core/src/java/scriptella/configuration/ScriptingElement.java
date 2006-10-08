@@ -29,8 +29,10 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
     private String connectionId;
     private String ifExpr;
     private DialectBasedContentEl contentEl;
+    private ScriptingElement parent;
 
-    protected ScriptingElement() {
+    protected ScriptingElement(ScriptingElement parent) {
+        this.parent = parent;
     }
 
     public String getConnectionId() {
@@ -60,6 +62,10 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
 
     public Resource getDialectContent(DialectIdentifier id) {
         return contentEl.getContent(id);
+    }
+
+    public ScriptingElement getParent() {
+        return parent;
     }
 
     public void configure(final XmlElement element) {

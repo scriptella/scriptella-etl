@@ -16,7 +16,7 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
     <properties>
-        <include href="script.properties"/>
+        <include href="etl.properties"/>
     </properties>
     <connection driver="$driver" url="$url" user="$user" password="$password"/>
 
