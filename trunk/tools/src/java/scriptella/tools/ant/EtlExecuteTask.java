@@ -24,6 +24,7 @@ import org.apache.tools.ant.types.FileSet;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.tools.launcher.EtlLauncher;
+import scriptella.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -144,6 +145,9 @@ public class EtlExecuteTask extends Task {
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet
             launcher.setProperties(getProject().getProperties());
+        } else {
+            launcher.setProperties(CollectionUtils.asMap(System.getProperties()));
+
         }
 
         Handler h = new AntHandler();

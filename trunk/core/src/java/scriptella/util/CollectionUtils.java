@@ -17,6 +17,7 @@ package scriptella.util;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -64,5 +65,15 @@ public final class CollectionUtils {
      */
     public static <V> Map<String, V> newCaseInsensitiveAsciiMap() {
         return new TreeMap<String, V>(ASCII_CASE_INSENSITIVE_ORDER);
+    }
+
+    /**
+     * Returns parameterized version of {@link Properties} the instance
+     * remains the same.
+     * @param properties properties to represent as a map.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String,String> asMap(Properties properties) {
+        return (Map)properties;
     }
 }

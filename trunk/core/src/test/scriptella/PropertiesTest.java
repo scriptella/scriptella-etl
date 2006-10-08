@@ -24,6 +24,7 @@ import scriptella.execution.EtlExecutorException;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.spi.ConnectionParameters;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -57,6 +58,16 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("jdbc:hsqldb:mem:propertiestest", ctx.getParameter("url"));
         assertEquals("sa", ctx.getParameter("user"));
         assertEquals("", ctx.getParameter("password"));
+        Map<String,String> extra = new HashMap<String, String>();
+        extra.put("var", "2");
+        se.setExternalProperties(extra);
+        se.execute();
+        assertEquals("2", ctx.getParameter("var"));
+        assertEquals("2|2|2|2|2|2", ctx.getParameter("b"));
+
+
+
+
     }
 
     @Override
