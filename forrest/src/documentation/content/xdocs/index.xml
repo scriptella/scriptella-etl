@@ -1,60 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-	<header>
-		<title>Welcome to Scriptella Project</title>
-	</header>
-	<body>
-		<section id="overview">
-			<title>About Scriptella</title>
-			<p>Scriptella is an open source Extract-Transform-Load (ETL) and scripts execution tool.</p>
-			<p>Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use SQL(or other
+    <header>
+        <title>Welcome to Scriptella Project</title>
+    </header>
+    <body>
+        <section id="overview">
+            <title>About Scriptella</title>
+            <p>Scriptella is an open source Extract-Transform-Load (ETL) and scripts execution tool.</p>
+            <p>Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use
+                SQL(or other
                 scripting language suitable for your datasource) to perform required transformations.</p>
-			<p>
-				<a href="download.html">Download</a>
+            <p>
+                <a href="download.html">Download</a>
                 and
                 <a href="tutorial.html">use it</a>
                 ! Scriptella is licensed under the
                 <a href="license.html">Apache License, Version 2.0</a>
-			</p>
-		</section>
-		<section id="usage">
-			<title>Typical use</title>
-			<ul>
-				<li>Database migration.</li>
-				<li>Database creation/update scripts.</li>
-				<li>Cross-database ETL operations, import/export</li>
-				<li>Alternative for Ant &lt;sql&gt; task.</li>
-			</ul>
-		</section>
-		<section id="features">
-			<title>Features</title>
-			<ul>
-				<li>Simple XML syntax for scripts. Add dynamics to your existing SQL scripts by creating a thin
+            </p>
+        </section>
+        <section id="usage">
+            <title>Typical use</title>
+            <ul>
+                <li>Database migration.</li>
+                <li>Database creation/update scripts.</li>
+                <li>Cross-database ETL operations, import/export</li>
+                <li>Alternative for Ant &lt;sql&gt; task.</li>
+            </ul>
+        </section>
+        <section id="features">
+            <title>Features</title>
+            <ul>
+                <li>
+                    <strong>Simple XML syntax</strong>
+                    for scripts. Add dynamics to your existing SQL scripts by creating a thin
                     wrapper XML file:
                     <source><![CDATA[
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
     <connection driver="$driver" url="$url" user="$user" password="$password"/>
     <script>
         <include href="PATH_TO_YOUR_SCRIPT.sql"/>
-        -- And/or directly insert SQL here
+        -- And/or directly insert SQL statements here
     </script>
 </etl>
     ]]></source>
-				</li>
-				<li>Support for multiple datasources (or multiple connections to a single database) in a script file.</li>
-				<li>Support for many useful JDBC features, e.g. parameters in SQL including file blobs and JDBC
-                    escaping.</li>
-				<li>Support for evaluated expressions and properties (JEXL syntax)</li>
-				<li>Support for cross-database SQL scripts by using &lt;dialect&gt; elements</li>
-				<li>Transactional execution</li>
-				<li>Error handling via &lt;onerror&gt; elements</li>
-				<li>Conditional scripts/queries execution(similar to Ant if/unless attrbutes but more powerful)</li>
-				<li>Easy-to-Use as a standalone tool or Ant task. No deployment/installation required.</li>
-				<li>Service Provider Interface (SPI) for interoperability with non-JDBC Datasources.</li>
-				<li>Velocity and Janino providers. Generate reports with Velocity directly from your script files.
-                For complex tasks embed java code which is compiled and executed by Janino.</li>
-			</ul>
-		</section>
-	</body>
+                </li>
+                <li>Support for
+                    <strong>multiple datasources</strong>
+                    (or multiple connections to a single database) in a script file.
+                </li>
+                <li>Support for many useful
+                    <strong>JDBC features</strong>
+                    , e.g. parameters in SQL including file blobs and JDBC
+                    escaping.
+                </li>
+                <li>
+                    <strong>Performance.</strong>
+                    Performance and low memory usage are one of our primary goals.
+                </li>
+                <li>Support for
+                    <strong>evaluated expressions and properties</strong>
+                    (JEXL syntax)
+                </li>
+                <li>Support for
+                    <strong>cross-database ETL scripts</strong>
+                    by using &lt;dialect&gt; elements
+                </li>
+                <li>
+                    <strong>Transactional execution</strong>
+                </li>
+                <li>
+                    <strong>Error handling</strong>
+                    via &lt;onerror&gt; elements
+                </li>
+                <li>
+                    <strong>Conditional scripts/queries execution</strong>
+                    (similar to Ant if/unless attrbutes but more powerful)
+                </li>
+                <li>
+                    <strong>Easy-to-Use</strong>
+                    as a standalone tool or Ant task. No deployment/installation required.
+                </li>
+                <li>
+                    <strong>
+                        <a href="docs/api/scriptella/spi/package-summary.html">Service Provider Interface (SPI)</a>
+                    </strong>
+                    for interoperability with non-JDBC DataSources.
+                </li>
+                <li>Built-In
+                    <a href="reference/drivers.html#nonjdbc">CSV, LDAP, Velocity and Janino</a>
+                    providers. Integration with
+                    <a href="reference/drivers.html#spring">Spring Framework</a>
+                    and
+                    <a href="reference/drivers.html#jndi">JNDI</a>
+                    for
+                    <strong>enterprise ready</strong>
+                    scripts.
+                </li>
+            </ul>
+        </section>
+        </body>
 </document>

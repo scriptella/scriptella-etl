@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+    <header>
+        <title>Scriptella Project Support</title>
+    </header>
+    <body>
+        <section>
+            <title>Community Support</title>
+            <p>For community support, check out the <a href="http://www.javaforge.com/proj/forum/browseForum.do?forum_id=3126">Discussion Forum</a>.</p>
+            <note>
+                You have to <a href="http://www.javaforge.com/registration.do">register</a> a JavaForge account to post forum messages and submit issues. 
+            </note>
+        </section>
+        <section>
+            <title>Issue Tracker</title>
+            <p>If you think that you've found a bug or want to propose a feature to implement?
+                Use JavaForge project <a href="http://www.javaforge.com/proj/tracker.do?proj_id=781">Issue Tracker</a>.</p>
+        </section>
+    </body>
+</document>

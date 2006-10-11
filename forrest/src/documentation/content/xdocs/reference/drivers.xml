@@ -1,111 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
-    <header>
-        <title>Scriptella Drivers Matrix</title>
-        <authors>
-            <person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
-        </authors>
-        <notice>Version 0.2dev. Work in progress</notice>
-        <abstract>
-            <img src="../images/site-logo.png" alt=""/>
-            <br/>
+	<header>
+		<title>Scriptella Drivers Matrix</title>
+		<authors>
+			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+		</authors>
+		<notice>Version 0.2dev. Work in progress</notice>
+		<abstract>
+			<img src="../images/site-logo.png" alt=""/>
+			<br/>
             This document describes Scriptella Drivers supported by Scriptella.
-            Please note that any JDBC compliant driver should work with Scriptella without a special JDBC adapter.
             <br/>
             See also the
             <a href="../docs/api/">Javadoc</a>
             for the built-in drivers.
         </abstract>
-    </header>
-    <body>
-        <anchor id="jdbcbridge"/>
-        <section>
-            <title>JDBC Bridge Drivers</title>
-            <table>
-                <tr>
-                    <th>Adapter Name</th>
-                    <th>Scriptella Driver Name</th>
-                    <th>Native Driver</th>
-                    <th>Notes</th>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
-                    </td>
-                    <td>scriptella.driver.hsqldb.Driver</td>
-                    <td>org.hsqldb.jdbcDriver</td>
-                    <td/>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
-                    </td>
-                    <td>scriptella.driver.h2.Driver</td>
-                    <td>org.h2.Driver</td>
-                    <td/>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/jndi/package-summary.html">JNDI</a>
-                    </td>
-                    <td>scriptella.driver.jndi.Driver</td>
-                    <td>Any JDBC driver</td>
-                    <td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
+	</header>
+	<body>
+		<section id="jdbcbridge">
+			<title>JDBC Bridge Drivers</title>
+			<p>Scriptella providers a set of built-in drivers for popular databases, see also
+			<a href="../docs/api/scriptella/jdbc/package-summary.html">JDBC Bridge Javadoc</a>.</p>
+			<note>Although usage of JDBC adapters is recommended you may directly use any JDBC compliant driver.</note>
+			<table>
+				<tr>
+					<th>Adapter Name</th>
+					<th>Scriptella Driver Name</th>
+					<th>Native Driver</th>
+					<th>Notes</th>
+				</tr>
+				<tr>
+					<td>
+						<a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
+					</td>
+					<td>scriptella.driver.hsqldb.Driver</td>
+					<td>org.hsqldb.jdbcDriver</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>
+						<a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
+					</td>
+					<td>scriptella.driver.h2.Driver</td>
+					<td>org.h2.Driver</td>
+					<td/>
+				</tr>
+				<tr>
+					<td>
+						<anchor id="jndi"/>
+						<a href="../docs/api/scriptella/driver/jndi/package-summary.html">JNDI</a>
+					</td>
+					<td>scriptella.driver.jndi.Driver</td>
+					<td>Any JDBC driver</td>
+					<td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
                         environment</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
-                    </td>
-                    <td>scriptella.driver.spring.Driver</td>
-                    <td>Any JDBC driver</td>
-                    <td>This driver allows to work with <a href="http://www.springframework.org">Spring</a> managed datasource connections, useful in Spring Framework
+				</tr>
+				<tr>
+					<td>
+						<anchor id="spring"/>
+						<a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
+					</td>
+					<td>scriptella.driver.spring.Driver</td>
+					<td>Any JDBC driver</td>
+					<td>This driver allows to work with <a href="http://www.springframework.org">Spring</a> managed datasource connections, useful in Spring Framework
                         projects.<br/>
                         The driver requires <code>scriptella.driver.spring.EtlExecutorBean</code> to be used in Spring configuration.
                     </td>
-                </tr>
-            </table>
-        </section>
-        <anchor id="nonjdbc"/>
-        <section>
-            <title>Non-JDBC Drivers</title>
-            <table>
-                <tr>
-                    <th>Adapter Name</th>
-                    <th>Scriptella Driver Name</th>
-                    <th>Notes</th>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a>
-                    </td>
-                    <td>scriptella.driver.csv.Driver</td>
-                    <td>The driver to write and query CSV files.</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino</a>
-                    </td>
-                    <td>scriptella.driver.janino.Driver</td>
-                    <td>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
-                    </td>
-                    <td>scriptella.driver.ldap.Driver</td>
-                    <td>This driver allows to execute LDIF scripts and search filter queries.</td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>
-                    </td>
-                    <td>scriptella.driver.velocity.Driver</td>
-                    <td>This driver allows to integrate velocity templates into script files.</td>
-                </tr>
-            </table>
-        </section>
-
-    </body>
+				</tr>
+			</table>
+		</section>
+		<section id="nonjdbc">
+			<title>Non-JDBC Drivers</title>
+			<table>
+				<tr>
+					<th>Adapter Name</th>
+					<th>Scriptella Driver Name</th>
+					<th>Notes</th>
+				</tr>
+				<tr>
+					<td>
+						<anchor id="csv"/>
+						<a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a>
+					</td>
+					<td>scriptella.driver.csv.Driver</td>
+					<td>The driver to write and query CSV files.</td>
+				</tr>
+				<tr>
+					<td>
+						<anchor id="janino"/>
+						<a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino</a>
+					</td>
+					<td>scriptella.driver.janino.Driver</td>
+					<td>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
+				</tr>
+				<tr>
+					<td>
+						<anchor id="ldap"/>
+						<a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
+					</td>
+					<td>scriptella.driver.ldap.Driver</td>
+					<td>This driver allows to execute LDIF scripts and search filter queries.</td>
+				</tr>
+				<tr>
+					<td>
+						<anchor id="velocity"/>
+						<a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>
+					</td>
+					<td>scriptella.driver.velocity.Driver</td>
+					<td>This driver allows to integrate velocity templates into script files.</td>
+				</tr>
+			</table>
+		</section>
+	</body>
 </document>
