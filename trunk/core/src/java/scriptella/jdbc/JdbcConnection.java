@@ -31,7 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * TODO: Add documentation
+ * Represents a JDBC connection.
  *
  * @author Fyodor Kupolov
  * @version 1.0

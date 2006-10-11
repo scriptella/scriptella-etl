@@ -10,7 +10,7 @@
 		<faq id="DRIVERS">
 			<question>Where can I find documentation on script syntax for driver FOO/BAR/...?</question>
 			<answer>The up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
-			<a href="site:reference">Reference Documentation</a> also covers drivers usage and scripts syntax.</answer>
+			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</answer>
 		</faq>
 		<!-- More faqs or parts here -->
 	</faqsection>

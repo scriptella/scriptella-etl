@@ -1,14 +1,14 @@
 <body>
 Ant tasks.
 
-<h2>EtlExecuteTask(etl)</h2>
+<h2>EtlExecuteTask (etl)</h2>
 
 <h3>How to register</h3>
 To use the task in a build file, the following taskdef declaration should be added:
 <pre><code>
     &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar"/&gt;
 </code></pre>
-<em>Note:</em> Additional JDBC drivers required for scripts execution should also be appended to classpath:
+<em>Note:</em> Additional libraries required for ETL execution may also be appended to classpath:
 <pre><code>
     &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar;hsqldb.jar"/&gt;
 </code></pre>
@@ -36,7 +36,7 @@ To use the task in a build file, the following taskdef declaration should be add
         <td>quiet</td><td>If true be extra quiet.</td><td>No, default value is false.</td>
     </tr>
 
-    <tr><td colspan="3">The following attributes are not supported yet</td></tr>
+    <tr><td colspan="3"><em>The following attributes are not supported yet</em></td></tr>
     <tr>
         <td>fork</td><td>if enabled triggers the class execution in another VM (disabled by default)</td><td>No</td>
     </tr>
@@ -64,7 +64,7 @@ The task supports nested <a href="http://ant.apache.org/manual/CoreTypes/fileset
 <b>Executes all .etl.xml files in db directory:</b>
 <pre><code>&lt;etl&gt;
     &lt;fileset dir="db" includes="*.etl.xml" /&gt;
-    &lt;/etl&gt;
+&lt;/etl&gt;
 </code></pre>
 
 
