@@ -27,10 +27,10 @@ if "%SCRIPTELLA_HOME%" == "" set SCRIPTELLA_HOME=%~dp0\..
 rem ----- set the current working dir as the CUR_DIR variable  ----
 set CUR_DIR=%CD%
 
-cd %~dp0..\lib
+cd /d %~dp0..\lib
 set _SCRIPTELLA_CP=
 @for %%i in (*.jar) do set _SCRIPTELLA_CP=!_SCRIPTELLA_CP!;%%~fi
-@cd %cur_dir%
+@cd /d %cur_dir%
 
 rem ---- define java cmd. Use JAVACMD to specify java.exe location and VM options
 if "%JAVA_HOME%" == "" goto noJavaHome
