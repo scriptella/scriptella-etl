@@ -17,7 +17,7 @@ package scriptella.jdbc;
 
 import scriptella.configuration.ConfigurationException;
 import scriptella.expression.PropertiesSubstitutor;
-import scriptella.util.ExceptionUtils;
+import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
 import java.io.IOException;
@@ -58,27 +58,26 @@ import java.util.regex.Matcher;
  * @version 1.0
  */
 public class SqlParserBase {
-
     /**
      * Parses SQL script.
      *
      * @param reader reader with SQL script.
      */
     public void parse(final Reader reader) {
+        parse(new SqlTokenizer(reader));
+    }
+
+    public void parse(final SqlTokenizer tok) {
         try {
-            SqlTokenizer tok = new SqlTokenizer(reader);
             for (StringBuilder sb;(sb=tok.nextStatement())!=null;) {
                 handleStatement(sb, tok.getInjections());
             }
         } catch (IOException e) {
-            throw new ConfigurationException(e);
+            throw new ConfigurationException("Failed to read element content", e);
         } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                ExceptionUtils.ignoreThrowable(e);
-            }
+            IOUtils.closeSilently(tok);
         }
+
     }
 
     private final Matcher m = PropertiesSubstitutor.PROP_PTR.matcher("");

@@ -28,6 +28,7 @@ import scriptella.interactive.ProgressIndicator;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -45,6 +46,9 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
     private BeanFactory beanFactory;
     private ProgressIndicator progressIndicator;
     private boolean autostart;
+    private Map<String, String> properties;
+    private URL configLocation;
+
 
     /**
      * Creates scripts executor.
@@ -58,8 +62,9 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
 
     /**
      * Sets autostart property.
+     *
      * @param autostart true if executor must be automatically runned after initialization.
-     * Default value is <code>false</code>.
+     *                  Default value is <code>false</code>.
      */
     public void setAutostart(boolean autostart) {
         this.autostart = autostart;
@@ -68,6 +73,7 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
     /**
      * Sets progress indicator to use.
      * <p>By default no progress shown.
+     *
      * @param progressIndicator progress indicator to use.
      */
     public void setProgressIndicator(ProgressIndicator progressIndicator) {
@@ -75,27 +81,33 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
     }
 
     /**
-     * Sets configuration location and loads it.
+     * Sets configuration location.
+     *
      * @param resource configuration resource.
-     * @see #setConfigLocation(java.net.URL)
      */
     public void setConfigLocation(Resource resource) throws IOException {
-        setConfigLocation(resource.getURL());
+        configLocation = resource.getURL();
     }
 
-    /**
-     * Loads the configuration from the specified URL.
-     * @param url URL to load configuration from.
-     */
-    private void setConfigLocation(URL url) {
-        ConfigurationFactory cf = new ConfigurationFactory();
-        cf.setResourceURL(url);
-        setConfiguration(cf.createConfiguration());
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     public void afterPropertiesSet() throws Exception {
-        if (getConfiguration()==null) {
-            throw new IllegalStateException("configLocation must be specified");
+
+        if (getConfiguration() == null) {
+            if (configLocation == null) {
+                throw new IllegalStateException("configLocation must be specified");
+            } else { //Initialize configuration
+                ConfigurationFactory cf = new ConfigurationFactory();
+                cf.setResourceURL(configLocation);
+                cf.setExternalProperties(properties);
+                setConfiguration(cf.createConfiguration());
+            }
         }
         if (autostart) {
             execute();
@@ -112,7 +124,7 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
 
     @Override
     public ExecutionStatistics execute() throws EtlExecutorException {
-        if (progressIndicator!=null) {
+        if (progressIndicator != null) {
             return execute(progressIndicator);
         } else {
             return super.execute();

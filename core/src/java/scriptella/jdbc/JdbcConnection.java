@@ -21,10 +21,12 @@ import scriptella.spi.DialectIdentifier;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
+import scriptella.util.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,11 +40,15 @@ import java.util.logging.Logger;
  */
 public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
+    public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
+    public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
     private boolean transactable = false;
     private ParametersParser parametersParser;
-    private int statementCacheSize = 100;
+    int statementCacheSize = 100;
+    String separator = ";";
+    boolean separatorSingleLine;
     private final Map<Resource, SqlSupport> resourcesMap = new IdentityHashMap<Resource, SqlSupport>();
 
     public JdbcConnection(Connection con, ConnectionParameters parameters) {
@@ -72,13 +78,23 @@ public class JdbcConnection extends AbstractConnection {
      */
     protected void init(ConnectionParameters parameters) {
         String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_KEY);
-        if (cacheSizeStr != null && cacheSizeStr.trim().length() > 0) {
+        if (!StringUtils.isEmpty(cacheSizeStr)) {
             try {
                 statementCacheSize = Integer.valueOf(cacheSizeStr);
             } catch (NumberFormatException e) {
                 throw new JdbcException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
             }
         }
+        String separatorStr = parameters.getProperty(STATEMENT_SEPARATOR_KEY);
+        if (!StringUtils.isEmpty(separatorStr)) {
+            separator=separatorStr.trim();
+        }
+        try {
+            separatorSingleLine = parameters.getBooleanProperty(STATEMENT_SEPARATOR_SINGLELINE_KEY, false);
+        } catch (ParseException e) {
+            throw new JdbcException(e.getMessage());
+        }
+
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -116,10 +132,6 @@ public class JdbcConnection extends AbstractConnection {
             resourcesMap.put(queryContent, q = new Query(queryContent, this));
         }
         q.execute(con, parametersCallback, queryCallback);
-    }
-
-    StatementCache newStatementCache() {
-        return new StatementCache(con, statementCacheSize);
     }
 
     ParametersParser getParametersParser() {
@@ -181,7 +193,4 @@ public class JdbcConnection extends AbstractConnection {
         return "JdbcConnection{" + (con == null ? "" : con.getClass().getName()) + '}';
     }
 
-    public JdbcTypesConverter newConverter() {
-        return new JdbcTypesConverter();
-    }
 }

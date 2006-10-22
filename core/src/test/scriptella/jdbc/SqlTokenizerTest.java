@@ -59,9 +59,9 @@ public class SqlTokenizerTest extends AbstractTestCase {
                 "-notacomment$v/**fdfdfd$comment\n$comment.v$$???\n;;;*/;stmt${var};\n" +
                 "//$comment";
         SqlTokenizer tok = new SqlTokenizer(new StringReader(s));
-        tok.nextStatement();
+        assertEquals("insert into table values 1,?v--$comment\n", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {27}), tok.getInjections());
-        tok.nextStatement();
+        assertEquals("-notacomment$v/**fdfdfd$comment\n$comment.v$$???\n;;;*/", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {12}), tok.getInjections());
         assertEquals("stmt${var}", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {4}), tok.getInjections());
@@ -83,5 +83,78 @@ public class SqlTokenizerTest extends AbstractTestCase {
         SqlTokenizer tok = new SqlTokenizer(new StringReader(""));
         assertNull(tok.nextStatement());
     }
+
+    public void testSeparator() throws IOException {
+        String data = "st;1;;st 2";
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator(";;");
+        assertEquals("st;1", tok.nextStatement().toString());
+        assertEquals("st 2", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator(";;");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("st;1;;st 2", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        data = "st;1 \n;;\nst 2";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator(";;");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("st;1 \n", tok.nextStatement().toString());
+        assertEquals("st 2", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        data = "st;$v1\n / /*?comment*/ ?v2 2";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals(data, tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {3, 23}), tok.getInjections());
+        assertNull(tok.nextStatement());
+        ///
+        data = "st;$v1\r/\n/*?comment*/ ?v2 2";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("st;$v1\r", tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {3}), tok.getInjections());
+        assertEquals("/*?comment*/ ?v2 2", tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {13}), tok.getInjections());
+        assertNull(tok.nextStatement());
+        ///
+        data = "STATEMENT1 / \n\r" +
+                "   / \r\nSTATEMENT2\n/**fdfdfd**//";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("STATEMENT1 / \n\r", tok.nextStatement().toString());
+        assertEquals("\nSTATEMENT2\n" +
+                "/**fdfdfd**//", tok.nextStatement().toString());
+        ///
+        data = "/\nscript\n/\n";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("", tok.nextStatement().toString());
+        assertEquals("script\n", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        ///
+        data = "/\nscript\n/";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("", tok.nextStatement().toString());
+        assertEquals("script\n", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        ///
+        data = "statement;--comment\n/\nscrip$t\n/";
+        tok = new SqlTokenizer(new StringReader(data));
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals("statement;--comment\n", tok.nextStatement().toString());
+        assertEquals("scrip$t\n", tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {5}), tok.getInjections());
+        assertNull(tok.nextStatement());
+    }
+
 
 }

@@ -24,7 +24,6 @@ import scriptella.interactive.ProgressIndicator;
 import scriptella.util.CollectionUtils;
 
 import java.net.URL;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,8 +36,7 @@ import java.util.logging.Logger;
  * <p>The usage scenario of this class may be described using the following steps:
  * <ul>
  * <li>{@link #EtlExecutor(scriptella.configuration.ConfigurationEl)} Create an instance of this class
- * and pass a {@link scriptella.configuration.ConfigurationFactory#createConfiguration() script file configuration} .
- * <li>Optionally {@link #setExternalProperties(java.util.Map) set external properties}.
+ * and pass a {@link scriptella.configuration.ConfigurationFactory#createConfiguration() script file configuration}.
  * <li>{@link #execute() Execute} the script
  * </ul>
  * </pre></code>
@@ -54,7 +52,6 @@ import java.util.logging.Logger;
 public class EtlExecutor {
     private static final Logger LOG = Logger.getLogger(EtlExecutor.class.getName());
     private ConfigurationEl configuration;
-    private Map<String, String> externalProperties;
 
     public EtlExecutor() {
     }
@@ -150,40 +147,13 @@ public class EtlExecutor {
         final ProgressCallback progress = ctx.getProgressCallback();
         progress.step(1, "Initializing properties");
 
-        if (externalProperties != null) {
-            ctx.addProperties(externalProperties);
-        }
-
-        ctx.addProperties(configuration.getProperties());
+        ctx.setProperties(configuration.getProperties());
         ctx.setProgressCallback(progress.fork(9, 100));
         ctx.session = new Session(configuration, ctx);
         ctx.getProgressCallback().complete();
         ctx.setProgressCallback(progress); //Restoring
 
         return ctx;
-    }
-
-    /**
-     * A getter for external Properties.
-     *
-     * @return external properties set by {@link #setExternalProperties}.
-     */
-    @ThreadSafe
-    public Map<String, String> getExternalProperties() {
-        return externalProperties;
-    }
-
-    /**
-     * Sets additional properties.
-     * <p>External properties takes precedence over properties specified
-     * in scriptella &lt;properties&gt; element.
-     * <p>Intended for integration with other systems like ant.
-     *
-     * @param externalProperties
-     */
-    @ThreadSafe
-    public void setExternalProperties(final Map<String, String> externalProperties) {
-        this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
     }
 
     /**
@@ -203,7 +173,7 @@ public class EtlExecutor {
      * Helper method to create a new ScriptExecutor for specified script URL.
      *
      * @param scriptFileUrl      URL of script file.
-     * @param externalProperties see {@link #setExternalProperties(java.util.Map)}
+     * @param externalProperties see {@link ConfigurationFactory#setExternalProperties(java.util.Map)}
      * @return configured instance of script executor.
      * @see ConfigurationFactory
      */
@@ -211,12 +181,10 @@ public class EtlExecutor {
     public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String, String> externalProperties) {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(scriptFileUrl);
-        ConfigurationEl c = cf.createConfiguration();
-        EtlExecutor se = new EtlExecutor(c);
         if (externalProperties != null) {
-            se.setExternalProperties(externalProperties);
+            cf.setExternalProperties(externalProperties);
         }
-        return se;
+        return new EtlExecutor(cf.createConfiguration());
     }
 
 }

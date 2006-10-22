@@ -16,7 +16,7 @@
 package scriptella.driver.alljdbc;
 
 import scriptella.AbstractTestCase;
-import scriptella.execution.EtlExecutor;
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.DriverFactory;
@@ -36,6 +36,7 @@ import java.util.Properties;
 
 /**
  * Test validity data conversion between databases
+ * TODO Refactor this class
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -82,30 +83,33 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
 
-    private EtlExecutor schema = newEtlExecutor("schema.xml");
+    private Map<String,String> externalProperties;
+    @Override
+    protected ConfigurationFactory newConfigurationFactory() {
+        ConfigurationFactory cf = super.newConfigurationFactory();
+        cf.setExternalProperties(externalProperties);
+        return cf;
+    }
 
     public void test() throws EtlExecutorException, ClassNotFoundException {
         int n = drivers.length;
         //just to make sure properties are valid
         assertTrue(n == urls.length && n == users.length && n == passwords.length);
 
-        EtlExecutor se = newEtlExecutor();
-
-        Map<String,String> props = new HashMap<String, String>();
+        externalProperties = new HashMap<String, String>();
         //test any combination of drivers in both directions
         for (int i = 0; i < n; i++) {
-            props.put("driver1", drivers[i]);
-            props.put("url1", urls[i]);
-            props.put("user1", users[i]);
-            props.put("password1", passwords[i]);
+            externalProperties.put("driver1", drivers[i]);
+            externalProperties.put("url1", urls[i]);
+            externalProperties.put("user1", users[i]);
+            externalProperties.put("password1", passwords[i]);
             for (int j = 0; j < n; j++) {
                 if (j != i) {
-                    props.put("driver2", drivers[j]);
-                    props.put("url2", urls[j]);
-                    props.put("user2", users[j]);
-                    props.put("password2", passwords[j]);
-                    se.setExternalProperties(props);
-                    se.execute();
+                    externalProperties.put("driver2", drivers[j]);
+                    externalProperties.put("url2", urls[j]);
+                    externalProperties.put("user2", users[j]);
+                    externalProperties.put("password2", passwords[j]);
+                    newEtlExecutor().execute();
                     assertEquals(1, rows.size());
                     Object[] row = rows.get(0);
                     rows.clear();//clear the callback variable for the next loop
@@ -130,15 +134,15 @@ public class AllJDBCDriversTest extends AbstractTestCase {
             String url = urls[i];
             String user = users[i];
             String password = passwords[i];
-            Map<String,String> props = new HashMap<String, String>();
-            props.put("driver",driver);
-            props.put("url",url);
-            props.put("user",user);
-            props.put("password",password);
+            externalProperties = new HashMap<String, String>();
+            externalProperties.put("driver",driver);
+            externalProperties.put("url",url);
+            externalProperties.put("user",user);
+            externalProperties.put("password",password);
             try {
                 Properties p = new Properties();
                 p.load(getClass().getResourceAsStream(driver+".types.properties"));
-                props.putAll((Map)p);
+                externalProperties.putAll((Map)p);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
@@ -149,8 +153,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
-            schema.setExternalProperties(props);
-            schema.execute();
+            newEtlExecutor("schema.xml").execute();
         }
     }
 

@@ -121,11 +121,26 @@
 					<strong>id</strong> attribute is required if you declare more than one connections inside your script.
                     The value of this attribute is used to reference the connection in scripts and queries.</p>
 				<p>
-					<strong>classpath</strong> attribute is used to specify additional classpath to load driver libraries. Alternatively you may
-                add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
-                    Boot classpath libraries take precedence over libraries specified connection classpath attribute.
+					<strong>classpath</strong> optional attribute is used to specify additional classpath to load driver libraries.
+                    .Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides.
+                    Absolute URLs are also supported, e.g. ftp://server/jconnect.jar;http://server2/classes12.zip
+                    Alternatively you can add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
+                    Boot classpath libraries take precedence over libraries specified in connection classpath attribute.
                 </p>
-				<p>Use element's content to pass properties into connection. Several driver also support
+                <p>
+                    <strong>lazy-init</strong> optional attribute specifies connection initialization strategy.
+                    <code>true</code> if connection initialization should be deferred until it is actually used.
+                    The default value of <code>false</code> means that connection is initialized on ETL startup.
+                    Lazy connection initialization may be useful in following cases:
+                    <ul>
+                        <li>A script or a query operating with this connection has conditional <b>if</b> attribute, in
+                        this case greedy initialization may be redundant</li>
+                        <li>Other connections create database users or produce files required for this connection
+                        to be initialized properly.</li>
+                    </ul>
+                </p>
+
+                <p>Use element's content to pass properties into connection. Several driver also support
                 connection properties in URL string.</p>
 			</section>
 			<section>
@@ -293,7 +308,11 @@
 						<td>-version, -v</td>
 						<td>print version</td>
 					</tr>
-				</table>
+                    <tr>
+                        <td>-template, -t</td>
+                        <td>creates an etl.xml template file in the current directory</td>
+                    </tr>
+                </table>
 			</section>
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>

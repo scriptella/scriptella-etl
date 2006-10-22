@@ -16,15 +16,12 @@
 package scriptella.execution;
 
 import scriptella.core.Session;
-import scriptella.expression.PropertiesSubstitutor;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
-import scriptella.util.PropertiesMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 
 /**
@@ -39,14 +36,13 @@ import java.util.Map;
  */
 public class EtlContext implements ParametersCallback, DriverContext {
     private ProgressCallback progressCallback;
-    private Map<String, String> properties = new PropertiesMap();
+    private ParametersCallback properties;
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
     Session session; //Connections related stuff is here
-    private final PropertiesSubstitutor propertiesSubstitutor = new PropertiesSubstitutor(this);
 
     public Object getParameter(final String name) {
-        return properties.get(name);
+        return properties.getParameter(name);
     }
 
     public ProgressCallback getProgressCallback() {
@@ -58,16 +54,13 @@ public class EtlContext implements ParametersCallback, DriverContext {
     }
 
     /**
-     * Adds properties and expands their values by evaluating expressions and property references.
-     *
-     * @param properties properties to add to scripts context.
-     * @see #substituteProperties(String)
+     * Sets configuration properties for this context.
+     * @param properties configuration properties.
      */
-    void addProperties(final Map<String, String> properties) {
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            this.properties.put(entry.getKey(), substituteProperties(entry.getValue()));
-        }
+    void setProperties(ParametersCallback properties) {
+        this.properties = properties;
     }
+
 
     public URL getScriptFileURL() {
         return baseURL;
@@ -88,10 +81,6 @@ public class EtlContext implements ParametersCallback, DriverContext {
 
     public Session getSession() {
         return session;
-    }
-
-    public String substituteProperties(final String s) {
-        return propertiesSubstitutor.substitute(s);
     }
 
 }

@@ -15,7 +15,7 @@
  */
 package scriptella;
 
-import scriptella.configuration.ConfigurationEl;
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.core.ConnectionManager;
 import scriptella.core.SqlTestHelper;
 import scriptella.execution.EtlContext;
@@ -39,7 +39,7 @@ public class PropertiesTest extends AbstractTestCase {
     private ConnectionParameters params;
 
     public void test() throws EtlExecutorException {
-        final EtlExecutor se = newEtlExecutor("PropertiesTest.xml");
+        EtlExecutor se = prepareExecutor(null);
         se.execute();
 
         assertEquals("jdbc:hsqldb:mem:propertiestest", params.getUrl());
@@ -60,20 +60,17 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("", ctx.getParameter("password"));
         Map<String,String> extra = new HashMap<String, String>();
         extra.put("var", "2");
-        se.setExternalProperties(extra);
+        se = prepareExecutor(extra);
         se.execute();
         assertEquals("2", ctx.getParameter("var"));
         assertEquals("2|2|2|2|2|2", ctx.getParameter("b"));
-
-
-
-
     }
 
-    @Override
-    protected EtlExecutor newEtlExecutor(
-            final ConfigurationEl configuration) {
-        return new EtlExecutor(configuration) {
+    private EtlExecutor prepareExecutor(Map<String,String> props) {
+        ConfigurationFactory cf = new ConfigurationFactory();
+        cf.setResourceURL(getClass().getResource(getClass().getSimpleName()+".xml"));
+        cf.setExternalProperties(props);
+        return new EtlExecutor(cf.createConfiguration()) {
             //overrides prepare method to get ctx and params for connection
             protected EtlContext prepare(
                     final ProgressIndicator indicator) {
@@ -84,5 +81,7 @@ public class PropertiesTest extends AbstractTestCase {
                 return ctx;
             }
         };
+
     }
+
 }

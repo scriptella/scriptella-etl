@@ -54,7 +54,7 @@ public class OnErrorEl extends XmlConfigurableBase {
         } else {
             codes = new LinkedHashSet<String>(Arrays.asList(CODES_SEPARATOR.split(codestr)));
         }
-        retry = element.getBooleanProperty("retry", false);
+        retry = element.getBooleanAttribute("retry", false);
         content = new DialectBasedContentEl(element);
     }
 

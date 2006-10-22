@@ -15,6 +15,9 @@
  */
 package scriptella.jdbc;
 
+import scriptella.util.StringUtils;
+
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -24,22 +27,38 @@ import java.util.List;
 /**
  * Tokenizer for SQL statements.
  * <p>This class splits sql statements using a specifed
- * {@link #setSeparator(char) separator char}.
+ * {@link #setSeparator(String) separator string}.
  * <p>The ? injections in quoted literals and comments are skipped.
  * The $ substitutions are skipped only in comments.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SqlTokenizer {
+public class SqlTokenizer implements Closeable {
     private final Reader reader;
     private final List<Integer> injections = new ArrayList<Integer>();
     private final StringBuilder sb = new StringBuilder(80);
-    private char separator = ';';
+    private char[] separator = DEFAULT_SEPARATOR;
+    private boolean separatorOnSingleLine;
+    private boolean trim;
+    private SeparatorMatcher separatorMatcher = new SeparatorMatcher();
+    private static final char[] DEFAULT_SEPARATOR = ";".toCharArray();
 
     public SqlTokenizer(Reader reader) {
         this.reader = reader;
     }
+
+    public SqlTokenizer(Reader reader, String separator, boolean separatorOnSingleLine) {
+        this.reader = reader;
+        setSeparator(separator);
+        setSeparatorOnSingleLine(separatorOnSingleLine);
+    }
+
+    private int position;
+    private char previousChar = (char) -1;
+    private char currentChar;
+
+    private int lastLineStart;
 
 
     /**
@@ -51,55 +70,69 @@ public class SqlTokenizer {
     public StringBuilder nextStatement() throws IOException {
         sb.setLength(0);
         injections.clear();
-        char prevChar = (char) -1;
         int n;
-        for (int i = 0; (n = reader.read()) >= 0; i++) {
-            char c = (char) n;
-            if (c==separator) {
-                return sb;
+        final boolean newLineMode = separatorOnSingleLine; //make a local copy for performance reasons
+        final boolean defaultMode = !newLineMode;
+        boolean whitespacesOnly = true;
+        final char sep0 = separator[0];
+        lastLineStart = 0;
+
+
+        previousChar = (char) -1;
+        for (position = 0; (n = reader.read()) >= 0; position++) {
+            currentChar = (char) n;
+            sb.append(currentChar);
+            //Checking separator substring
+            if ((currentChar == sep0) && //if matched a first separator char
+                    //and no whitespaces in new line mode or not a new line mode
+                    ((newLineMode && whitespacesOnly) || defaultMode)) {
+                if (separatorMatcher.matches()) {  //try to match the whole string
+                    return sb;
+                }
             }
-            sb.append(c);
-            switch (c) {
+            if (newLineMode && currentChar > 32) {
+                whitespacesOnly = false;
+            }
+            switch (currentChar) {
                 case '-':
-                    if (prevChar == c) { //Comment
-                        prevChar=(char) -1;
-                        i+=seekEol(sb);
-                        continue;
+                    if (previousChar == '-') { //Comment
+                        seekEol();
+                        whitespacesOnly = true;
+                        lastLineStart = position + 1;
                     }
                     break;
                 case '/':
-                    if (prevChar == '/') { //Comment
-                        prevChar=(char) -1;
-                        i+=seekEol(sb);
-                        continue;
+                    if (previousChar == '/') { //Comment
+                        seekEol();
                     }
                     break;
                 case '*':
-                    if (prevChar == '/') {
-                        i+=seekEndCStyleComment(sb);
-                        prevChar=(char) -1;
-                        continue;
+                    if (previousChar == '/') {
+                        seekEndCStyleComment();
                     }
                     break;
                 case '"':
-                    i=seekQuote(sb, '\"', i);
-                    prevChar=(char) -1;
-                    continue;
+                    seekQuote('\"');
+                    break;
                 case '\'':
-                    i=seekQuote(sb, '\'', i);
-                    prevChar=(char) -1;
-                    continue;
+                    seekQuote('\'');
+                    break;
                 case '?':
                 case '$':
-                    injections.add(i);
+                    injections.add(position);
+                    break;
+                case '\r':
+                case '\n': //new line started
+                    whitespacesOnly = true;
+                    lastLineStart = position + 1;
                     break;
             }
 
-            prevChar = c;
+            previousChar = currentChar;
         }
-        if (sb.length()>0) {
+        if (sb.length() > 0) {
             return sb;
-        } else return n>=0?sb:null;
+        } else return n >= 0 ? sb : null;
     }
 
     /**
@@ -108,54 +141,81 @@ public class SqlTokenizer {
     public List<Integer> getInjections() {
         return injections;
     }
-    private int seekQuote(StringBuilder sb, char q, int pos) throws IOException {
-        int i=pos+1;
-        for (int n; (n = reader.read()) >= 0;i++) {
+
+    private void seekQuote(char q) throws IOException {
+        position++;
+        for (int n; (n = reader.read()) >= 0; position++) {
             sb.append((char) n);
-            if ('$'==n) { //$ expressions are substituted in quotes
-                injections.add(i);
+            if ('$' == n) { //$ expressions are substituted in quotes
+                injections.add(position);
             } else if (q == n) {  //quote
-                return i;
+                return;
             }
         }
-        return i;
-
     }
 
-    private int seekEol(StringBuilder sb) throws IOException {
-        int i=0;
-        for (int n; (n = reader.read()) >= 0; i++) {
+    private void seekEol() throws IOException {
+        position++;
+        for (int n; (n = reader.read()) >= 0; position++) {
             sb.append((char) n);
             if ('\r' == n || '\n' == n) {  //EOL
-                return i+1;
+                return;
             }
         }
-        return i;
     }
 
-    private int seekEndCStyleComment(StringBuilder sb) throws IOException {
-        char prevChar = (char) -1;
-        int i=0;
-        for (int n; (n = reader.read()) >= 0; i++) {
+    private void seekEndCStyleComment() throws IOException {
+        position++;
+        for (int n; (n = reader.read()) >= 0; position++) {
             sb.append((char) n);
-            if ('/' == n && prevChar == '*') {  // / * Comment
-                return i+1;
+            if ('/' == n && previousChar == '*') {  // / * Comment
+                previousChar = (char) n;
+                return;
             }
-            prevChar = (char) n;
+            previousChar = (char) n;
         }
-        return i;
     }
 
-    public char getSeparator() {
-        return separator;
+    public String getSeparator() {
+        return new String(separator).intern();
     }
 
     /**
      * Sets statements separator.
-     * @param separator statements separator. Default value is ';'
+     *
+     * @param separator statements separator. Default value is &quot;;&quot;
      */
-    public void setSeparator(char separator) {
-        this.separator = separator;
+    public void setSeparator(String separator) {
+        if (StringUtils.isEmpty(separator)) {
+            throw new IllegalArgumentException("separator string cannot be empty");
+        }
+        this.separator = separator.toCharArray();
+    }
+
+    public boolean isSeparatorOnSingleLine() {
+        return separatorOnSingleLine;
+    }
+
+    public boolean isTrim() {
+        return trim;
+    }
+
+    /**
+     * Sets line trimming option.
+     *
+     * @param trim true if extra ASCII whitespaces should be removed from a line.
+     */
+    public void setTrim(boolean trim) {
+        this.trim = trim;
+    }
+
+    /**
+     * Sets the separator mode.
+     *
+     * @param separatorOnSingleLine true if {@link #separator} must be on a single line.
+     */
+    public void setSeparatorOnSingleLine(boolean separatorOnSingleLine) {
+        this.separatorOnSingleLine = separatorOnSingleLine;
     }
 
     public static void main(String[] args) throws IOException {
@@ -171,6 +231,46 @@ public class SqlTokenizer {
         }
 
     }
+
+    private class SeparatorMatcher {
+        private boolean matches() throws IOException {
+            final int separatorLength = separator.length;
+            for (int j = 1, n; (j < separatorLength) && (n = reader.read()) >= 0; j++) {
+                position++;
+                previousChar = currentChar;
+                currentChar = (char) n;
+                sb.append(currentChar);
+                if (separator[j] != n) {
+                    return false;
+                }
+
+            }
+            if (!separatorOnSingleLine) {
+                final int len = sb.length();
+                sb.delete(len - separatorLength, len);
+                return true;
+            } else {
+                for (int n; (n = reader.read()) >= 0;) {
+                    position++;
+                    previousChar = currentChar;
+                    currentChar = (char) n;
+                    sb.append(currentChar);
+                    if (n > 32) {
+                        return false;
+                    } else if (n == '\r' || n == '\n') {
+                        break;
+                    }
+                }
+                sb.delete(lastLineStart, sb.length());
+                return true;
+            }
+        }
+    }
+
+    public void close() throws IOException {
+        reader.close();
+    }
+
 
 }
 

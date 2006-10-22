@@ -28,6 +28,18 @@ Scriptella JDBC Bridge.
         <td>Size of prepared statements cache or 0 to disable statement caching.</td>
         <td>No, the default value is 100.</td>
     </tr>
+    <tr>
+        <td>statement.separator</td>
+        <td>SQL statements separator string. Similar to Ant delimiter property.</td>
+        <td>No, the default value is <code>;</code> (semicolon).</td>
+    </tr>
+    <tr>
+        <td>statement.separator.singleline</td>
+        <td>True if the delimiter should only be recognized on a line by itself. Leading and trailing whitespaces are
+        ignored when searching for a separator in <code>statement.separator.singleline=true</code> mode.
+            Similar to Ant delimitertype property.</td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
 </table>
 <h2>Properties Substitution</h2>
 The bridge supports standard ${} variables expansion and
@@ -44,8 +56,8 @@ select * FROM table_name where id=?
 </code></pre>
 <p><u>Notes:</u>
 <ul>
-    <li>$ prefixed expressions are substituted in all parts except comments.
-    <li>? prefixed expressions are not substituted inside quotes and comments.
+    <li>$ prefixed expressions are substituted in all parts except comments.</li>
+    <li>? prefixed expressions are not substituted inside quotes and comments.</li>
     <br>Example:
     <code>
     <pre>--only ${prop} and ?surname are handled
@@ -56,7 +68,13 @@ select * FROM table_name where id=?
 
 <h2>Examples</h2>
 <code><pre>
-    &lt;connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="hsqldb.jar"/&gt;
+    &lt;connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="hsqldb.jar"&gt;
+        #Disable cache - just for example
+        statement.cache=0
+        #Set SQL statements separator
+        statement.separator=;
+    &lt;/connection>
+
     &lt;connection id="out" driver="h2" url="jdbc:h2:file:out" user="sa"/&gt;
     &lt;query connection-id="in"&gt;
         SELECT * from Bug

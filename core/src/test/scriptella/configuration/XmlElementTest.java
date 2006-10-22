@@ -18,6 +18,8 @@ package scriptella.configuration;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import scriptella.AbstractTestCase;
+import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.MockParametersCallbacks;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -68,7 +70,7 @@ public class XmlElementTest extends AbstractTestCase {
     static XmlElement asElement(String xml) {
         try {
             Element el = BUILDER.parse(new InputSource(new StringReader(xml))).getDocumentElement();
-            return new XmlElement(el, new URL("file:/test"));
+            return new XmlElement(el, new URL("file:/test"), new PropertiesSubstitutor(MockParametersCallbacks.NULL));
         } catch (Exception e) {
             throw new IllegalStateException("Unable to create XML element", e);
         }

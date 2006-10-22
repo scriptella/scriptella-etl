@@ -62,4 +62,10 @@ public class StringUtilsTest extends AbstractTestCase {
         }
 
     }
+
+    public void testConsoleFormat() {
+        String sep = System.getProperty("line.separator");
+        String test = "    \u0000 test\r\n  line2\r  line3 ";
+        assertEquals("test"+sep+" line2"+sep+" line3", StringUtils.consoleFormat(test));
+    }
 }

@@ -71,7 +71,8 @@ This element may contain properties as plain text with includes.
  @attr password database password
  @attr catalog catalog
  @attr schema schema
- @attr classpath the classpath to use when loading the driver. Paths are resolved relative to a directory where scripts file resides.
+ @attr classpath the classpath to use when loading the driver. Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides. Absolute URLs are also supported, e.g. ftp://server/lib.jar
+ @attr lazy-init <b>true</b> if connection initialization should be deferred until it is actually used. The default value of <b>false</b> means that connection is initialized on ETL startup.  
 -->
 <!ATTLIST connection
 id ID #IMPLIED
@@ -82,6 +83,7 @@ password CDATA #IMPLIED
 catalog CDATA #IMPLIED
 schema CDATA #IMPLIED
 classpath CDATA #IMPLIED
+lazy-init (true | false) "false"
 >
 <!--
 The fallback element contains alternate content to be used if the requested resource cannot be found.
@@ -89,7 +91,13 @@ This element may contain plain text or includes.
 <p><u>Example:</u>
 %
 <include href="http://no-such-url/file.txt">
-    <fallback>Failed to retrieve full text</fallback>
+    <fallback> //First fallback
+        <include href="localFile.txt>
+            <fallback> //If alternative location also failed
+                Failed to retrieve full text
+            </fallback>
+        </include>
+    </fallback>
 </include>
 %
 -->
@@ -97,11 +105,15 @@ This element may contain plain text or includes.
 
 <!--
 The include element specifies content to include. Concept similar to XInclude.
-This element may contain plain text, includes or fallbacks.
+<p><u>Examples:</u>
+%
+<include href="http://host/file.sql"><fallback>SHUTDOWN</fallback></include>
+<include href="db/schema.sql"/>
+%
 -->
 <!ELEMENT include (fallback?)>
 <!--
-@attr href contains an URL pointing to the file to include
+@attr href contains an URI pointing to the file to include. URIs are resolved relative to ETL file.
 @attr encoding Included text encoding name.
 -->
 <!ATTLIST include

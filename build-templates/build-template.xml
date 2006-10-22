@@ -54,13 +54,13 @@
     </target>
 
     <target name="jar" depends="compile, resources">
-        <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}" manifest="../build-templates/MANIFEST.MF">
-            <manifest>
-                <attribute name="Implementation-Title" value="${ant.project.name} Module"/>
-                <attribute name="Build-Date" value="${TODAY}"/>
-                <attribute name="Implementation-Version" value="${version}"/>
-            </manifest>
-        </jar>
+        <copy todir="${tmp.dir}" file="../build-templates/MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
     </target>
 
 </project>

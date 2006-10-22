@@ -20,11 +20,14 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
+import scriptella.core.ThreadSafe;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -39,6 +42,7 @@ public class ConfigurationFactory {
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "etl.dtd";
     private URL resourceURL;
+    private Map<String, String> externalProperties;
 
     static {
         setValidating(true);
@@ -47,6 +51,7 @@ public class ConfigurationFactory {
 
     /**
      * Sets validation option.
+     *
      * @param validating true if XML file validation should be performed.
      */
     public static void setValidating(boolean validating) {
@@ -64,13 +69,40 @@ public class ConfigurationFactory {
         this.resourceURL = resourceURL;
     }
 
+    /**
+     * A getter for external Properties.
+     *
+     * @return external properties set by {@link #setExternalProperties}.
+     */
+    @ThreadSafe
+    public Map<String, String> getExternalProperties() {
+        return externalProperties;
+    }
+
+    /**
+     * Sets additional properties.
+     * <p>External properties takes precedence over properties specified
+     * in ETL &lt;properties&gt; element.
+     * <p>Intended for integration with other systems like ant.
+     *
+     * @param externalProperties external properties. Nulls allowed.
+     */
+    @ThreadSafe
+    public void setExternalProperties(final Map<String, String> externalProperties) {
+        if (externalProperties==null) {
+            this.externalProperties=null;
+        } else {
+            this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
+        }
+    }
+
     public ConfigurationEl createConfiguration() {
         try {
             DocumentBuilder db = DBF.newDocumentBuilder();
             db.setEntityResolver(new EntityResolver() {
                 public InputSource resolveEntity(final String publicId,
                                                  final String systemId) {
-                    if (systemId!=null && systemId.trim().endsWith(DTD_NAME)) {
+                    if (systemId != null && systemId.trim().endsWith(DTD_NAME)) {
                         return new InputSource(ConfigurationFactory.class.getResourceAsStream(
                                 "/scriptella/dtd/" + DTD_NAME));
                     }
@@ -116,9 +148,11 @@ public class ConfigurationFactory {
 
             final InputSource inputSource = new InputSource(resourceURL.toString());
             final Document document = db.parse(inputSource);
+            PropertiesMerger merger = externalProperties == null ?
+                    new PropertiesMerger() : new PropertiesMerger(externalProperties);
 
             return new ConfigurationEl(new XmlElement(
-                    document.getDocumentElement(), resourceURL));
+                    document.getDocumentElement(), resourceURL, merger.getSubstitutor()), merger);
         } catch (IOException e) {
             throw new ConfigurationException("Unable to load document: " + e.getMessage(), e);
         } catch (Exception e) {

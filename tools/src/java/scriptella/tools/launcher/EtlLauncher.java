@@ -23,6 +23,7 @@ import scriptella.execution.ExecutionStatistics;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
+import scriptella.tools.template.TemplateManager;
 import scriptella.util.BugReport;
 import scriptella.util.CollectionUtils;
 import scriptella.util.StringUtils;
@@ -82,7 +83,8 @@ public class EtlLauncher {
     private EtlExecutor exec = new EtlExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
-    private static final String DEFAULT_FILE_NAME = "etl.xml";
+    private Map<String,String> properties;
+    public static final String DEFAULT_FILE_NAME = "etl.xml";
 
     public EtlLauncher() {
     }
@@ -118,6 +120,10 @@ public class EtlLauncher {
                 }
                 if (arg.startsWith("-v")) {
                     printVersion();
+                    return 0;
+                }
+                if (arg.startsWith("-t")) {
+                    template();
                     return 0;
                 }
                 if (arg.startsWith("-")) {
@@ -161,13 +167,14 @@ public class EtlLauncher {
                 }
             }
         }
+        LoggingConfigurer.remove(h);
 
         return failed?1:0;
     }
 
     protected void printVersion() {
-        Package p = Package.getPackage("scriptella.tools");
-        if (p != null) {
+        Package p = getClass().getPackage();
+        if (p != null && p.getSpecificationTitle() != null && p.getImplementationVersion() != null) {
             out.println(p.getSpecificationTitle() + " Version " + p.getImplementationVersion());
         } else {
             out.println("Scriptella version information unavailable");
@@ -177,14 +184,23 @@ public class EtlLauncher {
     protected void printUsage() {
         out.println("scriptella [-options] [<file 1> ... <file N>]");
         out.println("Options:");
-        out.println("  -help,    -h        display help ");
-        out.println("  -debug,   -d        print debugging information");
-        out.println("  -quiet,   -q        be extra quiet");
-        out.println("  -version, -v        print version");
+        out.println("  -help,     -h        display help ");
+        out.println("  -debug,    -d        print debugging information");
+        out.println("  -quiet,    -q        be extra quiet");
+        out.println("  -version,  -v        print version");
+        out.println("  -template, -t        creates an etl.xml template file in the current directory");
+    }
+
+    protected void template() {
+        try {
+            new TemplateManager().create();
+        } catch (Exception e) {
+            err.println(e.getMessage());
+        }
     }
 
     public void setProperties(final Map<String,String> props) {
-        exec.setExternalProperties(props);
+        properties=props;
     }
 
     public void setProgressIndicator(final ProgressIndicator indicator) {
@@ -200,7 +216,9 @@ public class EtlLauncher {
                     file.getPath(), e);
         }
 
+        factory.setExternalProperties(properties);
         final ConfigurationEl c = factory.createConfiguration();
+
         exec.setConfiguration(c);
         ExecutionStatistics st = exec.execute(indicator);
 
