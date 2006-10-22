@@ -71,7 +71,12 @@
             <fileset dir="${drivers}/build" includes="*.jar"/>
         </copy>
         <delete file="${build.dir}/${jar.name}" failonerror="no"/>
-        <jar destfile="${build.dir}/${jar.name}" manifest="build-templates/MANIFEST.MF">
+        <copy todir="${tmp.dir}" file="${basedir}/build-templates/MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+        <jar destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF">
             <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
@@ -82,9 +87,6 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
-                <attribute name="Implementation-Title" value="Scriptella Core and Drivers"/>
-                <attribute name="Implementation-Version" value="${version}"/>
-                <attribute name="Build-Date" value="${TODAY}"/>
             </manifest>
         </jar>
         <!-- Update samples libs --> 

@@ -27,7 +27,6 @@ import java.util.Map;
  * @version 1.0
  */
 public class ConnectionParameters {
-
     private Map<String, String> properties;
     private String url;
     private String user;

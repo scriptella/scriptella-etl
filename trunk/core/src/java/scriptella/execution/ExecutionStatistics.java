@@ -68,6 +68,10 @@ public class ExecutionStatistics {
     }
 
     public String toString() {
+        final Collection<ElementInfo> elements = getElements();
+        if (elements.isEmpty()) {
+            return "No elements executed";
+        }
         StringBuilder sb = new StringBuilder(1024);
         NumberFormat doubleFormat = new DecimalFormat("0.00");
         sb.append("Executed ");
@@ -87,7 +91,7 @@ public class ExecutionStatistics {
 
         sb.append('\n');
 
-        for (ElementInfo ei : getElements()) {
+        for (ElementInfo ei : elements) {
             sb.append(ei.id).append(":");
 
             if (ei.okCount>0) {

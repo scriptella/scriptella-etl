@@ -1,3 +1,6 @@
 Specification-Title: Scriptella ETL and Scripts Execution Tool.
 Specification-Vendor: The Scriptella Project Team
 Implementation-Vendor: The Scriptella Project Team
+Implementation-Title: Scriptella ETL and Scripts Execution Tool.
+Implementation-Version: ${version}
+Build-Date: ${TODAY}

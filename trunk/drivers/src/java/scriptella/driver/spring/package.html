@@ -45,7 +45,7 @@ properties and dependencies like progress indicator may also be injected.
     &lt;bean id="executor" class="<b>scriptella.driver.spring.EtlExecutorBean</b>">
         &lt;property name="configLocation">&lt;value>etl.xml&lt;/value>&lt;/property>
         &lt;property name="progressIndicator">&lt;ref local="progress"/>&lt;/property>
-        &lt;property name="externalProperties">&lt;map>
+        &lt;property name="properties">&lt;map>
             &lt;entry key="tableName">&lt;value>Spring_Table&lt;/value>&lt;/entry>
             &lt;/map>
         &lt;/property>

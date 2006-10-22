@@ -10,7 +10,7 @@
     </bean>
     <bean id="executor" class="scriptella.driver.spring.EtlExecutorBean">
         <property name="configLocation"><value>/scriptella/driver/spring/SpringDriverTest.xml</value></property>
-        <property name="externalProperties"><map>
+        <property name="properties"><map>
             <entry key="tableName"><value>SpringTable</value></entry>
             </map>
         </property>

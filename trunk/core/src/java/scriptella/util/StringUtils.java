@@ -15,6 +15,8 @@
  */
 package scriptella.util;
 
+import java.util.regex.Pattern;
+
 /**
  * Miscellaneous String/CharSequence utility methods.
  *
@@ -77,6 +79,31 @@ public final class StringUtils {
             }
             return true;
         }
+
+    private static Pattern WHITESPACES = Pattern.compile("[\\x00-\\x20&&[^\\r\\n]]+");
+    private static Pattern EOLS = Pattern.compile("[\\r\\n]+");
+
+    /**
+     * Formats specified string for console suitable representation.
+     * <p>All EOL char sequences are replaced with a single system line.separator,
+     * and all other whitespace sequences are replaced with a single space.
+     * @param string string to format. Nulls are allowed.
+     * @return formatted string.
+     */
+    public static String consoleFormat(String string) {
+        if (string==null) {
+            return "";
+        }
+        String res = string.trim();
+        String sep = System.getProperty("line.separator");
+        if (sep==null) {
+            sep="\n";
+        }
+        res = EOLS.matcher(res).replaceAll(sep);
+        res = WHITESPACES.matcher(res).replaceAll(" ");
+        return res;
+    }
+
 
 
 }

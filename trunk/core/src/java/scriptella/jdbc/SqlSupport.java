@@ -19,6 +19,7 @@ import scriptella.core.StatisticInterceptor;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
+import scriptella.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -51,8 +52,8 @@ public class SqlSupport implements Closeable {
 
         this.resource = resource;
         this.connection = connection;
-        converter = connection.newConverter();
-        cache = connection.newStatementCache();
+        converter = new JdbcTypesConverter();
+        cache = new StatementCache(connection.getNativeConnection(), connection.statementCacheSize);
     }
 
 
@@ -62,7 +63,8 @@ public class SqlSupport implements Closeable {
 
         try {
             final Reader reader = resource.open();
-            parser.parse(reader);
+            SqlTokenizer tok = new SqlTokenizer(reader, this.connection.separator, this.connection.separatorSingleLine);
+            parser.parse(tok);
         } catch (IOException e) {
             throw new JdbcException("Failed to open resource", e);
         }
@@ -129,7 +131,7 @@ public class SqlSupport implements Closeable {
                     updateCount = sw.update();
                 }
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("     Statement" + sql.trim() +
+                    LOG.fine("     Statement " + StringUtils.consoleFormat(sql.trim()) +
                             (params.isEmpty() ? "" : ", Parameters: " + params) +
                             " executed. " + (updateCount >= 0 ? "Update count=" + updateCount : ""));
                 }

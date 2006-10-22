@@ -15,6 +15,8 @@
  */
 package scriptella.configuration;
 
+import scriptella.spi.ParametersCallback;
+
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -31,10 +33,11 @@ import java.util.Set;
 public class ConfigurationEl extends XmlConfigurableBase {
     private List<ConnectionEl> connections;
     private List<ScriptingElement> scriptingElements;
-    private PropertiesEl properties;
+    private PropertiesMerger propertiesMerger;
     private URL documentUrl;
 
-    public ConfigurationEl(XmlElement element) {
+    public ConfigurationEl(XmlElement element, PropertiesMerger merger) {
+        propertiesMerger = merger;
         configure(element);
     }
 
@@ -54,8 +57,11 @@ public class ConfigurationEl extends XmlConfigurableBase {
         this.scriptingElements = scriptingElements;
     }
 
-    public Map<String, String> getProperties() {
-        return properties.getMap();
+    /**
+     * Returns this configuration properties merged with external ones specified in a factory. 
+     */
+    public ParametersCallback getProperties() {
+        return propertiesMerger;
     }
 
     public URL getDocumentUrl() {
@@ -68,7 +74,10 @@ public class ConfigurationEl extends XmlConfigurableBase {
 
     public void configure(final XmlElement element) {
         documentUrl = element.getDocumentURL();
-        properties = new PropertiesEl(element.getChild("properties"));
+
+        Map<String,String> xmlProps = new PropertiesEl(element.getChild("properties")).getMap();
+        //Now merge external and local xml properties
+        propertiesMerger.addProperties(xmlProps);
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
@@ -119,7 +128,7 @@ public class ConfigurationEl extends XmlConfigurableBase {
 
     public String toString() {
         return "ConfigurationEl{" + "connections=" + connections +
-                ", scriptingElements=" + scriptingElements + ", properties=" + properties +
+                ", scriptingElements=" + scriptingElements + ", properties=" + propertiesMerger +
                 ", documentUrl=" + documentUrl + "}";
     }
 }

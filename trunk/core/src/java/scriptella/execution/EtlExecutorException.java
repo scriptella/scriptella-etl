@@ -19,6 +19,7 @@ import scriptella.configuration.Location;
 import scriptella.core.ExceptionInterceptor;
 import scriptella.expression.Expression;
 import scriptella.spi.ProviderException;
+import scriptella.util.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -88,8 +89,9 @@ public class EtlExecutorException extends Exception {
             pw.print(lastExpression.getMessage());
             pw.println();
         }
-        this.message = out.toString();
+        this.message = StringUtils.consoleFormat(out.toString());
     }
+
 
     public String getMessage() {
         return message;

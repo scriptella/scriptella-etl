@@ -18,7 +18,7 @@ package scriptella.configuration;
 import java.util.Map;
 
 /**
- * TODO: Add documentation
+ * Connection configuration element.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -33,6 +33,7 @@ public class ConnectionEl extends XmlConfigurableBase {
     private String schema;
     private String classpath;
     private PropertiesEl properties;
+    private boolean lazyInit;
 
     public ConnectionEl() {
     }
@@ -101,6 +102,14 @@ public class ConnectionEl extends XmlConfigurableBase {
         this.classpath = classpath;
     }
 
+    public boolean isLazyInit() {
+        return lazyInit;
+    }
+
+    public void setLazyInit(boolean lazyInit) {
+        this.lazyInit = lazyInit;
+    }
+
     /**
      * @return Map of properties for this connection.
      */
@@ -117,6 +126,8 @@ public class ConnectionEl extends XmlConfigurableBase {
         setProperty(element, "password");
         setProperty(element, "catalog");
         setProperty(element, "schema");
+        setProperty(element, "classpath");
+        lazyInit = element.getBooleanAttribute("lazy-init", false);
         setProperty(element, "classpath");
         properties = new PropertiesEl(element);
     }

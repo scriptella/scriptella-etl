@@ -42,12 +42,13 @@ By default the current directory file etl.xml is executed. Use file attribute to
 			<source><![CDATA[
 java -jar scriptella.jar [arguments]
                 ]]></source>
-			<note>
+            <note>
                 You may use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar
                 to specify additional classpath (overcomes -jar option limitation). In this case
                 you don't have to define connection classpath attributes.
             </note>
-		</section>
+            <p>Type <code>scriptella -t</code> to create a template etl.xml file for a quick start.</p>
+        </section>
 		<section>
 			<title>Examples</title>
             <section>

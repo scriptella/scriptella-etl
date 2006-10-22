@@ -15,8 +15,6 @@
  */
 package scriptella.spi;
 
-import java.util.Map;
-
 /**
  * Set of common implementations for testing.
  *
@@ -48,15 +46,4 @@ public class MockParametersCallbacks {
             throw new UnsupportedOperationException();
         }
     };
-
-
-    public static ParametersCallback fromMap(final Map<String, ?> map) {
-        return new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return map.get(name);
-            }
-        };
-
-    }
-
 }

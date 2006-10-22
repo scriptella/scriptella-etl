@@ -36,4 +36,13 @@ public class SqlTokenizerPerfTest extends AbstractTestCase {
         while (tok.nextStatement()!=null) {
         }
     }
+    public void testNewLineSeparator() throws IOException {
+        String text = "INSERT INTO Table VALUES(?v,$v2);--Hint $v\n  / \r" +
+                "/* Comment */\n//comment\nUPDATE Test SET V=?{v2}";
+        RepeatingInputStream ris = new RepeatingInputStream(text.getBytes(), 20000);
+        SqlTokenizer tok = new SqlTokenizer(new InputStreamReader(ris));
+        while (tok.nextStatement()!=null) {
+        }
+    }
+
 }

@@ -49,10 +49,15 @@ public class Session {
         ProgressCallback progressCallback = ctx.getProgressCallback().fork(50, connections.size());
         for (ConnectionEl c : connections) {
             final ConnectionManager con = new ConnectionManager(ctx, c);
-            Connection connection = con.getConnection();
-            String id = connections.size() > 1 ? ("id=" + c.getId() + ", ") : "";//print an ID if more than one connection
-            progressCallback.step(1, "Connection " + id + connection.toString() +
-                    ", " + connection.getDialectIdentifier() + " registered");
+            if (c.isLazyInit()) {
+                progressCallback.step(1, "Lazy-init specified for connection" + (c.getId() == null ? " " : c.getId()) +
+                        "- initialization deferred.");
+            } else {
+                String id = connections.size() > 1 ? ("id=" + c.getId() + ", ") : "";//print an ID if more than one connection
+                Connection connection = con.getConnection();
+                progressCallback.step(1, "Connection " + id + connection.toString() +
+                        ", " + connection.getDialectIdentifier() + " registered");
+            }
             managedConnections.put(c.getId(), con);
         }
 
@@ -72,7 +77,7 @@ public class Session {
             }
             progressCallback.step(1, s.getLocation() + " prepared");
         }
-        
+
     }
 
     ConnectionManager getConnection(final String id) {

@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import scriptella.expression.PropertiesSubstitutor;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,15 +36,16 @@ import java.util.Set;
 public class XmlElement {
     private Element element;
     private URL documentURL;
+    private PropertiesSubstitutor substitutor;
 
-    public XmlElement(Element element, URL documentURI) {
+    public XmlElement(Element element, URL documentURI, PropertiesSubstitutor substitutor) {
         this.element = element;
         this.documentURL = documentURI;
+        this.substitutor = substitutor;
     }
 
     public XmlElement(Element element, XmlElement parent) {
-        this.element = element;
-        documentURL = parent.documentURL;
+        this(element, parent.documentURL, parent.substitutor);
     }
 
     public String getTagName() {
@@ -110,7 +112,7 @@ public class XmlElement {
         while (node != null) {
             if (node instanceof Element) {
                 if (name.equals(((Element) node).getTagName())) {
-                    res.add(new XmlElement((Element) node, documentURL));
+                    res.add(new XmlElement((Element) node, this));
                 }
             }
 
@@ -127,7 +129,7 @@ public class XmlElement {
         while (node != null) {
             if (node instanceof Element) {
                 if (names.contains(((Element) node).getTagName())) {
-                    res.add(new XmlElement((Element) node, documentURL));
+                    res.add(new XmlElement((Element) node, this));
                 }
             }
 
@@ -143,7 +145,7 @@ public class XmlElement {
         while (node != null) {
             if (node instanceof Element) {
                 if (name.equals(((Element) node).getTagName())) {
-                    return new XmlElement((Element) node, documentURL);
+                    return new XmlElement((Element) node, this);
                 }
             }
 
@@ -159,7 +161,7 @@ public class XmlElement {
 
         while (node != null) {
             if (node instanceof Element) {
-                result.add(new XmlElement((Element) node, documentURL));
+                result.add(new XmlElement((Element) node, this));
             }
 
             node = node.getNextSibling();
@@ -168,14 +170,26 @@ public class XmlElement {
         return result;
     }
 
+    /**
+     * Gets the value of attribute.
+     * <p>Additionally property {@link #expandProperties(String) expansion} is performed.
+     * @param attribute attribute name.
+     * @return value of the attribute or null if attribute is absent or has empty value.
+     */
     public String getAttribute(final String attribute) {
         final String a = element.getAttribute(attribute);
 
-        return ((a != null) && (a.length() == 0)) ? null : a;
+        return ((a != null) && (a.length() == 0)) ? null : expandProperties(a);
     }
 
-    protected boolean getBooleanProperty(final String attribute,
-                                         final boolean defaultValue) {
+    /**
+     * Returns the value of boolean attribute.
+     * @param attribute attribute name.
+     * @param defaultValue default value to use if attribute value unspecified.
+     * @see #getAttribute(String)
+     */
+    protected boolean getBooleanAttribute(final String attribute,
+                                          final boolean defaultValue) {
         final String a = getAttribute(attribute);
 
         if (a == null) {
@@ -196,4 +210,14 @@ public class XmlElement {
                 "' of boolean attribute " + attribute +
                 ". Valid values: yes/no, true/false, 1/0, on/off", this);
     }
+
+    /**
+     * Expands properties in a string.
+     * @param s string to expand properties.
+     * @return string with substituted properties.
+     */
+    public String expandProperties(final String s) {
+        return substitutor.substitute(s);
+    }
+
 }

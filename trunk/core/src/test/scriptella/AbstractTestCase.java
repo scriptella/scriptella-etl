@@ -34,6 +34,7 @@ import java.net.URLStreamHandlerFactory;
 
 /**
  * TODO: Add documentation
+ * TODO: add integration testcase subclass.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -112,7 +113,7 @@ public abstract class AbstractTestCase extends TestCase {
     }
 
     protected ConfigurationEl loadConfiguration(final String path) {
-        ConfigurationFactory cf = new ConfigurationFactory();
+        ConfigurationFactory cf = newConfigurationFactory();
         final URL resource = getClass().getResource(path);
 
         if (resource == null) {
@@ -122,6 +123,13 @@ public abstract class AbstractTestCase extends TestCase {
         cf.setResourceURL(resource);
 
         return cf.createConfiguration();
+    }
+
+    /**
+     * Overridable method to allow factory customization.
+     */
+    protected ConfigurationFactory newConfigurationFactory() {
+        return new ConfigurationFactory();
     }
 
     /**
