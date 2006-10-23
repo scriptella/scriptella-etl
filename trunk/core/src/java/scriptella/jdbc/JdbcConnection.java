@@ -47,8 +47,8 @@ public class JdbcConnection extends AbstractConnection {
     private boolean transactable = false;
     private ParametersParser parametersParser;
     int statementCacheSize = 100;
-    String separator = ";";
-    boolean separatorSingleLine;
+    protected String separator = ";";
+    protected boolean separatorSingleLine;
     private final Map<Resource, SqlSupport> resourcesMap = new IdentityHashMap<Resource, SqlSupport>();
 
     public JdbcConnection(Connection con, ConnectionParameters parameters) {
