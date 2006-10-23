@@ -128,21 +128,36 @@
                     Boot classpath libraries take precedence over libraries specified in connection classpath attribute.
                 </p>
                 <p>
-                    <strong>lazy-init</strong> optional attribute specifies connection initialization strategy.
-                    <code>true</code> if connection initialization should be deferred until it is actually used.
-                    The default value of <code>false</code> means that connection is initialized on ETL startup.
-                    Lazy connection initialization may be useful in following cases:
-                    <ul>
-                        <li>A script or a query operating with this connection has conditional <b>if</b> attribute, in
-                        this case greedy initialization may be redundant</li>
-                        <li>Other connections create database users or produce files required for this connection
-                        to be initialized properly.</li>
-                    </ul>
+                    <strong>lazy-init</strong>
+                    optional attribute specifies connection initialization strategy.
+                    <code>true</code>
+                    if connection initialization should be deferred until it is actually used.
+                    The default value of
+                    <code>false</code>
+                    means that connection is initialized on ETL startup.
+                    Lazy connection initialization may be useful in the following cases:
                 </p>
+                <ul>
+                    <li>A script or a query operating with this connection has conditional <strong>if</strong>
+                        attribute, in this case greedy initialization may be redundant
+                    </li>
+                    <li>Other connections create database users or produce files required for this connection
+                        to be initialized properly.</li>
+                </ul>
+                <p>Use element's content to set connection properties. Several drivers also recognize
+                    connection properties in a URL string, e.g. jdbc:url:db;param=value</p>
+                <p>
+                    <strong>Example</strong>
+                </p>
+                <source><![CDATA[
+<!-- Declare a connection to Oracle database using sys user-->
+<connection driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB" user="sys as sysdba" password="password">
+    #Connection properties
+    plsql=true
+</connection>]]>
+                </source>
 
-                <p>Use element's content to pass properties into connection. Several driver also support
-                connection properties in URL string.</p>
-			</section>
+            </section>
 			<section>
 				<title>&lt;script&gt;</title>
 				<p>Elements of this type contain executable content. The script language is connection specific.
@@ -308,11 +323,11 @@
 						<td>-version, -v</td>
 						<td>print version</td>
 					</tr>
-                    <tr>
-                        <td>-template, -t</td>
-                        <td>creates an etl.xml template file in the current directory</td>
-                    </tr>
-                </table>
+					<tr>
+						<td>-template, -t</td>
+						<td>creates an etl.xml template file in the current directory</td>
+					</tr>
+				</table>
 			</section>
 			<fixme author="ejboy">Describe command line tools</fixme>
 		</section>
@@ -399,37 +414,37 @@
 				</section>
 			</section>
 		</section>
-        <section id="inprocess">
-            <title>In-Process Java Integration</title>
-            <p>Although Ant and command line execution are the most typical usage scenarious, it may be helpful to
+		<section id="inprocess">
+			<title>In-Process Java Integration</title>
+			<p>Although Ant and command line execution are the most typical usage scenarious, it may be helpful to
                 invoke
                 Scriptella directly from Java code. Typical use cases for in-process integration:</p>
-            <ul>
-                <li>Preparing datasources for testing. Example: create the database before a test case, and cleanup on
+			<ul>
+				<li>Preparing datasources for testing. Example: create the database before a test case, and cleanup on
                     test completion.</li>
-                <li>Creating/upgrading database schema on application startup. Example: creating a database on web
+				<li>Creating/upgrading database schema on application startup. Example: creating a database on web
                     application initialization, very helpful in user friendly, zero-deployment or demo
                     applications.</li>
-                <li>Custom migration solutions. Example: Client uploads a CSV file to a J2EE server and then Scriptella
+				<li>Custom migration solutions. Example: Client uploads a CSV file to a J2EE server and then Scriptella
                     managed ETL script imports CSV data into several database tables.</li>
-            </ul>
-            <p>The invocation from java code is simple:</p>
-            <ul>
-                <li>Make sure scriptella.jar is available on classpath.</li>
-                <li>Use EtlExecutor.newExecutor to execute an ETL file. See
+			</ul>
+			<p>The invocation from java code is simple:</p>
+			<ul>
+				<li>Make sure scriptella.jar is available on classpath.</li>
+				<li>Use EtlExecutor.newExecutor to execute an ETL file. See
                     <a href="../docs/api/scriptella/execution/EtlExecutor.html">EtlExecutor Javadoc</a>
                     for more details.
                 </li>
-            </ul>
-            <note>
+			</ul>
+			<note>
                 Typically you will need a
                 <a href="drivers.html#spring">Spring Driver</a>
                 or a
                 <a href="drivers.html#jndi">JNDI Driver</a>
                 to integrate with application deployment environment (Spring, J2EE or other).
             </note>
-        </section>
-        <section>
+		</section>
+		<section>
 			<title>JDBC Adapters</title>
 			<p>Scriptella is bundled with a set of adapters for popular
             JDBC drivers. You are free to use any JDBC vendor drivers, but
@@ -556,14 +571,14 @@
 			</table>
 		</section>
 		<section>
-            <title>Best Practices</title>
-            <p>This chapter describes Scriptella usage best practices. The following list provides general
+			<title>Best Practices</title>
+			<p>This chapter describes Scriptella usage best practices. The following list provides general
                 recommendations for Scriptella ETL scripts:</p>
-            <ul>
-                <li>Do not hardcode connection properties and other configuration settings e.g. driver names, urls, mode
+			<ul>
+				<li>Do not hardcode connection properties and other configuration settings e.g. driver names, urls, mode
                     flags etc. Use a property file like etl.properties to store ETL configuration parameters</li>
-                <li>Use built-in Scriptella adapters for JDBC drivers if possible.</li>
-                <li>Use &lt;dialect&gt; for database specific SQL parts. Use properties to configure data types similar
+				<li>Use built-in Scriptella adapters for JDBC drivers if possible.</li>
+				<li>Use &lt;dialect&gt; for database specific SQL parts. Use properties to configure data types similar
                     to domains, example:
                     <source>
 CREATE TABLE User (
@@ -574,22 +589,21 @@ LOGIN $SMALL_STRING
 --stored in a mapping property file e.g. type-mapping.properties
 --and easily reconfigurable for another DB vendor
                     </source>
-                </li>
-                <li>Use JDBC escaping to specify time and date literals, function calls and other parameters
+				</li>
+				<li>Use JDBC escaping to specify time and date literals, function calls and other parameters
                     independently from DB vendor. Examples:
                     <br/>
                     Calls without a return value:
                     <code>{ call procedure_name (argument1, argument2,...) }</code>
-                    <br/>
+					<br/>
                     Calls with a return value:
                     <code>{ ? = call procedure_name (argument1, argument2,...) }</code>
-                    <br/>
+					<br/>
                     Timestamp Literals:
                     <code>{ts 'yyyy-mm-dd hh:mm:ss.f...'}</code>
-                    <br/>
-                </li>
-
-                <li>Use
+					<br/>
+				</li>
+				<li>Use
                     <strong>.etl.xml</strong>
                     naming convention for ETL scripts. In this case it would be easy to recognize scriptella
                     files, moreover you wont have
@@ -601,30 +615,29 @@ LOGIN $SMALL_STRING
                     <code>init</code>
                     was found.
                 </li>
-                <li>For large bulk-insert files use &lt;include&gt; element to avoid loading a whole file into
+				<li>For large bulk-insert files use &lt;include&gt; element to avoid loading a whole file into
                     memory.</li>
-            </ul>
-            <section>
-                <title>Using Scriptella as a Database Schema Evolution Tool</title>
-                <p>
-                    <strong>dbupgrade</strong>
+			</ul>
+			<section>
+				<title>Using Scriptella as a Database Schema Evolution Tool</title>
+				<p>
+					<strong>dbupgrade</strong>
                     example shows how to build a simple database upgrade(downgrade) script. The following steps are
                     required to create a simple database upgrade framework:
                 </p>
-                <ul>
-                    <li>If no DB present create an new database and fill it with up-to-date inital script</li>
-                    <li>If old DB is present apply a set of incremental updates to migrate from version X to Y.</li>
-                </ul>
-                <p>Scriptella provides enough features to create a simple database upgrade framework, but the primary
+				<ul>
+					<li>If no DB present create an new database and fill it with up-to-date inital script</li>
+					<li>If old DB is present apply a set of incremental updates to migrate from version X to Y.</li>
+				</ul>
+				<p>Scriptella provides enough features to create a simple database upgrade framework, but the primary
                     one is the ability to work with several datasources.
                     This means you can change database vendors between builds and synchronize several datasources, e.g.
                     LDAP-Database.</p>
-                <p>Scriptella is lightweight and can be easily added to a set of application libraries during
+				<p>Scriptella is lightweight and can be easily added to a set of application libraries during
                     deployment. In this case you can integrate your schema upgrade solution
                     with application startup procedure typically written as a set of webapp context listeners or
                     initializer servlets.</p>
-
-            </section>
+			</section>
 		</section>
 	</body>
 </document>

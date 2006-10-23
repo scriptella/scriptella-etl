@@ -56,7 +56,20 @@
 					<td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
                         environment</td>
 				</tr>
-				<tr>
+                <tr>
+                    <td>
+                        <anchor id="oracle"/>
+                        <a href="../docs/api/scriptella/driver/oracle/package-summary.html">Oracle Database</a>
+                    </td>
+                    <td>scriptella.driver.oracle.Driver</td>
+                    <td>oracle.jdbc.driver.OracleDriver</td>
+                    <td>Built-in Scriptella driver for Oracle. The following extra features supported:
+                        <ul>
+                            <li>Simplified handling of PL/SQL blocks.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
 					<td>
 						<anchor id="spring"/>
 						<a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
