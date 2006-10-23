@@ -9,10 +9,56 @@
 		<title>General</title>
 		<faq id="DRIVERS">
 			<question>Where can I find documentation on script syntax for driver FOO/BAR/...?</question>
-			<answer>The up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
-			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</answer>
-		</faq>
+			<answer><p>The up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
+			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</p></answer>
+        </faq>
 		<!-- More faqs or parts here -->
 	</faqsection>
-	<!-- More faqs or parts here -->
+    <faqsection>
+        <title>SQL</title>
+        <faq id="PLSQL">
+            <question>How to create an Oracle trigger (run a PL/SQL block)?</question>
+            <answer><p>
+                To recognize Oracle PL/SQL statement blocks you'd have to specify <code>plsql=true</code> connection property
+                (supported only by <a href="reference/drivers.html#oracle">Scriptella Adapter for Oracle</a>).
+                In this case a slash(/) on a single line is used as a statement separator:</p>
+            <source><![CDATA[
+<connection driver="oracle" ...>
+    plsql=true
+</connection>
+<script>
+    CREATE OR REPLACE TRIGGER secure_del_trigger
+       BEFORE DELETE
+       ON emp
+       FOR EACH ROW
+    DECLARE
+       unauthorized_deletion   EXCEPTION;
+    BEGIN
+       IF <your business rule is violated> THEN
+         RAISE unauthorized_deletion;
+       END IF;
+    EXCEPTION
+       WHEN unauthorized_deletion
+       THEN
+          raise_application_error (-20500,
+            'This record cannot be deleted');
+    END;
+    /
+
+    -- Other statements separated with a slash on a single line
+</script>]]>
+
+            </source>
+                <p>If you are using Oracle JDBC driver directly then set the following configuration properties:</p>
+                <source><![CDATA[
+<connection driver="oracle.jdbc.driver.OracleDriver" ...>
+    statement.separator=/
+    statement.separator.singleline=true
+</connection>]]>
+                </source>
+                <p>This idea is similar to <a href="http://www.javaddicts.net/blog/index.php/2005/06/13/executing-oracle-plsql-from-ant/">Ant solution</a>.</p>
+            </answer>
+        </faq>
+    </faqsection>
+    <!-- More faqs or parts here -->
 </faqs>
