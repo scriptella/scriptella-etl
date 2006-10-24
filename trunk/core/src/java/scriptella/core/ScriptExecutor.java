@@ -20,6 +20,7 @@ import scriptella.configuration.OnErrorEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.spi.Connection;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.ProviderException;
 import scriptella.spi.Resource;
 import scriptella.util.ExceptionUtils;
 
@@ -89,7 +90,10 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         DialectIdentifier dialectId = con.getDialectIdentifier();
         if (onErrorEl != null) { //if error handler present for this case
             Resource content = onErrorEl.getContent(dialectId);
-            LOG.log(Level.WARNING, "Script " + getLocation() + " failed. Using onError handler: " + onErrorEl, t);
+            if (LOG.isLoggable(Level.INFO)) {
+                printErrorHandler(onErrorEl, t);
+            }
+
             try {
                 con.executeScript(content, ctx);
                 return onErrorEl.isRetry();
@@ -101,6 +105,21 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         }
         return false;
 
+    }
+
+    private void printErrorHandler(final OnErrorEl onErrorEl, final Throwable t) {
+        StringBuilder msg = new StringBuilder("Script ").append(getLocation()).append(" failed.");
+        if (t instanceof ProviderException) {
+            ProviderException pe = ((ProviderException) t);
+            String st = pe.getErrorStatement();
+            msg.append("Error statement: ").append(st).append('.');
+            if (pe.getNativeException() != null) {
+                msg.append("Native driver error: ").append(pe).append('.');
+            }
+            msg.append("Driver error: ").append(t).append('.');
+        }
+        msg.append(" Using onError handler: ").append(onErrorEl);
+        LOG.log(Level.INFO, msg.toString());
     }
 
 
