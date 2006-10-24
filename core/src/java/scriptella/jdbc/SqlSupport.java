@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,7 +46,7 @@ public class SqlSupport implements Closeable {
     protected final JdbcTypesConverter converter;
     protected final StatementCache cache;
 
-    public SqlSupport(Resource resource, JdbcConnection connection) {
+    public SqlSupport(final Resource resource, final JdbcConnection connection) {
         if (resource == null) {
             throw new IllegalArgumentException("Resource cannot be null");
         }
@@ -130,11 +131,7 @@ public class SqlSupport implements Closeable {
                 } else {
                     updateCount = sw.update();
                 }
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("     Statement " + StringUtils.consoleFormat(sql.trim()) +
-                            (params.isEmpty() ? "" : ", Parameters: " + params) +
-                            " executed. " + (updateCount >= 0 ? "Update count=" + updateCount : ""));
-                }
+                logExecutedStatement(sql, params, updateCount);
                 executedCount++;
                 return updateCount;
             } catch (SQLException e) {
@@ -154,8 +151,46 @@ public class SqlSupport implements Closeable {
 
         }
 
+        private void logExecutedStatement(final String sql, final List<?> parameters, final int updateCount) {
+            SQLWarning warnings = null;
+            try {
+                warnings = con.getWarnings();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to obtain SQL warnings", e);
 
+            }
+            Level level = warnings == null ? Level.FINE : Level.INFO;
+            if (warnings != null) { //If warnings present - use INFO priority
+                level = Level.INFO;
+            }
+
+            if (LOG.isLoggable(level)) {
+                StringBuilder sb = new StringBuilder("     Executed statement ");
+                sb.append(StringUtils.consoleFormat(sql));
+                if (!parameters.isEmpty()) {
+                    sb.append(", Parameters: ").append(parameters);
+                }
+                if (updateCount >= 0) {
+                    sb.append(". Update count: ").append(updateCount);
+                }
+                if (warnings != null) { //Iterate warnings
+                    sb.append(". SQL Warnings:");
+                    do {
+                        sb.append("\n * ").append(warnings);
+                        warnings = warnings.getNextWarning();
+                    } while (warnings != null);
+                    try {
+                        con.clearWarnings();
+                    } catch (Exception e) { //catch everything because drivers may violate rules and throw any exception
+                        LOG.log(Level.WARNING, "Failed to clear SQL warnings", e);
+                    }
+                }
+
+                LOG.log(level, sb.toString());
+            }
+        }
     }
+
 
     public void close() {
         cache.close();
