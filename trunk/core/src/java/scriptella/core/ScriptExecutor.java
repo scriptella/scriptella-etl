@@ -91,8 +91,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         if (onErrorEl != null) { //if error handler present for this case
             Resource content = onErrorEl.getContent(dialectId);
             if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, StringUtils.consoleFormat(
-                        "Script "+getLocation()+" failed. Driver error: "+t+"\nUsing onError handler: "+onErrorEl));
+                LOG.log(Level.INFO, StringUtils.consoleFormat("Script " + getLocation() + " failed. Driver error: " + t + "\nUsing onError handler: " + onErrorEl));
             }
 
             try {
@@ -101,9 +100,8 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
             } catch (Exception e) {
                 return onError(e, errorHandler, ctx); //calling this method again and triying to find another onerror
             }
-        } else { //if no onError found - rethrow the exception
-            ExceptionUtils.throwUnchecked(t);
-        }
+        } //if no onError found - rethrow the exception
+        ExceptionUtils.throwUnchecked(t);
         return false;
 
     }
