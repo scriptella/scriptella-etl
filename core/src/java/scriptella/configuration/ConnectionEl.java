@@ -113,7 +113,7 @@ public class ConnectionEl extends XmlConfigurableBase {
     /**
      * @return Map of properties for this connection.
      */
-    public Map<String, String> getProperties() {
+    public Map<String, ?> getProperties() {
         return properties.getMap();
     }
 

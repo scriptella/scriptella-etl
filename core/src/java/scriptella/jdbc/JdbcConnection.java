@@ -44,9 +44,9 @@ public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
-    private boolean transactable = false;
+    private boolean transactable;
     private ParametersParser parametersParser;
-    int statementCacheSize = 100;
+    int statementCacheSize;
     protected String separator = ";";
     protected boolean separatorSingleLine;
     private final Map<Resource, SqlSupport> resourcesMap = new IdentityHashMap<Resource, SqlSupport>();
@@ -77,15 +77,13 @@ public class JdbcConnection extends AbstractConnection {
      * Called in constructor
      */
     protected void init(ConnectionParameters parameters) {
-        String cacheSizeStr = parameters.getProperty(STATEMENT_CACHE_KEY);
-        if (!StringUtils.isEmpty(cacheSizeStr)) {
-            try {
-                statementCacheSize = Integer.valueOf(cacheSizeStr);
-            } catch (NumberFormatException e) {
-                throw new JdbcException(STATEMENT_CACHE_KEY + " property must be a non negative integer", e);
-            }
+
+        try {
+            statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 100);
+        } catch (ParseException e) {
+            throw new JdbcException(e.getMessage());
         }
-        String separatorStr = parameters.getProperty(STATEMENT_SEPARATOR_KEY);
+        String separatorStr = parameters.getStringProperty(STATEMENT_SEPARATOR_KEY);
         if (!StringUtils.isEmpty(separatorStr)) {
             separator=separatorStr.trim();
         }

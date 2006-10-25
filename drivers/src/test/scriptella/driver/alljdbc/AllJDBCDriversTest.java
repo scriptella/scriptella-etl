@@ -43,6 +43,8 @@ import java.util.Properties;
  */
 public class AllJDBCDriversTest extends AbstractTestCase {
     private static List<Object[]> rows = new ArrayList<Object[]>(); //modified by janino
+    private static final byte[] blob=new byte[100000];
+    private static final String clob;
     private static final String[] drivers;
     private static final String[] urls;
     private static final String[] users;
@@ -50,6 +52,12 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     private List<Connection> connections;
 
     static {
+        //Initializing blob/clob
+
+        for (int i=0;i<blob.length;i++) {
+            blob[i]= (byte) (0x30+i%10);
+        }
+        clob=new String(blob);
         //reading test properties containing a set of drivers
         Properties props = new Properties();
         InputStream is = AllJDBCDriversTest.class.getResourceAsStream("test.properties");
@@ -83,7 +91,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
 
-    private Map<String,String> externalProperties;
+    private Map<String,Object> externalProperties;
     @Override
     protected ConfigurationFactory newConfigurationFactory() {
         ConfigurationFactory cf = super.newConfigurationFactory();
@@ -96,13 +104,15 @@ public class AllJDBCDriversTest extends AbstractTestCase {
         //just to make sure properties are valid
         assertTrue(n == urls.length && n == users.length && n == passwords.length);
 
-        externalProperties = new HashMap<String, String>();
+        externalProperties = new HashMap<String, Object>();
         //test any combination of drivers in both directions
         for (int i = 0; i < n; i++) {
             externalProperties.put("driver1", drivers[i]);
             externalProperties.put("url1", urls[i]);
             externalProperties.put("user1", users[i]);
             externalProperties.put("password1", passwords[i]);
+            externalProperties.put("blob", blob);
+            externalProperties.put("clob", clob);
             for (int j = 0; j < n; j++) {
                 if (j != i) {
                     externalProperties.put("driver2", drivers[j]);
@@ -129,18 +139,21 @@ public class AllJDBCDriversTest extends AbstractTestCase {
 
     protected void setUp() throws Exception {
         connections = new ArrayList<Connection>(drivers.length);
+        //Initialize drivers one by one
+        Properties p = new Properties();
+        externalProperties = new HashMap<String, Object>();
         for (int i = 0; i < drivers.length; i++) {
             String driver = drivers[i];
             String url = urls[i];
             String user = users[i];
             String password = passwords[i];
-            externalProperties = new HashMap<String, String>();
+            externalProperties.clear();
             externalProperties.put("driver",driver);
             externalProperties.put("url",url);
             externalProperties.put("user",user);
             externalProperties.put("password",password);
             try {
-                Properties p = new Properties();
+                p.clear();
                 p.load(getClass().getResourceAsStream(driver+".types.properties"));
                 externalProperties.putAll((Map)p);
             } catch (IOException e) {
@@ -189,12 +202,11 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
     public void checkBData(Object bdata) {
-        checkData(bdata);
+        assertTrue(Arrays.equals(blob, (byte[]) bdata));
     }
 
     public void checkCData(Object cdata) {
-        String exp = "abcdefg";
-        assertEquals(exp, cdata);
+        assertEquals(clob, cdata);
     }
 
 

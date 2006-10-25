@@ -46,7 +46,7 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
     private BeanFactory beanFactory;
     private ProgressIndicator progressIndicator;
     private boolean autostart;
-    private Map<String, String> properties;
+    private Map<String, ?> properties;
     private URL configLocation;
 
 
@@ -89,11 +89,11 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
         configLocation = resource.getURL();
     }
 
-    public Map<String, String> getProperties() {
+    public Map<String, ?> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(Map<String, ?> properties) {
         this.properties = properties;
     }
 

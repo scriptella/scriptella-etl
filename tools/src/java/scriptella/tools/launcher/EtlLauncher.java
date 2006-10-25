@@ -83,7 +83,7 @@ public class EtlLauncher {
     private EtlExecutor exec = new EtlExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
-    private Map<String,String> properties;
+    private Map<String,?> properties;
     public static final String DEFAULT_FILE_NAME = "etl.xml";
 
     public EtlLauncher() {
@@ -199,7 +199,7 @@ public class EtlLauncher {
         }
     }
 
-    public void setProperties(final Map<String,String> props) {
+    public void setProperties(final Map<String,?> props) {
         properties=props;
     }
 

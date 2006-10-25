@@ -178,7 +178,7 @@ public class EtlExecutor {
      * @see ConfigurationFactory
      */
     @ThreadSafe
-    public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String, String> externalProperties) {
+    public static EtlExecutor newExecutor(final URL scriptFileUrl, final Map<String, ?> externalProperties) {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(scriptFileUrl);
         if (externalProperties != null) {

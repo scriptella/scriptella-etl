@@ -26,23 +26,23 @@ import java.util.Set;
 /**
  * Represents a persistent set of properties.
  * <p>This class is a replacement for {@link Properties} class.
- * <p>Please note that {@link #put(String, String)} has additional semantics.
+ * <p>Please note that {@link #put(String, Object)} has additional semantics.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class PropertiesMap implements Map<String, String> {
-    private Map<String, String> props;
+public class PropertiesMap implements Map<String, Object> {
+    private Map<String, Object> props;
 
     public PropertiesMap() {
-        props = new LinkedHashMap<String, String>();
+        props = new LinkedHashMap<String, Object>();
     }
 
     public PropertiesMap(int initialCapacity) {
-        props = new LinkedHashMap<String, String>(initialCapacity);
+        props = new LinkedHashMap<String, Object>(initialCapacity);
     }
 
-    public PropertiesMap(Map<String, String> props) {
+    public PropertiesMap(Map<String, ?> props) {
         this(props.size());
         putAll(props);
     }
@@ -63,7 +63,7 @@ public class PropertiesMap implements Map<String, String> {
         return props.containsValue(value);
     }
 
-    public String get(Object key) {
+    public Object get(Object key) {
         return props.get(key);
     }
 
@@ -76,20 +76,20 @@ public class PropertiesMap implements Map<String, String> {
      * @return value associated with specified key,
      *         or null if there was no mapping for key.
      */
-    public String put(String key, String value) {
-        String old = props.get(key);
+    public Object put(String key, Object value) {
+        Object old = props.get(key);
         if (old==null) {
             props.put(key, value);
         }
         return old;
     }
 
-    public String remove(Object key) {
+    public Object remove(Object key) {
         return props.remove(key);
     }
 
-    public void putAll(Map<? extends String, ? extends String> t) {
-        for (Entry<? extends String, ? extends String> entry : t.entrySet()) {
+    public void putAll(Map<? extends String, ? extends Object> t) {
+        for (Entry<? extends String, ? extends Object> entry : t.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
     }
@@ -102,11 +102,11 @@ public class PropertiesMap implements Map<String, String> {
         return props.keySet();
     }
 
-    public Collection<String> values() {
+    public Collection<Object> values() {
         return props.values();
     }
 
-    public Set<Entry<String, String>> entrySet() {
+    public Set<Entry<String, Object>> entrySet() {
         return props.entrySet();
     }
 

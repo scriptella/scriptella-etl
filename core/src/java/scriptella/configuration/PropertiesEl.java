@@ -30,7 +30,7 @@ import java.util.Map;
  * @version 1.0
  */
 public class PropertiesEl extends XmlConfigurableBase {
-    Map<String, String> map = Collections.emptyMap();
+    Map<String, ?> map = Collections.emptyMap();
 
     public PropertiesEl() {
     }
@@ -67,11 +67,11 @@ public class PropertiesEl extends XmlConfigurableBase {
         }
     }
 
-    public Map<String, String> getMap() {
+    public Map<String, ?> getMap() {
         return map;
     }
 
-    public void setMap(Map<String, String> map) {
+    public void setMap(Map<String, ?> map) {
         this.map = new PropertiesMap(map);
     }
 }
