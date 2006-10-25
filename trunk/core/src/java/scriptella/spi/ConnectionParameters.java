@@ -27,7 +27,7 @@ import java.util.Map;
  * @version 1.0
  */
 public class ConnectionParameters {
-    private Map<String, String> properties;
+    private Map<String, ?> properties;
     private String url;
     private String user;
     private String password;
@@ -38,8 +38,7 @@ public class ConnectionParameters {
     /**
      * Creates connection parameters based on &lt;connection&gt; element..
      */
-    public ConnectionParameters(Map<String, String> properties, String url, String user, String password,
-                                String schema, String catalog, DriverContext context) {
+    public ConnectionParameters(Map<String, ?> properties, String url, String user, String password, String schema, String catalog, DriverContext context) {
         this.properties = properties;
         this.url = url;
         this.user = user;
@@ -54,7 +53,7 @@ public class ConnectionParameters {
      *
      * @return properties map.
      */
-    public Map<String, String> getProperties() {
+    public Map<String, ?> getProperties() {
         return properties;
     }
 
@@ -65,13 +64,64 @@ public class ConnectionParameters {
      * @return property value
      * @see #getProperties()
      */
-    public String getProperty(String name) {
+    public Object getProperty(String name) {
         return properties.get(name);
+    }
+
+    /**
+     * Returns string value of the property.
+     *
+     * @param name property name.
+     */
+    public String getStringProperty(String name) {
+        Object v = properties.get(name);
+        return v == null ? null : v.toString();
+    }
+
+    /**
+     * Returns the value of integer property.
+     *
+     * @see #getNumberProperty(String,Number)
+     */
+    public Integer getIntegerProperty(String name, int defaultValue) throws ParseException {
+        return getNumberProperty(name, defaultValue).intValue();
+    }
+
+    public Integer getIntegerProperty(String name) throws ParseException {
+        Number res = getNumberProperty(name, null);
+        return res == null ? null : res.intValue();
+    }
+
+    /**
+     * Returns numeric value of the property.
+     *
+     * @param name         property name.
+     * @param defaultValue default value to use when property omitted.
+     */
+    public Number getNumberProperty(String name, Number defaultValue) throws ParseException {
+        Object v = properties.get(name);
+        if (v == null) {
+            return defaultValue;
+        }
+        if (v instanceof Number) {
+            return ((Number) v);
+        }
+        String s = v.toString();
+        if (s.length() == 0) {
+            return defaultValue;
+        }
+
+        //We do not support doubles etc. for now
+        try {
+            return Long.getLong(v.toString());
+        } catch (NumberFormatException e) {
+            throw new ParseException(name + " property must be integer.", 0);
+        }
     }
 
 
     /**
-     * @see #getBooleanProperty(String, boolean)
+     * @see #getBooleanProperty(String,boolean)
      */
     public boolean getBooleanProperty(String name) throws ParseException {
         return getBooleanProperty(name, false);
@@ -79,39 +129,53 @@ public class ConnectionParameters {
 
     /**
      * Parses property value as boolean flag.
-     * @param name property name.
+     *
+     * @param name         property name.
      * @param defaultValue default value to use if connection has no such property.
      * @return boolean property value.
      * @throws ParseException if property has unrecognized value.
      */
     public boolean getBooleanProperty(String name, boolean defaultValue) throws ParseException {
-        String a = getProperty(name);
-        if (a==null) {
+        Object a = getProperty(name);
+        if (a == null) {
             return defaultValue;
         }
-        if ("true".equalsIgnoreCase(a) || "1".equalsIgnoreCase(a) ||
-                "on".equalsIgnoreCase(a) || "yes".equalsIgnoreCase(a)) {
+        if (a instanceof Boolean) {
+            return (Boolean) a;
+        }
+        if (a instanceof Number) {
+            return ((Number) a).intValue() > 0;
+        }
+        String s = a.toString();
+
+        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s)) {
             return true;
         }
 
-        if ("false".equalsIgnoreCase(a) || "0".equalsIgnoreCase(a) ||
-                "off".equalsIgnoreCase(a) || "no".equalsIgnoreCase(a)) {
+        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
             return false;
         }
-        throw new ParseException("Unrecognized boolean property value "+a,0);
+        throw new ParseException("Unrecognized boolean property value " + a, 0);
     }
 
     /**
      * Parses property value as a charset encoding name.
+     *
      * @param name property name.
      * @return value of the property or null if connection has no such property.
      * @throws ParseException if charset name is unsupported.
      */
     public String getCharsetProperty(String name) throws ParseException {
-        String enc = getProperty(name);
-        if (enc != null && !Charset.isSupported(enc)) {
-            throw new ParseException("Specified encoding " +
-                    enc+ " is not supported. Supported encodings are " + Charset.availableCharsets().keySet(),0);
+        Object cs = getProperty(name);
+        if (cs == null) {
+            return null;
+        }
+        if (cs instanceof Charset) {
+            return ((Charset) cs).name();
+        }
+        String enc = cs.toString();
+        if (!Charset.isSupported(enc)) {
+            throw new ParseException("Specified encoding " + enc + " is not supported. Supported encodings are " + Charset.availableCharsets().keySet(), 0);
         }
         return enc;
     }
@@ -160,6 +224,7 @@ public class ConnectionParameters {
 
     /**
      * Get a drivers context.
+     *
      * @return script context.
      */
     public DriverContext getContext() {
@@ -167,13 +232,6 @@ public class ConnectionParameters {
     }
 
     public String toString() {
-        return "ConnectionParameters{" +
-                "properties=" + properties +
-                ", url='" + url + '\'' +
-                ", user='" + user + '\'' +
-                ", password='" + password + '\'' +
-                ", schema='" + schema + '\'' +
-                ", catalog='" + catalog + '\'' +
-                '}';
+        return "ConnectionParameters{" + "properties=" + properties + ", url='" + url + '\'' + ", user='" + user + '\'' + ", password='" + password + '\'' + ", schema='" + schema + '\'' + ", catalog='" + catalog + '\'' + '}';
     }
 }

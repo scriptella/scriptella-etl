@@ -36,14 +36,14 @@ class PropertiesMerger implements ParametersCallback {
     private PropertiesSubstitutor substitutor=new PropertiesSubstitutor(this);
 
     public PropertiesMerger() {
-        this.properties = new PropertiesMap();
+        properties = new PropertiesMap();
     }
 
     public PropertiesMerger(Properties properties) {
         this.properties = new PropertiesMap(CollectionUtils.asMap(properties));
     }
 
-    public PropertiesMerger(Map<String,String> properties) {
+    public PropertiesMerger(Map<String,?> properties) {
         this.properties = new PropertiesMap(properties);
     }
 
@@ -53,9 +53,13 @@ class PropertiesMerger implements ParametersCallback {
      * @param properties properties to add to scripts context.
      * @see #getSubstitutor()
      */
-    void addProperties(final Map<String, String> properties) {
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            this.properties.put(entry.getKey(), substitutor.substitute(entry.getValue()));
+    void addProperties(final Map<String, ?> properties) {
+        for (Map.Entry<String, ?> entry : properties.entrySet()) {
+            Object v = entry.getValue();
+            if (v!=null && v instanceof CharSequence) {
+                v = substitutor.substitute(v.toString());
+            }
+            this.properties.put(entry.getKey(), v);
         }
     }
 

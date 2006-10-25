@@ -42,7 +42,7 @@ public class ConfigurationFactory {
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "etl.dtd";
     private URL resourceURL;
-    private Map<String, String> externalProperties;
+    private Map<String, ?> externalProperties;
 
     static {
         setValidating(true);
@@ -75,7 +75,7 @@ public class ConfigurationFactory {
      * @return external properties set by {@link #setExternalProperties}.
      */
     @ThreadSafe
-    public Map<String, String> getExternalProperties() {
+    public Map<String, ?> getExternalProperties() {
         return externalProperties;
     }
 
@@ -88,11 +88,11 @@ public class ConfigurationFactory {
      * @param externalProperties external properties. Nulls allowed.
      */
     @ThreadSafe
-    public void setExternalProperties(final Map<String, String> externalProperties) {
+    public void setExternalProperties(final Map<String, ?> externalProperties) {
         if (externalProperties==null) {
             this.externalProperties=null;
         } else {
-            this.externalProperties = new LinkedHashMap<String, String>((Map<String, String>) externalProperties);
+            this.externalProperties = new LinkedHashMap<String, Object>(externalProperties);
         }
     }
 

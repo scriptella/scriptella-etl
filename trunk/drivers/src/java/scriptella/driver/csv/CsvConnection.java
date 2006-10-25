@@ -102,13 +102,13 @@ public class CsvConnection extends AbstractConnection {
             throw new CsvProviderException(e.getMessage());
 
         }
-        String sep = parameters.getProperty(SEPARATOR);
+        String sep = parameters.getStringProperty(SEPARATOR);
         if (sep != null && sep.length() > 0) {
             separator = sep.charAt(0);
         } else {
             separator = ',';
         }
-        String q = parameters.getProperty(QUOTE);
+        String q = parameters.getStringProperty(QUOTE);
         if (q == null) {
             quote = '\"'; //default value
         } else if (q.length() > 0) {
@@ -122,7 +122,7 @@ public class CsvConnection extends AbstractConnection {
         } catch (ParseException e) {
             throw new CsvProviderException(e.getMessage());
         }
-        String eolStr = parameters.getProperty(EOL);
+        String eolStr = parameters.getStringProperty(EOL);
         if (eolStr != null && eolStr.length() > 0) {
             eol = eolStr;
         } else {

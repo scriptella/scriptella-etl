@@ -75,7 +75,7 @@ public class ConfigurationEl extends XmlConfigurableBase {
     public void configure(final XmlElement element) {
         documentUrl = element.getDocumentURL();
 
-        Map<String,String> xmlProps = new PropertiesEl(element.getChild("properties")).getMap();
+        Map<String,?> xmlProps = new PropertiesEl(element.getChild("properties")).getMap();
         //Now merge external and local xml properties
         propertiesMerger.addProperties(xmlProps);
 
