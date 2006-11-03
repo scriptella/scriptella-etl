@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
  * @version 1.0
  */
 public class SqlTokenizerPerfTest extends AbstractTestCase {
+    //600
     public void test() throws IOException {
         String text = "INSERT INTO Table VALUES(?v,$v2);--Hint $v;\n" +
                 "/* Comment */\n//comment\nUPDATE Test SET V=?{v2}";
@@ -36,6 +37,7 @@ public class SqlTokenizerPerfTest extends AbstractTestCase {
         while (tok.nextStatement()!=null) {
         }
     }
+    //700
     public void testNewLineSeparator() throws IOException {
         String text = "INSERT INTO Table VALUES(?v,$v2);--Hint $v\n  / \r" +
                 "/* Comment */\n//comment\nUPDATE Test SET V=?{v2}";

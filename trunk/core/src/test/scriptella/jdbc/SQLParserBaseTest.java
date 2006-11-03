@@ -29,7 +29,7 @@ import java.util.TreeSet;
  */
 public class SQLParserBaseTest extends AbstractTestCase {
     public void test() {
-        String s = "-not skipped\n--HintOrComment\n" +
+        String s = "-not skipped\n/*+ HintOrComment*/\n" +
                 "     \n" +
                 "     CREATE TABLE Test (\n" +
                 "            ID INT,\n" +
@@ -42,7 +42,7 @@ public class SQLParserBaseTest extends AbstractTestCase {
                 " //comment$justatext ?{justatext} ?justatext\n";
         //comments are ignored and quoted values are not parsed
         final String[] expected = {
-                "-not skipped\n--HintOrComment\nCREATE TABLE Test (\n" +
+                "-not skipped\n/*+ HintOrComment*/\nCREATE TABLE Test (\n" +
                         "            ID INT,\n" +
                         "            $/VALUE/ VARCHAR(255)\n" +
                         "        )",

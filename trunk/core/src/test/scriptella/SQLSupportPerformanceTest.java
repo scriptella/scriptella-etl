@@ -42,6 +42,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
 
     /**
      * History:
+     * 04.11.2006 - Duron 1.7Mhz - 1400 ms
      * 11.09.2006 - Duron 1.7Mhz - 1578 ms
      */
     public void test() throws EtlExecutorException {
@@ -66,6 +67,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
 
     /**
      * History:
+     * 04.11.2006 - Duron 1.7Mhz - 2300 ms
      * 11.09.2006 - Duron 1.7Mhz - 2578 ms
      * @throws EtlExecutorException
      * @throws SQLException
