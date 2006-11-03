@@ -59,6 +59,7 @@ public class SqlTokenizerTest extends AbstractTestCase {
                 "-notacomment$v/**fdfdfd$comment\n$comment.v$$???\n;;;*/;stmt${var};\n" +
                 "//$comment";
         SqlTokenizer tok = new SqlTokenizer(new StringReader(s));
+        tok.setKeepFormat(true);
         assertEquals("insert into table values 1,?v--$comment\n", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {27}), tok.getInjections());
         assertEquals("-notacomment$v/**fdfdfd$comment\n$comment.v$$???\n;;;*/", tok.nextStatement().toString());
@@ -107,6 +108,7 @@ public class SqlTokenizerTest extends AbstractTestCase {
         tok = new SqlTokenizer(new StringReader(data));
         tok.setSeparator("/");
         tok.setSeparatorOnSingleLine(true);
+        tok.setKeepFormat(true);
         assertEquals(data, tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {3, 23}), tok.getInjections());
         assertNull(tok.nextStatement());
@@ -115,6 +117,7 @@ public class SqlTokenizerTest extends AbstractTestCase {
         tok = new SqlTokenizer(new StringReader(data));
         tok.setSeparator("/");
         tok.setSeparatorOnSingleLine(true);
+        tok.setKeepFormat(true);
         assertEquals("st;$v1\r", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {3}), tok.getInjections());
         assertEquals("/*?comment*/ ?v2 2", tok.nextStatement().toString());
@@ -126,9 +129,9 @@ public class SqlTokenizerTest extends AbstractTestCase {
         tok = new SqlTokenizer(new StringReader(data));
         tok.setSeparator("/");
         tok.setSeparatorOnSingleLine(true);
-        assertEquals("STATEMENT1 / \n\r", tok.nextStatement().toString());
+        assertEquals("STATEMENT1 / \n", tok.nextStatement().toString());
         assertEquals("\nSTATEMENT2\n" +
-                "/**fdfdfd**//", tok.nextStatement().toString());
+                "/", tok.nextStatement().toString());
         ///
         data = "/\nscript\n/\n";
         tok = new SqlTokenizer(new StringReader(data));
@@ -150,10 +153,43 @@ public class SqlTokenizerTest extends AbstractTestCase {
         tok = new SqlTokenizer(new StringReader(data));
         tok.setSeparator("/");
         tok.setSeparatorOnSingleLine(true);
-        assertEquals("statement;--comment\n", tok.nextStatement().toString());
+        assertEquals("statement;\n", tok.nextStatement().toString());
         assertEquals("scrip$t\n", tok.nextStatement().toString());
         assertEquals(Arrays.asList(new Integer[] {5}), tok.getInjections());
         assertNull(tok.nextStatement());
+    }
+
+    /**
+     * Tests if oracle hints are preserved.
+     */
+    public void testOracleHint() throws IOException {
+        String original = "SQL /*+ HINT */ --NOTAHINT \n\r /* +NOTAHINT*/";
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(original));
+        assertEquals("SQL /*+ HINT */ \n ",tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        tok = new SqlTokenizer(new StringReader(original));
+        tok.setKeepFormat(true);
+        assertEquals(original,tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        //Now test with / separator - result should be the same
+        tok = new SqlTokenizer(new StringReader(original));
+        tok.setKeepFormat(true);
+        tok.setSeparator("/");
+        tok.setSeparatorOnSingleLine(true);
+        assertEquals(original,tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
+        //Now test the ?,$ handling
+        original = "SQL $v1 ?v2 /*+ HINT */ --?NOT$AHINT \n\r '$v3'/* +$NOTAHINT*/ ?v4";
+        tok = new SqlTokenizer(new StringReader(original));
+        assertEquals("SQL $v1 ?v2 /*+ HINT */ \n '$v3' ?v4",tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {4,8,27,32}),tok.getInjections());
+        //The same check but with keep format
+        tok = new SqlTokenizer(new StringReader(original));
+        tok.setKeepFormat(true);
+        assertEquals(original,tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {4,8,41,61}),tok.getInjections());
+        assertNull(tok.nextStatement());
+
     }
 
 

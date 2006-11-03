@@ -38,7 +38,8 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
     private ColumnsMap columnsMap;
     private ParametersCallback params; //parent parameters callback to use
     private JdbcTypesConverter converter;
-    private final int columnsCount;
+    private int columnsCount;
+    private int[] jdbcTypes;
 
     /**
      * Instantiates an adapter, prepares a cache and builds a map of column names.
@@ -51,15 +52,18 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
                             ParametersCallback parametersCallback, JdbcTypesConverter converter) {
         this.params = parametersCallback;
         this.resultSet = resultSet;
-        columnsMap = new ColumnsMap();
         this.converter = converter;
+    }
 
+    private void initMetaData() {
+        columnsMap = new ColumnsMap();
         try {
             final ResultSetMetaData m = resultSet.getMetaData();
             columnsCount = m.getColumnCount();
-
+            jdbcTypes = new int[columnsCount];
             for (int i = 1; i <= columnsCount; i++) {
                 columnsMap.registerColumn(m.getColumnName(i), i);
+                jdbcTypes[i-1]=m.getColumnType(i); //Store column types for converter
             }
         } catch (SQLException e) {
             throw new JdbcException("Unable to process result set ", e);
@@ -80,11 +84,14 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
 
 
     public Object getParameter(final String name) {
+        if (columnsMap==null) { //if first time access
+            initMetaData();
+        }
         try {
             Integer index = columnsMap.find(name);
-            if (index != null && index > 0 && index <= columnsCount) { //if index found and in range
-                int ind = index - 1;
-                return converter.getObject(resultSet, ind + 1);
+            int ind = index==null?-1:index - 1;
+            if (ind >= 0 && ind < columnsCount) { //if index found and in range
+                return converter.getObject(resultSet, ind + 1, jdbcTypes[ind]);
             } else { //otherwise call uppper level params
                 return params.getParameter(name);
             }
@@ -105,6 +112,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             resultSet = null;
             params = null;
             columnsMap = null;
+            jdbcTypes=null;
         }
     }
 }

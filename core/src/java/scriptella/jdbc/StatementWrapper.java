@@ -41,8 +41,8 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      * For testing only.
      */
     protected StatementWrapper() {
-        converter=null;
-        statement=null;
+        converter = null;
+        statement = null;
     }
 
     protected StatementWrapper(T statement, JdbcTypesConverter converter) {
@@ -73,7 +73,15 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      */
     public abstract int update() throws SQLException;
 
-    public void query(QueryCallback queryCallback, ParametersCallback parametersCallback) throws SQLException {
+    /**
+     * Executes the query and returns the result set.
+     *
+     * @return result set with query result.
+     * @throws SQLException if JDBC driver fails to execute the operation.
+     */
+    protected abstract ResultSet query() throws SQLException;
+
+    public void query(final QueryCallback queryCallback, final ParametersCallback parametersCallback) throws SQLException {
         ResultSetAdapter r = null;
         try {
             r = new ResultSetAdapter(query(), parametersCallback, converter);
@@ -85,7 +93,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
         }
     }
 
-    public void setParameters(List<Object> params) throws SQLException {
+    public void setParameters(final List<Object> params) throws SQLException {
     }
 
     /**
@@ -93,14 +101,6 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      */
     public void clear() {
     }
-
-    /**
-     * Executes the query and returns the result set.
-     *
-     * @return result set with query result.
-     * @throws SQLException if JDBC driver fails to execute the operation.
-     */
-    protected abstract ResultSet query() throws SQLException;
 
     /**
      * @see java.sql.Statement#toString()
@@ -128,11 +128,13 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             this.sql = sql;
         }
 
-        @Override public int update() throws SQLException {
+        @Override
+        public int update() throws SQLException {
             return statement.executeUpdate(sql);
         }
 
-        @Override protected ResultSet query() throws SQLException {
+        @Override
+        protected ResultSet query() throws SQLException {
             return statement.executeQuery(sql);
         }
 
@@ -155,17 +157,20 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
         /**
          * Sets parameters for this statement.
          * <p>Default implementation is noop.
+         *
          * @param params parameters to set.
          * @throws SQLException
          */
-        @Override public void setParameters(List<Object> params) throws SQLException {
+        @Override
+        public void setParameters(List<Object> params) throws SQLException {
             for (int i = 0, n = params.size(); i < n; i++) {
                 Object o = params.get(i);
                 converter.setObject(statement, i + 1, o);
             }
         }
 
-        @Override public int update() throws SQLException {
+        @Override
+        public int update() throws SQLException {
             try {
                 return statement.executeUpdate();
             } finally {
@@ -173,11 +178,13 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             }
         }
 
-        @Override protected ResultSet query() throws SQLException {
+        @Override
+        protected ResultSet query() throws SQLException {
             return statement.executeQuery();
         }
 
-        @Override public void clear() {
+        @Override
+        public void clear() {
             try {
                 statement.clearParameters();
             } catch (SQLException e) {

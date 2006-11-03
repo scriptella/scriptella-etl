@@ -20,7 +20,6 @@ import scriptella.util.StringUtils;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,26 +29,27 @@ import java.util.List;
  * {@link #setSeparator(String) separator string}.
  * <p>The ? injections in quoted literals and comments are skipped.
  * The $ substitutions are skipped only in comments.
+ * <p>This class became too complex and <b>needs to be refactored</b>.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class SqlTokenizer implements Closeable {
-    private final Reader reader;
+    private final ReaderWrapper reader;
     private final List<Integer> injections = new ArrayList<Integer>();
     private final StringBuilder sb = new StringBuilder(80);
     private char[] separator = DEFAULT_SEPARATOR;
     private boolean separatorOnSingleLine;
-    private boolean trim;
+    private boolean keepFormat;
     private SeparatorMatcher separatorMatcher = new SeparatorMatcher();
     private static final char[] DEFAULT_SEPARATOR = ";".toCharArray();
 
     public SqlTokenizer(Reader reader) {
-        this.reader = reader;
+        this.reader = new ReaderWrapper(reader);
     }
 
     public SqlTokenizer(Reader reader, String separator, boolean separatorOnSingleLine) {
-        this.reader = reader;
+        this.reader = new ReaderWrapper(reader);
         setSeparator(separator);
         setSeparatorOnSingleLine(separatorOnSingleLine);
     }
@@ -70,17 +70,16 @@ public class SqlTokenizer implements Closeable {
     public StringBuilder nextStatement() throws IOException {
         sb.setLength(0);
         injections.clear();
-        int n;
         final boolean newLineMode = separatorOnSingleLine; //make a local copy for performance reasons
         final boolean defaultMode = !newLineMode;
         boolean whitespacesOnly = true;
         final char sep0 = separator[0];
         lastLineStart = 0;
 
-
         previousChar = (char) -1;
-        for (position = 0; (n = reader.read()) >= 0; position++) {
-            currentChar = (char) n;
+        int n;
+        for (position = 0; (n = readNormalizedChar()) >= 0; position++) {
+            currentChar=(char) n;
             sb.append(currentChar);
             //Checking separator substring
             if ((currentChar == sep0) && //if matched a first separator char
@@ -96,14 +95,14 @@ public class SqlTokenizer implements Closeable {
             switch (currentChar) {
                 case '-':
                     if (previousChar == '-') { //Comment
-                        seekEol();
+                        seekEndLineComment();
                         whitespacesOnly = true;
-                        lastLineStart = position + 1;
                     }
                     break;
                 case '/':
                     if (previousChar == '/') { //Comment
-                        seekEol();
+                        seekEndLineComment();
+                        whitespacesOnly = true;
                     }
                     break;
                 case '*':
@@ -135,6 +134,29 @@ public class SqlTokenizer implements Closeable {
         } else return n >= 0 ? sb : null;
     }
 
+    private int readNormalizedChar() throws IOException {
+        for (int n;(n = reader.read())>=0;) {
+            if (!keepFormat) {
+                //Normalize char  \r,\n->\n  ; any whitespace transformed to space
+                //If previous char was also a whitespace - this char is ignored
+                if (n=='\n' || n=='\r') {
+                    if (previousChar=='\n') {
+                        continue;
+                    }
+                    n='\n';
+
+                } else if (n<' ') {
+                    if (previousChar==' ' || previousChar=='\n') {
+                        continue;
+                    }
+                    n=' ';
+                }
+            }
+            return n;
+        }
+        return -1;
+    }
+
     /**
      * @return injections for the last returned statement.
      */
@@ -143,8 +165,8 @@ public class SqlTokenizer implements Closeable {
     }
 
     private void seekQuote(char q) throws IOException {
-        position++;
-        for (int n; (n = reader.read()) >= 0; position++) {
+        for (int n; (n = reader.read()) >= 0; ) {
+            position++;
             sb.append((char) n);
             if ('$' == n) { //$ expressions are substituted in quotes
                 injections.add(position);
@@ -154,22 +176,54 @@ public class SqlTokenizer implements Closeable {
         }
     }
 
-    private void seekEol() throws IOException {
-        position++;
-        for (int n; (n = reader.read()) >= 0; position++) {
-            sb.append((char) n);
+    private void seekEndLineComment() throws IOException {
+        if (!keepFormat) {
+            position-=2;
+            sb.setLength(position+1);
+        }
+        for (int n; (n = reader.read()) >= 0; ) {
+            if (keepFormat) {
+                position++;
+                sb.append((char) n);
+            }
             if ('\r' == n || '\n' == n) {  //EOL
+                if (!keepFormat) {
+                    position++;
+                    sb.append('\n');
+                    currentChar='\n';
+                } else {
+                    currentChar=(char) n;
+                }
+                lastLineStart = position + 1; //remember the new line position
                 return;
             }
         }
     }
 
+    /**
+     * Seeks until end c-style comment * /.
+     * If keepFormat=false, the comment string is not appended to the buffer.
+     * @throws IOException
+     */
     private void seekEndCStyleComment() throws IOException {
-        position++;
-        for (int n; (n = reader.read()) >= 0; position++) {
-            sb.append((char) n);
+        boolean firstChar=true;
+        boolean copyChars=true;
+        for (int n; (n = reader.read()) >= 0; ) {
+            //Oracle is extraordinary as always ;)
+            //if oracle hint, i.e. /*+ and keepformat=false
+            if (firstChar && !keepFormat && n!='+') {
+                position-=2;
+                sb.setLength(position+1);
+                copyChars=false;
+            }
+            firstChar=false;
+
+            if (copyChars) {
+                position++;
+                sb.append((char) n);
+            }
             if ('/' == n && previousChar == '*') {  // / * Comment
-                previousChar = (char) n;
+                currentChar = (char) -1;
                 return;
             }
             previousChar = (char) n;
@@ -196,19 +250,6 @@ public class SqlTokenizer implements Closeable {
         return separatorOnSingleLine;
     }
 
-    public boolean isTrim() {
-        return trim;
-    }
-
-    /**
-     * Sets line trimming option.
-     *
-     * @param trim true if extra ASCII whitespaces should be removed from a line.
-     */
-    public void setTrim(boolean trim) {
-        this.trim = trim;
-    }
-
     /**
      * Sets the separator mode.
      *
@@ -217,19 +258,20 @@ public class SqlTokenizer implements Closeable {
     public void setSeparatorOnSingleLine(boolean separatorOnSingleLine) {
         this.separatorOnSingleLine = separatorOnSingleLine;
     }
+    
+    /**
+     * Returns true if preserve comments and whitespaces. Default value is <b><code>false</code></b>
+     */
+    public boolean isKeepFormat() {
+        return keepFormat;
+    }
 
-    public static void main(String[] args) throws IOException {
-        SqlTokenizer tok = new SqlTokenizer(new StringReader("he?llo/*t?ttt*/oo; --comment; text\n" +
-                ";text${dd}2\"dd?dd\""));
-
-
-        for (StringBuilder sb; (sb = tok.nextStatement()) != null;) {
-            System.out.println("sb = " + sb);
-            List<Integer> inj = tok.getInjections();
-            System.out.println("inj = " + inj);
-
-        }
-
+    /**
+     * Keep original text format, i.e. preserve comments and whitespaces.
+     * @param keepFormat true if comments/whitespaces should be preserved.
+     */
+    public void setKeepFormat(boolean keepFormat) {
+        this.keepFormat = keepFormat;
     }
 
     private class SeparatorMatcher {
@@ -247,7 +289,7 @@ public class SqlTokenizer implements Closeable {
             }
             if (!separatorOnSingleLine) {
                 final int len = sb.length();
-                sb.delete(len - separatorLength, len);
+                sb.setLength(len - separatorLength);
                 return true;
             } else {
                 for (int n; (n = reader.read()) >= 0;) {
@@ -261,16 +303,52 @@ public class SqlTokenizer implements Closeable {
                         break;
                     }
                 }
-                sb.delete(lastLineStart, sb.length());
+                sb.setLength(lastLineStart);
                 return true;
             }
         }
     }
 
-    public void close() throws IOException {
-        reader.close();
+
+    /**
+     * Unsynchronized buffered wrapper for a reader.
+     * <p>Used for performance reasons to avoid multiple calls to underlying reader implementation,
+     * this class is faster and lighter than BufferedReader for our case.
+     */
+    private static final class ReaderWrapper {
+        /**
+         * Size of internal buffer
+         */
+        private static final int BUF_SIZE=512; //optimal for small and huge scripts
+        private char[] buf=new char[BUF_SIZE];
+        private int bufSize;
+        private int bufPos;
+        private final Reader reader;
+
+        ReaderWrapper(Reader reader) {
+            this.reader = reader;
+        }
+
+        /**
+         * Reads a character for reader.
+         * <p>Internal bufferring is used for performance reasons.
+         * @return a character read.
+         */
+        private int read() throws IOException {
+            if (bufPos>=bufSize) { //buffer is empty
+                bufSize=reader.read(buf, 0, BUF_SIZE);
+                if (bufSize<0) {
+                    return -1;
+                }
+                bufPos=0;
+            }
+            return buf[bufPos++];
+        }
+
     }
 
-
+    public void close() throws IOException {
+        reader.reader.close();
+    }
 }
 
