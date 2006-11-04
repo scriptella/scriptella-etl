@@ -8,7 +8,7 @@
     <connection id="c3" driver="janino"/>
     <script connection-id="c1">
         DELETE FROM Test;<!--Clearing the previous data-->
-        insert into Test values (1, 3.14, 'String', true, {ts '2006-07-21 19:43:00'}, '01010101', ?blob, ?clob);
+        INSERT INTO Test VALUES (1, 3.14, 'String', 1, {ts '2006-07-21 19:43:00'}, '01010101', ?blob, ?clob);
     </script>
     <script connection-id="c2">
         DELETE FROM Test;<!--Clearing the previous data-->

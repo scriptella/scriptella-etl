@@ -144,12 +144,11 @@ public class SqlTokenizer implements Closeable {
                         continue;
                     }
                     n='\n';
-
-                } else if (n<' ') {
-                    if (previousChar==' ' || previousChar=='\n') {
+                } else if (n <= ' ') {
+                    if (previousChar == ' ' || previousChar == '\n') {
                         continue;
                     }
-                    n=' ';
+                    n = ' ';
                 }
             }
             return n;
