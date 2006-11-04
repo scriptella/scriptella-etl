@@ -5,7 +5,6 @@
     </description>
     <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
     <script>
-        DROP TABLE Test IF EXISTS;
         CREATE TABLE Test (
             ID $INT,
             Num $FLOAT,
@@ -16,6 +15,9 @@
             BData $LONGVARBINARY,
             CData $LONGVARCHAR
         );
+        <onerror codes="955" retry="true">
+            DROP TABLE Test
+        </onerror>
     </script>
 
 </etl>

@@ -165,7 +165,7 @@ public class SqlTokenizerTest extends AbstractTestCase {
     public void testOracleHint() throws IOException {
         String original = "SQL /*+ HINT */ --NOTAHINT \n\r /* +NOTAHINT*/";
         SqlTokenizer tok = new SqlTokenizer(new StringReader(original));
-        assertEquals("SQL /*+ HINT */ \n ",tok.nextStatement().toString());
+        assertEquals("SQL /*+ HINT */ \n",tok.nextStatement().toString());
         assertNull(tok.nextStatement());
         tok = new SqlTokenizer(new StringReader(original));
         tok.setKeepFormat(true);
@@ -179,17 +179,28 @@ public class SqlTokenizerTest extends AbstractTestCase {
         assertEquals(original,tok.nextStatement().toString());
         assertNull(tok.nextStatement());
         //Now test the ?,$ handling
-        original = "SQL $v1 ?v2 /*+ HINT */ --?NOT$AHINT \n\r '$v3'/* +$NOTAHINT*/ ?v4";
+        original = "SQL $v1 ?v2 /*+ HINT */ --?NOT$AHINT \n\r'$v3'/* +$NOTAHINT*/ ?v4";
         tok = new SqlTokenizer(new StringReader(original));
-        assertEquals("SQL $v1 ?v2 /*+ HINT */ \n '$v3' ?v4",tok.nextStatement().toString());
-        assertEquals(Arrays.asList(new Integer[] {4,8,27,32}),tok.getInjections());
+        assertEquals("SQL $v1 ?v2 /*+ HINT */ \n'$v3' ?v4",tok.nextStatement().toString());
+        assertEquals(Arrays.asList(new Integer[] {4,8,26,31}),tok.getInjections());
         //The same check but with keep format
         tok = new SqlTokenizer(new StringReader(original));
         tok.setKeepFormat(true);
         assertEquals(original,tok.nextStatement().toString());
-        assertEquals(Arrays.asList(new Integer[] {4,8,41,61}),tok.getInjections());
+        assertEquals(Arrays.asList(new Integer[] {4,8,40,60}),tok.getInjections());
         assertNull(tok.nextStatement());
+    }
 
+    /**
+     * Tests if extra whitespaces are removed in keepformat=false mode.
+     * Single whitespace trimming is not performed, because performance is more important. 
+     */
+    public void testWhitespaceTrim() throws IOException {
+        String sql = "    --Comment\n\n\n               SQL--text\n;   SQL2";
+        SqlTokenizer tok = new SqlTokenizer(new StringReader(sql));
+        assertEquals(" \nSQL\n", tok.nextStatement().toString());
+        assertEquals(" SQL2", tok.nextStatement().toString());
+        assertNull(tok.nextStatement());
     }
 
 

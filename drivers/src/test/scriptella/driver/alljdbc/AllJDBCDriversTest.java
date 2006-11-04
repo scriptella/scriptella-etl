@@ -20,9 +20,12 @@ import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.DriverFactory;
+import scriptella.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Timestamp;
@@ -80,6 +83,26 @@ public class AllJDBCDriversTest extends AbstractTestCase {
      */
     public static void addRow(Object[] row) {
         rows.add(row);
+        //Now normalize the row
+        for (int i = 0; i < row.length; i++) {
+            if (row[i]==null) {
+                continue;
+            }
+            try {
+                if (row[i] instanceof Blob) {
+                    Blob b = (Blob) row[i];
+                    row[i]= IOUtils.toByteArray(b.getBinaryStream());
+                } else if (row[i] instanceof Clob) {
+                    Clob c = (Clob) row[i];
+                    row[i]= IOUtils.toString(c.getCharacterStream());
+                }
+
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+
     }
 
     private static String[] split(String value) {
@@ -177,11 +200,11 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
     private void checkId(Object id) {
-        assertEquals(1, id);
+        assertEquals("1", String.valueOf(id));
     }
 
     private void checkNum(Object num) {
-        assertEquals(3.14, num);
+        assertEquals("3.14", String.valueOf(num));
     }
 
     private void checkStr(Object str) {
@@ -189,7 +212,13 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     }
 
     private void checkFlag(Object flag) {
-        assertEquals(true, flag);
+        assertNotNull(flag);
+        if (flag instanceof Boolean) {
+            assertTrue((Boolean)flag);
+        } else {
+            assertEquals("1", String.valueOf(flag));
+        }
+
     }
 
     private void checkTi(Object ti) {
@@ -198,7 +227,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
 
     public void checkData(Object data) {
         byte[] exp = new byte[]{1, 1, 1, 1};
-        assertTrue(Arrays.equals(exp, (byte[]) data));
+        assertTrue(Arrays.equals(exp, (byte[])data));
     }
 
     public void checkBData(Object bdata) {
