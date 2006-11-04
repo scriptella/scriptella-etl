@@ -25,7 +25,6 @@ import java.util.Properties;
 
 /**
  * Scriptella Adapter for Oracle database.
- * <p>The primary feature of this driver is {@link scriptella.driver.hsqldb.HsqlConnection#SHUTDOWN_ON_EXIT}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
