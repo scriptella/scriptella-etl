@@ -15,7 +15,7 @@
     <!--ETL Queries and Scripts -->
     <script>
         -- Put SQL Here or use include element:
-        <!-- <include href="schema.sql/> -->
+        <!-- <include href="schema.sql"/> -->
     </script>
 
     <!-- Uncomment and modify to run a query-based transformation
