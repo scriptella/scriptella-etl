@@ -27,9 +27,13 @@
     <property name="java.dir" value="${src.dir}/java"/>
     <property name="conf.dir" value="${src.dir}/conf"/>
     <property name="test.dir" value="${src.dir}/test"/>
+    <property name="tests.tmp.dir" value="${tmp.dir}/tests"/>
+    <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
     <property name="root.dir" value="${basedir}/.."/>
     <tstamp/>
     <property file="${root.dir}/version.properties"/>
+
+
 
 
     <target name="init" depends="clean">
@@ -62,5 +66,35 @@
 
         <jar basedir="${classes.dir}" destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
     </target>
+
+    <target name="test" depends="compile, resources" description="Runs module tests and produce XML report">
+        <mkdir dir="${tests.tmp.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${tests.tmp.dir}"
+               debug="on" debuglevel="lines,vars,source">
+            <classpath>
+                <path refid="test.classpath"/>
+                <pathelement location="${classes.dir}"/>
+            </classpath>
+        </javac>
+        <copy todir="${tests.tmp.dir}">
+            <fileset dir="${test.dir}" includes="**/*.properties **/*.xml **/*.sql"/>
+        </copy>
+        <mkdir dir="${tests.xml.report.dir}"/>
+        <!--Executing junit-->
+        <junit fork="on" forkmode="once" errorproperty="unit.tests.failed" dir="${root.dir}">
+            <classpath >
+                <path refid="test.classpath"/>
+                <pathelement location="${classes.dir}"/>
+                <pathelement location="${tests.tmp.dir}"/>
+                <pathelement location="${basedir}/lib"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${tests.xml.report.dir}">
+                <fileset dir="${test.dir}" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+
+    </target>
+
 
 </project>

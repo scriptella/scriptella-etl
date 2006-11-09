@@ -13,10 +13,23 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project name="scriptella coverage build file">
+<project name="scriptella coverage build file" default="report">
     <description>
-        Ant build with cobertura tasks. Do not call directly, use build.xml-coverage instead
+        Coverage for JUnit tests. PerfTests are excluded to make coverage testing faster.
     </description>
+
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="tmp.dir" value="${build.dir}/tmp/coverage"/>
+    <property name="classes" value="${tmp.dir}/classes"/>
+    <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
+
+    <property name="instrumented.dir" value="${tmp.dir}/instrumented"/>
+    <property name="reports.dir" value="${build.dir}/reports"/>
+    <property name="coverage.report.dir" value="${reports.dir}/coverage"/>
+    <property name="coverage.junit.report.dir" value="${reports.dir}/coverage-junit"/>
+    <property file="custom.build.properties"/>
+    <property file="build.properties"/>
+
     <path id="cobertura.classpath">
         <fileset dir="${cobertura.dir}">
             <include name="cobertura.jar"/>
@@ -24,7 +37,9 @@
         </fileset>
     </path>
 
-    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+    <path id="classpath">
+        <fileset dir="lib" includes="**/*.jar"/>
+    </path>
 
     <target name="instrument">
         <delete file="${instrumented.dir}/cobertura.ser"/>
@@ -38,31 +53,97 @@
                 source line containing a reference to log4j, for the
                 purposes of coverage reporting.
             -->
-            <ignore regex="org.apache.log4j.*"/>
+            <ignore regex="java.util.logging.Logger"/>
+            <ignore regex="java.lang.UnsupportedOperationException"/>
+            <ignore regex="java.lang.IllegalStateException"/>
 
-            <fileset dir="${tests.tmp.dir}">
+            <fileset dir="${classes}">
                 <!--
                     Instrument all the application classes, but
                     don't instrument the test classes.
                 -->
                 <include name="scriptella/**/*.class"/>
                 <exclude name="**/*Test.class"/>
+                <exclude name="**/*Test$*.class"/>
+                <exclude name="**/*TestCase.class"/>
+                <exclude name="**/*TestCase$*.class"/>
             </fileset>
         </cobertura-instrument>
 
     </target>
 
+    <target name="clean" unless="noclean">
+        <delete dir="${tmp.dir}"/>
+    </target>
 
-    <target name="report">
-        <!--
-            Generate an XML file containing the coverage data using
-            the "srcdir" attribute.
-        -->
+    <target name="init" depends="clean" description="Initializes test classes/resources">
+        <condition property="cobertura.notfound">
+            <and>
+                <isset property="cobertura.dir"/>
+                <not>
+                    <available file="${cobertura.dir}"/>
+                </not>
+            </and>
+        </condition>
+        <fail if="cobertura.notfound" message="cobertura.dir should point to an exisiting directory where Cobertura is installed."/>
+        <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+        <mkdir dir="${classes}"/>
+        <javac srcdir="core/src/test;drivers/src/test;tools/src/test;core/src/java;drivers/src/java;tools/src/java"
+               destdir="${classes}" debug="on" debuglevel="lines,vars,source" classpathref="classpath"/>
+
+        <!--Copying resources-->
+        <copy todir="${classes}">
+            <fileset dir="core/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
+            <fileset dir="core/src/conf" includes="**"/>
+            <fileset dir="drivers/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
+            <fileset dir="tools/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
+            <fileset dir="tools/src/conf" includes="**"/>
+        </copy>
+        <mkdir dir="${tests.xml.report.dir}"/>
+    </target>
+
+    <target name="run" depends="init, instrument">
+        <!--Executing junit-->
+        <junit fork="on" forkmode="once" errorproperty="unit.tests.failed">
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="${instrumented.dir}/cobertura.ser"/>
+            <classpath>
+                <pathelement location="${instrumented.dir}"/>
+                <pathelement location="${classes}"/>
+                <path refid="classpath"/>
+                <path refid="cobertura.classpath"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${tests.xml.report.dir}">
+                <fileset dir="core/src/test" includes="**/*Test.java" excludes="**/*PerfTest.java"/>
+                <fileset dir="drivers/src/test" includes="**/*Test.java" excludes="**/*PerfTest.java"/>
+                <fileset dir="tools/src/test" includes="**/*Test.java" excludes="**/*PerfTest.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+
+    <target name="report" depends="init, instrument, run">
+        <description>
+            Generate an HTML file containing the coverage data
+        </description>
+        <!--Deletes report dir to clear previous reports-->
+        <delete dir="${coverage.junit.report.dir}" failonerror="no"/>
+        <mkdir dir="${coverage.junit.report.dir}"/>
+        <junitreport todir="${coverage.junit.report.dir}">
+            <fileset dir="${tests.xml.report.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report todir="${coverage.junit.report.dir}"/>
+        </junitreport>
         <delete dir="${coverage.report.dir}" failonerror="no"/>
         <mkdir dir="${coverage.report.dir}"/>
-        <cobertura-report destdir="${coverage.report.dir}">
-            <fileset dir="${core}/src/java" includes="**/*.java"/>
+        <cobertura-report destdir="${coverage.report.dir}" datafile="${instrumented.dir}/cobertura.ser">
+            <fileset dir="core/src/java" includes="**/*.java" excludes="**/*Test.java"/>
+            <fileset dir="drivers/src/java" includes="**/*.java" excludes="**/*Test.java"/>
+            <fileset dir="tools/src/java" includes="**/*.java" excludes="**/*Test.java"/>
         </cobertura-report>
+        <fail if="unit.tests.failed" message="JUnit test failed see ${coverage.junit.report.dir}"/>
+
     </target>
 
 </project>

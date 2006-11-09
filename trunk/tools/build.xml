@@ -1,8 +1,14 @@
 <project name="scriptella-tools" default="jar">
     <path id="classpath">
-        <pathelement location="${basedir}/../core/build/scriptella-core.jar"/>
+        <pathelement location="${basedir}/../core/build/tmp/classes"/>
     </path>
-
+    <path id="test.classpath">
+        <path refid="classpath"/>
+        <pathelement location="${basedir}/../core/build/tmp/tests"/>
+        <pathelement location="${basedir}/../lib/commons-logging.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
+        <pathelement location="${basedir}/../lib/hsqldb.jar"/>
+    </path>
     <import file="../build-templates/build-template.xml"/>
 
 </project>

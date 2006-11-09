@@ -48,8 +48,9 @@ public class SqlTokenizer implements Closeable {
         this.reader = new ReaderWrapper(reader);
     }
 
-    public SqlTokenizer(Reader reader, String separator, boolean separatorOnSingleLine) {
+    public SqlTokenizer(Reader reader, String separator, boolean separatorOnSingleLine, boolean keepFormat) {
         this.reader = new ReaderWrapper(reader);
+        setKeepFormat(keepFormat);
         setSeparator(separator);
         setSeparatorOnSingleLine(separatorOnSingleLine);
     }

@@ -36,7 +36,7 @@ import java.sql.SQLException;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SQLSupportPerformanceTest extends DBTestCase {
+public class SQLSupportPerfTest extends DBTestCase {
     private static final byte SQL[] = "update ${'test'} set id=?{property};rollback;".getBytes();
     private static final byte SQL2[] = "update test set id=?{property};".getBytes();
 
@@ -118,7 +118,7 @@ public class SQLSupportPerformanceTest extends DBTestCase {
 
     public static void main(final String args[])
             throws EtlExecutorException {
-        SQLSupportPerformanceTest t = new SQLSupportPerformanceTest();
+        SQLSupportPerfTest t = new SQLSupportPerfTest();
         t.test();
     }
 

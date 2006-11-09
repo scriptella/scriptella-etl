@@ -30,10 +30,6 @@
     <property name="tmp.dir" value="${build.dir}/tmp"/>
     <property name="reports.dir" value="${build.dir}/reports"/>
     <property name="tests.report.dir" value="${reports.dir}/junit"/>
-    <property name="coverage.report.dir" value="${reports.dir}/coverage"/>
-    <property name="tests.tmp.dir" value="${tmp.dir}/test"/>
-    <property name="tests.xml.report.dir" value="${tests.tmp.dir}/junit-xml"/>
-    <property name="instrumented.dir" value="${tmp.dir}/instrumented"/>
     <property name="jar.name" value="scriptella.jar"/>
     <property name="product.name" value="scriptella-${version}"/>
     <property name="zip.name" value="${product.name}.zip"/>
@@ -44,12 +40,6 @@
     <property name="src.zip.includes" value=""></property>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
     <tstamp/>
-
-    <!--Classpath to use for JUnit tests execution -->
-    <path id="tests.classpath">
-        <pathelement location="${lib.dir}/hsqldb.jar"/>
-        <pathelement location="${tests.tmp.dir}"/>
-    </path>
 
     <target name="clean" unless="noclean">
         <description>
@@ -93,7 +83,6 @@
         <copy todir="${basedir}/samples/lib">
             <fileset dir="${lib.dir}" excludes="h2* *jexl* *logging*"/>
             <fileset file="${build.dir}/${jar.name}"/>
-
         </copy>
     </target>
 
@@ -130,79 +119,33 @@
         <description>Prepares binary and src distribution</description>
     </target>
 
-    <target name="instrument" if="coverage">
+    <target name="test">
         <description>
-            Instrument classes if cobertura coverage is on
+            Runs unit tests and produces reports in ${tests.report.dir}.
+            The tests are runned per module to control dependencies between modules.
         </description>
-        <ant antfile="${basedir}/coverage.xml" target="instrument"/>
-    </target>
 
-    <target name="test" depends="jar">
-        <description>
-            Runs unit tests and produces reports in ${tests.report.dir}
-        </description>
-        <unjar src="${build.dir}/scriptella.jar" dest="${tests.tmp.dir}"/>
-        <!--Calling instrumentation if coverage is on-->
-        <antcall target="instrument"/>
-        <javac srcdir="${core}/src/test" destdir="${tests.tmp.dir}"
-               classpath="${build.dir}/scriptella.jar:${lib.dir}/hsqldb.jar"
-               debug="on" debuglevel="lines,vars,source"/>
-        <!--Copying resources-->
-        <copy todir="${tests.tmp.dir}">
-            <fileset dir="${core}/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
-        </copy>
-        <mkdir dir="${tests.xml.report.dir}"/>
-
-        <!--Executing junit-->
-        <junit fork="on" forkmode="once" errorproperty="unit.tests.failed">
-            <sysproperty key="net.sourceforge.cobertura.datafile" file="${instrumented.dir}/cobertura.ser"/>
-            <classpath refid="tests.classpath"/>
-            <formatter type="xml"/>
-            <batchtest todir="${tests.xml.report.dir}">
-                <fileset dir="${core}/src/test">
-                    <include name="**/*Test.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        <!--Deletes report dir to clear previous reports-->
+        <ant dir="${core}" antfile="${core}/build.xml" target="test" inheritall="false"/>
+        <ant dir="${drivers}" antfile="${drivers}/build.xml" target="test" inheritall="false"/>
+        <ant dir="${tools}" antfile="${tools}/build.xml" target="test" inheritall="false"/>
         <delete dir="${tests.report.dir}" failonerror="no"/>
         <mkdir dir="${tests.report.dir}"/>
         <junitreport todir="${tests.report.dir}">
-            <fileset dir="${tests.xml.report.dir}">
-                <include name="TEST-*.xml"/>
-            </fileset>
+            <fileset dir="${core}/build/tmp/junit-xml" includes="TEST-*.xml"/>
+            <fileset dir="${drivers}/build/tmp/junit-xml" includes="TEST-*.xml"/>
+            <fileset dir="${tools}/build/tmp/junit-xml" includes="TEST-*.xml"/>
             <report todir="${tests.report.dir}"/>
         </junitreport>
         <fail if="unit.tests.failed" message="JUnit test failed see ${tests.report.dir}"/>
+
     </target>
 
-    <target name="coverage" if="cobertura.dir">
+    <target name="coverage">
         <description>
             Runs junit and produce reports including code coverage.
             Requires cobertura.dir to be specified in build.properties
         </description>
-        <condition property="cobertura.notfound">
-            <and>
-                <isset property="cobertura.dir"/>
-                <not>
-                    <available file="${cobertura.dir}"/>
-                </not>
-            </and>
-        </condition>
-        <fail if="cobertura.notfound" message="cobertura.dir should point to exisiting directory"/>
-        <property name="coverage" value="present"/>
-        <!--Instrumented classpath to use for JUnit tests execution -->
-        <path id="tests.classpath">
-            <pathelement location="${lib.dir}/hsqldb.jar"/>
-            <pathelement location="${instrumented.dir}"/>
-            <pathelement location="${tests.tmp.dir}"/>
-            <fileset dir="${cobertura.dir}">
-                <include name="cobertura.jar"/>
-                <include name="lib/**/*.jar"/>
-            </fileset>
-        </path>
-        <antcall target="test"/>
-        <ant antfile="${basedir}/coverage.xml" target="report"/>
+        <ant antfile="${basedir}/coverage.xml" inheritall="false"/>
     </target>
 
 

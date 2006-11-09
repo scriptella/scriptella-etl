@@ -15,7 +15,7 @@
             BData $LONGVARBINARY,
             CData $LONGVARCHAR
         );
-        <onerror codes="955" retry="true">
+        <onerror codes="955,42101" retry="true">
             DROP TABLE Test
         </onerror>
     </script>

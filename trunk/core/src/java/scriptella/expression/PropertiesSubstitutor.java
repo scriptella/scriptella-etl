@@ -99,53 +99,45 @@ public class PropertiesSubstitutor {
             return s;
         }
         StringBuilder res = null;
-        char[] sChars = s.toCharArray();
+        final char[] sChars = s.toCharArray();
         int lastPos = 0;
         m1.reset(s);
         m2.reset(s);
         for (int i = 0; i < len; i++) {
-            char c = sChars[i];
-            switch (c) {
-                case '$':
-                    //Start of expression
-                    Matcher m;
-                    if (m1.find(i + 1) && m1.start() == i + 1) {
-                        m = m1;
-                    } else if (m2.find(i + 1) && m2.start() == i + 1) {
-                        m = m2;
-                    } else { //not an expression
-                        m = null;
+            if (sChars[i]=='$') {
+                //Start of expression
+                Matcher m;
+                if (m1.find(i + 1) && m1.start() == i + 1) {
+                    m = m1;
+                } else if (m2.find(i + 1) && m2.start() == i + 1) {
+                    m = m2;
+                } else { //not an expression
+                    m = null;
+                }
+                if (m != null) {
+                    if (res == null) {
+                        res = new StringBuilder(s.length());
                     }
-                    if (m != null) {
-                        if (res == null) {
-                            res = new StringBuilder(s.length());
-                        }
-                        if (i > lastPos) { //if we have unflushed character
-                            res.append(sChars, lastPos, i - lastPos);
-                        }
-                        final String name = m.group(1);
-                        String v;
+                    if (i > lastPos) { //if we have unflushed character
+                        res.append(sChars, lastPos, i - lastPos);
+                    }
+                    final String name = m.group(1);
+                    String v;
 
-                        if (m == m1) {
-                            v = toString(parameters.getParameter(name));
-                        } else {
-                            v = toString(Expression.compile(name).evaluate(parameters));
-                        }
-
-                        lastPos = m.end();
-                        if (v != null) {
-                            res.append(v);
-                        } else { //appends the original string
-                            res.append(sChars, i, lastPos - i);
-                        }
-
+                    if (m == m1) {
+                        v = toString(parameters.getParameter(name));
+                    } else {
+                        v = toString(Expression.compile(name).evaluate(parameters));
                     }
 
+                    lastPos = m.end();
+                    if (v != null) {
+                        res.append(v);
+                    } else { //appends the original string
+                        res.append(sChars, i, lastPos - i);
+                    }
 
-                    break;
-                default:
-
-
+                }
             }
         }
         if (res == null) {
