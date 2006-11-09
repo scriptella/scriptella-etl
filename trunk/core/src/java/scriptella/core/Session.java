@@ -101,7 +101,7 @@ public class Session {
         for (int i = 0, n = executors.size(); i < n; i++) {
             ExecutableElement exec = executors.get(i);
             exec.execute(dynCtx);
-            progress.step(1, locations.get(i).toString());
+            progress.step(1, locations.get(i).toString()+" executed");
         }
     }
 
