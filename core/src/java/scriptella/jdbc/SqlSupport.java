@@ -57,14 +57,13 @@ public class SqlSupport implements Closeable {
         cache = new StatementCache(connection.getNativeConnection(), connection.statementCacheSize);
     }
 
-
-    protected int parseAndExecute(final Connection connection,
-                                  final ParametersCallback parametersCallback, final QueryCallback queryCallback) {
-        Parser parser = new Parser(connection, queryCallback, parametersCallback);
+    protected final int parseAndExecute(final ParametersCallback parametersCallback, final QueryCallback queryCallback) {
+        Parser parser = new Parser(connection.getNativeConnection(), queryCallback, parametersCallback);
 
         try {
             final Reader reader = resource.open();
-            SqlTokenizer tok = new SqlTokenizer(reader, this.connection.separator, this.connection.separatorSingleLine);
+            SqlTokenizer tok = new SqlTokenizer(reader, connection.separator,
+                    connection.separatorSingleLine, connection.keepformat);
             parser.parse(tok);
         } catch (IOException e) {
             throw new JdbcException("Failed to open resource", e);

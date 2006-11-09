@@ -19,8 +19,6 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 
-import java.sql.Connection;
-
 
 /**
  * TODO: Add documentation
@@ -33,15 +31,10 @@ class Query extends SqlSupport {
         super(resource, connection);
     }
 
-    public void execute(final Connection connection,
-                        final QueryCallback callBack) {
-        execute(connection, null, callBack);
-    }
-
-    public void execute(final Connection connection, final ParametersCallback parametersCallback,
+    public void execute(final ParametersCallback parametersCallback,
                         final QueryCallback queryCallback) {
         final int r;
-        r = parseAndExecute(connection, parametersCallback, queryCallback);
+        r = parseAndExecute(parametersCallback, queryCallback);
 
         if (r > 0) {
             throw new JdbcException("Query cannot make updates.");

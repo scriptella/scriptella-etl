@@ -15,7 +15,6 @@
  */
 package scriptella.tools.template;
 
-import scriptella.tools.launcher.EtlLauncher;
 import scriptella.util.IOUtils;
 
 import java.io.File;
@@ -23,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -36,7 +36,10 @@ import java.util.Map;
 public class TemplateManager {
     private static final String DEFAULT_ETL_XML = "default.etl.xml";
     private static final String DEFAULT_ETL_PROPS = "default.etl.properties";
-    private Map<String,String> properties;
+    private Map<String, String> properties;
+    private static final String DEFAULT_BASE_NAME = "etl";
+    private static final String XML_EXT = ".xml";
+    private static final String PROPS_EXT = ".properties";
 
     public TemplateManager() {
     }
@@ -51,6 +54,7 @@ public class TemplateManager {
 
     /**
      * Produce template files.
+     *
      * @throws IOException if output fails.
      */
     public void create() throws IOException {
@@ -64,33 +68,44 @@ public class TemplateManager {
             throw new IllegalArgumentException("Resource " + DEFAULT_ETL_PROPS + " not found");
         }
 
-        String xmlName = defineName();
-        String propsName = xmlName.substring(0, xmlName.length() - 4) + ".properties";
+        String baseName = defineName();
+        String xmlName = baseName + XML_EXT;
+        String propsName = baseName + PROPS_EXT;
         String xmlTemplate = IOUtils.toString(new InputStreamReader(xml));
-        FileWriter fw = new FileWriter(xmlName);
+        Writer w = newFileWriter(xmlName);
 
-        fw.write(MessageFormat.format(xmlTemplate, propsName));
-        fw.close();
-        fw = new FileWriter(propsName);
+        w.write(MessageFormat.format(xmlTemplate, propsName));
+        w.close();
+        w = newFileWriter(propsName);
         String propsTemplate = IOUtils.toString(new InputStreamReader(props));
-        fw.write(propsTemplate);
-        fw.close();
+        w.write(propsTemplate);
+        w.close();
         System.out.println("Files " + xmlName + ", " + propsName + " have been successfully created.");
     }
 
+    /**
+     * Defines base name for ETL.
+     */
     String defineName() {
         for (int i = 0; i < 10; i++) {
-            String name = ((i > 0) ? i + "." : "") + EtlLauncher.DEFAULT_FILE_NAME;
-            if (checkFile(name)) {
+            String name = DEFAULT_BASE_NAME + ((i > 0) ? ("[" + i + "]") : "");
+            if (checkFile(name + XML_EXT) && checkFile(name + PROPS_EXT)) {
                 return name;
             }
         }
         throw new IllegalStateException("Too many templates generated. Remove unused.");
     }
 
+    /**
+     * Template factory method for writers.
+     */
+    protected Writer newFileWriter(String fileName) throws IOException {
+        return new FileWriter(fileName);
+    }
 
     /**
      * Returns true if file doesn't exist.
+     *
      * @param name file name.
      */
     protected boolean checkFile(String name) {

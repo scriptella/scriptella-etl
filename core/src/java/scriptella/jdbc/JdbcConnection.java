@@ -42,6 +42,7 @@ public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
     public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
+    public static final String KEEPFORMAT_KEY = "keepformat";
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
     private boolean transactable;
@@ -49,6 +50,7 @@ public class JdbcConnection extends AbstractConnection {
     int statementCacheSize;
     protected String separator = ";";
     protected boolean separatorSingleLine;
+    protected boolean keepformat;
     private final Map<Resource, SqlSupport> resourcesMap = new IdentityHashMap<Resource, SqlSupport>();
 
     public JdbcConnection(Connection con, ConnectionParameters parameters) {
@@ -92,7 +94,11 @@ public class JdbcConnection extends AbstractConnection {
         } catch (ParseException e) {
             throw new JdbcException(e.getMessage());
         }
-
+        try {
+            keepformat = parameters.getBooleanProperty(KEEPFORMAT_KEY, false);
+        } catch (ParseException e) {
+            throw new JdbcException(e.getMessage());
+        }
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -121,7 +127,7 @@ public class JdbcConnection extends AbstractConnection {
         if (s == null) {
             resourcesMap.put(scriptContent, s = new Script(scriptContent, this));
         }
-        s.execute(con, parametersCallback);
+        s.execute(parametersCallback);
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
@@ -129,7 +135,7 @@ public class JdbcConnection extends AbstractConnection {
         if (q == null) {
             resourcesMap.put(queryContent, q = new Query(queryContent, this));
         }
-        q.execute(con, parametersCallback, queryCallback);
+        q.execute(parametersCallback, queryCallback);
     }
 
     ParametersParser getParametersParser() {

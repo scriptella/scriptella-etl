@@ -18,8 +18,6 @@ package scriptella.jdbc;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;
 
-import java.sql.Connection;
-
 
 /**
  * TODO: Add documentation
@@ -32,7 +30,7 @@ public class Script extends SqlSupport {
         super(resource, connection);
     }
 
-    public int execute(Connection con, ParametersCallback parametersCallback) {
-        return parseAndExecute(con, parametersCallback, null);
+    public int execute(ParametersCallback parametersCallback) {
+        return parseAndExecute(parametersCallback, null);
     }
 }

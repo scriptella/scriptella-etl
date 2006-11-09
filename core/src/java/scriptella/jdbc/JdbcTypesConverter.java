@@ -160,6 +160,7 @@ class JdbcTypesConverter implements Closeable {
             int len = c.getContentLength();
 
             if (len < 0) {
+                //todo move this code to a lobs factory
                 throw new SQLException("Unknown content-length for file " + url);
             }
 

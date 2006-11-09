@@ -40,6 +40,13 @@ Scriptella JDBC Bridge.
             Similar to Ant delimitertype property.</td>
         <td>No, the default value is <code>false</code>.</td>
     </tr>
+    <tr>
+        <td>keepformat</td>
+        <td>True if the original SQL formatting should be preserved.
+        <p>This property is similar to Ant keepformat property except that Oracle-style hints (?*+ hint */) are always preserved in Scriptella.</p></td>
+        <td>No, the default value is <code>false</code>, i.e. extra whitespaces and comments removed.</td>
+    </tr>
+
 </table>
 <h2>Properties Substitution</h2>
 The bridge supports standard ${} variables expansion and
