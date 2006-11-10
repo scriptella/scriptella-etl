@@ -81,7 +81,15 @@
                         The driver requires <code>scriptella.driver.spring.EtlExecutorBean</code> to be used in Spring configuration.
                     </td>
 				</tr>
-			</table>
+                <tr>
+                    <td>
+                        <a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
+                    </td>
+                    <td>scriptella.driver.sybase.Driver</td>
+                    <td>com.sybase.jdbc3.jdbc.SybDriver</td>
+                    <td/>
+                </tr>
+            </table>
 		</section>
 		<section id="nonjdbc">
 			<title>Non-JDBC Drivers</title>
