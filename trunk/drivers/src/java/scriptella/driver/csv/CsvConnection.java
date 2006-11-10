@@ -199,7 +199,7 @@ public class CsvConnection extends AbstractConnection {
             CSVReader in = new CSVReader(IOUtils.getReader(url.openStream(), encoding), separator, quote);
             CsvQuery q = new CsvQuery(in, headers, trim);
             try {
-                q.execute(queryContent.open(), parametersCallback, queryCallback);
+                q.execute(new CSVReader(queryContent.open()), parametersCallback, queryCallback);
             } catch (IOException e) {
                 throw new CsvProviderException("Cannot read query " + queryContent, e);
             } finally {

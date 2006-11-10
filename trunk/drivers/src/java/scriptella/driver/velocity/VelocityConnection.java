@@ -132,10 +132,6 @@ public class VelocityConnection extends AbstractConnection {
     private static class VelocityContextAdapter implements Context {
         private ParametersCallback callback;
 
-        public ParametersCallback getCallback() {
-            return callback;
-        }
-
         public void setCallback(ParametersCallback callback) {
             this.callback = callback;
         }

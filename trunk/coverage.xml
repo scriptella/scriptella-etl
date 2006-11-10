@@ -21,6 +21,7 @@
     <property name="build.dir" value="${basedir}/build"/>
     <property name="tmp.dir" value="${build.dir}/tmp/coverage"/>
     <property name="classes" value="${tmp.dir}/classes"/>
+    <property name="testclasses" value="${tmp.dir}/testclasses"/>
     <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
 
     <property name="instrumented.dir" value="${tmp.dir}/instrumented"/>
@@ -59,14 +60,9 @@
 
             <fileset dir="${classes}">
                 <!--
-                    Instrument all the application classes, but
-                    don't instrument the test classes.
+                    Instrument all the application classes.
                 -->
-                <include name="scriptella/**/*.class"/>
-                <exclude name="**/*Test.class"/>
-                <exclude name="**/*Test$*.class"/>
-                <exclude name="**/*TestCase.class"/>
-                <exclude name="**/*TestCase$*.class"/>
+                <include name="**/*.class"/>
             </fileset>
         </cobertura-instrument>
 
@@ -88,11 +84,16 @@
         <fail if="cobertura.notfound" message="cobertura.dir should point to an exisiting directory where Cobertura is installed."/>
         <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
         <mkdir dir="${classes}"/>
-        <javac srcdir="core/src/test;drivers/src/test;tools/src/test;core/src/java;drivers/src/java;tools/src/java"
+        <mkdir dir="${testclasses}"/>
+        <javac srcdir="core/src/java;drivers/src/java;tools/src/java"
                destdir="${classes}" debug="on" debuglevel="lines,vars,source" classpathref="classpath"/>
-
+        <javac srcdir="core/src/test;drivers/src/test;tools/src/test"
+               destdir="${testclasses}" debug="on" debuglevel="lines,vars,source">
+            <classpath refid="classpath"/>
+            <classpath location="${classes}"/>
+        </javac>
         <!--Copying resources-->
-        <copy todir="${classes}">
+        <copy todir="${testclasses}">
             <fileset dir="core/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
             <fileset dir="core/src/conf" includes="**"/>
             <fileset dir="drivers/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
@@ -109,6 +110,7 @@
             <classpath>
                 <pathelement location="${instrumented.dir}"/>
                 <pathelement location="${classes}"/>
+                <pathelement location="${testclasses}"/>
                 <path refid="classpath"/>
                 <path refid="cobertura.classpath"/>
             </classpath>

@@ -15,10 +15,14 @@
  */
 package scriptella.driver.janino;
 
+import org.codehaus.janino.Scanner;
 import org.codehaus.janino.ScriptEvaluator;
 import scriptella.spi.Resource;
+import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -50,15 +54,15 @@ final class CodeCompiler {
             //Exception are not required to be handled
             evaluator.setThrownExceptions(THROWN_EXCEPTIONS);
             evaluator.setParentClassLoader(getClass().getClassLoader());
-            evaluator.setExtendedType(query ? JaninoQuery.class: JaninoScript.class);
+            evaluator.setExtendedType(query ? JaninoQuery.class : JaninoScript.class);
             evaluator.setStaticMethod(false);
 
             Reader r = null;
             try {
                 r = content.open();
-                evaluator.cook(r);//todo use resource name
+                evaluator.cook(content.toString(), r);
             } catch (Exception e) {
-                throw new JaninoProviderException("Compilation failed", e);
+                throw guestErrorStatement(new JaninoProviderException("Compilation failed", e), content);
             } finally {
                 IOUtils.closeSilently(r);
             }
@@ -66,11 +70,46 @@ final class CodeCompiler {
             try {
                 ctx = cl.newInstance();
             } catch (Exception e) {
-                throw new JaninoProviderException("Unable to instantiate compiled class",e);
+                throw new JaninoProviderException("Unable to instantiate compiled class", e);
             }
             objectCache.put(content, ctx);
         }
         return ctx;
+    }
+
+    /**
+     * Finds error statement which caused compilation error.
+     */
+    private static JaninoProviderException guestErrorStatement(JaninoProviderException pe, Resource r) {
+        Throwable cause = pe.getCause();
+        if (cause instanceof Scanner.LocatedException) {
+            Scanner.LocatedException le = (Scanner.LocatedException) cause;
+            if (le.getLocation() != null) {
+                String line = getLine(r, le.getLocation().getLineNumber());
+                pe.setErrorStatement(line);
+            }
+        }
+        return pe;
+    }
+
+    static String getLine(Resource resource, int line) {
+        Reader r = null;
+        try {
+            r = resource.open();
+            BufferedReader br = new BufferedReader(r);
+            for (int i = 0; i < line - 1; i++) {
+                if (br.readLine() == null) {
+                    return null;
+                }
+            }
+            return br.readLine();
+        } catch (IOException e) {
+            ExceptionUtils.ignoreThrowable(e);
+        } finally {
+            IOUtils.closeSilently(r);
+        }
+        return null;
+
     }
 
 

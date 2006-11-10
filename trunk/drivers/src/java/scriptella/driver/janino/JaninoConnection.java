@@ -21,19 +21,11 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
-import scriptella.util.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Scriptella connection adapter for Janino Script Evaluator.
  */
 public class JaninoConnection extends AbstractConnection {
-    private static final Logger LOG = Logger.getLogger(JaninoConnection.class.getName());
     private CodeCompiler compiler = new CodeCompiler();
 
     /**
@@ -69,7 +61,8 @@ public class JaninoConnection extends AbstractConnection {
      */
     public synchronized void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
 
-        JaninoQuery q = compiler.compileQuery(queryContent);
+        JaninoQuery q = null;
+        q = compiler.compileQuery(queryContent);
         q.setParametersCallback(parametersCallback);
         q.setQueryCallback(queryCallback);
         try {
@@ -92,14 +85,14 @@ public class JaninoConnection extends AbstractConnection {
      * @param scriptClass class to use when finding an error statement.
      * @return the same exception with a guessed error statement.
      */
-    private JaninoProviderException guessErrorStatement(JaninoProviderException e, Resource content, Class scriptClass) {
+    private static JaninoProviderException guessErrorStatement(JaninoProviderException e, Resource content, Class scriptClass) {
         Throwable ex = e.getCause();
         StackTraceElement[] trace = ex.getStackTrace();
         final String scriptClassName = scriptClass.getName();
         for (StackTraceElement el : trace) { //find the top most instance of generated class
             String className = el.getClassName();
             if (scriptClassName.equals(className)) {
-                String st = getLine(content, el.getLineNumber());
+                String st = CodeCompiler.getLine(content, el.getLineNumber());
                 e.setErrorStatement(st);
                 break;
             }
@@ -107,28 +100,6 @@ public class JaninoConnection extends AbstractConnection {
         }
         return e;
     }
-
-    private String getLine(Resource resource, int line) {
-        Reader r = null;
-        try {
-            r = resource.open();
-            BufferedReader br = new BufferedReader(r);
-            for (int i=0;i<line-1;i++) {
-                if (br.readLine()==null) {
-                    return null;
-                }
-            }
-            return br.readLine();
-        } catch (IOException e) {
-            LOG.log(Level.FINE, "Failed to determine error statement",e);
-        } finally {
-            IOUtils.closeSilently(r);
-        }
-        return null;
-
-    }
-
-
 
     /**
      * Closes the connection and releases all related resources.
