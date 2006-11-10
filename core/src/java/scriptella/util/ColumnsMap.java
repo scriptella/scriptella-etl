@@ -51,6 +51,9 @@ public class ColumnsMap {
      * @return column index, or null if column not found.
      */
     public Integer find(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Parameter name cannot be null");
+        }
         Integer index = map == null ? null : map.get(name);
         //If name is not a column name and is integer
         if (index == null && StringUtils.isDecimalInt(name)) {

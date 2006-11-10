@@ -73,6 +73,26 @@ public class JaninoConnectionTest extends AbstractTestCase {
         c.close();
         List<String> expected = Arrays.asList("//*p*", "v2");
         assertEquals(expected, rows);
+    }
+
+    public void testErrorSourceCode() {
+        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        //test compilation errors
+        try {
+            c.executeScript(new StringResource("int b=1;\na='"), MockParametersCallbacks.NULL);
+            fail("Error statements must be recognized");
+        } catch (JaninoProviderException e) {
+            assertEquals("a='", e.getErrorStatement());
+        }
+        //test execution errors
+        try {
+            c.executeScript(new StringResource("int b=1;\nObject a=get(\"1\");"), MockParametersCallbacks.UNSUPPORTED);
+            fail("Error statements must be recognized");
+        } catch (JaninoProviderException e) {
+            assertEquals("Object a=get(\"1\");", e.getErrorStatement());
+        }
+
+
 
     }
 }

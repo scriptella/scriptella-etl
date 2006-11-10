@@ -20,10 +20,10 @@ import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.util.ColumnsMap;
+import scriptella.util.ExceptionUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -58,23 +58,38 @@ public class CsvQuery implements ParametersCallback, Closeable {
         this.trim = trim;
     }
 
-    public void execute(Reader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback) throws IOException {
+    /**
+     * Executes a query.
+     * @param queryReader query content reader. Closed after this method completes.
+     * @param parametersCallback parameters to use.
+     * @param queryCallback callback to use for result set iteration.
+     * @throws IOException if IO error occurs.
+     */
+    public void execute(CSVReader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback) throws IOException {
+        try {
+            substitutor.setParameters(parametersCallback);
+            List<Pattern[]> patterns = compileQueries(queryReader);
+            columnsMap = new ColumnsMap();
+            if (headers) {
+                String[] row = reader.readNext();
+                for (int i = 0; i < row.length; i++) {
+                    columnsMap.registerColumn(row[i], i + 1);
+                }
+            }
+            //For each row
+            while ((row = reader.readNext()) != null) {
+                if (matches(patterns, row)) {
+                    queryCallback.processRow(this);
+                }
+            }
+        } finally { //clean up
+            try {
+                queryReader.close();
+            } catch (Exception e) {
+                ExceptionUtils.ignoreThrowable(e);
+            }
+        }
 
-        substitutor.setParameters(parametersCallback);
-        List<Pattern[]> patterns = compileQueries(queryReader);
-        columnsMap = new ColumnsMap();
-        if (headers) {
-            String[] row = reader.readNext();
-            for (int i = 0; i < row.length; i++) {
-                columnsMap.registerColumn(row[i], i + 1);
-            }
-        }
-        //For each row
-        while ((row = reader.readNext()) != null) {
-            if (matches(patterns, row)) {
-                queryCallback.processRow(this);
-            }
-        }
     }
 
     /**
@@ -115,12 +130,11 @@ public class CsvQuery implements ParametersCallback, Closeable {
     /**
      * Compiles queries into a list of patterns.
      *
-     * @param reader reader for query text.
+     * @param r CSV reader for query text.
      * @return list of compiled columns.
      */
     @SuppressWarnings("unchecked")
-    List<Pattern[]> compileQueries(final Reader reader) {
-        CSVReader r = new CSVReader(reader);//Parsing rules for queries are always default
+    List<Pattern[]> compileQueries(final CSVReader r) {
         List<String[]> list;
         try {
             list = r.readAll();
@@ -139,7 +153,7 @@ public class CsvQuery implements ParametersCallback, Closeable {
                     try {
                         patterns[i] = Pattern.compile(substitutor.substitute(s), Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
                     } catch (Exception e) {
-                        throw new CsvProviderException("Illegal regular expression syntax for query.", e, s);
+                        throw new CsvProviderException("Illegal regular expression syntax for query", e, s);
                     }
                 }
             }
@@ -166,9 +180,6 @@ public class CsvQuery implements ParametersCallback, Closeable {
     }
 
     public Object getParameter(final String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Parameter name cannot be null");
-        }
         if (reader == null) {
             throw new IllegalStateException("CSV Resultset is closed");
         }
