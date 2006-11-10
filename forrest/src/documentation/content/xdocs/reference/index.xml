@@ -3,10 +3,11 @@
 <document>
 	<header>
 		<title>Scriptella Reference Documentation</title>
-		<authors>
+        <version>0.5dev</version>
+        <authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
-		<notice>Version 0.2dev. Work in progress</notice>
+        <notice>Work in progress</notice>
 		<abstract class="pageBreakAfter">
 			<img src="../images/site-logo.png" alt=""/>
 		</abstract>
