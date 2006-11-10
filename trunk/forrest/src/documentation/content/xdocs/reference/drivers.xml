@@ -3,10 +3,11 @@
 <document>
 	<header>
 		<title>Scriptella Drivers Matrix</title>
+		<version>0.5dev</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
-		<notice>Version 0.2dev. Work in progress</notice>
+		<notice>Work in progress</notice>
 		<abstract>
 			<img src="../images/site-logo.png" alt=""/>
 			<br/>
@@ -16,6 +17,7 @@
             <a href="../docs/api/">Javadoc</a>
             for the built-in drivers.
         </abstract>
+        
 	</header>
 	<body>
 		<section id="jdbcbridge">
@@ -56,20 +58,20 @@
 					<td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
                         environment</td>
 				</tr>
-                <tr>
-                    <td>
-                        <anchor id="oracle"/>
-                        <a href="../docs/api/scriptella/driver/oracle/package-summary.html">Oracle Database</a>
-                    </td>
-                    <td>scriptella.driver.oracle.Driver</td>
-                    <td>oracle.jdbc.driver.OracleDriver</td>
-                    <td>Built-in Scriptella driver for Oracle. The following extra features supported:
+				<tr>
+					<td>
+						<anchor id="oracle"/>
+						<a href="../docs/api/scriptella/driver/oracle/package-summary.html">Oracle Database</a>
+					</td>
+					<td>scriptella.driver.oracle.Driver</td>
+					<td>oracle.jdbc.driver.OracleDriver</td>
+					<td>Built-in Scriptella driver for Oracle. The following extra features supported:
                         <ul>
-                            <li>Simplified handling of PL/SQL blocks.</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
+							<li>Simplified handling of PL/SQL blocks.</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
 					<td>
 						<anchor id="spring"/>
 						<a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
@@ -81,15 +83,15 @@
                         The driver requires <code>scriptella.driver.spring.EtlExecutorBean</code> to be used in Spring configuration.
                     </td>
 				</tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
-                    </td>
-                    <td>scriptella.driver.sybase.Driver</td>
-                    <td>com.sybase.jdbc3.jdbc.SybDriver</td>
-                    <td/>
-                </tr>
-            </table>
+				<tr>
+					<td>
+						<a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
+					</td>
+					<td>scriptella.driver.sybase.Driver</td>
+					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
+					<td/>
+				</tr>
+			</table>
 		</section>
 		<section id="nonjdbc">
 			<title>Non-JDBC Drivers</title>
