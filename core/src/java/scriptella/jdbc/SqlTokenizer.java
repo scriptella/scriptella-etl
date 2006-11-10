@@ -56,7 +56,7 @@ public class SqlTokenizer implements Closeable {
     }
 
     private int position;
-    private char previousChar = (char) -1;
+    private char previousChar;
     private char currentChar;
 
     private int lastLineStart;
@@ -66,7 +66,7 @@ public class SqlTokenizer implements Closeable {
      * Parses the following SQL statement from reader.
      *
      * @return parsed SQL statement
-     * @throws IOException if I/O exception occurs.
+     * @throws IOException if I/O exception occurs
      */
     public StringBuilder nextStatement() throws IOException {
         sb.setLength(0);
@@ -203,7 +203,7 @@ public class SqlTokenizer implements Closeable {
     /**
      * Seeks until end c-style comment * /.
      * If keepFormat=false, the comment string is not appended to the buffer.
-     * @throws IOException
+     * @throws IOException if I/O error occurs
      */
     private void seekEndCStyleComment() throws IOException {
         boolean firstChar=true;
@@ -261,6 +261,7 @@ public class SqlTokenizer implements Closeable {
     
     /**
      * Returns true if preserve comments and whitespaces. Default value is <b><code>false</code></b>
+     * @return <tt>false</tt> by default
      */
     public boolean isKeepFormat() {
         return keepFormat;
@@ -333,6 +334,7 @@ public class SqlTokenizer implements Closeable {
          * Reads a character for reader.
          * <p>Internal bufferring is used for performance reasons.
          * @return a character read.
+         * @throws IOException if I/O exception occurs
          */
         private int read() throws IOException {
             if (bufPos>=bufSize) { //buffer is empty
