@@ -15,7 +15,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 %
-@title Scriptella File DTD
+@title Scriptella ETL File DTD
+@doctype etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd"
+@root etl
 -->
 
 <!--
