@@ -67,10 +67,10 @@ public class ParametersParser {
                     throw new JdbcException("Failed to evaluate file URL", expression);
                 }
                 if (o instanceof URL) {
-                    return (URL) o;
+                    return Lobs.newBlob((URL) o);
                 } else {
                     try {
-                        return driverContext.resolve(String.valueOf(o));
+                        return Lobs.newBlob(driverContext.resolve(String.valueOf(o)));
                     } catch (MalformedURLException e) {
                         throw new JdbcException("Wrong file URL \""+o+"\"", e, expression);
                     }

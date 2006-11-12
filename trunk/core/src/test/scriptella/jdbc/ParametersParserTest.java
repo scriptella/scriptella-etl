@@ -39,13 +39,13 @@ public class ParametersParserTest extends TestCase {
         ParametersParser p = new ParametersParser(dc);
 
         String expr = "file 'myfile'";
-        Object actual = p.evaluate(expr, MockParametersCallbacks.UNSUPPORTED);
+        Lobs.UrlBlob actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.UNSUPPORTED);
         URL expected = dc.resolve("myfile");
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.getUrl());
         expr = "file 'http'+'://host/'+name";
-        actual = p.evaluate(expr, MockParametersCallbacks.SIMPLE);
+        actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.SIMPLE);
         expected = new URL("http://host/*name*");
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.getUrl());
     }
 
     /**

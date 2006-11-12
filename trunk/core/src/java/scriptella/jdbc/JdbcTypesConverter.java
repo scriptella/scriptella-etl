@@ -17,12 +17,10 @@ package scriptella.jdbc;
 
 import scriptella.util.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
@@ -40,7 +38,7 @@ import java.util.List;
  * Represents a converter for prepared statement parameters and result set columns.
  * <p>This class defines a strategy for handling specific parameters like {@link URL}
  * and by default provides a generic behaviour for any objects.
- * <p>Configuration by exception is the general phylosophy of this class, i.e.
+ * <p>Configuration by exception is the general philosophy of this class, i.e.
  * most of the conversions must be performed by a provided resultset/preparedstatement and
  * custom conversions are applied only in rare cases. One of these cases is BLOB/CLOB handling.
  * <p>Specific adapters of JDBC drivers may provide a subclass of this class to
@@ -50,7 +48,7 @@ import java.util.List;
  * @version 1.0
  */
 class JdbcTypesConverter implements Closeable {
-    private List<InputStream> resources;
+    private List<Closeable> resources;
 
     /**
      * Gets the value of the designated column in the current row of this ResultSet
@@ -64,7 +62,6 @@ class JdbcTypesConverter implements Closeable {
      * @see ResultSet#getObject(int)
      */
     public Object getObject(final ResultSet rs, final int index, final int jdbcType) throws SQLException {
-        //TODO for longvarchar/longvarbinary maybe use get...stream, and convert it to blob?
         switch(jdbcType) {
             case Types.DATE: //For date/timestamp use getTimestamp to keep hh,mm,ss if possible
             case Types.TIMESTAMP:
@@ -75,9 +72,20 @@ class JdbcTypesConverter implements Closeable {
                 return rs.getBlob(index);
             case Types.CLOB:
                 return rs.getClob(index);
+            case Types.LONGVARBINARY:
+                InputStream is = rs.getBinaryStream(index);
+                return is==null?null:toBlob(is);
+            case Types.LONGVARCHAR:
+                Reader reader = rs.getCharacterStream(index);
+                return reader==null?null:toClob(reader);
         }
-        return rs.getObject(index);
+        Object res = rs.getObject(index);
+        if (res==null) {
+            return null;
+        }
+        return res;
     }
+
 
     /**
      * Sets the value of the designated parameter using the given object.
@@ -93,16 +101,14 @@ class JdbcTypesConverter implements Closeable {
         if (value==null) {
             preparedStatement.setObject(index, null);
         } else if (value instanceof InputStream) {
-            setStreamObject(preparedStatement, index, (InputStream) value);
-        } else if (value instanceof URL) {
-            setURLObject(preparedStatement, index, (URL) value);
+            setBlob(preparedStatement, index, toBlob((InputStream) value));
+        } else if (value instanceof Reader) {
+            setClob(preparedStatement, index, toClob((Reader) value));
         //For BLOBs/CLOBs use JDBC 1.0 methods for compatibility
         } else if (value instanceof Blob) {
-            Blob b = (Blob) value;
-            preparedStatement.setBinaryStream(index, b.getBinaryStream(), (int) b.length());
+            setBlob(preparedStatement, index, (Blob) value);
         } else if (value instanceof Clob) {
-            Clob c = (Clob) value;
-            preparedStatement.setCharacterStream(index, c.getCharacterStream(), (int) c.length());
+            setClob(preparedStatement, index, (Clob) value);
         } else if (value instanceof Date) {
             setDateObject(preparedStatement, index, (Date) value);
         } else if (value instanceof Calendar) {
@@ -112,19 +118,28 @@ class JdbcTypesConverter implements Closeable {
         }
     }
 
-    /**
-     * Sets input stream for statement.
-     */
-    protected void setStreamObject(final PreparedStatement ps, final int index, final InputStream stream) throws SQLException {
-        try {
-            //A hack is used to determine stream size, but most drivers do so
-            //and available=size for memory and file streams.
-            //May be we provide a better solution in future
-            //Option converter.stream_to_array is also reasonable
-            ps.setBinaryStream(index, stream, stream.available());
-        } catch (IOException e) {
-            throw (SQLException)new SQLException("Failed to check binary stream: "+e.getMessage()).initCause(e);
+    protected Blob toBlob(InputStream is) {
+        Blob blob = Lobs.newBlob(is);
+        if (blob instanceof Closeable) {
+            registerResource((Closeable) blob);
         }
+        return blob;
+    }
+
+    protected Clob toClob(Reader reader) {
+        Clob clob = Lobs.newClob(reader);
+        if (clob instanceof Closeable) {
+            registerResource((Closeable) clob);
+        }
+        return clob;
+    }
+
+    protected void setBlob(final PreparedStatement ps, final int index, final Blob blob) throws SQLException {
+        ps.setBinaryStream(index, blob.getBinaryStream(), (int) blob.length());
+    }
+
+    protected void setClob(final PreparedStatement ps, final int index, final Clob clob) throws SQLException {
+        ps.setCharacterStream(index, clob.getCharacterStream(), (int) clob.length());
     }
 
     /**
@@ -142,45 +157,20 @@ class JdbcTypesConverter implements Closeable {
         }
     }
 
-
-    /**
-     * Sets a content of the file specified by URL.
-     */
-    protected void setURLObject(final PreparedStatement ps, final int index, final URL url) throws SQLException {
-        try {
-            final URLConnection c = url.openConnection();
-            final InputStream is = new BufferedInputStream(c.getInputStream());
-
-            if (resources == null) {
-                resources = new ArrayList<InputStream>();
-            }
-
-            resources.add(is);
-
-            int len = c.getContentLength();
-
-            if (len < 0) {
-                //todo move this code to a lobs factory
-                throw new SQLException("Unknown content-length for file " + url);
-            }
-
-            ps.setBinaryStream(index, is, len);
-        } catch (IOException e) {
-            throw (SQLException) new SQLException("Unable to read content for file " + url +
-                    ": " + e.getMessage()).initCause(e);
+    protected void registerResource(Closeable resource) {
+        if (resources==null) {
+            resources=new ArrayList<Closeable>();
         }
-
-
+        resources.add(resource);
     }
-
 
     /**
      * Closes any resources opened during this object lifecycle.
      */
     public void close() {
         if (resources != null) {
-            for (InputStream is : resources) {
-                IOUtils.closeSilently(is);
+            for (Closeable r : resources) {
+                IOUtils.closeSilently(r);
             }
             resources = null;
         }
