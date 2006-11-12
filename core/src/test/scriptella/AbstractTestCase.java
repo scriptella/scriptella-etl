@@ -66,8 +66,7 @@ public abstract class AbstractTestCase extends TestCase {
                                     return testURLHandler.getOutputStream(u);
                                 }
 
-                                public InputStream getInputStream()
-                                        throws IOException {
+                                public InputStream getInputStream() throws IOException {
                                     return testURLHandler.getInputStream(u);
                                 }
 

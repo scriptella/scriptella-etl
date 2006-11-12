@@ -81,16 +81,16 @@ public final class IOUtils {
      */
     public static String toString(final Reader reader, final long maxLength) throws IOException {
         char cb[] = new char[4096];
-        StringBuilder sb = new StringBuilder(cb.length * 2);
+        StringBuilder sb = new StringBuilder(cb.length);
         long len = 0;
 
         try {
-            for (int c; (c = reader.read(cb)) > 0;) {
-                len += c;
+            for (int n; (n = reader.read(cb)) >= 0;) {
+                len += n;
                 if (len > maxLength) {
                     throw new IOException("Content too long to fit in memory");
                 }
-                sb.append(cb, 0, c);
+                sb.append(cb, 0, n);
             }
         } finally {
             closeSilently(reader);
@@ -120,11 +120,11 @@ public final class IOUtils {
      */
     public static byte[] toByteArray(InputStream is, long maxLength) throws IOException {
         byte b[] = new byte[4096];
-        ByteArrayOutputStream os = new ByteArrayOutputStream(b.length * 2);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(b.length);
         long len = 0;
 
         try {
-            for (int n; (n = is.read(b)) > 0;) {
+            for (int n; (n = is.read(b)) >= 0;) {
                 len += n;
                 if (len > maxLength) {
                     throw new IOException("Content too long to fit in memory");
