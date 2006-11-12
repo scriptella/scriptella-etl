@@ -35,7 +35,9 @@ See http://forrest.apache.org/docs/linking.html for more info
         <!-- Temprorary solution to avoid broken links. See forrest FAQ for solution on apidocs links-->
         <api label="API Docs" href="docs/api/"/>
         <dtd label="DTD Reference" href="docs/dtd/"/>
-        <howtos label="How-Tos" tab="howto" href="howto/migrate-from-ant.html"/>
+        <howtos label="How-Tos" tab="howto">
+            <ant label="Migrate from Ant SQL Task" href="howto/migrate-from-ant.html"/>
+         </howtos>
         <!--For now API Docs links breaks wholesite generation, resolve the problem and uncomment 
         <whole_site_html label="Whole Site HTML" href="wholesite.html"/>
         <whole_site_pdf label="Whole Site PDF" href="wholesite.pdf"/>-->
