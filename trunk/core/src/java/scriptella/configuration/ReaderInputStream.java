@@ -21,12 +21,12 @@ import java.io.Reader;
 
 
 /**
- * TODO: Add documentation
+ * TODO: Refactor this class to support unicode convertion similar to native2ascii works
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ReaderInputStream extends InputStream {
+class ReaderInputStream extends InputStream {
     private Reader reader;
 
     public ReaderInputStream(Reader reader) {
@@ -41,7 +41,7 @@ public class ReaderInputStream extends InputStream {
 
     public int read(final byte b[], final int off, final int len)
             throws IOException {
-        char[] c = null;
+        char[] c;
         if (tmpBuf != null && tmpBuf.length >= len) {
             c = tmpBuf;
         } else {
