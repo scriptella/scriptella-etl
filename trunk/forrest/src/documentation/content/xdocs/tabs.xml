@@ -13,7 +13,8 @@
   -->
 	<tab id="" label="Home" dir="" indexfile="index.html"/>
 	<tab id="reference" label="Reference" dir="reference/"/>
-	<!-- Add new tabs here, eg:
+    <tab id="howto" label="How-Tos" dir="howto/" indexfile="migrate-from-ant.html"/>
+    <!-- Add new tabs here, eg:
   <tab label="How-Tos" dir="community/howto/"/>
   <tab label="XML Site" dir="xml-site/"/>
   -->
