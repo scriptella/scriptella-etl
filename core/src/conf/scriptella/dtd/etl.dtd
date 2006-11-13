@@ -38,13 +38,23 @@ JNDI bound datasource.
 <!ELEMENT etl (description?, properties?, connection*, (script*, query*)*)>
 
 <!--
-Contains description of scripts file.
+Contains description of ETL file.
 -->
 <!ELEMENT description (#PCDATA)>
 <!--
 The properties element contains a set of properties available for script elements.
 The content of this element conforms to format supported by java.util.Properties.
 This element may contain plain text or includes.
+<p><u>Example:</u>
+%
+<properties>
+    #standard properties syntax
+    table.size=10
+    tmp=c\:\\temp\\
+    #including content from external properties file
+    <include href="etl.properties"/>
+</properties>
+
 -->
 <!ELEMENT properties (#PCDATA | include)*>
 <!--
@@ -59,22 +69,26 @@ This element may contain properties as plain text with includes.
     ignore_transactions=true
 </connection>
 
-<connection driver="hsql"
+<connection driver="hsqldb"
             url="jdbc:hsqldb:file:db"
             user="sa" classpath="hsqldb.jar"/>
 %
 -->
 <!ELEMENT connection (#PCDATA | include)*>
 <!--
- @attr id connection identifier. Used in scripts and queries
- @attr driver driver class
- @attr url connection url. Required for JDBC providers.
+ @attr id connection identifier. Connection is referenced by id in scripts and queries.
+       For single connection ETL files this attribute is optional.
+ @attr driver driver class name.
+ @attr url connection url.
  @attr user database login
  @attr password database password
  @attr catalog catalog
  @attr schema schema
- @attr classpath the classpath to use when loading the driver. Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides. Absolute URLs are also supported, e.g. ftp://server/lib.jar
- @attr lazy-init <b>true</b> if connection initialization should be deferred until it is actually used. The default value of <b>false</b> means that connection is initialized on ETL startup.  
+ @attr classpath the classpath to use when loading the driver.
+       Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides.
+       Absolute URLs are also supported, e.g. ftp://server/lib.jar
+ @attr lazy-init <b>true</b> if connection initialization should be deferred until it is actually used.
+       The default value of <b>false</b> means that connection is initialized on ETL startup.
 -->
 <!ATTLIST connection
 id ID #IMPLIED
@@ -127,7 +141,7 @@ The dialect element defines a vendor specific script. Scripting elements may con
 This element may contain plain text or includes.
 <u>Example:</u>
 %
-<dialect name=".*oracle.*" version="10.*">
+<dialect name=".*oracle.*" version=".*10.*">
 //Statements executed only for Oracle 10 and higher
 </dialect>
 %
@@ -172,7 +186,7 @@ retry (true | false) "false"
 <!--
 The query element is used to specify a query producing a result set.
 This element may contain queries, scripts, plain text, includes and dialects.
-<p><u>Example:</u><br/>
+<p><u>Example:</u><br>
 Queries a table and writes the result into CSV file
 %
 <query connection-id="in">
@@ -186,7 +200,9 @@ Queries a table and writes the result into CSV file
 <!ELEMENT query (#PCDATA | include | dialect | query | script)*>
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+       For single connection ETL files the connection-id is optional.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+        Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
  @attr id script identifier(name).
 -->
 <!ATTLIST query
@@ -198,7 +214,7 @@ id ID #IMPLIED
 <!--
 The script element is used to specify a script.
 This element may contain plain text,onerror handlers, includes and dialects.
-<p><u>Example:</u></br>
+<p><u>Example:</u><br>
 Inserts a row into Test table if id>0
 %
 <script if="id>0">
@@ -209,8 +225,10 @@ Inserts a row into Test table if id>0
 <!ELEMENT script (#PCDATA | include | dialect | onerror)*>
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+       For single connection ETL files the connection-id is optional.
  @attr new-tx true if a new transaction(and extra connection) is required for this element.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+        Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
  @attr id script identifier(name).
 -->
 <!ATTLIST script
