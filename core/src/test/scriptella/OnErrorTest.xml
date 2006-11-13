@@ -36,7 +36,7 @@
         <onerror><!-- Fails too-->
             insert into test(id, value) values (2,'Updated');
         </onerror>
-        <onerror message=".*Unique constraint violation.*"><!--Updates-->
+        <onerror message=".*unique constraint.*"><!--Updates-->
             <dialect name=".*hsql.*">
                 UPDATE test set value='Updated2' where ID=2;
             </dialect>
