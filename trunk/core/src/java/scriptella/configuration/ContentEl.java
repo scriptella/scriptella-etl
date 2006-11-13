@@ -52,9 +52,10 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     }
 
     public void configure(final XmlElement element) {
-        for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
+        setLocation(element);
+        for (Node node = element.getElement().getFirstChild(); node != null; node = node.getNextSibling()) {
             Resource resource = asResource(element, node);
-            if (resource!=null) {
+            if (resource != null) {
                 content.add(resource);
             }
         }
@@ -64,21 +65,20 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     /**
      * Creates a resource using content from the specified node.
      * <p>If node is not textual content or not include element, the content is skipped and null is returned.
+     *
      * @param parentElement parent element of this node.
-     * @param node node to get content from.
+     * @param node          node to get content from.
      * @return parsed resource or null.
      */
     static Resource asResource(final XmlElement parentElement, final Node node) {
-        if (node==null) {
+        if (node == null) {
             return null;
         }
         if (node instanceof Text) {
-             return new StringResource(((Text)node).getData());
-         } else if (node instanceof Element &&
-                 "include".equals(node.getNodeName())) {
-             return new IncludeEl(
-                     new XmlElement((Element) node, parentElement));
-         }
+            return new StringResource(((Text) node).getData());
+        } else if (node instanceof Element && "include".equals(node.getNodeName())) {
+            return new IncludeEl(new XmlElement((Element) node, parentElement));
+        }
         return null;
 
 
@@ -97,6 +97,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
 
     /**
      * Appends a resource to this content.
+     *
      * @param resource resource to append.
      */
     final void append(final Resource resource) {
@@ -104,15 +105,15 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     }
 
     public String toString() {
-        return "ContentEl{" + "content=" + content + "}";
+        Location loc = getLocation();
+        return loc != null ? loc.toString() : ("ContentEl{" + "content=" + content + '}');
     }
 
     class MultipartReader extends Reader {
         private int pos = 0;
         private Reader current;
 
-        public int read(final char cbuf[], final int off, final int len)
-                throws IOException {
+        public int read(final char cbuf[], final int off, final int len) throws IOException {
             if ((pos < 0) || ((pos >= content.size()) && (current == null))) {
                 return -1;
             }

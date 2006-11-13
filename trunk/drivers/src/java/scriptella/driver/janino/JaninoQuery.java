@@ -71,7 +71,7 @@ import java.util.Map;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JaninoQuery extends JaninoScript implements ParametersCallback {
+public abstract class JaninoQuery extends JaninoScript implements ParametersCallback {
     private QueryCallback queryCallback;
     private Map<String, Object> row;
 

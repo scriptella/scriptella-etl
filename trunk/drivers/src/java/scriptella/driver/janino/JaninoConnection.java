@@ -40,7 +40,7 @@ public class JaninoConnection extends AbstractConnection {
         JaninoScript s = compiler.compileScript(scriptContent);
         s.setParametersCallback(parametersCallback);
         try {
-            s.eval();
+            s.execute();
         } catch (Exception e) {
             throw guessErrorStatement(new JaninoProviderException(
                     "Script execution failed due to exception",e), scriptContent, s.getClass());
@@ -66,7 +66,7 @@ public class JaninoConnection extends AbstractConnection {
         q.setParametersCallback(parametersCallback);
         q.setQueryCallback(queryCallback);
         try {
-            q.eval();
+            q.execute();
         } catch (Exception e) {
             throw guessErrorStatement(new JaninoProviderException(
                     "Query execution failed due to exception",e), queryContent, q.getClass());
