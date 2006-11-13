@@ -94,9 +94,12 @@ public class ConnectionParameters {
 
     /**
      * Returns numeric value of the property.
+     * <p>Accepts decimal, hexadecimal, and octal numbers if property is String.
      *
      * @param name         property name.
      * @param defaultValue default value to use when property omitted.
+     * @return numeric property value.
+     * @see Long#decode(String)
      */
     public Number getNumberProperty(String name, Number defaultValue) throws ParseException {
         Object v = properties.get(name);
@@ -113,7 +116,7 @@ public class ConnectionParameters {
 
         //We do not support doubles etc. for now
         try {
-            return Long.getLong(v.toString());
+            return Long.decode(v.toString());
         } catch (NumberFormatException e) {
             throw new ParseException(name + " property must be integer.", 0);
         }
