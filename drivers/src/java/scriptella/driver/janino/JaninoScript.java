@@ -24,7 +24,7 @@ import scriptella.spi.ParametersCallback;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JaninoScript {
+public abstract class JaninoScript {
     /**
      * This field in not a part of the public API.
      */
@@ -47,8 +47,7 @@ public class JaninoScript {
     /**
      * This method in not a part of the public API.
      */
-    protected void eval() throws Exception {
-    }
+    protected abstract void execute() throws Exception;
 
 
     /**

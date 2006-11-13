@@ -34,7 +34,10 @@ public class JaninoBaseClassesTest extends AbstractTestCase {
      * Tests public API methods provided by {@link JaninoScript}.
      */
     public void testScript() {
-        JaninoScript js = new JaninoScript();
+        JaninoScript js = new JaninoScript() {
+            protected void execute() throws Exception {
+            }
+        };
         js.setParametersCallback(MockParametersCallbacks.SIMPLE);
         assertEquals("*1*", js.get("1"));
     }
@@ -43,7 +46,10 @@ public class JaninoBaseClassesTest extends AbstractTestCase {
      */
     public void testQuery() {
         final int[] rows = new int[1]; //just to allow inner classes to modify a variable
-        JaninoQuery jq = new JaninoQuery();
+        JaninoQuery jq = new JaninoQuery() {
+            protected void execute() throws Exception {
+            }
+        };
         //now check a query exposing a row with one column
         jq.setParametersCallback(new ParametersCallback() {
             public Object getParameter(final String name) {
