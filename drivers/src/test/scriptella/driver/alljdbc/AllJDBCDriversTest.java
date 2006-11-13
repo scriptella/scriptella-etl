@@ -197,6 +197,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
         for (Connection connection : connections) {
             JdbcUtils.closeSilent(connection);
         }
+        rows.clear();
     }
 
     private void checkId(Object id) {
