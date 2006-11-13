@@ -71,6 +71,5 @@ public class QueryEl extends ScriptingElement {
     public void configure(final XmlElement element) {
         super.configure(element);
         setChildScriptinglElements(loadScriptingElements(element, this));
-        setLocation(element);
     }
 }
