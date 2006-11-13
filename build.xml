@@ -73,7 +73,6 @@
             <fileset file="${basedir}/version.properties"/>
             <zipfileset src="${lib.dir}/commons-jexl.jar" includes="**" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-logging.jar" includes="**" excludes="META-INF/*"/>
-            <zipfileset dir="${lib.dir}" includes="*license*" prefix="META-INF"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
@@ -81,7 +80,7 @@
         </jar>
         <!-- Update samples libs --> 
         <copy todir="${basedir}/samples/lib">
-            <fileset dir="${lib.dir}" excludes="h2* *jexl* *logging*"/>
+            <fileset dir="${lib.dir}" excludes="spring.jar h2.jar"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
     </target>
@@ -91,7 +90,7 @@
         <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${lib.dir}" includes="*jexl* *logging*" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}" includes="commons-*.jar *license*.txt" prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
@@ -103,7 +102,7 @@
         <description>Prepares examples distribution</description>
         <delete file="${build.dir}/${examples.zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${examples.zip.name}">
-            <fileset dir="${basedir}/samples" excludes="lib/spring.jar"/>
+            <fileset dir="${basedir}/samples"/>
         </zip>
     </target>
 
