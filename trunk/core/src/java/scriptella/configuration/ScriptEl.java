@@ -52,7 +52,6 @@ public class ScriptEl extends ScriptingElement {
     public void configure(final XmlElement element) {
         super.configure(element);
         newTx = element.getBooleanAttribute("new-tx", false);
-        setLocation(element);
         //The following code loads nested onerror elements
         onerrors = load(element.getChildren("onerror"), OnErrorEl.class);
     }

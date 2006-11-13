@@ -202,6 +202,10 @@ public abstract class XmlConfigurableBase implements XmlConfigurable {
         location = new Location(element.getXPath());
     }
 
+    protected void setLocation(Location location) {
+        this.location = location;
+    }
+
     protected Location getLocation() {
         return location;
     }

@@ -69,9 +69,11 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
     }
 
     public void configure(final XmlElement element) {
+        setLocation(element);
         setProperty(element, "connection-id", "connectionId");
         setProperty(element, "if");
         contentEl = new DialectBasedContentEl(element);
+        contentEl.setLocation(getLocation());
     }
 
 

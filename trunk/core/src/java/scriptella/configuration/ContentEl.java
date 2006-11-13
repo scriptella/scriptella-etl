@@ -52,7 +52,6 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     }
 
     public void configure(final XmlElement element) {
-        setLocation(element);
         for (Node node = element.getElement().getFirstChild(); node != null; node = node.getNextSibling()) {
             Resource resource = asResource(element, node);
             if (resource != null) {

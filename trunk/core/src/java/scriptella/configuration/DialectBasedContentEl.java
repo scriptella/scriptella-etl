@@ -88,6 +88,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
             if (d.matches(id)) {
                 if (result == null) {
                     result = new ContentEl();
+                    result.setLocation(getLocation());
                 }
                 result.merge(d.getContentEl());
             }
