@@ -62,6 +62,20 @@ public final class IOUtils {
     }
 
     /**
+     * Silently closes a collection of objects.
+     * @param closeables iterable closeables. Null value allowed.
+     * @see #closeSilently(java.io.Closeable)
+     */
+    public static void closeSilently(Iterable<? extends Closeable> closeables) {
+        if (closeables != null) {
+            for (Closeable closeable : closeables) {
+                closeSilently(closeable);
+            }
+        }
+    }
+
+
+    /**
      * Loads a reader content into a string.
      *
      * @param reader reader to load content from. Closed at the end of the operation.

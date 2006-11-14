@@ -15,15 +15,14 @@
  */
 package scriptella.jdbc;
 
+import scriptella.util.IOUtils;
+
 import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Statements cache for {@link JdbcConnection}.
@@ -33,9 +32,7 @@ import java.util.logging.Logger;
  */
 class StatementCache implements Closeable {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static final Logger LOG = Logger.getLogger(StatementCache.class.getName());
     private Map<String, StatementWrapper> map;
-    private List<StatementWrapper> disposeQueue = new ArrayList<StatementWrapper>();
     private final Connection connection;
 
     /**
@@ -46,11 +43,11 @@ class StatementCache implements Closeable {
     public StatementCache(Connection connection, final int size) {
         this.connection = connection;
         if (size > 0) { //if cache is enabled
-            this.map = new LinkedHashMap<String, StatementWrapper>(size, DEFAULT_LOAD_FACTOR, true) {
+            map = new LinkedHashMap<String, StatementWrapper>(size, DEFAULT_LOAD_FACTOR, true) {
                 protected boolean removeEldestEntry(Map.Entry<String, StatementWrapper> eldest) {
                     boolean remove = size() > size;
                     if (remove) {
-                        disposeQueue.add(eldest.getValue());
+                        eldest.getValue().close();
                     }
 
                     return remove;
@@ -83,7 +80,7 @@ class StatementCache implements Closeable {
             put(sql, sw);
         } else if (sw instanceof StatementWrapper.Simple) {
             //If simple statement is obtained second time - use prepared to improve performance
-            disposeQueue.add(sw);
+            sw.close(); //closing unused statement
             put(sql, sw = prepare(sql, converter));
         }
         sw.setParameters(params);
@@ -126,26 +123,14 @@ class StatementCache implements Closeable {
             sw.close();
         } else {
             sw.clear();
-            close(disposeQueue);
-        }
-    }
-
-    protected void close(Collection<StatementWrapper> list) {
-        if (!list.isEmpty()) {
-            for (StatementWrapper st: list) {
-                st.close();
-            }
-            list.clear();
         }
     }
 
     public void close() {
         if (map != null) {
             //closing statements
-            close(disposeQueue);
-            close(map.values());
+            IOUtils.closeSilently(map.values());
             map = null;
-            disposeQueue.clear();
         }
     }
 

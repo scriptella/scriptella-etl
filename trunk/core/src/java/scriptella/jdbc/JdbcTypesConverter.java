@@ -169,9 +169,7 @@ class JdbcTypesConverter implements Closeable {
      */
     public void close() {
         if (resources != null) {
-            for (Closeable r : resources) {
-                IOUtils.closeSilently(r);
-            }
+            IOUtils.closeSilently(resources);
             resources = null;
         }
     }
