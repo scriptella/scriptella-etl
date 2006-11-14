@@ -40,7 +40,7 @@ public class Driver extends GenericDriver {
                 try {
                     Class.forName(SYBASE_DRIVER_NAME);
                 } catch (ClassNotFoundException e2) {
-                    throw new JdbcException("Nor " + SYBASE_DRIVER_NAME + " neither " + SYBASE_JDBC2_DRIVER_NAME + " drivers were not found. Please check class path settings", e);
+                    throw new JdbcException(SYBASE_JDBC3_DRIVER_NAME + " driver were not found. Please check class path settings", e);
                 }
             }
 
