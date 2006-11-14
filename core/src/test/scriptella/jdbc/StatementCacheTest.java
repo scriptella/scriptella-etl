@@ -90,10 +90,10 @@ public class StatementCacheTest extends DBTestCase {
             sb.append('.');
             StatementWrapper s = sc.prepare(sb.toString(), Collections.emptyList(), converter);
             assertEquals(i, preparedParamsSet);//Should be recognized as simple statement
+            sc.releaseStatement(s);
+            assertEquals(i, simpleClosed);
             StatementWrapper s2 = sc.prepare(sb.toString(), params, converter);
             assertEquals(i + 1, preparedParamsSet); //Should be recognized as a prepared statement
-            assertEquals(i, simpleClosed);
-            sc.releaseStatement(s);
             assertEquals(i + 1, simpleClosed); //statement should be closed
             assertEquals(i, preparedCleared);
             sc.releaseStatement(s2);
