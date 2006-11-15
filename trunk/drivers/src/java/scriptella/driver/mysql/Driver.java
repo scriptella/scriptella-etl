@@ -31,7 +31,7 @@ public class Driver extends GenericDriver {
         try {
             Class.forName(MYSQL_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
-            throw new JdbcException(MYSQL_DRIVER_NAME+ " driver were not found. Please check class path settings", e);
+            throw new JdbcException(MYSQL_DRIVER_NAME+ " driver was not found. Please check class path settings", e);
         }
     }
 
