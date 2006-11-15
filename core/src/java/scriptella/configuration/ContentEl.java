@@ -34,6 +34,12 @@ import java.util.List;
  * @version 1.0
  */
 public class ContentEl extends XmlConfigurableBase implements Resource {
+    /**
+     * Max length of string resource to concat with the previous one.
+     * This limitation is necessary to avoid concatenation of large text blocks, because in this
+     * case too much memory is used.
+     */
+    private static final int MAX_CONCAT_RESOURCE_LENGTH = 1024 * 128; //128Kb
     private List<Resource> content = new ArrayList<Resource>();
     /**
      * Null-Object to use instead of null if necessary
@@ -48,15 +54,20 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     }
 
     public Reader open() throws IOException {
+        if (content.isEmpty()) {
+            return NULL_CONTENT.open();
+        }
+        //If content consists of only one resource - open it
+        if (content.size() == 1) {
+            return content.get(0).open();
+        }
+        //Otherwise create a multipart reader.
         return new BufferedReader(new MultipartReader());
     }
 
     public void configure(final XmlElement element) {
         for (Node node = element.getElement().getFirstChild(); node != null; node = node.getNextSibling()) {
-            Resource resource = asResource(element, node);
-            if (resource != null) {
-                content.add(resource);
-            }
+            append(asResource(element, node));
         }
     }
 
@@ -97,10 +108,27 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     /**
      * Appends a resource to this content.
      *
-     * @param resource resource to append.
+     * @param resource resource to append. Nulls are ignored.
      */
     final void append(final Resource resource) {
-        content.add(resource);
+        if (resource != null) {
+            //If string rsource and we already have content
+            if (resource != null && (resource instanceof StringResource) && !content.isEmpty()) {
+                final int lastIndex = content.size() - 1;
+                Resource last = content.get(lastIndex);
+                if (last instanceof StringResource) { //If last resource is also a string resource
+                    //Concat them and produce a new resource if new size does not exceed the memory limit
+                    StringResource nextRes = (StringResource) resource;
+                    StringResource prevRes = (StringResource) last;
+                    if (prevRes.getString().length() + nextRes.getString().length() < MAX_CONCAT_RESOURCE_LENGTH) {
+                        content.set(lastIndex, new StringResource(prevRes.getString() + nextRes.getString()));
+                        return;
+
+                    }
+                }
+            }
+            content.add(resource);
+        }
     }
 
     public String toString() {
@@ -111,9 +139,10 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     class MultipartReader extends Reader {
         private int pos = 0;
         private Reader current;
+        private int blocksCount=content.size();
 
         public int read(final char cbuf[], final int off, final int len) throws IOException {
-            if ((pos < 0) || ((pos >= content.size()) && (current == null))) {
+            if ((pos < 0) || ((pos >= blocksCount) && (current == null))) {
                 return -1;
             }
 
@@ -122,7 +151,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
 
             while (l > 0) {
                 if (current == null) {
-                    if (pos < content.size()) {
+                    if (pos < blocksCount) {
                         current = content.get(pos).open();
                         pos++;
                     } else {
