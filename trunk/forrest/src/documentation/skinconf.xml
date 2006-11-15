@@ -95,8 +95,8 @@ which will be used to configure the chosen Forrest skin.
     be complete, that is it must point to the file itself, not to a 
     directory.
   -->
-	<trail location="none">
-		<link1 name="" href=""/>
+	<trail location="alt">
+		<link1 name="JavaForge Page" href="http://www.javaforge.com/proj/summary.do?proj_id=781"/>
 		<link2 name="" href=""/>
 		<link3 name="" href=""/>
 	</trail>
