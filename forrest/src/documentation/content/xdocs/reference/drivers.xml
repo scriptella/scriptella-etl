@@ -91,7 +91,15 @@
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
 					<td/>
 				</tr>
-			</table>
+                <tr>
+                    <td>
+                        <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
+                    </td>
+                    <td>scriptella.driver.mysql.Driver</td>
+                    <td>com.mysql.jdbc.Driver</td>
+                    <td/>
+                </tr>
+            </table>
 		</section>
 		<section id="nonjdbc">
 			<title>Non-JDBC Drivers</title>
