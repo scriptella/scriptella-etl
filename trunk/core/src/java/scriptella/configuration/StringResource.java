@@ -55,6 +55,14 @@ public class StringResource implements Resource {
         return new StringReader(string);
     }
 
+
+    /**
+     * Returns the string wrapped by this resource.
+     */
+    public String getString() {
+        return string;
+    }
+
     public String toString() {
         return description==null?"Text block":description;
     }

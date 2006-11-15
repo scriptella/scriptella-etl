@@ -38,4 +38,15 @@ public class ContentElTest extends AbstractTestCase {
         assertEquals("/etl[1]/query[1]/script[1]", element.getContent().toString());
     }
 
+    /**
+     * Tests if {@link scriptella.configuration.ContentEl#open()} returns a correct text.
+     */
+    public void testContent() {
+        EtlExecutor ex = newEtlExecutor();
+        List<ScriptingElement> elements = ex.getConfiguration().getScriptingElements();
+        ScriptingElement element = elements.get(0);
+        assertEquals("Script", asString(element.getContent()));
+    }
+
+
 }
