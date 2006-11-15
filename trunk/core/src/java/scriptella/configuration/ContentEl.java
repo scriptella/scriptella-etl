@@ -113,7 +113,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     final void append(final Resource resource) {
         if (resource != null) {
             //If string rsource and we already have content
-            if (resource != null && (resource instanceof StringResource) && !content.isEmpty()) {
+            if (resource instanceof StringResource && !content.isEmpty()) {
                 final int lastIndex = content.size() - 1;
                 Resource last = content.get(lastIndex);
                 if (last instanceof StringResource) { //If last resource is also a string resource
@@ -123,7 +123,6 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
                     if (prevRes.getString().length() + nextRes.getString().length() < MAX_CONCAT_RESOURCE_LENGTH) {
                         content.set(lastIndex, new StringResource(prevRes.getString() + nextRes.getString()));
                         return;
-
                     }
                 }
             }
@@ -131,6 +130,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
         }
     }
 
+    @Override
     public String toString() {
         Location loc = getLocation();
         return loc != null ? loc.toString() : ("ContentEl{" + "content=" + content + '}');
