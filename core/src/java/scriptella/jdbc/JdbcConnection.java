@@ -81,7 +81,7 @@ public class JdbcConnection extends AbstractConnection {
     protected void init(ConnectionParameters parameters) {
 
         try {
-            statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 100);
+            statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);
         } catch (ParseException e) {
             throw new JdbcException(e.getMessage());
         }
