@@ -60,6 +60,15 @@
 				</tr>
                 <tr>
                     <td>
+                        <a href="../docs/api/scriptella/driver/mssql/package-summary.html">MSSQL Database</a>
+                    </td>
+                    <td>scriptella.driver.mssql.Driver</td>
+                    <td>com.microsoft.sqlserver.jdbc.SQLServerDriver</td>
+                    <td>This driver works with MSSQL2005, MSSQL2000 JDBC drivers and also allows to use jTDS JDBC driver for Microsoft SQL Server</td>
+                    <td/>
+                </tr>
+                <tr>
+                    <td>
                         <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
                     </td>
                     <td>scriptella.driver.mysql.Driver</td>
@@ -97,7 +106,7 @@
 					</td>
 					<td>scriptella.driver.sybase.Driver</td>
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
-					<td/>
+                    <td/>
 				</tr>
             </table>
 		</section>
