@@ -6,11 +6,11 @@
 	</header>
 	<body>
         <section>
-			<title>Development Version: 0.4dev (October 9 2006)</title>
+			<title>Development Version: 0.5dev (November 16 2006)</title>
             <table>
-                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.4dev.zip?doc_id=20303">scriptella-0.4dev.zip</a></td></tr>
-                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.4dev-src.zip?doc_id=20304">scriptella-0.4dev-src.zip</a></td></tr>
-                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-0.4dev.zip?doc_id=20305">scriptella-examples-0.4dev.zip</a></td></tr>
+                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.5dev.zip?doc_id=22227">scriptella-0.5dev.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-0.5dev-src.zip?doc_id=22228">scriptella-0.5dev-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-0.5dev.zip?doc_id=22229">scriptella-examples-0.5dev.zip</a></td></tr>
             </table>
 		</section>
         <p>See also <a href="http://javaforge.com/proj/doc.do?doc_id=8353">JavaForge Downloads Page</a></p>
