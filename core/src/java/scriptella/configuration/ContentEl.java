@@ -112,7 +112,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
      */
     final void append(final Resource resource) {
         if (resource != null) {
-            //If string rsource and we already have content
+            //If string resource and we already have content
             if (resource instanceof StringResource && !content.isEmpty()) {
                 final int lastIndex = content.size() - 1;
                 Resource last = content.get(lastIndex);
