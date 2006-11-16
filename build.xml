@@ -80,7 +80,7 @@
         </jar>
         <!-- Update samples libs --> 
         <copy todir="${basedir}/samples/lib">
-            <fileset dir="${lib.dir}" excludes="spring.jar h2.jar"/>
+            <fileset dir="${lib.dir}" excludes="spring.* h2.*"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
     </target>
