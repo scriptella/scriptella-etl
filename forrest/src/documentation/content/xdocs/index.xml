@@ -13,9 +13,7 @@
                 scripting language suitable for your datasource) to perform required transformations.</p>
             <p>
                 <a href="download.html">Download</a>
-                and
-                <a href="tutorial.html">use it</a>
-                ! Scriptella is licensed under the
+                and <a href="tutorial.html">use it</a>! Scriptella is licensed under the
                 <a href="license.html">Apache License, Version 2.0</a>
             </p>
         </section>
@@ -24,8 +22,9 @@
             <ul>
                 <li>Database migration.</li>
                 <li>Database creation/update scripts.</li>
-                <li>Cross-database ETL operations, import/export</li>
+                <li>Cross-database ETL operations, import/export.</li>
                 <li>Alternative for Ant &lt;sql&gt; task.</li>
+                <li>Automated database schema upgrade.</li>
             </ul>
         </section>
         <section id="features">
@@ -83,6 +82,10 @@
                     as a standalone tool or Ant task. No deployment/installation required.
                 </li>
                 <li>
+                    <strong>Built-in adapters</strong> for popular <a href="reference/drivers.html#jdbc">databases</a>
+                    for a tight integration. Support for any database with JDBC/ODBC compliant driver.
+                </li>
+                <li>
                     <strong>
                         <a href="docs/api/scriptella/spi/package-summary.html">Service Provider Interface (SPI)</a>
                     </strong>
@@ -99,6 +102,32 @@
                     scripts.
                 </li>
             </ul>
+        </section>
+        <section>
+            <title>News</title>
+            <section>
+                <title>Scriptella 0.5dev Released (November 16, 2006)</title>
+                <p>We are pleased to announce that Sciptella 0.5dev has been released.
+                    New Features and Bug Fixes:</p>
+                <ul>
+                    <li>3621 TSK Log SQLWarnings</li>
+                    <li>3622 TSK Configurable sql delimiters for JDBC Bridge</li>
+                    <li>3653 BUG scriptella.bat not woking if no JAVA_HOME</li>
+                    <li>3654 BUG Illegal handling of -- comments</li>
+                    <li>3655 CRQ add lazy-init connection attribute</li>
+                    <li>3657 TSK Oracle driver</li>
+                    <li>3690 TSK Sybase driver</li>
+                    <li>3740 TSK Resultset Data types conversion (including BLOB/CLOB)</li>
+                    <li>3742 TSK Support for Oracle Hints</li>
+                    <li>3793 TSK MySQL driver</li>
+                    <li>Performance improvements</li>
+                    <li>Supported libraries upgraded to Janino 2.5.1, H2 1.0, HSQLDB 1.8.0.7, opencsv 1.7</li>
+                    <li>Improved code coverage</li>
+                </ul>
+                <p>This release has been tested on Oracle, Sybase, Microsoft SQL Server,
+                    MySQL, HSQLDB and H2 databases.<br/>
+                <a href="download.html">Download now!</a></p>
+            </section>
         </section>
         </body>
 </document>
