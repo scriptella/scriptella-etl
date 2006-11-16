@@ -58,7 +58,15 @@
 					<td>This driver allows to work with JNDI-bound datasource connections, useful in J2EE
                         environment</td>
 				</tr>
-				<tr>
+                <tr>
+                    <td>
+                        <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
+                    </td>
+                    <td>scriptella.driver.mysql.Driver</td>
+                    <td>com.mysql.jdbc.Driver</td>
+                    <td/>
+                </tr>
+                <tr>
 					<td>
 						<anchor id="oracle"/>
 						<a href="../docs/api/scriptella/driver/oracle/package-summary.html">Oracle Database</a>
@@ -91,14 +99,6 @@
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
 					<td/>
 				</tr>
-                <tr>
-                    <td>
-                        <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
-                    </td>
-                    <td>scriptella.driver.mysql.Driver</td>
-                    <td>com.mysql.jdbc.Driver</td>
-                    <td/>
-                </tr>
             </table>
 		</section>
 		<section id="nonjdbc">
