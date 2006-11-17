@@ -19,8 +19,14 @@ import scriptella.jdbc.GenericDriver;
 import scriptella.jdbc.JdbcException;
 
 /**
- * Scriptella Adapter for MSSQL database.
+ * Scriptella Adapter for Microsoft SQL Server  database.
  *
+ * This driver looks in classpath for the following drivers(in search order) :
+ * <ul>
+ * <li>Microsoft JDBC Driver for MS SQL Server 2005 - <code>com.microsoft.sqlserver.jdbc.SQLServerDriver</code></li>
+ * <li>Microsoft JDBC Driver for MS SQL Server 2000 - <code>com.microsoft.jdbc.sqlserver.SQLServerDriver</code></li>
+ * <li>jTDS JDBC Driver for Microsoft SQL Server - <code>net.sourceforge.jtds.jdbc.Driver</code></li>
+ * </ul>
  * @author Kirill Volgin
  * @version 1.0
  */
@@ -30,20 +36,30 @@ public class Driver extends GenericDriver {
     public static final String MSSQL_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
 
     static {
-        //trying to initialize by turn known MSSQL drivers
+        //trying to initialize by turn known Microsoft SQL Server drivers
+        boolean driverLoaded = false;
+        Exception exception = null;
+        try {
+            Class.forName(MSSQL_TDS_DRIVER_NAME);
+            driverLoaded = true;
+        } catch (ClassNotFoundException e) {
+            exception = e;
+        }
         try {
             Class.forName(MSSQL_2005_DRIVER_NAME);
+            driverLoaded = true;
         } catch (ClassNotFoundException e) {
             try {
                 Class.forName(MSSQL_2000_DRIVER_NAME);
-            } catch (ClassNotFoundException e1) {
-                try {
-                    Class.forName(MSSQL_TDS_DRIVER_NAME);
-                } catch (ClassNotFoundException e2) {
-                    throw new JdbcException("Couldn't find corresponding jdbc driver for MS SQL. Please check class path settings", e);
-                }
+                driverLoaded = true;
+            } catch (ClassNotFoundException driverNotFoundException) {
+                exception = driverNotFoundException;//save last exception
             }
         }
+        if (!driverLoaded) {
+            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception.getMessage());            
+        }
+
     }
 
 }
