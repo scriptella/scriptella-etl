@@ -60,11 +60,11 @@
 				</tr>
                 <tr>
                     <td>
-                        <a href="../docs/api/scriptella/driver/mssql/package-summary.html">MSSQL Database</a>
+                        <a href="../docs/api/scriptella/driver/mssql/package-summary.html">Microsoft SQL Server Database</a>
                     </td>
                     <td>scriptella.driver.mssql.Driver</td>
                     <td>com.microsoft.sqlserver.jdbc.SQLServerDriver</td>
-                    <td>This driver works with MSSQL2005, MSSQL2000 JDBC drivers and also allows to use jTDS JDBC driver for Microsoft SQL Server</td>
+                    <td>This driver works with Microsoft SQL Server 2005, Microsoft SQL Server 2000 JDBC drivers and also allows to use jTDS JDBC driver for Microsoft SQL Server</td>
                     <td/>
                 </tr>
                 <tr>

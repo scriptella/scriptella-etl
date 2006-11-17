@@ -1,13 +1,13 @@
 <body>
 MySQL Driver Adapter for Scriptella.
-<p><b>Note: </b>The driver tries to load MySQL JDBC driver.
+<p><b>Note: </b>The driver tries to load Microsoft SQL Server JDBC driver.
 <h2>General information</h2>
 <table>
     <tr>
         <td><b>Driver class:</b></td><td><code>scriptella.spi.mssql.Driver</code></td>
     </tr>
     <tr>
-        <td><b>URL:</b></td><td><code>Same as for MSSQL JDBC Driver.</code></td>
+        <td><b>URL:</b></td><td><code>Same as for Microsoft SQL Server  JDBC Driver.</code></td>
     </tr>
     <tr>
         <td><b>Runtime dependencies:</b></td>
@@ -27,7 +27,9 @@ MySQL Driver Adapter for Scriptella.
 
 <h2>Examples</h2>
 <code><pre>
-    &lt;connection driver="mssql" url="jdbc:sqlserver://localhost;database=test" user="username" password="password"&gt;
+    &lt;connection id="c1" driver="mssql" url="jdbc:sqlserver://localhost;database=test" user="username" password="password"&gt;
+    &lt;/connection&gt;
+    &lt;connection id="c2" driver="mssql" url="jdbc:jtds:sqlserver://pc613/test" user="username" password="password"&gt;
     &lt;/connection&gt;
 </pre></code>
 
