@@ -18,6 +18,8 @@ package scriptella.expression;
 import scriptella.AbstractTestCase;
 import scriptella.spi.MockParametersCallbacks;
 
+import java.io.IOException;
+
 /**
  * Tests {@link PropertiesSubstitutor}
  *
@@ -34,17 +36,17 @@ public class PropertiesSubstitutorTest extends AbstractTestCase {
         exp = "No Params to substitute";
         s = ps.substitute(exp);
         assertEquals(exp, s);
-
-
     }
 
-    public void test() {
+    public void test() throws IOException {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE);
-        String s = ps.substitute("$$ Text${subst1}${subst2}$subst3$subst4 End of test");
-        assertEquals("$$ Text*subst1**subst2**subst3**subst4* End of test", s);
+        String expression = "$$ Text${subst1}${subst2}$subst3$subst4 End of test";
+        String s = ps.substitute(expression);
+        String expected = "$$ Text*subst1**subst2**subst3**subst4* End of test";
+        assertEquals(expected, s);
     }
 
-    public void testNullProperties() {
+    public void testNullProperties() throws IOException {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NULL);
         String exp = "$$ Text${subst1}${subst2}$subst3$subst4 End of test";
         String s = ps.substitute(exp);

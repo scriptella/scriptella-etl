@@ -43,7 +43,7 @@ public class MockParametersCallbacks {
 
     public static final ParametersCallback UNSUPPORTED = new ParametersCallback() {
         public Object getParameter(final String name) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Parameter "+name);
         }
     };
 }

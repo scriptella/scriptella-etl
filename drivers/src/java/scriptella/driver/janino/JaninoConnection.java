@@ -61,8 +61,7 @@ public class JaninoConnection extends AbstractConnection {
      */
     public synchronized void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
 
-        JaninoQuery q = null;
-        q = compiler.compileQuery(queryContent);
+        JaninoQuery q = compiler.compileQuery(queryContent);
         q.setParametersCallback(parametersCallback);
         q.setQueryCallback(queryCallback);
         try {

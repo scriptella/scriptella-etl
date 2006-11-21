@@ -29,30 +29,32 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.text.ParseException;
 
 /**
  * Represents a session to velocity engine.
  */
 public class VelocityConnection extends AbstractConnection {
+    public static final String OUTPUT_ENCODING = "output.encoding";
     private final URL url;
-
     private final VelocityEngine engine;
     private final VelocityContextAdapter adapter;
     private Writer writer;//lazy initialized
     private String encoding;//encoding for writer
 
 
-
     /**
      * Instantiates a velocity connection.
      *
-     * @param url            URL for output.
-     * @param outputEncoding charset name for output stream. If null default charset is used.
      * @param parameters connection parameters.
      */
-    public VelocityConnection(URL url, String outputEncoding, ConnectionParameters parameters) {
+    public VelocityConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
-        this.url = url;
+        try {
+            url = parameters.getResolvedUrl();
+        } catch (ParseException e) {
+            throw new VelocityProviderException(e.getMessage());
+        }
         engine = new VelocityEngine();
         engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, Driver.LOG_SYSTEM);
         engine.setProperty("velocimacro.library", "");//unnecessary file in our case
@@ -62,7 +64,11 @@ public class VelocityConnection extends AbstractConnection {
             throw new VelocityProviderException("Unable to initialize engine", e);
         }
         adapter = new VelocityContextAdapter();
-        encoding = outputEncoding;
+        try {
+            encoding = parameters.getCharsetProperty(OUTPUT_ENCODING);
+        } catch (ParseException e) {
+            throw new VelocityProviderException(e.getMessage());
+        }
     }
 
     /**

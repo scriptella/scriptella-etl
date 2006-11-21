@@ -23,7 +23,10 @@ import java.util.HashMap;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public abstract class MockConnectionParameters {
-    public static final ConnectionParameters NULL = new ConnectionParameters(
-            new HashMap<String, String>(), null,null,null, null, null, null);
+public class MockConnectionParameters extends ConnectionParameters {
+    protected MockConnectionParameters() {
+        super(new HashMap<String, String>(), null, null, null, null, null, null);
+    }
+
+    public static final ConnectionParameters NULL = new MockConnectionParameters();
 }

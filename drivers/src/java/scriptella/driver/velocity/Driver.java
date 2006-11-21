@@ -22,9 +22,6 @@ import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +33,6 @@ import java.util.logging.Logger;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Velocity", "1.4");
-    public static final String OUTPUT_ENCODING = "output.encoding";
     private static final Logger LOG = Logger.getLogger(Driver.class.getName());
     static final LogSystem LOG_SYSTEM = new LogSystem() {
         public void init(RuntimeServices rs) {
@@ -76,19 +72,7 @@ public class Driver extends AbstractScriptellaDriver {
      * @return new connection.
      */
     public Connection connect(ConnectionParameters connectionParameters) {
-        String urlStr = connectionParameters.getUrl();
-        String outEnc = null;
-        try {
-            outEnc = connectionParameters.getCharsetProperty(OUTPUT_ENCODING);
-        } catch (ParseException e) {
-            throw new VelocityProviderException(e.getMessage());
-        }
-        try {
-            URL url = connectionParameters.getContext().resolve(urlStr);
-            return new VelocityConnection(url, outEnc, connectionParameters);
-        } catch (MalformedURLException e) {
-            throw new VelocityProviderException("Invalid URL connection attribute value: " + urlStr, e);
-        }
+        return new VelocityConnection(connectionParameters);
     }
 
 
