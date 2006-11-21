@@ -29,7 +29,6 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -133,16 +132,10 @@ public class CsvConnection extends AbstractConnection {
         } catch (ParseException e) {
             throw new CsvProviderException(e.getMessage());
         }
-
-        String urlStr = parameters.getUrl();
-        if (urlStr == null) {
-            throw new CsvProviderException("url connection attribute is required");
-        }
-
         try {
-            url = parameters.getContext().resolve(urlStr);
-        } catch (MalformedURLException e) {
-            throw new CsvProviderException("Invalid URL connection attribute value: " + urlStr, e);
+            url = parameters.getResolvedUrl();
+        } catch (ParseException e) {
+            throw new CsvProviderException(e.getMessage());
         }
     }
 

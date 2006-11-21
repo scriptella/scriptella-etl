@@ -101,7 +101,7 @@ public abstract class ProviderException extends SystemException {
     }
 
     /**
-     * May be overriden by subclasses to provide user friendly provider name.
+     * Overriden by subclasses to provide user friendly provider name.
      *
      * @return provider name.
      */

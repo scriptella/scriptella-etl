@@ -17,6 +17,7 @@ package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
 import scriptella.configuration.StringResource;
+import scriptella.spi.ConnectionParameters;
 import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockParametersCallbacks;
 
@@ -54,7 +55,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
 
     static VelocityConnection createConnection(final OutputStream out) {
         try {
-            URL u = new URL("mem", "", 0, "memfile", new URLStreamHandler() {
+            final URL u = new URL("mem", "", 0, "memfile", new URLStreamHandler() {
                 protected URLConnection openConnection(URL u) {
                     return new URLConnection(u) {
                         public void connect() {
@@ -70,7 +71,13 @@ public class VelocityConnectionTest extends AbstractTestCase {
                     };
                 }
             });
-            return new VelocityConnection(u, null, MockConnectionParameters.NULL);
+            ConnectionParameters cp = new MockConnectionParameters() {
+                @Override
+                public URL getResolvedUrl() {
+                    return u;
+                }
+            };
+            return new VelocityConnection(cp);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }

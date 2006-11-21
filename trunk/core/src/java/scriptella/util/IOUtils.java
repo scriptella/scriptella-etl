@@ -195,6 +195,33 @@ public final class IOUtils {
     }
 
     /**
+     * Optionally makes a buffered reader from the specified one.
+     * <p>If specified reader is buffered the object is returned unchanged.
+     * @param reader reader to convert.
+     * @return buffered reader.
+     */
+    public static BufferedReader asBuffered(Reader reader) {
+        if (reader==null) {
+            throw new IllegalArgumentException("Reader cannot be null");
+        }
+        return (reader instanceof BufferedReader?(BufferedReader)reader:new BufferedReader(reader));
+    }
+
+    /**
+     * Optionally makes a buffered writer from the specified one.
+     * <p>If specified writer is buffered the object is returned unchanged.
+     * @param writer writer to convert.
+     * @return buffered writer.
+     */
+    public static BufferedWriter asBuffered(Writer writer) {
+        if (writer==null) {
+            throw new IllegalArgumentException("Writer cannot be null");
+        }
+        return (writer instanceof BufferedWriter?(BufferedWriter)writer:new BufferedWriter(writer));
+    }
+
+
+    /**
      * @return buffered writer for specified output stream.
      * @see #getWriter(java.io.OutputStream, String, boolean)
      *

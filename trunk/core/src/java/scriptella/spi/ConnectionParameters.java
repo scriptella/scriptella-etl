@@ -16,6 +16,12 @@
 
 package scriptella.spi;
 
+import scriptella.util.ExceptionUtils;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Map;
@@ -151,11 +157,13 @@ public class ConnectionParameters {
         }
         String s = a.toString();
 
-        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s)) {
+        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
+        {
             return true;
         }
 
-        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
+        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
+        {
             return false;
         }
         throw new ParseException("Unrecognized boolean property value " + a, 0);
@@ -184,6 +192,45 @@ public class ConnectionParameters {
     }
 
     /**
+     * Parses property value as URL parameter.
+     * <p>The URL is resolved relative to script file location.
+     *
+     * @param name property name
+     * @return value of the property or null if connection has no such property.
+     * @throws ParseException if URL is malformed.
+     */
+    public URL getUrlProperty(String name) throws ParseException {
+        Object u = getProperty(name);
+        if (u == null) {
+            return null;
+        }
+        if (u instanceof URL) {
+            return (URL) u;
+        }
+        try {
+            if (u instanceof URI) {
+                URI uri = (URI) u;
+                return uri.toURL();
+            }
+            if (u instanceof File) {
+                File f = (File) u;
+                return f.toURL();
+            }
+        } catch (MalformedURLException e) {
+            ExceptionUtils.ignoreThrowable(e);
+            //If malformed URL try to use the toString resolving
+        }
+
+        try {
+            String uri = u.toString();
+            return getContext().resolve(uri);
+        } catch (MalformedURLException e) {
+            throw new ParseException("Specified URL " + u + " is malformed", 0);
+        }
+
+    }
+
+    /**
      * Returns connection URL.
      * <p>URL format is arbitrary and specified by Service Provider.
      *
@@ -191,6 +238,22 @@ public class ConnectionParameters {
      */
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * Returns the url property resolved relative to a script location.
+     *
+     * @throws ParseException if connection URL is malformed or null.
+     */
+    public URL getResolvedUrl() throws ParseException {
+        if (url == null) {
+            throw new ParseException("URL connection property is requred", 0);
+        }
+        try {
+            return getContext().resolve(url);
+        } catch (MalformedURLException e) {
+            throw new ParseException("Specified connection URL " + url + " is malformed", 0);
+        }
     }
 
     /**
