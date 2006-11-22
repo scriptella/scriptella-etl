@@ -114,7 +114,7 @@
         </zip>
     </target>
 
-    <target name="distrib" depends="zip, srczip, examples">
+    <target name="dist" depends="zip, srczip, examples">
         <description>Prepares binary and src distribution</description>
     </target>
 
