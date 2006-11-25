@@ -20,6 +20,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.util.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
@@ -60,7 +61,7 @@ import java.io.Writer;
  * @version 1.0
  */
 public class TextScriptExecutor implements Closeable {
-    private Writer out;
+    private BufferedWriter out;
     private PropertiesSubstitutor ps=new PropertiesSubstitutor();
 
     /**
@@ -83,6 +84,7 @@ public class TextScriptExecutor implements Closeable {
             for (String line; (line = r.readLine()) != null;) {
                 try {
                     out.write(ps.substitute(line));
+                    out.newLine();
                 } catch (IOException e) {
                     throw new TextProviderException("Failed writing to a text file", e);
                 }
