@@ -73,19 +73,8 @@
             INSERT INTO Primes VALUES(?i);
         </script>
     </query>
-    <!-- Now we generate a report header.
-     Don't forget about using CDATA.-->
-    <script connection-id="velocity">
-        <![CDATA[
-        <html>
-            <head>
-                <title>$report_title</title>
-            </head>
-            <body>
-                <h1>$report_header</h1>
-                <table border=1>
-        ]]>
-    </script>
+    <!-- Now we generate a report header.-->
+    <script connection-id="velocity">#parse ("header.vm")</script>
     <!--Write CSV file header.
     Please note that standard comma separated CSV syntax is used,
      commas are transparently converted to semicolumns by CSV driver-->
@@ -97,12 +86,12 @@
         SELECT * FROM Primes
         <!--And use this row set to produce a table.
          rownum - is an implicit variable containing current row number
-         number is the name of the column in the Primes table-->
-        <script connection-id="velocity">
-<![CDATA[
-                <tr>
-                    <th>${rownum}</th><td>${number}</td>
-                </tr>]]>
+         number is the name of the column in the Primes table.
+         Don't forget about using CDATA to escape HTML markup-->
+        <script connection-id="velocity"><![CDATA[
+            <tr>
+                <th>${rownum}</th><td>${number}</td>
+            </tr>]]>
         </script>
         <!--Producing a CSV file-->
         <script connection-id="csv">
@@ -110,14 +99,5 @@
         </script>
     </query>
     <!--And finally produce a report footer -->
-    <script connection-id="velocity">
-<![CDATA[
-                </table>
-                $report_footer
-            </body>
-        </html>
-        ]]>
-    </script>
-
-
+    <script connection-id="velocity">#parse ("footer.vm")</script>
 </etl>
