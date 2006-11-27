@@ -16,11 +16,9 @@
 package scriptella.driver.oracle;
 
 import scriptella.jdbc.JdbcConnection;
-import scriptella.jdbc.JdbcException;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
-import java.text.ParseException;
 
 /**
  * Oracle connection wrapper.
@@ -46,13 +44,9 @@ public class OracleConnection extends JdbcConnection {
     @Override
     protected void init(final ConnectionParameters parameters) {
         super.init(parameters);
-        try {
-            if (parameters.getBooleanProperty(PLSQL, false)) {
-                separator = "/";
-                separatorSingleLine = true;
-            }
-        } catch (ParseException e) {
-            throw new JdbcException(e.getMessage());
+        if (parameters.getBooleanProperty(PLSQL, false)) {
+            separator = "/";
+            separatorSingleLine = true;
         }
     }
 

@@ -16,6 +16,7 @@
 package scriptella.driver.csv;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.MockDriverContext;
@@ -74,8 +75,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.HEADERS, "false");
         props.put(CsvConnection.QUOTE, "'");
         props.put(CsvConnection.SEPARATOR, ";");
-        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -114,8 +114,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.EOL, "\r\n");
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.SEPARATOR, ";");
-        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -137,8 +136,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.TRIM, "no");
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.EOL, "\r\n");
-        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         con.executeQuery(new StringResource(" c4.*"), //extra leading whitespace

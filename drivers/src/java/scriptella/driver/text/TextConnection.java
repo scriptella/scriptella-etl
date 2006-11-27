@@ -15,7 +15,6 @@
  */
 package scriptella.driver.text;
 
-import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
@@ -25,8 +24,6 @@ import scriptella.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
-import java.text.ParseException;
 
 /**
  * Represents a connection to a Text file.
@@ -36,18 +33,8 @@ import java.text.ParseException;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class TextConnection extends AbstractConnection {
-
-
-    private URL url;
-    private String encoding;
+public class TextConnection extends AbstractTextConnection {
     private TextScriptExecutor out;
-
-    /**
-     * Name of the <code>encoding</code> connection property.
-     * Specifies charset encoding for outputted Text files.
-     */
-    private static final String ENCODING = "encoding";
 
     /**
      * For testing purposes only.
@@ -57,16 +44,6 @@ public class TextConnection extends AbstractConnection {
 
     public TextConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
-        try {
-            url = parameters.getResolvedUrl();
-        } catch (ParseException e) {
-            throw new TextProviderException(e.getMessage());
-        }
-        try {
-            encoding = parameters.getCharsetProperty(ENCODING);
-        } catch (ParseException e) {
-            throw new TextProviderException(e.getMessage());
-        }
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {
@@ -88,7 +65,7 @@ public class TextConnection extends AbstractConnection {
     protected void initOut() {
         if (out == null) {
             try {
-                out = new TextScriptExecutor(IOUtils.getWriter(IOUtils.getOutputStream(url), encoding));
+                out = new TextScriptExecutor(IOUtils.getWriter(IOUtils.getOutputStream(url), encoding), trim, eol);
             } catch (IOException e) {
                 throw new TextProviderException("Unable to open file " + url + " for writing", e);
             }
@@ -105,6 +82,9 @@ public class TextConnection extends AbstractConnection {
             qs = IOUtils.toString(queryContent.open());
         } catch (IOException e) {
             throw new TextProviderException("Cannot read query", e);
+        }
+        if (trim) {
+            qs = qs.trim();
         }
 
         Reader in;

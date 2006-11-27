@@ -61,7 +61,7 @@ public class ConnectionManager {
                 throw new ConfigurationException("Unable to parse classpath parameter for "+connection, e);
             }
         }
-        connectionParameters = new ConnectionParameters(c.getProperties(), c.getUrl(), c.getUser(), c.getPassword(), c.getSchema(), c.getCatalog(), ctx);
+        connectionParameters = new ConnectionParameters(c, ctx);
         try {
             driver = DriverFactory.getDriver(c.getDriver(), cl);
         } catch (ClassNotFoundException e) {
@@ -75,6 +75,9 @@ public class ConnectionManager {
     public Connection getConnection() {
         if (connection == null) {
             connection = driver.connect(connectionParameters);
+            if (connection == null) {
+                throw new ConfigurationException("Driver returned null connection for "+connectionParameters);
+            }
         }
 
         return connection;
@@ -82,6 +85,9 @@ public class ConnectionManager {
 
     public Connection newConnection() {
         final Connection c = driver.connect(connectionParameters);
+        if (c == null) {
+            throw new ConfigurationException("Driver returned null connection for "+connectionParameters);
+        }
 
         if (newConnections == null) {
             newConnections = new ArrayList<Connection>();

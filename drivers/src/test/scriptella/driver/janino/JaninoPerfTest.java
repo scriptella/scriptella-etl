@@ -16,8 +16,10 @@
 package scriptella.driver.janino;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
-import scriptella.spi.MockConnectionParameters;
+import scriptella.spi.ConnectionParameters;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -36,7 +38,7 @@ public class JaninoPerfTest extends AbstractTestCase {
      * 06.09.2006 - Duron 1.7Mhz - 656 ms
      */
     public void testScript() {
-        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        JaninoConnection c = new JaninoConnection(new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE));
         ParametersCallback pc = MockParametersCallbacks.NAME;
 
 
@@ -52,7 +54,7 @@ public class JaninoPerfTest extends AbstractTestCase {
      * 06.09.2006 - Duron 1.7Mhz - 844 ms
      */
     public void testQuery() {
-        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        JaninoConnection c = new JaninoConnection(new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE));
         final int[] r = new int[]{0};
 
         Resource queryContent = new StringResource(

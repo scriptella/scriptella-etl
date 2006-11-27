@@ -13,20 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.configuration;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Map;
 
 /**
- * Mock implementations of {@link ConnectionParameters} suitable for testing.
+ * Testable mock for connection elements.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class MockConnectionParameters extends ConnectionParameters {
-    protected MockConnectionParameters() {
-        super(new HashMap<String, String>(), null, null, null, null, null, null);
+public class MockConnectionEl extends ConnectionEl {
+    private Map<String,?> properties;
+
+    public MockConnectionEl() {
+        properties = Collections.emptyMap();
     }
 
-    public static final ConnectionParameters NULL = new MockConnectionParameters();
+    public MockConnectionEl(Map<String,?> properties, String url) {
+        this.properties = properties;
+        setUrl(url);
+    }
+
+    public MockConnectionEl(Map<String,?> properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public Map<String, ?> getProperties() {
+        return properties;
+    }
+
 }

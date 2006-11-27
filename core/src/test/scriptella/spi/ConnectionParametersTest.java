@@ -16,6 +16,7 @@
 package scriptella.spi;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -36,18 +37,18 @@ public class ConnectionParametersTest extends AbstractTestCase {
      * Tests if properties parsing methods work correctly.
      */
     public void testPropertiesParsing() throws ParseException, MalformedURLException, URISyntaxException {
-        Map<String,Object> p = new HashMap<String, Object>();
-        p.put("int",10);
-        p.put("negative",-10);
-        p.put("int2","20");
-        p.put("boolean",true);
-        p.put("boolean2","yes");
-        p.put("url1","file://test");
-        p.put("url2",new URI("file:/url#hash"));
+        Map<String, Object> p = new HashMap<String, Object>();
+        p.put("int", 10);
+        p.put("negative", -10);
+        p.put("int2", "20");
+        p.put("boolean", true);
+        p.put("boolean2", "yes");
+        p.put("url1", "file://test");
+        p.put("url2", new URI("file:/url#hash"));
         File f = new File("tmp");
-        p.put("url3",f);
-        p.put("url4","file4");
-        ConnectionParameters cp = new ConnectionParameters(p, "", "", "", "", "", MockDriverContext.INSTANCE);
+        p.put("url3", f);
+        p.put("url4", "file4");
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(p), MockDriverContext.INSTANCE);
         Integer v = cp.getIntegerProperty("nosuchproperty", 1);
         assertEquals(1, v.intValue());
         v = cp.getIntegerProperty("int", 1);

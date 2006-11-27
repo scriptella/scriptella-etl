@@ -129,9 +129,14 @@ public class PropertiesMap implements Map<String, Object> {
         Properties tmp = new Properties() { //Overrides Properties to preserve insertion order
 
             public Object put(final Object k, final Object v) {
-                return PropertiesMap.this.put((String) k, (String) v);
+                return PropertiesMap.this.put((String) k, v);
             }
         };
         tmp.load(is);
+    }
+
+
+    public String toString() {
+        return String.valueOf(props);
     }
 }

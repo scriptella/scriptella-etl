@@ -31,7 +31,6 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import java.io.IOException;
 import java.io.Reader;
-import java.text.ParseException;
 import java.util.Hashtable;
 
 /**
@@ -133,28 +132,16 @@ public class LdapConnection extends AbstractConnection {
         String baseDn = parameters.getStringProperty(SEARCH_SCOPE_KEY);
         this.baseDn = baseDn == null ? "" : baseDn;
 
-        try {
-            Integer tl = parameters.getIntegerProperty(SEARCH_TIMELIMIT_KEY);
-            if (tl != null) {
-                searchControls.setTimeLimit(tl);
-            }
-        } catch (ParseException e) {
-            throw new LdapProviderException(e.getMessage());
+        Integer tl = parameters.getIntegerProperty(SEARCH_TIMELIMIT_KEY);
+        if (tl != null) {
+            searchControls.setTimeLimit(tl);
         }
-        try {
-            Integer cl = parameters.getIntegerProperty(SEARCH_COUNTLIMIT_KEY);
-            if (cl != null) {
-                searchControls.setCountLimit(cl);
-            }
-        } catch (ParseException e) {
-            throw new LdapProviderException(e.getMessage());
+        Integer cl = parameters.getIntegerProperty(SEARCH_COUNTLIMIT_KEY);
+        if (cl != null) {
+            searchControls.setCountLimit(cl);
         }
-        try {
-            Number mfl = parameters.getNumberProperty(FILE_MAXLENGTH_KEY, null);
-            maxFileLength = mfl == null ? null : mfl.longValue();
-        } catch (ParseException e) {
-            throw new LdapProviderException(e.getMessage());
-        }
+        Number mfl = parameters.getNumberProperty(FILE_MAXLENGTH_KEY, null);
+        maxFileLength = mfl == null ? null : mfl.longValue();
 
         driverContext = parameters.getContext();
     }

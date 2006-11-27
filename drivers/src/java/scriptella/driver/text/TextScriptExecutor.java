@@ -62,14 +62,20 @@ import java.io.Writer;
  */
 public class TextScriptExecutor implements Closeable {
     private BufferedWriter out;
+    private boolean trim;
+    private String eol;
     private PropertiesSubstitutor ps=new PropertiesSubstitutor();
 
     /**
      * Creates an executor.
      * @param out writer for output.
+     * @param trim true if each line in the output file should be trimmed
+     * @param eol EOL separator.
      */
-    public TextScriptExecutor(Writer out) {
+    public TextScriptExecutor(Writer out, boolean trim, String eol) {
         this.out = IOUtils.asBuffered(out);
+        this.trim = trim;
+        this.eol = eol;
     }
 
     /**
@@ -82,9 +88,12 @@ public class TextScriptExecutor implements Closeable {
         BufferedReader r = IOUtils.asBuffered(reader);
         try {
             for (String line; (line = r.readLine()) != null;) {
+                if (trim) {
+                    line = line.trim();
+                }
                 try {
                     out.write(ps.substitute(line));
-                    out.newLine();
+                    out.write(eol);
                 } catch (IOException e) {
                     throw new TextProviderException("Failed writing to a text file", e);
                 }

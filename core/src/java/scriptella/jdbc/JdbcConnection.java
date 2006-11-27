@@ -26,7 +26,6 @@ import scriptella.util.StringUtils;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -80,25 +79,13 @@ public class JdbcConnection extends AbstractConnection {
      */
     protected void init(ConnectionParameters parameters) {
 
-        try {
-            statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);
-        } catch (ParseException e) {
-            throw new JdbcException(e.getMessage());
-        }
+        statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);
         String separatorStr = parameters.getStringProperty(STATEMENT_SEPARATOR_KEY);
         if (!StringUtils.isEmpty(separatorStr)) {
             separator=separatorStr.trim();
         }
-        try {
-            separatorSingleLine = parameters.getBooleanProperty(STATEMENT_SEPARATOR_SINGLELINE_KEY, false);
-        } catch (ParseException e) {
-            throw new JdbcException(e.getMessage());
-        }
-        try {
-            keepformat = parameters.getBooleanProperty(KEEPFORMAT_KEY, false);
-        } catch (ParseException e) {
-            throw new JdbcException(e.getMessage());
-        }
+        separatorSingleLine = parameters.getBooleanProperty(STATEMENT_SEPARATOR_SINGLELINE_KEY, false);
+        keepformat = parameters.getBooleanProperty(KEEPFORMAT_KEY, false);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }

@@ -43,7 +43,7 @@ public class DatabaseMigrator {
         //Currently this class is just a sample of how to generate a migration script template
         //Rewite it
 
-        ConnectionParameters params = new ConnectionParameters(null, "jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm", "sa", "", null, null, null);
+        ConnectionParameters params = new ConnectionParameters(null,null);
         GenericDriver jdbcDriver = new GenericDriver();
 
 

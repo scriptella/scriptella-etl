@@ -16,6 +16,7 @@
 package scriptella.driver.csv;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.MockDriverContext;
@@ -74,8 +75,7 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
     public void testQuery() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
-        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         //Quering 20000 lines file 10 times.
@@ -106,8 +106,7 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
     public void testScript() throws UnsupportedEncodingException {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
-        ConnectionParameters cp = new ConnectionParameters(props, "tst://file", null, null, null, null,
-                MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
         String expected = "\"*col1*\",\"col2\",\"col3\"\n\"*col21*\",\"col22\",\"col23\"\n";

@@ -16,13 +16,11 @@
 package scriptella.driver.hsqldb;
 
 import scriptella.jdbc.JdbcConnection;
-import scriptella.jdbc.JdbcException;
 import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,12 +53,8 @@ public class HsqlConnection extends JdbcConnection {
     @Override
     protected void init(ConnectionParameters parameters) {
         super.init(parameters);
-        try {
-            shutdownOnExit = parameters.getBooleanProperty(SHUTDOWN_ON_EXIT, true)
-                    && isInprocess(parameters.getUrl());
-        } catch (ParseException e) {
-            throw new JdbcException(e.getMessage());
-        }
+        shutdownOnExit = parameters.getBooleanProperty(SHUTDOWN_ON_EXIT, true)
+                && isInprocess(parameters.getUrl());
     }
 
     void shutdown() {

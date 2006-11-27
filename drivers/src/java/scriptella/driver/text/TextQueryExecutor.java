@@ -75,7 +75,6 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
     private BufferedReader reader;
     private Matcher result;
 
-
     public TextQueryExecutor(final String query, final Reader in, final ParametersCallback parentParametersCallback) {
         if (query == null) {
             throw new IllegalArgumentException("Query cannot be null");

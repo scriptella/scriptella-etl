@@ -15,10 +15,6 @@
  */
 package scriptella.spi;
 
-import scriptella.configuration.ConfigurationException;
-
-import java.text.ParseException;
-
 /**
  * A base class for connections.
  * <p>Subclassing is more safe than directly implementing {@link Connection} interface.
@@ -58,11 +54,7 @@ public abstract class AbstractConnection implements Connection {
             throw new IllegalArgumentException("Connection parameters cannot be null");
         }
         //General Scriptella property for debugging non transactional providers
-        try {
-            readonly=parameters.getBooleanProperty("readonly");
-        } catch (ParseException e) {
-            throw new ConfigurationException(e.getMessage());
-        }
+        readonly=parameters.getBooleanProperty("readonly");
     }
 
 
