@@ -16,9 +16,10 @@
 package scriptella.driver.velocity;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.MockConnectionParameters;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 
 import java.io.ByteArrayOutputStream;
@@ -71,7 +72,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
                     };
                 }
             });
-            ConnectionParameters cp = new MockConnectionParameters() {
+            ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE) {
                 @Override
                 public URL getResolvedUrl() {
                     return u;

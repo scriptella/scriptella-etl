@@ -16,9 +16,11 @@
 package scriptella.driver.jndi;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.jdbc.JdbcConnection;
 import scriptella.jdbc.JdbcException;
 import scriptella.spi.ConnectionParameters;
+import scriptella.spi.MockDriverContext;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -55,7 +57,7 @@ public class JNDIDriverTest extends AbstractTestCase {
         CtxFactory.jndiName = "datasourceName";
         CtxFactory.connections = 0;
         CtxFactory.lookups = 0;
-        ConnectionParameters params = new ConnectionParameters(env, CtxFactory.jndiName, null, null, null, null, null);
+        ConnectionParameters params = new ConnectionParameters(new MockConnectionEl(env, CtxFactory.jndiName), MockDriverContext.INSTANCE);
         Driver drv = new Driver();
         JdbcConnection con1 = drv.connect(params);
         con1.close();

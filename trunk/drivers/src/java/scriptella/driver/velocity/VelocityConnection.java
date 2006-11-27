@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.text.ParseException;
 
 /**
  * Represents a session to velocity engine.
@@ -50,11 +49,7 @@ public class VelocityConnection extends AbstractConnection {
      */
     public VelocityConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
-        try {
-            url = parameters.getResolvedUrl();
-        } catch (ParseException e) {
-            throw new VelocityProviderException(e.getMessage());
-        }
+        url = parameters.getResolvedUrl();
         engine = new VelocityEngine();
         engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, Driver.LOG_SYSTEM);
         engine.setProperty("velocimacro.library", "");//unnecessary file in our case
@@ -64,11 +59,7 @@ public class VelocityConnection extends AbstractConnection {
             throw new VelocityProviderException("Unable to initialize engine", e);
         }
         adapter = new VelocityContextAdapter();
-        try {
-            encoding = parameters.getCharsetProperty(OUTPUT_ENCODING);
-        } catch (ParseException e) {
-            throw new VelocityProviderException(e.getMessage());
-        }
+        encoding = parameters.getCharsetProperty(OUTPUT_ENCODING);
     }
 
     /**

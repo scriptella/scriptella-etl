@@ -17,8 +17,10 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.CompileException;
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
-import scriptella.spi.MockConnectionParameters;
+import scriptella.spi.ConnectionParameters;
+import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
@@ -41,7 +43,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
      * This test creates a Janino connection that executes simple valid and invalid scripts.
      */
     public void testScript() {
-        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        JaninoConnection c = new JaninoConnection(new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE));
         field = 0;
         c.executeScript(new StringResource(JaninoConnectionTest.class.getName() + ".field=1;"), null);
         try {
@@ -57,7 +59,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
     }
 
     public void testQuery() {
-        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        JaninoConnection c = new JaninoConnection(new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE));
         field = 0;
         final List<String> rows = new ArrayList<String>();
 
@@ -76,7 +78,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
     }
 
     public void testErrorSourceCode() {
-        JaninoConnection c = new JaninoConnection(MockConnectionParameters.NULL);
+        JaninoConnection c = new JaninoConnection(new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE));
         //test compilation errors
         try {
             c.executeScript(new StringResource("int b=1;\na='"), MockParametersCallbacks.NULL);

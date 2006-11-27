@@ -16,6 +16,8 @@
 
 package scriptella.spi;
 
+import scriptella.configuration.ConfigurationException;
+import scriptella.configuration.ConnectionEl;
 import scriptella.util.ExceptionUtils;
 
 import java.io.File;
@@ -23,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -42,15 +43,22 @@ public class ConnectionParameters {
     private DriverContext context;
 
     /**
+     * For testing purposes.
+     */
+    protected ConnectionParameters() {
+    }
+
+    /**
      * Creates connection parameters based on &lt;connection&gt; element..
      */
-    public ConnectionParameters(Map<String, ?> properties, String url, String user, String password, String schema, String catalog, DriverContext context) {
-        this.properties = properties;
-        this.url = url;
-        this.user = user;
-        this.password = password;
-        this.schema = schema;
-        this.catalog = catalog;
+    public ConnectionParameters(ConnectionEl conf, DriverContext context) {
+        this.properties = conf.getProperties();
+        this.url = conf.getUrl();
+        this.user = conf.getUser();
+        this.password = conf.getPassword();
+        this.schema = conf.getSchema();
+        this.catalog = conf.getCatalog();
+
         this.context = context;
     }
 
@@ -89,11 +97,11 @@ public class ConnectionParameters {
      *
      * @see #getNumberProperty(String,Number)
      */
-    public Integer getIntegerProperty(String name, int defaultValue) throws ParseException {
+    public Integer getIntegerProperty(String name, int defaultValue) throws ConfigurationException {
         return getNumberProperty(name, defaultValue).intValue();
     }
 
-    public Integer getIntegerProperty(String name) throws ParseException {
+    public Integer getIntegerProperty(String name) throws ConfigurationException {
         Number res = getNumberProperty(name, null);
         return res == null ? null : res.intValue();
     }
@@ -107,7 +115,7 @@ public class ConnectionParameters {
      * @return numeric property value.
      * @see Long#decode(String)
      */
-    public Number getNumberProperty(String name, Number defaultValue) throws ParseException {
+    public Number getNumberProperty(String name, Number defaultValue) throws ConfigurationException {
         Object v = properties.get(name);
         if (v == null) {
             return defaultValue;
@@ -124,7 +132,7 @@ public class ConnectionParameters {
         try {
             return Long.decode(v.toString());
         } catch (NumberFormatException e) {
-            throw new ParseException(name + " property must be integer.", 0);
+            throw new ConfigurationException(name + " property must be integer.");
         }
     }
 
@@ -132,7 +140,7 @@ public class ConnectionParameters {
     /**
      * @see #getBooleanProperty(String,boolean)
      */
-    public boolean getBooleanProperty(String name) throws ParseException {
+    public boolean getBooleanProperty(String name) throws ConfigurationException {
         return getBooleanProperty(name, false);
     }
 
@@ -142,9 +150,9 @@ public class ConnectionParameters {
      * @param name         property name.
      * @param defaultValue default value to use if connection has no such property.
      * @return boolean property value.
-     * @throws ParseException if property has unrecognized value.
+     * @throws ConfigurationException if property has unrecognized value.
      */
-    public boolean getBooleanProperty(String name, boolean defaultValue) throws ParseException {
+    public boolean getBooleanProperty(String name, boolean defaultValue) throws ConfigurationException {
         Object a = getProperty(name);
         if (a == null) {
             return defaultValue;
@@ -166,7 +174,7 @@ public class ConnectionParameters {
         {
             return false;
         }
-        throw new ParseException("Unrecognized boolean property value " + a, 0);
+        throw new ConfigurationException("Unrecognized boolean property value " + a);
     }
 
     /**
@@ -174,9 +182,9 @@ public class ConnectionParameters {
      *
      * @param name property name.
      * @return value of the property or null if connection has no such property.
-     * @throws ParseException if charset name is unsupported.
+     * @throws ConfigurationException if charset name is unsupported.
      */
-    public String getCharsetProperty(String name) throws ParseException {
+    public String getCharsetProperty(String name) throws ConfigurationException {
         Object cs = getProperty(name);
         if (cs == null) {
             return null;
@@ -186,7 +194,7 @@ public class ConnectionParameters {
         }
         String enc = cs.toString();
         if (!Charset.isSupported(enc)) {
-            throw new ParseException("Specified encoding " + enc + " is not supported. Supported encodings are " + Charset.availableCharsets().keySet(), 0);
+            throw new ConfigurationException("Specified encoding " + enc + " is not supported. Supported encodings are " + Charset.availableCharsets().keySet());
         }
         return enc;
     }
@@ -197,9 +205,9 @@ public class ConnectionParameters {
      *
      * @param name property name
      * @return value of the property or null if connection has no such property.
-     * @throws ParseException if URL is malformed.
+     * @throws ConfigurationException if URL is malformed.
      */
-    public URL getUrlProperty(String name) throws ParseException {
+    public URL getUrlProperty(String name) throws ConfigurationException {
         Object u = getProperty(name);
         if (u == null) {
             return null;
@@ -225,7 +233,7 @@ public class ConnectionParameters {
             String uri = u.toString();
             return getContext().resolve(uri);
         } catch (MalformedURLException e) {
-            throw new ParseException("Specified URL " + u + " is malformed", 0);
+            throw new ConfigurationException("Specified URL " + u + " is malformed");
         }
 
     }
@@ -243,16 +251,16 @@ public class ConnectionParameters {
     /**
      * Returns the url property resolved relative to a script location.
      *
-     * @throws ParseException if connection URL is malformed or null.
+     * @throws ConfigurationException if connection URL is malformed or null.
      */
-    public URL getResolvedUrl() throws ParseException {
+    public URL getResolvedUrl() throws ConfigurationException {
         if (url == null) {
-            throw new ParseException("URL connection property is requred", 0);
+            throw new ConfigurationException("URL connection property is requred");
         }
         try {
             return getContext().resolve(url);
         } catch (MalformedURLException e) {
-            throw new ParseException("Specified connection URL " + url + " is malformed", 0);
+            throw new ConfigurationException("Specified connection URL " + url + " is malformed");
         }
     }
 

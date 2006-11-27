@@ -17,8 +17,8 @@ package scriptella.driver.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import scriptella.driver.text.AbstractTextConnection;
 import scriptella.expression.PropertiesSubstitutor;
-import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
@@ -29,8 +29,6 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,17 +39,11 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class CsvConnection extends AbstractConnection {
+public class CsvConnection extends AbstractTextConnection {
     private static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
-    private final URL url;
 
 
-    /**
-     * Name of the <code>encoding</code> connection property.
-     * Specifies charset encoding of CSV files.
-     */
-    public static final String ENCODING = "encoding";
     /**
      * Name of the <code>separator</code> connection property.
      * The delimiter to use for separating entries when reading from or writing to files.
@@ -70,37 +62,14 @@ public class CsvConnection extends AbstractConnection {
      * <p>Only valid for &lt;query&gt; elements.
      */
     public static final String HEADERS = "headers";
-    /**
-     * Name of the <code>eol</code> connection property.
-     * EOL suffix. Default value is \n.
-     * <p>Only valid for &lt;script&gt; elements.
-     */
-    public static final String EOL = "eol";
 
-    /**
-     * Name of the <code>trim</code> connection property.
-     * Value of <code>true</code> specifies that the leading and trailing
-     * whitespaces in CSV fields should be omitted. Default value is <code>true</code>.
-     * <p>Valid for &lt;script&gt; and &lt;query&gt; elements.
-     */
-    public static final String TRIM = "trim";
-
-    private final String encoding;
     private final char separator;
     private final char quote;
-    private final String eol;//the line feed terminator to use
     private final boolean headers;
-    private final boolean trim;
 
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
-        try {
-            encoding = parameters.getCharsetProperty(ENCODING);
-        } catch (ParseException e) {
-            throw new CsvProviderException(e.getMessage());
-
-        }
         String sep = parameters.getStringProperty(SEPARATOR);
         if (sep != null && sep.length() > 0) {
             separator = sep.charAt(0);
@@ -116,27 +85,7 @@ public class CsvConnection extends AbstractConnection {
             quote = CSVWriter.NO_QUOTE_CHARACTER;
         }
 
-        try {
-            headers = parameters.getBooleanProperty(HEADERS, true);
-        } catch (ParseException e) {
-            throw new CsvProviderException(e.getMessage());
-        }
-        String eolStr = parameters.getStringProperty(EOL);
-        if (eolStr != null && eolStr.length() > 0) {
-            eol = eolStr;
-        } else {
-            eol = "\n"; //Default value
-        }
-        try {
-            trim = parameters.getBooleanProperty(TRIM, true);
-        } catch (ParseException e) {
-            throw new CsvProviderException(e.getMessage());
-        }
-        try {
-            url = parameters.getResolvedUrl();
-        } catch (ParseException e) {
-            throw new CsvProviderException(e.getMessage());
-        }
+        headers = parameters.getBooleanProperty(HEADERS, true);
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {

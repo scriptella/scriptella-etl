@@ -36,9 +36,9 @@ public class TextScriptExecutorTest extends AbstractTestCase {
      * Tests general functionality.
      */
     public void test() throws IOException {
-        String s = "$rownum;$name;$surname;${email.trim().replaceAll('@','_at_')}";
+        String s = "  $rownum;$name;$surname;${email.trim().replaceAll('@','_at_')}\n";
         StringWriter out = new StringWriter();
-        TextScriptExecutor ts = new TextScriptExecutor(out);
+        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n");
         Map<String,String> m = new HashMap<String, String>();
         m.put("rownum", "1");
         m.put("name", "John");
@@ -54,7 +54,7 @@ public class TextScriptExecutorTest extends AbstractTestCase {
         ts.execute(new StringReader(s), c);
         ts.close();
         String res = out.toString();
-        String[] ar = res.split("[\\r\\n]");
+        String[] ar = res.split("\n");
         assertEquals("1;John;G;john_at_nosuchhost.com", ar[0]);
         assertEquals("2;Jim;G;jim_at_nosuchhost.com", ar[1]);
     }

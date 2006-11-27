@@ -16,9 +16,11 @@
 package scriptella.driver.hsqldb;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.MockConnectionEl;
 import scriptella.jdbc.JdbcConnection;
 import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
+import scriptella.spi.MockDriverContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,14 +42,18 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         Map<String, String> props = new HashMap<String, String>();
 
         final String url = "jdbc:hsqldb:mem:shutdowntest";
-        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
+        MockConnectionEl conf = new MockConnectionEl(props, url);
+        conf.setUser("sa");
+        ConnectionParameters params = new ConnectionParameters(conf, MockDriverContext.INSTANCE);
         JdbcConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         Statement st = nc.createStatement();
 
         st.execute("        CREATE TABLE Test (ID INT);");
         props.put("ifexists", "true"); //do not create new database if not exists
-        ConnectionParameters params2 = new ConnectionParameters(props, url, "sa", null, null, null, null);
+        MockConnectionEl conf2 = new MockConnectionEl(props, url);
+        conf.setUser("sa");
+        ConnectionParameters params2 = new ConnectionParameters(conf2, MockDriverContext.INSTANCE);
 
         JdbcConnection con2 = drv.connect(params2);
         con2.close();
@@ -83,7 +89,9 @@ public class ShutdownOnExitTest extends AbstractTestCase {
         Map<String, String> props = new HashMap<String, String>();
 
         final String url = "jdbc:hsqldb:mem:alreadyClosed";
-        ConnectionParameters params = new ConnectionParameters(props, url, "sa", null, null, null, null);
+        MockConnectionEl conf = new MockConnectionEl(props, url);
+        conf.setUser("sa");
+        ConnectionParameters params = new ConnectionParameters(conf, MockDriverContext.INSTANCE);
         JdbcConnection con = drv.connect(params);
         Connection nc = con.getNativeConnection();
         nc.createStatement().execute("SHUTDOWN;");
@@ -103,12 +111,16 @@ public class ShutdownOnExitTest extends AbstractTestCase {
 
         //Create first db and obtain 2 connections
         String url1 = "jdbc:hsqldb:mem:DifferentDbs1";
-        ConnectionParameters params = new ConnectionParameters(props, url1, "sa", null, null, null, null);
+        MockConnectionEl conf = new MockConnectionEl(props, url1);
+        conf.setUser("sa");
+        ConnectionParameters params = new ConnectionParameters(conf, MockDriverContext.INSTANCE);
         JdbcConnection con1 = drv.connect(params);
         JdbcConnection con11 = drv.connect(params);
         //Create second db and obtain 2 connections
         String url2 = "jdbc:hsqldb:mem:DifferentDbs2";
-        params = new ConnectionParameters(props, url2, "sa", null, null, null, null);
+        conf = new MockConnectionEl(props, url2);
+        conf.setUser("sa");
+        params = new ConnectionParameters(conf, MockDriverContext.INSTANCE);
         JdbcConnection con2 = drv.connect(params);
         JdbcConnection con22 = drv.connect(params);
         //close everything
