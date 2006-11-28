@@ -22,6 +22,7 @@ import scriptella.spi.DialectIdentifier;
 
 /**
  * Scriptella Driver for <a href="http://www.janino.net/">Janino</a> Java Compiler.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

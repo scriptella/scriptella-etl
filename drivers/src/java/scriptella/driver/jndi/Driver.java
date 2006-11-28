@@ -29,6 +29,7 @@ import java.util.Properties;
  * <p><em>Note:</em>Currently this driver does not support JTA transactions
  * and simply use connections provided by datasource.
  * In this case new-tx has no effect if code is runned inside a transaction.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

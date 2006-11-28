@@ -28,6 +28,7 @@ import java.util.Properties;
  * <p>This driver relies on {@link scriptella.jdbc.GenericDriver} functionality.
  * <p><em>Note:</em>Use Spring transaction proxies for
  * {@link EtlExecutorBean} to support Spring transactions.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

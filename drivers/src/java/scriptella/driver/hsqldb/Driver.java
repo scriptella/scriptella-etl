@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 /**
  * Scriptella Adapter for HSLQDB database.
  * <p>The primary feature of this driver is {@link HsqlConnection#SHUTDOWN_ON_EXIT}.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

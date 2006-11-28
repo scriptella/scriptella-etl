@@ -21,6 +21,8 @@ import scriptella.jdbc.JdbcException;
 /**
  * Scriptella Adapter for Sybase database.
  *
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
+ *
  * @author Kirill Volgin
  * @version 1.0
  */

@@ -22,6 +22,7 @@ import java.sql.Connection;
 
 /**
  * Oracle connection wrapper.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

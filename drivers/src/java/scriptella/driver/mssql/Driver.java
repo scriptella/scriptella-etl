@@ -27,6 +27,8 @@ import scriptella.jdbc.JdbcException;
  * <li>Microsoft JDBC Driver for MS SQL Server 2000 - <code>com.microsoft.jdbc.sqlserver.SQLServerDriver</code></li>
  * <li>jTDS JDBC Driver for Microsoft SQL Server - <code>net.sourceforge.jtds.jdbc.Driver</code></li>
  * </ul>
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
+ *
  * @author Kirill Volgin
  * @version 1.0
  */

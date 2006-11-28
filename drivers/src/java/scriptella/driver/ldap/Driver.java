@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 /**
  * Scriptella Driver for LDAP.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

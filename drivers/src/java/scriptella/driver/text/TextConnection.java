@@ -27,7 +27,6 @@ import java.io.Reader;
 
 /**
  * Represents a connection to a Text file.
- * <p/>
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
@@ -77,26 +76,22 @@ public class TextConnection extends AbstractTextConnection {
             throw new TextProviderException("Cannot query and update a Text file simultaneously");
         }
 
-        String qs;
-        try {
-            qs = IOUtils.toString(queryContent.open());
-        } catch (IOException e) {
-            throw new TextProviderException("Cannot read query", e);
-        }
-        if (trim) {
-            qs = qs.trim();
-        }
-
         Reader in;
         try {
             in = IOUtils.getReader(url.openStream(), encoding);
         } catch (IOException e) {
             throw new TextProviderException("Cannot open a text file for reading", e);
         }
+        Reader q;
+        try {
+            q = queryContent.open();
+        } catch (IOException e) {
+            throw new TextProviderException("Cannot read a text query", e);
+        }
 
         TextQueryExecutor tq = null;
         try {
-            tq = new TextQueryExecutor(qs, in , parametersCallback);
+            tq = new TextQueryExecutor(q, trim, in , parametersCallback);
             tq.execute(queryCallback);
         } finally {
             if (tq!=null) {

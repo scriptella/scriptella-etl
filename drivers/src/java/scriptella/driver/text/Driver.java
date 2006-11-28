@@ -29,6 +29,7 @@ import scriptella.spi.DialectIdentifier;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Text", "1.0");
+
     public Connection connect(ConnectionParameters connectionParameters) {
         return new TextConnection(connectionParameters);
     }

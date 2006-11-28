@@ -24,6 +24,10 @@ import scriptella.spi.Resource;
 
 /**
  * Scriptella connection adapter for Janino Script Evaluator.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
+ *
+ * @author Fyodor Kupolov
+ * @version 1.0
  */
 public class JaninoConnection extends AbstractConnection {
     private CodeCompiler compiler = new CodeCompiler();
