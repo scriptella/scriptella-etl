@@ -23,6 +23,8 @@ import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.util.CollectionUtils;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Level;
@@ -42,6 +44,7 @@ import java.util.logging.Logger;
  * </pre></code>
  * <p>Additionally simplified helper methods are declared in this class:
  * <ul>
+ * <li>{@link #newExecutor(java.io.File)}
  * <li>{@link #newExecutor(java.net.URL)}
  * <li>{@link #newExecutor(java.net.URL, java.util.Map)}
  * </ul>
@@ -154,6 +157,20 @@ public class EtlExecutor {
         ctx.setProgressCallback(progress); //Restoring
 
         return ctx;
+    }
+
+    /**
+     * Converts file to URL and invokes {@link #newExecutor(java.net.URL)}.
+     * @param scriptFile ETL file.
+     * @return configured instance of script executor.
+     * @see #newExecutor(java.net.URL)
+     */
+    public static EtlExecutor newExecutor(final File scriptFile) {
+        try {
+            return newExecutor(scriptFile.toURL());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
     }
 
     /**
