@@ -1,0 +1,96 @@
+<body>
+<h1>Text Driver for Scriptella.</h1>
+The driver to write and query Text files.
+<p><b>Note: </b>The driver doesn't use SQL syntax
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.spi.text.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>Text file URL. URIs are resolved relative to a script file directory.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code><a href="http://prdownloads.sourceforge.net/opencsv">opencsv-1.6+.jar</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>encoding</td>
+        <td>Specifies charset encoding of Text files.</td>
+        <td>No, the system default encoding is used.</td>
+    </tr>
+    <tr>
+        <td>eol</td>
+        <td>End-Of-Line suffix.<p>Only valid for &lt;script&gt; elements.</td>
+        <td>No, the default value is <code>\n</code>.</td>
+    </tr>
+    <tr>
+        <td>trim</td>
+        <td>Value of <code>true</code> specifies that the leading and trailing
+     whitespaces in text file lines should be omitted..
+        <td>No, the default value is <code>true</code>.</td>
+    </tr>
+</table>
+<h2>Query Syntax</h2>
+Text driver supports Regular expressions syntax to query text files.
+The file is read line-by-line and each line is matched against the regex pattern.
+If pattern matched the <b>>whole line</b> this match produces a row in a virtual
+result set. The column names in a virtual result set corresponds to captured groups in a regex.
+<br><u>Example:</u>
+<code>
+    <pre>
+&lt;query&gt;
+,.*food.*
+,Beverages,
+&lt;/query&gt;
+    </pre>
+</code>
+This query selects rows where the second column equals "Beverages" or
+contains "food" substring.
+<h2>Script Syntax</h2>
+The script syntax is simple, just specify a comma-separated set of columns.
+<br><u>Example:</u>
+<code>
+    <pre>
+&lt;script&gt;
+id,priority,summary,status
+1,Critical,NullPointerException in Main class,Open
+&lt;/script&gt;
+    </pre>
+</code>
+This script writes 2 lines to the output file.
+<h2>Properties substitution</h2>
+In CSV script and query elements use ${property} syntax for properties/variables substition.
+<h2>Examples</h2>
+<code><pre>
+&lt;connection id="in" driver="csv" url="data.csv" classpath="lib/opencsv.jar"&gt;
+
+&lt;/connection&gt;
+&lt;connection id="out" driver="csv" url="report.csv" classpath="lib/opencsv.jar"&gt;
+    #Use empty quote to turn off quoting
+    quote=
+    separator=;
+&lt;/connection&gt;
+
+&lt;script connection-id="out"&gt;
+    ID,Priority,Summary,Status
+&lt;/script&gt;
+
+&lt;query connection-id="in"&gt;
+    &lt;!--Empty query means select all--&gt;
+    &lt;script connection-id="out"&gt;
+        $rownum,$priority,$summary,$status
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre></code>
+Copies rows from data.csv file to report.csv, additionally the ID column is added.
+The result file will be semicolon separated.
+</body>

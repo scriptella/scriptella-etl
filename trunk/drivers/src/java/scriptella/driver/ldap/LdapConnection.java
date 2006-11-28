@@ -35,6 +35,7 @@ import java.util.Hashtable;
 
 /**
  * Represents a connection to a directory context.
+ * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
  * @version 1.0

@@ -26,6 +26,8 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -47,21 +49,21 @@ import java.util.regex.Pattern;
  * </code>
  * As the result of the query execution the following result set is produced:
  * <table border=1>
- *   <tr>
- *     <th>Column name/<br>row number</th>
- *     <th>0</th>
- *     <th>1</th>
- *   </tr>
- *   <tr>
- *     <td>1</td>
- *     <td>2;200;record 2</td>
- *     <td>200</td>
- *   </tr>
- *   <tr>
- *     <td>2</td>
- *     <td>3;250;record 3</td>
- *     <td>250</td>
- *   </tr>
+ * <tr>
+ * <th>Column name/<br>row number</th>
+ * <th>0</th>
+ * <th>1</th>
+ * </tr>
+ * <tr>
+ * <td>1</td>
+ * <td>2;200;record 2</td>
+ * <td>200</td>
+ * </tr>
+ * <tr>
+ * <td>2</td>
+ * <td>3;250;record 3</td>
+ * <td>250</td>
+ * </tr>
  * </table>
  * Where column name corresponds to the matched regex group name.
  *
@@ -71,20 +73,47 @@ import java.util.regex.Pattern;
 class TextQueryExecutor implements ParametersCallback, Closeable {
     private static final Logger LOG = Logger.getLogger(TextQueryExecutor.class.getName());
     private final ParametersCallback params;
-    private final Pattern query;
+    private final PropertiesSubstitutor ps;
+    private Pattern[] query;
     private BufferedReader reader;
     private Matcher result;
+    private boolean trim;
 
-    public TextQueryExecutor(final String query, final Reader in, final ParametersCallback parentParametersCallback) {
-        if (query == null) {
+    public TextQueryExecutor(final Reader queryReader, final boolean trim, final Reader in, final ParametersCallback parentParametersCallback) {
+        if (queryReader == null) {
             throw new IllegalArgumentException("Query cannot be null");
         }
+        this.trim = trim;
         this.params = parentParametersCallback;
+        ps = new PropertiesSubstitutor(params);
+        //Compiles patterns loaded from specified reader.
+        //Patterns are read line-by-line.
+        BufferedReader r = IOUtils.asBuffered(queryReader);
+        List<Pattern> result = new ArrayList<Pattern>();
         try {
-            this.query = Pattern.compile(new PropertiesSubstitutor(parentParametersCallback).substitute(query), Pattern.CASE_INSENSITIVE);
-        } catch (Exception e) {
-            throw new TextProviderException("Cannot parse query " + query, e);
+            for (String s; (s = r.readLine()) != null;) {
+                if (trim) {
+                    s = s.trim();
+                }
+                s = ps.substitute(s);
+                if (s.length() > 0) { //Not empty string
+                    try {
+                        result.add(Pattern.compile(s, Pattern.CASE_INSENSITIVE));
+                    } catch (Exception e) {
+                        throw new TextProviderException("Specified query is not a valid regex: "+s,e);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new TextProviderException("Unable to read query content", e);
+        } finally {
+            IOUtils.closeSilently(r);
         }
+        if (result.isEmpty()) {
+            LOG.fine("Empty query matches all lines");
+            result.add(Pattern.compile(".*"));
+        }
+        query = result.toArray(new Pattern[result.size()]);
         reader = IOUtils.asBuffered(in);
 
     }
@@ -95,25 +124,25 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
      * @param qc callback to notify on each row.
      */
     public void execute(final QueryCallback qc) {
-        Matcher m = null;
-
         try {
-            for (String line;(line=reader.readLine()) != null;) {
-                if (m==null) {
-                    m=query.matcher(line);
-                } else {
-                    m.reset(line);
+            for (String line; (line = reader.readLine()) != null;) {
+                if (trim) {
+                    line = line.trim();
                 }
-                if (m.matches()) {
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.info("Pattern matched: " + m);
+                for (Pattern p : query) {
+                    Matcher m = p.matcher(line);
+                    if (m.matches()) {
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.info("Pattern matched: " + m);
+                        }
+                        result = m;
+                        qc.processRow(this);
+
                     }
-                    result=m;
-                    qc.processRow(this);
                 }
             }
         } catch (IOException e) {
-            throw new TextProviderException("Unable to parse text file", e);
+            throw new TextProviderException("Unable to read a text file", e);
         }
     }
 
@@ -141,6 +170,6 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
 
     public void close() throws IOException {
         IOUtils.closeSilently(reader);
-        reader=null;
+        reader = null;
     }
 }
