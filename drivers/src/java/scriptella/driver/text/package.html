@@ -11,7 +11,7 @@ The driver to write and query Text files.
         <td><b>URL:</b></td><td><code>Text file URL. URIs are resolved relative to a script file directory.</code></td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td><code><a href="http://prdownloads.sourceforge.net/opencsv">opencsv-1.6+.jar</a></code></td>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -40,20 +40,66 @@ The driver to write and query Text files.
 </table>
 <h2>Query Syntax</h2>
 Text driver supports Regular expressions syntax to query text files.
-The file is read line-by-line and each line is matched against the regex pattern.
-If pattern matched the <b>>whole line</b> this match produces a row in a virtual
-result set. The column names in a virtual result set corresponds to captured groups in a regex.
+The file is read line-by-line from the location specified by the URL connection property and each line is matched
+against the regex pattern.
+<p>
+If the <b>whole line</b> matches the pattern this match produces a virtual row in a result set.
+The column names in a virtual result set correspond to matched regex group names.
+For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
+    result set row contains two columns(groups): 0-foobar, 1-bar
+</p>
+<p>It also possible to specify more than one regular expressions to match file content.
+Specify each regular expression on a separate line to match them using OR condition.
+<p>The Text driver uses <code>java.util.regex</code> implementation for pattern matching. See <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">java.util.Pattern</a>
+    for supported syntax Javadoc.</p>
+<p>Additional notes:
+<ul>
+    <li>Regular expressions matching is case-insensitive</li>
+    <li>Empty query selects all lines from the input file.</li>
+    <li>The <code>0</code>(zero) column name in the produced result set contains the matched line.</li>
+    <li>Leading and trailing whitespaces in query element and input file lines are trimmed by default.</li>
+</ul>
+</p>
 <br><u>Example:</u>
 <code>
     <pre>
 &lt;query&gt;
-,.*food.*
-,Beverages,
+  ERROR: (.*)
+  WARNING: (.*Failed.*)
 &lt;/query&gt;
     </pre>
 </code>
-This query selects rows where the second column equals "Beverages" or
-contains "food" substring.
+This query consists of 2 regular expressions:
+<ol>
+    <li>selects lines starting with <code>ERROR:</code> prefix</li>
+    <li>selects <code>WARNING</code> lines having <code>Failed</code> substring</li>
+</ol>
+The query selects any line satisfying one of these 2 regular expressions.
+Input file has the following content:
+<code>
+<pre>
+Log file started...
+INFO: INIT
+WARNING: CPU is slow
+WARNING: Failed to increase heap size
+ERROR: Process interrupted
+</pre>
+</code>
+As the result of query execution the following set of rows is produced:
+<table border="1">
+    <tr>
+        <th>0</th>
+        <th>1</th>
+    </tr>
+    <tr>
+        <td>WARNING: Failed to increase heap size</td>
+        <td>Failed to increase heap size</td>
+    </tr>
+    <tr>
+        <td>ERROR: Process interrupted</td>
+        <td>Process interrupted</td>
+    </tr>
+</table>
 <h2>Script Syntax</h2>
 The script syntax is simple, just specify a comma-separated set of columns.
 <br><u>Example:</u>
