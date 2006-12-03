@@ -125,19 +125,26 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
      */
     public void execute(final QueryCallback qc) {
         try {
+            int qCount = query.length;
+            Matcher[] matchers = new Matcher[qCount];
             for (String line; (line = reader.readLine()) != null;) {
                 if (trim) {
                     line = line.trim();
                 }
-                for (Pattern p : query) {
-                    Matcher m = p.matcher(line);
+                for (int i = 0; i < qCount; i++) {
+                    Matcher m = matchers[i];
+                    if (m==null) { //First time initialization
+                        m=query[i].matcher(line);
+                        matchers[i]=m;
+                    } else { //Reuse matcher for better performance
+                        m.reset(line);
+                    }
                     if (m.matches()) {
                         if (LOG.isLoggable(Level.FINE)) {
                             LOG.info("Pattern matched: " + m);
                         }
                         result = m;
                         qc.processRow(this);
-
                     }
                 }
             }
