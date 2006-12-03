@@ -101,42 +101,51 @@ As the result of query execution the following set of rows is produced:
     </tr>
 </table>
 <h2>Script Syntax</h2>
-The script syntax is simple, just specify a comma-separated set of columns.
+The &lt;script&gt; element content is read line-by-line, for each line
+properties are expanded and the output is sent to the file specifed by a url connection attribute.
+<p>Additional notes:
+<ul>
+    <li>Lines in the outputted file are separated by a EOL string specified by <code>eol</code> connection property.</li>
+    <li>Leading and trailing whitespaces in the output file lines are trimmed by default.</li>
+    <li>No escaping is performed when properties are expanded. Use String.replace or other escaping techniques to
+        achieve output similar to CSV etc.</li>
+    <li>If a script is executed multiple times (e.g. inside a parent query) the output is appended to the file content.</li>
+</ul>
+</p>
 <br><u>Example:</u>
 <code>
     <pre>
 &lt;script&gt;
-id,priority,summary,status
-1,Critical,NullPointerException in Main class,Open
+    Inserted a record with ID=$id. Table=${table}
 &lt;/script&gt;
     </pre>
 </code>
-This script writes 2 lines to the output file.
+For id=1 and table=system this script produces the following output:
+<code>
+    <pre>
+Inserted a record with ID=1. Table=system
+    </pre>
+</code>
 <h2>Properties substitution</h2>
-In CSV script and query elements use ${property} syntax for properties/variables substition.
+In text script and query elements ${property} or $property syntax is used for properties/variables substition.
 <h2>Examples</h2>
 <code><pre>
-&lt;connection id="in" driver="csv" url="data.csv" classpath="lib/opencsv.jar"&gt;
-
+&lt;connection id="in" driver="text" url="data.csv"&gt;
 &lt;/connection&gt;
-&lt;connection id="out" driver="csv" url="report.csv" classpath="lib/opencsv.jar"&gt;
-    #Use empty quote to turn off quoting
-    quote=
-    separator=;
+&lt;connection id="out" driver="text" url="report.csv"&gt;
 &lt;/connection&gt;
 
 &lt;script connection-id="out"&gt;
-    ID,Priority,Summary,Status
+    ID;Priority;Summary;Status
 &lt;/script&gt;
 
 &lt;query connection-id="in"&gt;
-    &lt;!--Empty query means select all--&gt;
     &lt;script connection-id="out"&gt;
-        $rownum,$priority,$summary,$status
+        $rownum;$column0;${column1==null?"":column1.replaceAll('"', '""')};$column2
     &lt;/script&gt;
 &lt;/query&gt;
 
 </pre></code>
 Copies rows from data.csv file to report.csv, additionally the ID column is added.
-The result file will be semicolon separated.
+The result file is semicolon separated.
 </body>
