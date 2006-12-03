@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.driver.csv;
+package scriptella.driver.text;
 
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
@@ -34,12 +34,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests for {@link scriptella.driver.csv.CsvConnection}.
+ * Tests for {@link scriptella.driver.text.TextConnection}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class CsvConnectionPerfTest extends AbstractTestCase {
+public class TextConnectionPerfTest extends AbstractTestCase {
     private int rows;
 
     private ByteArrayOutputStream out;
@@ -66,31 +66,29 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         };
 
     }
-
     /**
      * History:
-     * 11.09.2006 - Duron 1.7Mhz - 1265 ms
-     * 09.09.2006 - Duron 1.7Mhz - 1400 ms
+     * 03.12.2006 - Duron 1.7Mhz - 938 ms
      */
     public void testQuery() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
-        CsvConnection con = new CsvConnection(cp);
+        TextConnection con = new TextConnection(cp);
         //Quering 20000 lines file 10 times.
         for (int i=0;i<10;i++) {
             rows = 0;
-            con.executeQuery(new StringResource(" ,.*2, "), MockParametersCallbacks.NULL, new QueryCallback() {
+            con.executeQuery(new StringResource(".*,(.*2),.*"), MockParametersCallbacks.NULL, new QueryCallback() {
                 public void processRow(final ParametersCallback parameters) {
                     rows++;
-                    parameters.getParameter("c1");
-                    parameters.getParameter("2");
+                    parameters.getParameter("0");
+                    parameters.getParameter("1");
                     parameters.getParameter("nosuchcolumn");
 
                 }
             });
-            assertEquals(10000-1, rows); //1 line contains headers and not queries by default
+            assertEquals(10000, rows);
             assertNull("No output should be produced by a query", out);
         }
 
@@ -99,19 +97,18 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
 
     /**
      * History:
-     * 11.09.2006 - Duron 1.7Mhz - 844 ms
-     * 09.09.2006 - Duron 1.7Mhz - 875 ms
-     * @throws UnsupportedEncodingException
+     * 03.12.2006 - Duron 1.7Mhz - 703 ms
+     * @throws java.io.UnsupportedEncodingException
      */
     public void testScript() throws UnsupportedEncodingException {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
-        CsvConnection con = new CsvConnection(cp);
+        TextConnection con = new TextConnection(cp);
         String expected = "\"*col1*\",\"col2\",\"col3\"\n\"*col21*\",\"col22\",\"col23\"\n";
         for (int i = 0; i < 10000; i++) {
-            con.executeScript(new StringResource("$col1,\"col2\",col3\n${col21},col22,col23"),
+            con.executeScript(new StringResource("\"$col1\",\"col2\",\"col3\"\n\"${col21}\",\"col22\",\"col23\""),
                     MockParametersCallbacks.SIMPLE);
             out.reset();
         }
@@ -121,6 +118,8 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         //out is filled partially because we use out.reset() to minimize memory usage
         //So use indexOf to check
         assertTrue(actual.indexOf(expected) >= 0);
+
+
     }
 
 

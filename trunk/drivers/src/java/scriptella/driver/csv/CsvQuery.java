@@ -26,6 +26,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +41,8 @@ public class CsvQuery implements ParametersCallback, Closeable {
     private final boolean trim;
     private ColumnsMap columnsMap;
     private String[] row;
+    private Pattern[][] patterns;
+    private Matcher[][] matchers;
     private PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
 
     /**
@@ -60,15 +63,18 @@ public class CsvQuery implements ParametersCallback, Closeable {
 
     /**
      * Executes a query.
-     * @param queryReader query content reader. Closed after this method completes.
+     *
+     * @param queryReader        query content reader. Closed after this method completes.
      * @param parametersCallback parameters to use.
-     * @param queryCallback callback to use for result set iteration.
+     * @param queryCallback      callback to use for result set iteration.
      * @throws IOException if IO error occurs.
      */
     public void execute(CSVReader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback) throws IOException {
         try {
             substitutor.setParameters(parametersCallback);
-            List<Pattern[]> patterns = compileQueries(queryReader);
+            compileQueries(queryReader);
+
+
             columnsMap = new ColumnsMap();
             if (headers) {
                 String[] row = reader.readNext();
@@ -78,7 +84,7 @@ public class CsvQuery implements ParametersCallback, Closeable {
             }
             //For each row
             while ((row = reader.readNext()) != null) {
-                if (matches(patterns, row)) {
+                if (rowMatches()) {
                     queryCallback.processRow(this);
                 }
             }
@@ -93,29 +99,43 @@ public class CsvQuery implements ParametersCallback, Closeable {
     }
 
     /**
-     * Checks if specified row matches any of the specified patterns.
+     * Checks if current CSV row matches any of the specified patterns.
      *
-     * @param patterns regexp patterns to check.
-     *                 In case of patterns==null row matches criteria.
-     * @param row      CSV row.
      * @return true if row matches one of queries.
      */
-    static boolean matches(List<Pattern[]> patterns, String[] row) {
+    boolean rowMatches() {
         //Checking border conditions
-        if (patterns == null || patterns.isEmpty() || row == null || row.length == 0) {
+        Pattern[][] ptrs = patterns;
+        int columnsCount = row.length;
+        if (ptrs == null) {
             return true;
+        } else if (columnsCount == 0) {
+            return false;
         }
-        for (Pattern[] rowPatterns : patterns) {
+
+        for (int i = 0; i < ptrs.length; i++) {
+            Pattern[] rowPatterns = ptrs[i];
+            Matcher[] rowMatchers = matchers[i];
             boolean rowMatches = true;
-            for (int i = 0; i < rowPatterns.length; i++) {
-                Pattern columnPtr = rowPatterns[i];
-                if (i >= row.length) { //If patterns length exceeds row columns count
-                    rowMatches = false;
-                    break; //consider no matches
-                }
-                if (columnPtr != null && !columnPtr.matcher(row[i]).matches()) {
-                    rowMatches = false;
-                    break;
+            int patternsCount = rowPatterns.length;
+            if (patternsCount > columnsCount) { //If patterns length exceeds row columns count
+                continue; //Skip this query line
+            }
+            for (int j = 0; j < patternsCount; j++) {
+                Pattern columnPtr = rowPatterns[j];
+                if (columnPtr != null) {
+                    Matcher m = rowMatchers[j];
+                    String col = row[j]; //Current column value
+                    if (m == null) { //create new matcher
+                        m = columnPtr.matcher(col);
+                        rowMatchers[j] = m;
+                    } else { //reuse
+                        m.reset(col);
+                    }
+                    if (!m.matches()) {
+                        rowMatches = false;
+                        break;
+                    }
                 }
             }
             if (rowMatches) { //If this row matches current patterns
@@ -131,10 +151,9 @@ public class CsvQuery implements ParametersCallback, Closeable {
      * Compiles queries into a list of patterns.
      *
      * @param r CSV reader for query text.
-     * @return list of compiled columns.
      */
     @SuppressWarnings("unchecked")
-    List<Pattern[]> compileQueries(final CSVReader r) {
+    void compileQueries(final CSVReader r) {
         List<String[]> list;
         try {
             list = r.readAll();
@@ -164,8 +183,17 @@ public class CsvQuery implements ParametersCallback, Closeable {
                 res.add(patterns);
             }
         }
-
-        return res;
+        if (res != null) {
+            int len = res.size();
+            Pattern[][] ptrs = res.toArray(new Pattern[len][]);
+            //Create the matchers array to reuse for better performance
+            Matcher[][] matchers = new Matcher[len][];
+            for (int i = 0; i < len; i++) {
+                matchers[i] = new Matcher[ptrs[i].length];
+            }
+            this.patterns = ptrs;
+            this.matchers = matchers;
+        }
 
     }
 
