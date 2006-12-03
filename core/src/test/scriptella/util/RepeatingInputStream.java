@@ -35,10 +35,10 @@ public class RepeatingInputStream extends InputStream {
     }
 
     public int read() throws IOException {
-        if (pos >= data.length) {
+        if (count<=0 || pos >= data.length) {
             count--;
 
-            if (count >= 0) {
+            if (count > 0) {
                 pos = 0;
             } else {
                 return -1;
@@ -50,5 +50,5 @@ public class RepeatingInputStream extends InputStream {
 
         return r;
     }
-    
+
 }
