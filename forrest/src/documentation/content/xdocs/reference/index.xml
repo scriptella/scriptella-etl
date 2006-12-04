@@ -539,7 +539,7 @@
 				</tr>
 				<tr>
 					<td>CSV</td>
-					<td>Example of working with CSV data using HSQLDB CSV tables feature and opencsv library</td>
+					<td>Example of working with CSV data using HSQLDB CSV tables feature, opencsv library or Scriptella built-in Text driver.</td>
 				</tr>
 				<tr>
 					<td>DB Upgrade</td>
