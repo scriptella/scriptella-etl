@@ -59,7 +59,7 @@ public class Driver extends GenericDriver {
             }
         }
         if (!driverLoaded) {
-            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception.getMessage());            
+            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception);            
         }
 
     }
