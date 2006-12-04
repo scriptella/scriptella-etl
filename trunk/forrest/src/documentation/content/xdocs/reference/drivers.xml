@@ -132,7 +132,7 @@
 						<a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino</a>
 					</td>
 					<td>scriptella.driver.janino.Driver</td>
-					<td>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
+					<td>This driver allows embedding of Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
 				</tr>
 				<tr>
 					<td>
@@ -140,9 +140,18 @@
 						<a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
 					</td>
 					<td>scriptella.driver.ldap.Driver</td>
-					<td>This driver allows to execute LDIF scripts and search filter queries.</td>
+					<td>This driver allows executing LDIF scripts and search filter queries.</td>
 				</tr>
-				<tr>
+                <tr>
+                    <td>
+                        <anchor id="text"/>
+                        <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>
+                    </td>
+                    <td>scriptella.driver.text.Driver</td>
+                    <td>The driver for working with text data. It supports regular expressions syntax for quering
+                        and ant style property expansion in outputted text files.</td>
+                </tr>
+                <tr>
 					<td>
 						<anchor id="velocity"/>
 						<a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>

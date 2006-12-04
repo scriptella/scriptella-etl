@@ -78,6 +78,7 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
     private BufferedReader reader;
     private Matcher result;
     private boolean trim;
+    private static final String COLUMN_PREFIX = "column";
 
     public TextQueryExecutor(final Reader queryReader, final boolean trim, final Reader in, final ParametersCallback parentParametersCallback) {
         if (queryReader == null) {
@@ -100,7 +101,7 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
                     try {
                         result.add(Pattern.compile(s, Pattern.CASE_INSENSITIVE));
                     } catch (Exception e) {
-                        throw new TextProviderException("Specified query is not a valid regex: "+s,e);
+                        throw new TextProviderException("Specified query is not a valid regex: " + s, e);
                     }
                 }
             }
@@ -133,9 +134,9 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
                 }
                 for (int i = 0; i < qCount; i++) {
                     Matcher m = matchers[i];
-                    if (m==null) { //First time initialization
-                        m=query[i].matcher(line);
-                        matchers[i]=m;
+                    if (m == null) { //First time initialization
+                        m = query[i].matcher(line);
+                        matchers[i] = m;
                     } else { //Reuse matcher for better performance
                         m.reset(line);
                     }
@@ -162,9 +163,13 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
      * @return parameter value.
      */
     public Object getParameter(final String name) {
-        if (StringUtils.isDecimalInt(name)) {
+        String str = name;
+        if (str != null && str.startsWith(COLUMN_PREFIX)) {
+            str = name.substring(COLUMN_PREFIX.length());
+        }
+        if (StringUtils.isDecimalInt(str)) {
             try {
-                int ind = Integer.parseInt(name);
+                int ind = Integer.parseInt(str);
                 if (ind >= 0 && ind <= result.groupCount()) {
                     return result.group(ind);
                 }

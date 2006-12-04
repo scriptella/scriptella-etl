@@ -110,6 +110,8 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         tq.execute(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("1");
+                String p2 = (String) parameters.getParameter("column1");
+                assertEquals(p, p2);
                 assertTrue("Unexpected element " + p, expected.remove(p));
             }
         });
