@@ -47,7 +47,7 @@ If the <b>whole line</b> matches the pattern this match produces a virtual row i
 The column names in a virtual result set correspond to matched regex group names.
 For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
     result set row contains two columns(groups): 0-foobar, 1-bar. These columns
-    can be referenced in child script or query elements by a numeric name or by a string name columnN.
+    can be referenced in child script or query elements by a numeric name or by a string name <code>columnN</code>.
 </p>
 <p>It also possible to specify more than one regular expressions to match file content.
 Specify each regular expression on a separate line to match them using OR condition.
