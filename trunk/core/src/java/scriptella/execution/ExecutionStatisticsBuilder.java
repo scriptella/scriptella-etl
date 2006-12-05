@@ -56,10 +56,17 @@ public class ExecutionStatisticsBuilder {
         ei.started=System.nanoTime();
     }
 
+    /**
+     * Calls {@link #elementExecuted(int) elementExecuted(0)}
+     */
     public void elementExecuted() {
         elementExecuted(0);
     }
 
+    /**
+     * This method is called when element has been executed.
+     * @param statements number of executed statements.
+     */
     public void elementExecuted(final int statements) {
         executionStatistics.statements += statements;
 
@@ -108,26 +115,5 @@ public class ExecutionStatisticsBuilder {
         //assume that statistics is obtained immediately after the execution
         executionStatistics.setTotalTime(System.currentTimeMillis() - started);
         return executionStatistics;
-    }
-
-    public static void main(final String args[]) {
-        Location e1 = new Location("Script #1");
-        Location e2 = new Location("Script #2");
-        Location e3 = new Location("Query #1");
-
-        ExecutionStatisticsBuilder b = new ExecutionStatisticsBuilder();
-        b.elementStarted(e1);
-        b.elementExecuted(10);
-        b.elementStarted(e1);
-        b.elementExecuted(10);
-        b.elementStarted(e1);
-        b.elementFailed();
-        b.elementStarted(e3);
-        b.elementExecuted();
-        b.elementStarted(e2);
-        b.elementFailed();
-
-        final ExecutionStatistics s = b.getStatistics();
-        System.out.println("s = " + s);
     }
 }
