@@ -7,7 +7,7 @@
     <body>
         <section id="overview">
             <title>About Scriptella</title>
-            <p>Scriptella is an open source Extract-Transform-Load (ETL) and scripts execution tool.</p>
+            <p>Scriptella is an open source ETL (Extract-Transform-Load) and scripts execution tool.</p>
             <p>Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use
                 SQL (or other
                 scripting language suitable for the data source) to perform required transformations.</p>
