@@ -16,6 +16,7 @@
 package scriptella.execution;
 
 import scriptella.configuration.Location;
+import scriptella.spi.Connection;
 
 import java.util.Stack;
 
@@ -24,9 +25,11 @@ import java.util.Stack;
  * A builder for execution statistics.
  * <p>This class collects runtime ETL execution statistics, the usage contract is the following:</p>
  * <ul>
- * <li>Call {@link #elementStarted(scriptella.configuration.Location)} before executing an element.
+ * <li>{@link #etlStarted()} invoked on ETL start.
+ * <li>Call {@link #elementStarted(Location, Connection)} before executing an element.
  * <li>Call {@link #elementExecuted()} or {@link #elementFailed()} after executing an element.
- * <li>{@link #getStatistics() Obtain statistics} when ETL completes.
+ * <li>{@link #etlComplete()} invoked when ETL completes.
+ * <li>{@link #getStatistics() Obtain statistics} after ETL completes.
  * </ul>
  * <em>Notes:</em>
  * <ul>
@@ -38,9 +41,9 @@ import java.util.Stack;
  * @version 1.0
  */
 public class ExecutionStatisticsBuilder {
-    private ExecutionStatistics executionStatistics = new ExecutionStatistics();
+    private ExecutionStatistics executionStatistics;
     //assume that instantiation time is the start time
-    private long started = System.currentTimeMillis();
+    private long started;
 
     //Execution stack for nested elements
     private Stack<ExecutionStatistics.ElementInfo> executionStack = new Stack<ExecutionStatistics.ElementInfo>();
@@ -50,56 +53,88 @@ public class ExecutionStatisticsBuilder {
      *
      * @param loc element location.
      */
-    public void elementStarted(final Location loc) {
+    public void elementStarted(final Location loc, Connection connection) {
         ExecutionStatistics.ElementInfo ei = getInfo(loc);
         executionStack.push(ei);
+        ei.statementsOnStart = connection.getExecutedStatementsCount();
+        ei.connection = connection;
         ei.started=System.nanoTime();
     }
 
     /**
-     * Calls {@link #elementExecuted(int) elementExecuted(0)}
+     * This method is called when element has been executed.
      */
     public void elementExecuted() {
-        elementExecuted(0);
+        setElementState(true);
     }
 
     /**
-     * This method is called when element has been executed.
-     * @param statements number of executed statements.
+     * Invoked on ETL start
      */
-    public void elementExecuted(final int statements) {
-        executionStatistics.statements += statements;
+    public void etlStarted() {
+        executionStatistics = new ExecutionStatistics();
+        started = System.currentTimeMillis();
+    }
 
-        ExecutionStatistics.ElementInfo ei = getLastStartedElement();
-        ei.okCount++;
-
-        if (statements != 0) {
-            ei.statements += statements;
+    /**
+     * Invoked on ETL completion.
+     */
+    public void etlComplete() {
+        if (executionStatistics==null) {
+            throw new IllegalStateException("etlStarted not called");
         }
+
+        //assume that statistics is obtained immediately after the execution
+        executionStatistics.setTotalTime(System.currentTimeMillis() - started);
     }
 
+
     /**
-     * Calculates execution time and return the last started element.
-     *
-     * @return last started element.
+     * Calculates execution time and statements number for the completed element.
      */
-    private ExecutionStatistics.ElementInfo getLastStartedElement() {
+    private void setElementState(boolean ok) {
         ExecutionStatistics.ElementInfo ended = executionStack.pop();
         long ti = System.nanoTime() - ended.started;
         ended.workingTime += ti; //increase the total working time for element
-        //Now substract the execution time from parent element.
-        //Because query time must not include children
-        if (!executionStack.isEmpty()) {
-            executionStack.peek().workingTime -= ti;
+        if (ended.workingTime < 0) {
+            ended.workingTime = 0;
         }
-        return ended;
+        final Connection con = ended.connection;
+        ended.connection=null; //clear the connection to avoid leaks
+        long conStatements = con.getExecutedStatementsCount();
+        long elStatements = conStatements - ended.statementsOnStart;
+        if (ok) {
+            ended.okCount++;
+        } else {
+            ended.failedCount++;
+        }
+
+        if (elStatements > 0) {
+            ended.statements += elStatements;
+            executionStatistics.statements+=elStatements;
+        }
+
+
+        //Exclude this element time from parent elements
+        //Also find the parent elements with the same connection and decrement their number of statements
+        for (int i=executionStack.size()-1;i>=0;i--) {
+            final ExecutionStatistics.ElementInfo parent = executionStack.get(i);
+            parent.workingTime -= ti;
+            if (parent.connection==con) { //if the same objects
+                parent.statementsOnStart+=elStatements;
+            }
+        }
+
     }
 
     public void elementFailed() {
-        getLastStartedElement().failedCount++;
+        setElementState(false);
     }
 
     private ExecutionStatistics.ElementInfo getInfo(final Location loc) {
+        if (executionStatistics==null) {
+            throw new IllegalStateException("etlStarted must be invoked prior to calling this method");
+        }
         ExecutionStatistics.ElementInfo ei = executionStatistics.elements.get(loc.getXpath());
 
         if (ei == null) {
@@ -112,8 +147,6 @@ public class ExecutionStatisticsBuilder {
     }
 
     public ExecutionStatistics getStatistics() {
-        //assume that statistics is obtained immediately after the execution
-        executionStatistics.setTotalTime(System.currentTimeMillis() - started);
         return executionStatistics;
     }
 }

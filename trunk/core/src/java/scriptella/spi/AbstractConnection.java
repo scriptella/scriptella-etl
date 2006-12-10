@@ -25,6 +25,8 @@ package scriptella.spi;
 public abstract class AbstractConnection implements Connection {
     private DialectIdentifier dialectIdentifier;
     private boolean readonly;
+    //Counter for statements use counter.statements++ to update statistics
+    protected final StatementCounter counter = new StatementCounter();
 
     /**
      * May be used by sublasses to allow full customization
@@ -66,6 +68,10 @@ public abstract class AbstractConnection implements Connection {
         this.dialectIdentifier = dialectIdentifier;
     }
 
+    public long getExecutedStatementsCount() {
+        return counter.statements; //The default implementation
+    }
+
     /**
      * Returns readonly mode.
      * <p>readonly=true means updates must be skipped by the driver.
@@ -87,5 +93,15 @@ public abstract class AbstractConnection implements Connection {
     public String toString() {
         String simpleName = getClass().getSimpleName();
         return simpleName.length() == 0 ? "connection" : simpleName;
+    }
+
+    /**
+     * Helper class to use for executed statements counting.
+     */
+    public static class StatementCounter {
+        /**
+         * Stores number of executed statements.
+         */
+        public volatile long statements;
     }
 }

@@ -126,7 +126,9 @@ public class SearchFilterQuery implements ParametersCallback {
     }
 
     protected NamingEnumeration<SearchResult> query(final LdapConnection connection, final String filter) throws NamingException {
-        return connection.getCtx().search(connection.getBaseDn(), filter, connection.getSearchControls());
+        NamingEnumeration<SearchResult> en = connection.getCtx().search(connection.getBaseDn(), filter, connection.getSearchControls());
+        connection.getStatementCounter().statements++;
+        return en;
     }
 
 

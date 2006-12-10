@@ -72,9 +72,9 @@ public class PropertiesTest extends AbstractTestCase {
         cf.setExternalProperties(props);
         return new EtlExecutor(cf.createConfiguration()) {
             //overrides prepare method to get ctx and params for connection
-            protected EtlContext prepare(
-                    final ProgressIndicator indicator) {
-                ctx = super.prepare(indicator); //store ctx for assertions
+            @Override
+            protected EtlContext prepare(final ProgressIndicator indicator) {
+                ctx = super.prepare(indicator);
                 Map<String, ConnectionManager> connections = SqlTestHelper.getConnections(ctx.getSession());
                 ConnectionManager con = connections.entrySet().iterator().next().getValue();
                 params = SqlTestHelper.getConnectionParameters(con);

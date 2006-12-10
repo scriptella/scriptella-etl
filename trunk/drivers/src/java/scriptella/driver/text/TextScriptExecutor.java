@@ -15,7 +15,9 @@
  */
 package scriptella.driver.text;
 
+import scriptella.core.EtlCancelledException;
 import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 import scriptella.util.IOUtils;
 
@@ -82,18 +84,21 @@ public class TextScriptExecutor implements Closeable {
      * Parses a script from read, expands properties and produces the output.
      * @param reader script content.
      * @param pc parameters for substitution.
+     * @param counter statements counter.
      */
-    public void execute(Reader reader, ParametersCallback pc) {
+    public void execute(Reader reader, ParametersCallback pc, AbstractConnection.StatementCounter counter) {
         ps.setParameters(pc);
         BufferedReader r = IOUtils.asBuffered(reader);
         try {
             for (String line; (line = r.readLine()) != null;) {
+                EtlCancelledException.checkEtlCancelled();
                 if (trim) {
                     line = line.trim();
                 }
                 try {
                     out.write(ps.substitute(line));
                     out.write(eol);
+                    counter.statements++;
                 } catch (IOException e) {
                     throw new TextProviderException("Failed writing to a text file", e);
                 }
@@ -101,8 +106,6 @@ public class TextScriptExecutor implements Closeable {
         } catch (IOException e) {
             throw new TextProviderException("Failed reading a script file", e);
         }
-
-
     }
 
     public void close() throws IOException {

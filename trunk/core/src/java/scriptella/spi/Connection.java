@@ -17,6 +17,7 @@ package scriptella.spi;
 
 /**
  * Represents a connection to the system provided by {@link ScriptellaDriver}.
+ * <p>The implementations are not required to be thread safe.
  * <p>For most cases {@link AbstractConnection} may be used as a base for driver connection implementation.
  *
  * @author Fyodor Kupolov
@@ -48,6 +49,16 @@ public interface Connection {
      * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
     void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException;
+
+    /**
+     * This method returns the number of executed statements or 0 if this feature is unsupported.
+     * <p>If possible the connection should collect statistics about the number of executed statement.
+     * It's recommended to provide the most actual execution statistics, i.e. increment internal statements
+     * counter during a script or a query execution, so the monitoring tools would be able to track progress.  
+     *
+     * @return number of executed statements or 0 if this feature is unsupported.
+     */
+    long getExecutedStatementsCount();
 
     /**
      * Commits a current transaction (if any).

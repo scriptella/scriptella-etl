@@ -88,6 +88,13 @@ public class LdapConnection extends AbstractConnection {
      */
     public static final String FILE_MAXLENGTH_KEY = "file.maxlength";
 
+    public LdapConnection() {
+        this.searchControls = null;
+        this.maxFileLength = null;
+        this.baseDn = null;
+        this.driverContext = null;
+    }
+
     /**
      * Creates a connnection to a directory.
      *
@@ -165,6 +172,10 @@ public class LdapConnection extends AbstractConnection {
 
     String getBaseDn() {
         return baseDn;
+    }
+
+    StatementCounter getStatementCounter() {
+        return counter;
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {

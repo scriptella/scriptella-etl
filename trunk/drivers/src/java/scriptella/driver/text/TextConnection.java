@@ -50,7 +50,7 @@ public class TextConnection extends AbstractTextConnection {
         Reader reader = null;
         try {
             reader = scriptContent.open();
-            out.execute(reader, parametersCallback);
+            out.execute(reader, parametersCallback, counter);
         } catch (IOException e) {
             throw new TextProviderException("Failed to produce a text file", e);
         } finally {
@@ -92,7 +92,7 @@ public class TextConnection extends AbstractTextConnection {
         TextQueryExecutor tq = null;
         try {
             tq = new TextQueryExecutor(q, trim, in , parametersCallback);
-            tq.execute(queryCallback);
+            tq.execute(queryCallback, counter);
         } finally {
             if (tq!=null) {
                 IOUtils.closeSilently(tq);

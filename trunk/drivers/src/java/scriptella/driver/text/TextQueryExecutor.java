@@ -16,6 +16,7 @@
 package scriptella.driver.text;
 
 import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.util.ExceptionUtils;
@@ -123,10 +124,11 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
      * Executes a query and iterates the resultset using the callback.
      *
      * @param qc callback to notify on each row.
+     * @param counter statements counter.
      */
-    public void execute(final QueryCallback qc) {
+    public void execute(final QueryCallback qc,  AbstractConnection.StatementCounter counter) {
+        int qCount = query.length;
         try {
-            int qCount = query.length;
             Matcher[] matchers = new Matcher[qCount];
             for (String line; (line = reader.readLine()) != null;) {
                 if (trim) {
@@ -152,6 +154,7 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
         } catch (IOException e) {
             throw new TextProviderException("Unable to read a text file", e);
         }
+        counter.statements+=qCount;
     }
 
 

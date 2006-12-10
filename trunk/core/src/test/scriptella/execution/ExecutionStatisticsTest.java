@@ -42,7 +42,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
         for (ExecutionStatistics.ElementInfo info : elements) {
-            assertTrue(info.getWorkingTime()>=0);
+            assertTrue("Negative working time: "+info.getWorkingTime(), info.getWorkingTime()>=0);
             if ("/etl[1]/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
@@ -102,4 +102,41 @@ public class ExecutionStatisticsTest extends DBTestCase {
             }
         }
     }
+
+    public void test3() throws EtlExecutorException {
+        final EtlExecutor se = newEtlExecutor(
+                "ExecutionStatisticsTest3.xml");
+        final ExecutionStatistics s = se.execute();
+        Map<String, Integer> cats = s.getCategoriesStatistics();
+        assertEquals(2, cats.size());
+        assertEquals(2, cats.get("script").intValue());
+        assertEquals(2, cats.get("query").intValue());
+        assertEquals(9, s.getExecutedStatementsCount()); //4+2+2+1
+
+        final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
+
+        for (ExecutionStatistics.ElementInfo info : elements) {
+            if ("/etl[1]/script[1]".equals(info.getId())) {
+                assertEquals(1, info.getSuccessfulExecutionCount());
+                assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(4, info.getStatementsCount());
+            } else if ("/etl[1]/query[1]/query[1]/script[1]".equals(
+                    info.getId())) {
+                assertEquals(2, info.getSuccessfulExecutionCount());
+                assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(2, info.getStatementsCount()); //1 statement executed 2 times
+            } else if ("/etl[1]/query[1]/query[1]".equals(info.getId())) {
+                assertEquals(2, info.getSuccessfulExecutionCount());
+                assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(2, info.getStatementsCount());
+            } else if ("/etl[1]/query[1]".equals(info.getId())) {
+                assertEquals(1, info.getSuccessfulExecutionCount());
+                assertEquals(0, info.getFailedExecutionCount());
+                assertEquals(1, info.getStatementsCount());
+            } else {
+                fail("Unrecognized statistic element " + info.getId());
+            }
+        }
+    }
+
 }

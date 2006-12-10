@@ -15,6 +15,8 @@
  */
 package scriptella.execution;
 
+import scriptella.spi.Connection;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
@@ -138,7 +140,7 @@ public class ExecutionStatistics {
         return xpath.substring(slash + 1, br);
     }
 
-    private static StringBuilder appendPlural(final StringBuilder sb, final int num, final String singularNoun) {
+    private static StringBuilder appendPlural(final StringBuilder sb, final long num, final String singularNoun) {
         sb.append(num).append(' ');
         if (num > 1) { //plural form
             if ("query".equals(singularNoun)) { //exceptions
@@ -150,15 +152,6 @@ public class ExecutionStatistics {
             sb.append(singularNoun); //singular form
         }
         return sb;
-    }
-
-    private static String getPlural(final String noun) {
-        if ("query".equals(noun)) {
-            return "queries";
-        } else {
-            return noun+"s";
-        }
-
     }
 
     /**
@@ -181,7 +174,9 @@ public class ExecutionStatistics {
 
     public static class ElementInfo {
         int okCount;
-        int statements;
+        Connection connection;
+        long statementsOnStart;
+        long statements;
         int failedCount;
         long started;
         long workingTime;
@@ -202,7 +197,7 @@ public class ExecutionStatistics {
          *
          * @return number of executed statements.
          */
-        public int getStatementsCount() {
+        public long getStatementsCount() {
             return statements;
         }
 

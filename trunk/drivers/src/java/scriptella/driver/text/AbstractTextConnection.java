@@ -80,4 +80,20 @@ public abstract class AbstractTextConnection extends AbstractConnection {
 
     }
 
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public boolean isTrim() {
+        return trim;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public String getEol() {
+        return eol;
+    }
+
 }

@@ -17,6 +17,7 @@ package scriptella.driver.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import scriptella.core.EtlCancelledException;
 import scriptella.driver.text.AbstractTextConnection;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ConnectionParameters;
@@ -95,16 +96,16 @@ public class CsvConnection extends AbstractTextConnection {
         } catch (IOException e) {
             throw new CsvProviderException("Cannot read script.", e);
         }
-
-
     }
 
-    void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
+
+     void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
 
         CSVReader r = new CSVReader(reader);//Parsing rules of script in XML is always standard
         CSVWriter out = getOut();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
         for (String[] row; (row = r.readNext()) != null;) {
+            EtlCancelledException.checkEtlCancelled();
             for (int i = 0; i < row.length; i++) {
                 String field = row[i];
                 if (field != null) {
@@ -126,12 +127,12 @@ public class CsvConnection extends AbstractTextConnection {
             } else {
                 try {
                     out.writeNext(row);
+                    counter.statements++;
                 } catch (Exception e) {
                     throw new CsvProviderException("Failed to write CSV row ", e);
                 }
             }
         }
-
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
@@ -142,7 +143,7 @@ public class CsvConnection extends AbstractTextConnection {
             CSVReader in = new CSVReader(IOUtils.getReader(url.openStream(), encoding), separator, quote);
             CsvQuery q = new CsvQuery(in, headers, trim);
             try {
-                q.execute(new CSVReader(queryContent.open()), parametersCallback, queryCallback);
+                q.execute(new CSVReader(queryContent.open()), parametersCallback, queryCallback, counter);
             } catch (IOException e) {
                 throw new CsvProviderException("Cannot read query " + queryContent, e);
             } finally {

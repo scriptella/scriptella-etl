@@ -40,7 +40,7 @@ public class ConnectionParametersTest extends AbstractTestCase {
         Map<String, Object> p = new HashMap<String, Object>();
         p.put("int", 10);
         p.put("negative", -10);
-        p.put("int2", "20");
+        p.put("int2", " 20");
         p.put("boolean", true);
         p.put("boolean2", "yes");
         p.put("url1", "file://test");
