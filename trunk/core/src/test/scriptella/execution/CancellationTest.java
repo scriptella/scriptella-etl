@@ -52,7 +52,6 @@ public class CancellationTest extends DBTestCase {
             etlExecutor.execute();
         } catch (EtlExecutorException e) {
             assertTrue(e.isCancelled());
-            System.out.println("e = " + e);
         }
         ti = System.currentTimeMillis() - ti;
         assertTrue(interrupted);
