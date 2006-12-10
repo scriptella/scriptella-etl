@@ -238,13 +238,18 @@ public class EtlLauncher {
         final ConfigurationEl c = factory.createConfiguration();
 
         exec.setConfiguration(c);
+        EtlShutdownHook etlShutdownHook = null;
         if (cancelOnVmExit) {
-            new EtlShutdownHook().register();
+            etlShutdownHook = new EtlShutdownHook();
+            etlShutdownHook.register();
         }
         ExecutionStatistics st = exec.execute(indicator);
 
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("ETL file " + file + " has been successfully executed. Execution statistics:\n" + st.toString());
+        }
+        if (etlShutdownHook != null) {
+            etlShutdownHook.unregister();
         }
     }
 
