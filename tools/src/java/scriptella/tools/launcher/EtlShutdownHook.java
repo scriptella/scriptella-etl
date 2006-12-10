@@ -47,6 +47,18 @@ class EtlShutdownHook extends Thread {
         }
     }
 
+    /**
+     * Unregisters this system shutdown hook if it has been registered.
+     */
+    public void unregister() {
+        etlThread = null;
+        try {
+            Runtime.getRuntime().removeShutdownHook(this);
+        } catch (Exception e) {
+            LOG.log(Level.INFO, "Unable to remove shutdown hook.", e);
+        }
+    }
+
     public void run() {
         if (etlThread != null && etlThread.isAlive() && !etlThread.isInterrupted()) {
             //cannot use logging in a shutdown hook
