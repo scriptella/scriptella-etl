@@ -15,6 +15,9 @@
  */
 package scriptella.tools.launcher;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Shutdown hook added by {@link EtlLauncher}.
  *
@@ -22,6 +25,7 @@ package scriptella.tools.launcher;
  * @version 1.0
  */
 class EtlShutdownHook extends Thread {
+    private static final Logger LOG = Logger.getLogger(EtlShutdownHook.class.getName());
     private Thread etlThread;
     public EtlShutdownHook() {
         setName("ETL Cancellation Thread");
@@ -36,7 +40,11 @@ class EtlShutdownHook extends Thread {
      */
     public void register() {
         etlThread = Thread.currentThread();
-        Runtime.getRuntime().addShutdownHook(this);
+        try {
+            Runtime.getRuntime().addShutdownHook(this);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Unable to add shutdown hook. ETL will not be rolled back on abnormal termination.", e);
+        }
     }
 
     public void run() {
