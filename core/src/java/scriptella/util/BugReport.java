@@ -21,7 +21,6 @@ import scriptella.execution.EtlExecutorException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 
 /**
  * Represents bug report for unexpected conditions.
@@ -71,7 +70,9 @@ public class BugReport {
         StringWriter rep = new StringWriter();
         PrintWriter pw = new PrintWriter(rep);
         pw.println("Scriptella bug report. Submit to issue tracker.");
-        pw.println("Loaded packages info: "+ Arrays.toString(Package.getPackages()));
+        Package p = BugReport.class.getPackage();
+        String version = p != null && p.getImplementationVersion() != null ? p.getImplementationVersion() : "Unknown";
+        pw.println("Scriptella version: " + version);
         pw.println("Exception: ");
         throwable.printStackTrace(pw);
         pw.println("Environment: ");
