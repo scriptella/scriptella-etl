@@ -84,6 +84,7 @@ public class EtlLauncher {
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
     private Map<String,?> properties;
+    private boolean cancelOnVmExit=true;
     public static final String DEFAULT_FILE_NAME = "etl.xml";
 
     public EtlLauncher() {
@@ -207,6 +208,23 @@ public class EtlLauncher {
         this.indicator = indicator;
     }
 
+
+    /**
+     * Returns <code>true</code> if ETL will be cancelled on VM exit.
+     */
+    public boolean isCancelOnVmExit() {
+        return cancelOnVmExit;
+    }
+
+    /**
+     * Sets ETL cancellation mode on VM shutdown.
+     * @param cancelOnVmExit <code>true</code> if ETL should be cancelled on VM exit.
+     * Default value is <code>true</code>.
+     */
+    public void setCancelOnVmExit(boolean cancelOnVmExit) {
+        this.cancelOnVmExit = cancelOnVmExit;
+    }
+
     public void execute(final File file)
             throws EtlExecutorException {
         try {
@@ -220,6 +238,9 @@ public class EtlLauncher {
         final ConfigurationEl c = factory.createConfiguration();
 
         exec.setConfiguration(c);
+        if (cancelOnVmExit) {
+            new EtlShutdownHook().register();
+        }
         ExecutionStatistics st = exec.execute(indicator);
 
         if (LOG.isLoggable(Level.INFO)) {
