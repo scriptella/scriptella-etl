@@ -123,7 +123,7 @@ public class ExecutionStatistics {
             sb.append('\n');
 
         }
-        sb.append("Total working time ").append(doubleFormat.format(totalTime / 1000d)).append(" seconds.\n");
+        sb.append("Total working time ").append(doubleFormat.format(totalTime / 1000d)).append(" seconds.");
 
         return sb.toString();
     }

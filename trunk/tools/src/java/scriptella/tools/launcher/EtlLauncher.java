@@ -246,7 +246,8 @@ public class EtlLauncher {
         ExecutionStatistics st = exec.execute(indicator);
 
         if (LOG.isLoggable(Level.INFO)) {
-            LOG.info("ETL file " + file + " has been successfully executed. Execution statistics:\n" + st.toString());
+            LOG.info("Execution statistics:\n" + st.toString());
+            LOG.info("Successfully executed ETL file " + file);
         }
         if (etlShutdownHook != null) {
             etlShutdownHook.unregister();
