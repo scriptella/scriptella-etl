@@ -17,6 +17,7 @@ package scriptella.driver.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
 import scriptella.AbstractTestCase;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -38,6 +39,7 @@ public class CsvQueryTest extends AbstractTestCase {
         String query = ".*1.*,2,3,4";
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), false, false);
         rows=0;
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3,4 matches the pattern
         q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.UNSUPPORTED, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
@@ -47,8 +49,9 @@ public class CsvQueryTest extends AbstractTestCase {
                 assertEquals("3", parameters.getParameter("3"));
                 assertEquals("4", parameters.getParameter("4"));
             }
-        });
+        }, cnt);
         assertEquals(1, rows);
+        assertEquals(1, cnt.statements);
     }
 
     /**
@@ -60,6 +63,7 @@ public class CsvQueryTest extends AbstractTestCase {
         String query = "11,22,33";
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), true, true);
         rows=0;
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.SIMPLE, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
@@ -73,8 +77,9 @@ public class CsvQueryTest extends AbstractTestCase {
                 assertEquals("*4*", parameters.getParameter("4")); //Unknown column
                 assertEquals("*four*", parameters.getParameter("four")); //Unknown column
             }
-        });
+        }, cnt);
         assertEquals(1, rows);
+        assertEquals(1, cnt.statements);
     }
 
     /**
@@ -85,7 +90,7 @@ public class CsvQueryTest extends AbstractTestCase {
         String query = "\\"; //bad query
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), true, true);
         try {
-            q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.UNSUPPORTED, null );
+            q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.UNSUPPORTED, null, null);
             fail("Bad query syntax should be recognized");
         } catch (CsvProviderException e) {
             //OK

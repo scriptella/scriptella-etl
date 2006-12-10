@@ -17,6 +17,7 @@ package scriptella.driver.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
 import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.util.ColumnsMap;
@@ -67,13 +68,13 @@ public class CsvQuery implements ParametersCallback, Closeable {
      * @param queryReader        query content reader. Closed after this method completes.
      * @param parametersCallback parameters to use.
      * @param queryCallback      callback to use for result set iteration.
+     * @param counter            statements counter.
      * @throws IOException if IO error occurs.
      */
-    public void execute(CSVReader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback) throws IOException {
+    public void execute(CSVReader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback, AbstractConnection.StatementCounter counter) throws IOException {
         try {
             substitutor.setParameters(parametersCallback);
             compileQueries(queryReader);
-
 
             columnsMap = new ColumnsMap();
             if (headers) {
@@ -83,6 +84,7 @@ public class CsvQuery implements ParametersCallback, Closeable {
                 }
             }
             //For each row
+
             while ((row = reader.readNext()) != null) {
                 if (rowMatches()) {
                     queryCallback.processRow(this);
@@ -95,7 +97,9 @@ public class CsvQuery implements ParametersCallback, Closeable {
                 ExceptionUtils.ignoreThrowable(e);
             }
         }
-
+        if (patterns != null) {
+            counter.statements += patterns.length;
+        }
     }
 
     /**

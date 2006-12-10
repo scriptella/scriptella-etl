@@ -72,7 +72,7 @@ public class VelocityConnection extends AbstractConnection {
      * @param scriptContent      script content.
      * @param parametersCallback callback to get parameter values.
      */
-    public synchronized void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
+    public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
         //todo Current solution is slow, use per scriptContent caching by providing a custom Velocity ResourceLoader
         //todo also make Resource identifiable, i.e. replace url.getFile with resource name/location
         adapter.setCallback(parametersCallback);//we may use single context+engine because method is synchronized

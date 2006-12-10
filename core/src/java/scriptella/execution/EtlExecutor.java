@@ -49,6 +49,15 @@ import java.util.logging.Logger;
  * <li>{@link #newExecutor(java.net.URL, java.util.Map)}
  * </ul>
  *
+ * <h3>ETL Cancellation</h3>
+ * Scriptella execution model relies on a standard Java {@link Thread#interrupt()} mechanism.
+ * <p>To interrupt the ETL execution invoke {@link Thread#interrupt()} on a thread
+ * which {@link #execute() started} ETL operation. As a part of interruption process
+ * the engine tries to roll back all changes made during the ETL operation.
+ * <p>{@link java.util.concurrent.ExecutorService} and {@link java.util.concurrent.Future}
+ * can also be used to control ETL execution.
+ *
+ *
  * @author Fyodor Kupolov
  * @version 1.0
  */
@@ -102,6 +111,7 @@ public class EtlExecutor {
         } finally {
             if (ctx != null) {
                 closeAll(ctx);
+                ctx.getStatisticsBuilder().etlComplete();
                 ctx.getProgressCallback().complete();
             }
         }
@@ -144,12 +154,12 @@ public class EtlExecutor {
      */
     protected EtlContext prepare(final ProgressIndicator indicator) {
         EtlContext ctx = new EtlContext();
+        ctx.getStatisticsBuilder().etlStarted();
         ctx.setBaseURL(configuration.getDocumentUrl());
         ctx.setProgressCallback(new ProgressCallback(100, indicator));
 
         final ProgressCallback progress = ctx.getProgressCallback();
         progress.step(1, "Initializing properties");
-
         ctx.setProperties(configuration.getProperties());
         ctx.setProgressCallback(progress.fork(9, 100));
         ctx.session = new Session(configuration, ctx);

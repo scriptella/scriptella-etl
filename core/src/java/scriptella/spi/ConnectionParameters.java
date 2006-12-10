@@ -123,14 +123,14 @@ public class ConnectionParameters {
         if (v instanceof Number) {
             return ((Number) v);
         }
-        String s = v.toString();
+        String s = v.toString().trim();
         if (s.length() == 0) {
             return defaultValue;
         }
 
-        //We do not support doubles etc. for now
+        //For now we do not support doubles etc.
         try {
-            return Long.decode(v.toString());
+            return Long.decode(s);
         } catch (NumberFormatException e) {
             throw new ConfigurationException(name + " property must be integer.");
         }
@@ -163,7 +163,7 @@ public class ConnectionParameters {
         if (a instanceof Number) {
             return ((Number) a).intValue() > 0;
         }
-        String s = a.toString();
+        String s = a.toString().trim();
 
         if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         {
@@ -192,7 +192,7 @@ public class ConnectionParameters {
         if (cs instanceof Charset) {
             return ((Charset) cs).name();
         }
-        String enc = cs.toString();
+        String enc = cs.toString().trim();
         if (!Charset.isSupported(enc)) {
             throw new ConfigurationException("Specified encoding " + enc + " is not supported. Supported encodings are " + Charset.availableCharsets().keySet());
         }
@@ -230,7 +230,7 @@ public class ConnectionParameters {
         }
 
         try {
-            String uri = u.toString();
+            String uri = u.toString().trim();
             return getContext().resolve(uri);
         } catch (MalformedURLException e) {
             throw new ConfigurationException("Specified URL " + u + " is malformed");

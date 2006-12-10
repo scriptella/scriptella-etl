@@ -37,21 +37,13 @@ public class StatisticInterceptor extends ElementInterceptor {
         boolean ok = false;
         final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
         try {
-            statisticsBuilder.elementStarted(location);
+            statisticsBuilder.elementStarted(location, ctx.getConnection());
             executeNext(ctx);
             ok = true;
         } finally {
             if (ok) {
-                Integer count = STATEMENTS_INFO.get();//Obtain statistics of executed statements (if any)
-                STATEMENTS_INFO.remove(); //Clear threalocal state
-                
-                if (count == null) { //no information available
-                    statisticsBuilder.elementExecuted();
-                } else {
-                    statisticsBuilder.elementExecuted(count);
-                }
+                statisticsBuilder.elementExecuted();
             } else {
-                STATEMENTS_INFO.remove(); //Clear threalocal state
                 statisticsBuilder.elementFailed();
             }
         }
@@ -63,14 +55,5 @@ public class StatisticInterceptor extends ElementInterceptor {
         return new StatisticInterceptor(next, location);
     }
 
-    /**
-     * Updates statistics on number of executed statements for current element.
-     *
-     * @param statements number of executed statements
-     */
-    public static void statementsExecuted(int statements) {
-        STATEMENTS_INFO.set(statements);
-    }
 
-    private static final ThreadLocal<Integer> STATEMENTS_INFO = new ThreadLocal<Integer>();
 }

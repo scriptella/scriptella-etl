@@ -47,6 +47,11 @@ public abstract class ElementInterceptor implements ExecutableElement {
         return next;
     }
 
+    /**
+     * Executes next element in the chain.
+     * @param ctx dynamic context.
+     * @see ExecutableElement#execute(DynamicContext)
+     */
     protected void executeNext(final DynamicContext ctx) {
         getNext().execute(ctx);
     }

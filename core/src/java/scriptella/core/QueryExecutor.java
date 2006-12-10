@@ -80,6 +80,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         c.executeQuery(content, ctx,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback params) {
+                        EtlCancelledException.checkEtlCancelled();
                         ctxDecorator.rownum++;
                         ctxDecorator.setParams(params);
                         if (LOG.isLoggable(Level.FINE)) {

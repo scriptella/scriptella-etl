@@ -16,6 +16,7 @@
 package scriptella.driver.text;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -53,12 +54,14 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         final Set<String> expected = new HashSet<String>();
         expected.add("msg1");
         expected.add("msg3");
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         tq.execute(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("1");
                 assertTrue("Unexpected element " + p, expected.remove(p));
             }
-        });
+        }, cnt);
+        assertEquals(1, cnt.statements);
         assertTrue("The following elements were skipped "+expected, expected.isEmpty());
     }
 
@@ -68,12 +71,14 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         final Set<String> expected = new HashSet<String>();
         expected.add("line1");
         expected.add("line2");
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         tq.execute(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("0");
                 assertTrue("Unexpected element " + p, expected.remove(p));
             }
-        });
+        }, cnt);
+        assertEquals(1, cnt.statements);
         assertTrue("The following elements were skipped "+expected, expected.isEmpty());
     }
 
@@ -86,12 +91,14 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         final Set<String> expected = new HashSet<String>();
         expected.add("line2");
         expected.add("line4");
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         tq.execute(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("0");
                 assertTrue("Unexpected element " + p, expected.remove(p));
             }
-        });
+        }, cnt);
+        assertEquals(2, cnt.statements);
         assertTrue("The following elements were skipped "+expected, expected.isEmpty());
     }
 
@@ -107,6 +114,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         TextQueryExecutor tq = new TextQueryExecutor(new StringReader(".*(match).*"), true, in, MockParametersCallbacks.SIMPLE);
         final Set<String> expected = new HashSet<String>();
         expected.add("match");
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         tq.execute(new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("1");
@@ -114,7 +122,8 @@ public class TextQueryExecutorTest extends AbstractTestCase {
                 assertEquals(p, p2);
                 assertTrue("Unexpected element " + p, expected.remove(p));
             }
-        });
+        }, cnt);
+        assertEquals(1, cnt.statements);
         assertTrue("The following elements were skipped "+expected, expected.isEmpty());
 
     }

@@ -15,10 +15,12 @@
  */
 package scriptella.driver.ldap;
 
+import scriptella.core.EtlCancelledException;
 import scriptella.driver.ldap.ldif.Entry;
 import scriptella.driver.ldap.ldif.LdifParseException;
 import scriptella.driver.ldap.ldif.LdifReader;
 import scriptella.driver.ldap.ldif.SubstitutingLineReader;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 
 import javax.naming.CompoundName;
@@ -62,12 +64,6 @@ public class LdifScript {
         this.connection = connection;
     }
 
-    /**
-     * For testing purposes
-     */
-    protected LdifScript() {
-        connection = null;
-    }
 
     /**
      * Executes an LDIF content from the specified reader.
@@ -85,17 +81,19 @@ public class LdifScript {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameters cannot be null");
         }
-
         SubstitutingLineReader in = new SubstitutingLineReader(reader, parameters);
+        AbstractConnection.StatementCounter counter = connection.getStatementCounter();
         try {
             in.trackLines();
             for (LdifIterator it = new LdifIterator(in); it.hasNext(); in.trackLines()) {
+                EtlCancelledException.checkEtlCancelled();
                 Entry e = it.next();
                 if (isReadonly()) {
                     LOG.info("Readonly Mode - "+e+" has been skipped.");
                 } else {
                     modify(ctx, e);
                 }
+                counter.statements++;
             }
         } catch (LdifParseException e) {
             if (e.getErrorStatement() == null) {

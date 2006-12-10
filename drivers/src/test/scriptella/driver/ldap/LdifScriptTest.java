@@ -275,7 +275,7 @@ public class LdifScriptTest extends AbstractTestCase {
             }
 
         }.getProxy();
-        LdifScript ls = new LdifScript();
+        LdifScript ls = new LdifScript(new LdapConnection());
         ls.execute(ldif, mock, MockParametersCallbacks.SIMPLE);
 
         assertTrue("DirContext was not modified", modified);
@@ -298,7 +298,7 @@ public class LdifScriptTest extends AbstractTestCase {
             }
         }.getProxy();
         try {
-            LdifScript ls = new LdifScript();
+            LdifScript ls = new LdifScript(new LdapConnection());
             ls.execute(reader, mock, MockParametersCallbacks.UNSUPPORTED);
 
         } catch (LdapProviderException e) {

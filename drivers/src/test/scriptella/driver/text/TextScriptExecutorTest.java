@@ -16,6 +16,7 @@
 package scriptella.driver.text;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 
@@ -46,12 +47,16 @@ public class TextScriptExecutorTest extends AbstractTestCase {
         m.put("email", "  john@nosuchhost.com");
 
         ParametersCallback c = MockParametersCallbacks.fromMap(m);
-        ts.execute(new StringReader(s), c);
+        AbstractConnection.StatementCounter counter = new AbstractConnection.StatementCounter();
+        ts.execute(new StringReader(s), c, counter);
+        assertEquals(1, counter.statements);
+
         m.put("rownum", "2");
         m.put("name", "Jim");
         m.put("surname", "G");
         m.put("email", "  jim@nosuchhost.com");
-        ts.execute(new StringReader(s), c);
+        ts.execute(new StringReader(s), c, counter);
+        assertEquals(2, counter.statements);
         ts.close();
         String res = out.toString();
         String[] ar = res.split("\n");
