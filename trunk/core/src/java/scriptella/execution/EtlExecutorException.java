@@ -16,6 +16,7 @@
 package scriptella.execution;
 
 import scriptella.configuration.Location;
+import scriptella.core.EtlCancelledException;
 import scriptella.core.ExceptionInterceptor;
 import scriptella.expression.Expression;
 import scriptella.spi.ProviderException;
@@ -36,6 +37,7 @@ public class EtlExecutorException extends Exception {
     private Throwable lastExpression;
     private Location lastElementLocation;
     private String message;
+    private boolean cancelled;
 
     public EtlExecutorException(Throwable cause) {
         super(cause);
@@ -53,6 +55,10 @@ public class EtlExecutorException extends Exception {
             if (ex instanceof ExceptionInterceptor.ExecutionException) {
                 lastElementLocation = ((ExceptionInterceptor.ExecutionException) ex).getLocation();
             }
+
+            if (ex instanceof EtlCancelledException) {
+                cancelled = true;
+            }
         }
 
         final StringWriter out = new StringWriter();
@@ -64,7 +70,6 @@ public class EtlExecutorException extends Exception {
             pw.print("Location: ");
             pw.println(lastElementLocation);
         }
-
         if (lastProvider != null) {
             pw.print(lastProvider.getProviderName() + " provider exception: ");
             pw.println(lastProvider.getMessage());
@@ -82,8 +87,6 @@ public class EtlExecutorException extends Exception {
                 pw.println();
             }
         }
-
-
         if (lastExpression != null) {
             pw.print("Expression exception: ");
             pw.print(lastExpression.getMessage());
@@ -95,6 +98,22 @@ public class EtlExecutorException extends Exception {
 
     public String getMessage() {
         return message;
+    }
+
+    public ProviderException getLastProvider() {
+        return lastProvider;
+    }
+
+    public Throwable getLastExpression() {
+        return lastExpression;
+    }
+
+    public Location getLastElementLocation() {
+        return lastElementLocation;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     private static boolean isExpression(final Throwable cause) {
