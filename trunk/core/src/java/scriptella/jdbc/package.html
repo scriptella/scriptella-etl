@@ -46,6 +46,15 @@ Scriptella JDBC Bridge.
         <p>This property is similar to Ant keepformat property except that Oracle-style hints (?*+ hint */) are always preserved in Scriptella.</p></td>
         <td>No, the default value is <code>false</code>, i.e. extra whitespaces and comments removed.</td>
     </tr>
+    <tr>
+        <td>transaction.isolation</td>
+        <td>Transaction isolation level name or an integer value according to <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection">java.sql.Connection</a>
+            javadoc.
+            The valid level names are: <code>READ_UNCOMMITTED</code>, <code>READ_COMMITTED</code>,
+            <code>REPEATABLE_READ</code> and <code>SERIALIZABLE</code>.
+        <td>No, the default value is driver specific.</td>
+    </tr>
+
 
 </table>
 <h2>Properties Substitution</h2>
