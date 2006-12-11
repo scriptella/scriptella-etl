@@ -243,14 +243,17 @@ public class EtlLauncher {
             etlShutdownHook = new EtlShutdownHook();
             etlShutdownHook.register();
         }
-        ExecutionStatistics st = exec.execute(indicator);
-
+        ExecutionStatistics st;
+        try {
+            st = exec.execute(indicator);
+        } finally {
+            if (etlShutdownHook != null) {
+                etlShutdownHook.unregister();
+            }
+        }
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("Execution statistics:\n" + st.toString());
             LOG.info("Successfully executed ETL file " + file);
-        }
-        if (etlShutdownHook != null) {
-            etlShutdownHook.unregister();
         }
     }
 
