@@ -34,6 +34,7 @@ public class ExceptionInterceptor extends ElementInterceptor {
 
     public void execute(final DynamicContext ctx) {
         try {
+            EtlCancelledException.checkEtlCancelled();
             executeNext(ctx);
         } catch (ExecutionException e) {
             //do not wrap already intercepted exceptions
