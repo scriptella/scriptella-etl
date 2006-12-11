@@ -20,6 +20,7 @@ import scriptella.configuration.Location;
 
 /**
  * Intercepts exceptions thrown by wrapped executable elements.
+ * Additionally checks if ETL has been cancelled.
  *
  * @author Fyodor Kupolov
  * @version 1.0
