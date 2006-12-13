@@ -144,6 +144,14 @@
 				</tr>
                 <tr>
                     <td>
+                        <anchor id="lucene"/>
+                        <a href="../docs/api/scriptella/driver/lucene/package-summary.html">Lucene</a>
+                    </td>
+                    <td>scriptella.driver.lucene.Driver</td>
+                    <td>This driver allows search queries through lucene indexed data.</td>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="text"/>
                         <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>
                     </td>
