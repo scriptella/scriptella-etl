@@ -5,6 +5,7 @@
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/opencsv.jar"/>
         <pathelement location="${basedir}/../lib/spring.jar"/>
+        <pathelement location="${basedir}/../lib/lucene-core.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>
