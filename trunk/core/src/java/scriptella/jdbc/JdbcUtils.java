@@ -19,8 +19,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -71,24 +69,5 @@ public final class JdbcUtils {
         } catch (SQLException e) {
         }
     }
-
-    /**
-     * Iterates through the resultset and returns column values.
-     * @param rs resultset to iterate.
-     * @param columnPos column position. Starts at 1.
-     * @return list of column values.
-     */
-    public static List<String> getColumn(final ResultSet rs, final int columnPos) {
-        List<String> l = new ArrayList<String>();
-
-        try {
-            while (rs.next()) {
-                l.add(rs.getString(columnPos));
-            }
-        } catch (SQLException e) {
-            throw new JdbcException("Unable to get column #" + columnPos, e);
-        }
-
-        return l;
-    }
+    
 }

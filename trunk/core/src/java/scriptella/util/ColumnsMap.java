@@ -57,11 +57,7 @@ public class ColumnsMap {
         Integer index = map == null ? null : map.get(name);
         //If name is not a column name and is integer
         if (index == null && StringUtils.isDecimalInt(name)) {
-            try {
-                index = Integer.valueOf(name); //Try to parse name as index
-            } catch (NumberFormatException e) {
-                ExceptionUtils.ignoreThrowable(e);//we've checked with regexp
-            }
+            index = Integer.valueOf(name); //Try to parse name as index
         }
         return index;
     }

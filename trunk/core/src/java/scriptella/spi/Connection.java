@@ -34,8 +34,8 @@ public interface Connection {
      * <p>scriptContent may be used as a key for caching purposes, i.e.
      * provider may precompile scripts and use compiled versions for subsequent executions.
      *
-     * @param scriptContent      script content.
-     * @param parametersCallback callback to get parameter values.
+     * @param scriptContent      script content. Cannot be null.
+     * @param parametersCallback callback to get parameter values. Cannot be null.
      */
     void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException;
 
@@ -43,9 +43,9 @@ public interface Connection {
      * Executes a query specified by its content.
      * <p/>
      *
-     * @param queryContent       query content.
-     * @param parametersCallback callback to get parameter values.
-     * @param queryCallback      callback to call for each result set element produced by this query.
+     * @param queryContent       query content. Cannot be null.
+     * @param parametersCallback callback to get parameter values. Cannot be null.
+     * @param queryCallback      callback to call for each result set element produced by this query. Cannot be null.
      * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
     void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException;

@@ -56,6 +56,9 @@
     </script>
     <script>
         insert into test(id, value) values (5,'New value');
+        <onerror type="NoSuchException"><!--Updates-->
+            UPDATE test set value='Updated5' where ID=5;
+        </onerror>
         <onerror/><!--means ignoring any exception-->
     </script>
 

@@ -17,19 +17,13 @@ package scriptella.tools.template;
 
 import scriptella.jdbc.GenericDriver;
 import scriptella.jdbc.JdbcException;
-import scriptella.jdbc.JdbcUtils;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -194,7 +188,7 @@ public class DatabaseMigrator {
 
     private static List<String> getTables(Connection con, ConnectionParameters params) {
         try {
-            return JdbcUtils.getColumn(con.getMetaData()
+            return getColumn(con.getMetaData()
                     .getTables(con.getCatalog(),
                     params.getSchema(), null, new String[]{"TABLE"}), 3);
         } catch (SQLException e) {
@@ -204,13 +198,33 @@ public class DatabaseMigrator {
 
     private static Set<String> getTableColumns(Connection con, ConnectionParameters params, final String tableName) {
         try {
-            return new HashSet<String>(JdbcUtils.getColumn(
+            return new HashSet<String>(getColumn(
                     con.getMetaData()
                             .getColumns(params.getCatalog(), params.getSchema(), tableName, null),
                     4));
         } catch (SQLException e) {
             throw new JdbcException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Iterates through the resultset and returns column values.
+     * @param rs resultset to iterate.
+     * @param columnPos column position. Starts at 1.
+     * @return list of column values.
+     */
+    public static List<String> getColumn(final ResultSet rs, final int columnPos) {
+        List<String> l = new ArrayList<String>();
+
+        try {
+            while (rs.next()) {
+                l.add(rs.getString(columnPos));
+            }
+        } catch (SQLException e) {
+            throw new JdbcException("Unable to get column #" + columnPos, e);
+        }
+
+        return l;
     }
 
 }

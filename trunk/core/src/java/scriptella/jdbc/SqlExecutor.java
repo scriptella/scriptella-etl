@@ -52,10 +52,6 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     private final AbstractConnection.StatementCounter counter;
 
     public SqlExecutor(final Resource resource, final JdbcConnection connection) {
-        if (resource == null) {
-            throw new IllegalArgumentException("Resource cannot be null");
-        }
-
         this.resource = resource;
         this.connection = connection;
         converter = new JdbcTypesConverter();
