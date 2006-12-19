@@ -146,7 +146,7 @@
                         to be initialized properly.</li>
                 </ul>
                 <p>Use element's content to set connection properties. Several drivers also recognize
-                    connection properties in a URL string, e.g. jdbc:url:db;param=value</p>
+                    connection properties in a URL string, e.g. <code>jdbc:url:db;param=value</code></p>
                 <p>
                     <strong>Example</strong>
                 </p>
@@ -490,8 +490,9 @@
 			<section>
 				<title>Working with CSV data</title>
 				<p>The <a href="drivers.html#csv">built-in CSV driver</a> allows to easily query and generate CSV files.</p>
-				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
-                    feature could be used to work
+                <p>The <a href="drivers.html#text">built-in Text driver</a> provides a generic way to handle text data.</p>
+                <p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
+                    feature can be used to work
                     with CSV files.</p>
 				<p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
 			</section>
