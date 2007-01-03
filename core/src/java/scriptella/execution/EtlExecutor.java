@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  * <li>{@link #newExecutor(java.net.URL)}
  * <li>{@link #newExecutor(java.net.URL, java.util.Map)}
  * </ul>
- *
+ * <p/>
  * <h3>ETL Cancellation</h3>
  * Scriptella execution model relies on a standard Java {@link Thread#interrupt()} mechanism.
  * <p>To interrupt the ETL execution invoke {@link Thread#interrupt()} on a thread
@@ -57,27 +57,71 @@ import java.util.logging.Logger;
  * <p>{@link java.util.concurrent.ExecutorService} and {@link java.util.concurrent.Future}
  * can also be used to control ETL execution.
  *
- *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class EtlExecutor {
     private static final Logger LOG = Logger.getLogger(EtlExecutor.class.getName());
     private ConfigurationEl configuration;
+    private boolean jmxEnabled;
 
+    /**
+     * Creates ETL executor.
+     */
     public EtlExecutor() {
     }
 
+    /**
+     * Creates an ETL executor for specified configuration file.
+     *
+     * @param configuration ETL configuration.
+     */
     public EtlExecutor(ConfigurationEl configuration) {
         this.configuration = configuration;
     }
 
+    /**
+     * Returns ETL configuration for this executor.
+     *
+     * @return ETL configuration.
+     */
     public ConfigurationEl getConfiguration() {
         return configuration;
     }
 
+    /**
+     * Sets ETL configuration.
+     *
+     * @param configuration ETL configuration.
+     */
     public void setConfiguration(final ConfigurationEl configuration) {
         this.configuration = configuration;
+    }
+
+
+    /**
+     * Returns true if monitoring/management via JMX is enabled.
+     * <p>If jmxEnabled=true the executor registers MBeans for executed ETL files.
+     * The object names of the mbeans have the following form:
+     * <code>scriptella: type=etl,url="ETL_FILE_URL"</code>
+     *
+     * @return true if monitoring/management via JMX is enabled.
+     */
+    public boolean isJmxEnabled() {
+        return jmxEnabled;
+    }
+
+    /**
+     * Enables or disables ETL monitoring/management via JMX.
+     * <p>If jmxEnabled=true the executor registers MBeans for executed ETL files.
+     * The object names of the mbeans have the following form:
+     * <code>scriptella: type=etl,url="ETL_FILE_URL"</code>
+     *
+     * @param jmxEnabled true if monitoring/management via JMX is enabled.
+     * @see scriptella.execution.JmxEtlManagerMBean
+     */
+    public void setJmxEnabled(boolean jmxEnabled) {
+        this.jmxEnabled = jmxEnabled;
     }
 
     /**
@@ -97,9 +141,14 @@ public class EtlExecutor {
     public ExecutionStatistics execute(final ProgressIndicator indicator)
             throws EtlExecutorException {
         EtlContext ctx = null;
+        JmxEtlManager etlManager = null;
 
         try {
             ctx = prepare(indicator);
+            if (jmxEnabled) {
+                etlManager = new JmxEtlManager(ctx);
+                etlManager.register();
+            }
             execute(ctx);
             ctx.getProgressCallback().step(5, "Commiting transactions");
             commitAll(ctx);
@@ -113,6 +162,9 @@ public class EtlExecutor {
                 closeAll(ctx);
                 ctx.getStatisticsBuilder().etlComplete();
                 ctx.getProgressCallback().complete();
+            }
+            if (etlManager != null) {
+                etlManager.unregister();
             }
         }
 
@@ -171,6 +223,7 @@ public class EtlExecutor {
 
     /**
      * Converts file to URL and invokes {@link #newExecutor(java.net.URL)}.
+     *
      * @param scriptFile ETL file.
      * @return configured instance of script executor.
      * @see #newExecutor(java.net.URL)

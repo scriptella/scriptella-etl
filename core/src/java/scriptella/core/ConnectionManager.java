@@ -49,23 +49,23 @@ public class ConnectionManager {
     public ConnectionManager(EtlContext ctx, ConnectionEl c) {
         //Obtains a classloader
         ClassLoader cl = getClass().getClassLoader();
-        if (c.getClasspath()!=null) { //if classpath specified
+        if (c.getClasspath() != null) { //if classpath specified
             //Parse it and create a new classloader
             UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getScriptFileURL());
             try {
                 URL[] urls = tok.split(c.getClasspath());
-                if (urls.length>0) {
+                if (urls.length > 0) {
                     cl = new DriverClassLoader(urls);
                 }
             } catch (MalformedURLException e) {
-                throw new ConfigurationException("Unable to parse classpath parameter for "+connection, e);
+                throw new ConfigurationException("Unable to parse classpath parameter for " + connection, e);
             }
         }
         connectionParameters = new ConnectionParameters(c, ctx);
         try {
             driver = DriverFactory.getDriver(c.getDriver(), cl);
         } catch (ClassNotFoundException e) {
-            throw new ConfigurationException("Driver class " + c.getDriver()+ " not found for " + connectionParameters +
+            throw new ConfigurationException("Driver class " + c.getDriver() + " not found for " + connectionParameters +
                     ".Please check if the class name is correct and required libraries available on classpath", e);
         } catch (Exception e) {
             throw new ConfigurationException("Unable to initialize driver for " + connectionParameters + ":" + e.getMessage(), e);
@@ -76,7 +76,7 @@ public class ConnectionManager {
         if (connection == null) {
             connection = driver.connect(connectionParameters);
             if (connection == null) {
-                throw new ConfigurationException("Driver returned null connection for "+connectionParameters);
+                throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
             }
         }
 
@@ -86,7 +86,7 @@ public class ConnectionManager {
     public Connection newConnection() {
         final Connection c = driver.connect(connectionParameters);
         if (c == null) {
-            throw new ConfigurationException("Driver returned null connection for "+connectionParameters);
+            throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
         }
 
         if (newConnections == null) {
@@ -102,13 +102,13 @@ public class ConnectionManager {
         for (Connection c : getAllConnections()) {
             try {
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Rolling back "+c);
+                    LOG.fine("Rolling back " + c);
                 }
                 c.rollback();
             } catch (UnsupportedOperationException e) {
                 String msg = e.getMessage();
                 LOG.log(Level.WARNING,
-                        "Unable to rollback transaction for connection " + c + (msg==null?"": ": " + msg));
+                        "Unable to rollback transaction for connection " + c + (msg == null ? "" : ": " + msg));
 
             } catch (Exception e) {
                 LOG.log(Level.WARNING,
@@ -120,7 +120,7 @@ public class ConnectionManager {
     public void commit() {
         for (Connection c : getAllConnections()) {
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Commiting connection "+c);
+                LOG.fine("Commiting connection " + c);
             }
             c.commit();
         }
@@ -132,7 +132,7 @@ public class ConnectionManager {
             if (c != null) {
                 try {
                     if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("Closing "+c);
+                        LOG.fine("Closing " + c);
                     }
                     c.close();
                 } catch (Exception e) {
@@ -145,6 +145,23 @@ public class ConnectionManager {
         newConnections = null;
         connectionParameters = null;
         driver = null;
+    }
+
+    /**
+     * Returns number of executed statements by managed connections.
+     */
+    public long getExecutedStatementsCount() {
+        long s = 0;
+        if (connection != null) {
+            s += connection.getExecutedStatementsCount();
+
+        }
+        if (newConnections != null) {
+            for (Connection c : newConnections) {
+                s += c.getExecutedStatementsCount();
+            }
+        }
+        return s;
     }
 
     /**
@@ -162,7 +179,6 @@ public class ConnectionManager {
         }
         return cl;
     }
-
 
 
 }

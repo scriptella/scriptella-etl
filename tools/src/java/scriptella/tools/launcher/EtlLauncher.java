@@ -55,6 +55,23 @@ public class EtlLauncher {
     private static final PrintStream out = System.out;
     private static final PrintStream err = System.err;
 
+    /**
+     * Error codes returned by the launcher.
+     */
+    public enum ErrorCode {
+       OK(0), FAILED(1), FILE_NOT_FOUND(2), UNRECOGNIZED_OPTION(3);
+
+       ErrorCode(int code) {
+           errorCode = code;
+       }
+
+        private int errorCode;
+
+        public int getErrorCode() {
+            return errorCode;
+        }
+    }
+
     public static final Formatter STD_FORMATTER = new Formatter() {
         private final MessageFormat f = new MessageFormat("{0,date} {0,time} <{1}> {2}");
         private final Object args[] = new Object[3]; //arguments for formatter
@@ -96,7 +113,7 @@ public class EtlLauncher {
      * @return exit error code.
      * @see System#exit(int)
      */
-    int launch(String[] args) {
+    ErrorCode launch(String[] args) {
         ConsoleHandler h = new ConsoleHandler();
 
         h.setFormatter(STD_FORMATTER);
@@ -109,7 +126,7 @@ public class EtlLauncher {
             for (String arg : args) {
                 if (arg.startsWith("-h")) {
                     printUsage();
-                    return 0;
+                    return ErrorCode.OK;
                 }
                 if (arg.startsWith("-d")) {
                     h.setLevel(Level.FINE);
@@ -121,15 +138,19 @@ public class EtlLauncher {
                 }
                 if (arg.startsWith("-v")) {
                     printVersion();
-                    return 0;
+                    return ErrorCode.OK;
                 }
                 if (arg.startsWith("-t")) {
                     template();
-                    return 0;
+                    return ErrorCode.OK;
+                }
+                if (arg.startsWith("-jmx")) {
+                    setJmxEnabled(true);
+                    continue;
                 }
                 if (arg.startsWith("-")) {
                     err.println("Unrecognized option "+arg);
-                    return 3;
+                    return ErrorCode.UNRECOGNIZED_OPTION;
                 }
                 if (!arg.startsWith("-")) {
                     files.add(resolveFile(null, arg));
@@ -142,7 +163,7 @@ public class EtlLauncher {
             }
         } catch (FileNotFoundException e) {
             err.println(e.getMessage());
-            return 2;
+            return ErrorCode.FILE_NOT_FOUND;
         }
 
         if (indicator != null) {
@@ -150,7 +171,9 @@ public class EtlLauncher {
         }
 
         LoggingConfigurer.configure(h);
-        setProperties(CollectionUtils.asMap(System.getProperties()));
+        if (properties == null) {
+            setProperties(CollectionUtils.asMap(System.getProperties()));
+        }
         for (File file : files) {
             try {
                 execute(file);
@@ -170,7 +193,7 @@ public class EtlLauncher {
         }
         LoggingConfigurer.remove(h);
 
-        return failed?1:0;
+        return failed?ErrorCode.FAILED:ErrorCode.OK;
     }
 
     protected void printVersion() {
@@ -190,6 +213,7 @@ public class EtlLauncher {
         out.println("  -quiet,    -q        be extra quiet");
         out.println("  -version,  -v        print version");
         out.println("  -template, -t        creates an etl.xml template file in the current directory");
+        out.println("  -jmx                 enables ETL monitoring/management via JMX mbean");
     }
 
     protected void template() {
@@ -200,6 +224,11 @@ public class EtlLauncher {
         }
     }
 
+    /**
+     * Sets additional properties available for ETL.
+     * <p>By default {@link System#getProperties()} is used.
+     * @param props properties map.
+     */
     public void setProperties(final Map<String,?> props) {
         properties=props;
     }
@@ -223,6 +252,20 @@ public class EtlLauncher {
      */
     public void setCancelOnVmExit(boolean cancelOnVmExit) {
         this.cancelOnVmExit = cancelOnVmExit;
+    }
+
+    /**
+     * @see EtlExecutor#isJmxEnabled()
+     */
+    public boolean isJmxEnabled() {
+        return exec.isJmxEnabled();
+    }
+
+    /**
+     * @see EtlExecutor#setJmxEnabled(boolean)
+     */
+    public void setJmxEnabled(boolean jmxEnabled) {
+        exec.setJmxEnabled(jmxEnabled);
     }
 
     public void execute(final File file)
@@ -293,7 +336,7 @@ public class EtlLauncher {
 
     public static void main(final String args[]) {
         EtlLauncher launcher=new EtlLauncher();
-        System.exit(launcher.launch(args));
+        System.exit(launcher.launch(args).getErrorCode());
     }
 
 }

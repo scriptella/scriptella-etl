@@ -20,6 +20,7 @@ import scriptella.spi.Connection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -36,7 +37,8 @@ import java.util.Map;
 public class ExecutionStatistics {
     int statements;
     Map<String, ElementInfo> elements = new LinkedHashMap<String, ElementInfo>();
-    private long totalTime;
+    private Date started;
+    private Date finished;
 
     /**
      * @return number of statements executed for all elements.
@@ -123,8 +125,10 @@ public class ExecutionStatistics {
             sb.append('\n');
 
         }
-        sb.append("Total working time ").append(doubleFormat.format(totalTime / 1000d)).append(" seconds.");
-
+        long totalTime = getTotalTime();
+        if (totalTime>=0) {
+            sb.append("Total working time ").append(doubleFormat.format(totalTime / 1000d)).append(" seconds.");
+        }
         return sb.toString();
     }
 
@@ -155,22 +159,39 @@ public class ExecutionStatistics {
     }
 
     /**
-     * Sets total execution time.
-     *
-     * @param totalTime total execution time in milliseconds.
-     */
-    void setTotalTime(long totalTime) {
-        this.totalTime = totalTime;
-    }
-
-    /**
-     * Total ETL execution time.
+     * Total ETL execution time or -1 if ETL hasn't completed.
      *
      * @return ETL execution time in milliseconds.
      */
     public long getTotalTime() {
-        return totalTime;
+        return finished != null && started != null ? finished.getTime() - started.getTime() : -1;
     }
+
+    /**
+     * Returns date/time when ETL was started.
+     * @return ETL start date/time.
+     */
+    public Date getStartDate() {
+        return started==null?null:(Date)started.clone();
+    }
+
+    void setStarted(Date started) {
+        this.started=started;
+    }
+
+    /**
+     * Returns date/time when ETL was completed.
+     * @return ETL finish date/time.
+     */
+    public Date getFinishDate() {
+        return finished==null?null:(Date)finished.clone();
+    }
+
+    void setFinished(Date finished) {
+        this.finished=finished;
+    }
+
+
 
     public static class ElementInfo {
         int okCount;

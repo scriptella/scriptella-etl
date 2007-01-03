@@ -18,6 +18,7 @@ package scriptella.execution;
 import scriptella.configuration.Location;
 import scriptella.spi.Connection;
 
+import java.util.Date;
 import java.util.Stack;
 
 
@@ -42,11 +43,9 @@ import java.util.Stack;
  */
 public class ExecutionStatisticsBuilder {
     private ExecutionStatistics executionStatistics;
-    //assume that instantiation time is the start time
-    private long started;
 
     //Execution stack for nested elements
-    private Stack<ExecutionStatistics.ElementInfo> executionStack = new Stack<ExecutionStatistics.ElementInfo>();
+    protected Stack<ExecutionStatistics.ElementInfo> executionStack = new Stack<ExecutionStatistics.ElementInfo>();
 
     /**
      * Called when new element execution started.
@@ -73,7 +72,7 @@ public class ExecutionStatisticsBuilder {
      */
     public void etlStarted() {
         executionStatistics = new ExecutionStatistics();
-        started = System.currentTimeMillis();
+        executionStatistics.setStarted(new Date());
     }
 
     /**
@@ -85,7 +84,7 @@ public class ExecutionStatisticsBuilder {
         }
 
         //assume that statistics is obtained immediately after the execution
-        executionStatistics.setTotalTime(System.currentTimeMillis() - started);
+        executionStatistics.setFinished(new Date());
     }
 
 

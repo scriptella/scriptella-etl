@@ -49,6 +49,7 @@ public class EtlExecuteTask extends Task {
     private boolean inheritAll=true;
     private boolean debug;
     private boolean quiet;
+    private boolean jmx;
 
     public boolean isFork() {
         return fork;
@@ -99,6 +100,12 @@ public class EtlExecuteTask extends Task {
         this.quiet = quiet;
     }
 
+    /**
+     * @see EtlLauncher#setJmxEnabled(boolean)
+     */
+    public void setJmx(boolean jmx) {
+        this.jmx = jmx;
+    }
 
     public void addFileset(final FileSet set) {
         filesets.add(set);
@@ -141,6 +148,7 @@ public class EtlExecuteTask extends Task {
     }
 
     private void execute(final List<File> files) {
+        launcher.setJmxEnabled(jmx);
         launcher.setProgressIndicator(new ConsoleProgressIndicator());
 
         if (inheritAll) { //inherit ant properties - not supported in forked mode yet

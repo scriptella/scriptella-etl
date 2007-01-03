@@ -17,9 +17,18 @@ package scriptella.tools.launcher;
 
 import scriptella.DBTestCase;
 
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Tests for {@link EtlLauncher}.
@@ -43,14 +52,14 @@ public class EtlLauncherTest extends DBTestCase {
                 files.add(file.getName());
             }
         };
-        assertEquals(0, etlLauncher.launch(new String[]{"-v"}));
-        assertEquals(3, etlLauncher.launch(new String[]{"-nosuchproperty"}));
-        assertEquals(0, etlLauncher.launch(new String[]{"-h"}));
-        assertEquals(0, etlLauncher.launch(new String[]{}));
+        assertEquals(EtlLauncher.ErrorCode.OK, etlLauncher.launch(new String[]{"-v"}));
+        assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION, etlLauncher.launch(new String[]{"-nosuchproperty"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, etlLauncher.launch(new String[]{"-h"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, etlLauncher.launch(new String[]{}));
         assertEquals(1, files.size());
         assertEquals("etl.xml", files.get(0));
         files.clear();
-        assertEquals(2, etlLauncher.launch(new String[]{"_nofile_", "etl.xml"}));
+        assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND, etlLauncher.launch(new String[]{"_nofile_", "etl.xml"}));
         assertEquals(0, files.size());
     }
 
@@ -61,14 +70,46 @@ public class EtlLauncherTest extends DBTestCase {
                 return false;
             }
         };
-        assertEquals(2, etlLauncher.launch(new String[] {}));
+        assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND, etlLauncher.launch(new String[] {}));
 
 
     }
 
     public void testFile() {
         EtlLauncher launcher  = new EtlLauncher();
-        assertEquals(0, launcher.launch(new String[] {"tools/src/test/scriptella/tools/launcher/EtlLauncherTest"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[] {"tools/src/test/scriptella/tools/launcher/EtlLauncherTest"}));
     }
+
+    /**
+     * Tests if JMX monitoring is enabled during execution.
+     */
+    public void testJmx() throws FileNotFoundException, MalformedURLException, MalformedObjectNameException {
+        final EtlLauncher launcher  = new EtlLauncher();
+        launcher.setJmxEnabled(true);
+        final String fileName = "tools/src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
+        URL u = launcher.resolveFile(null, fileName).toURL();
+        final ObjectName mbeanName = new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(u.toString()));
+        final MBeanServer srv = ManagementFactory.getPlatformMBeanServer();
+        Callable r = new Callable() {
+            public String call() throws Exception {
+                try {
+                    final Number n = (Number) srv.getAttribute(
+                            mbeanName,
+                            "ExecutedStatementsCount");
+                    assertEquals(2, n.intValue());
+                } catch (Exception e) {
+                    fail(e.getMessage());
+                }
+                //Check if cancellation is working
+                srv.invoke(mbeanName, "cancel",null, null);
+                return "";
+            }
+        };
+        launcher.setProperties(Collections.singletonMap("callback", r));
+
+        assertEquals(EtlLauncher.ErrorCode.FAILED, launcher.launch(new String[] {fileName}));
+        assertFalse(srv.isRegistered(mbeanName));
+    }
+
 
 }
