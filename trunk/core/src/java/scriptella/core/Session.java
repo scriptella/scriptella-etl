@@ -105,6 +105,16 @@ public class Session {
         }
     }
 
+    public long getExecutedStatementsCount() {
+        long s = 0;
+        if (managedConnections != null) {
+            for (ConnectionManager connectionManager : managedConnections.values()) {
+                s += connectionManager.getExecutedStatementsCount();
+            }
+        }
+        return s;
+    }
+
     public void close() {
         if (managedConnections != null) {
             for (ConnectionManager connectionManager : managedConnections.values()) {

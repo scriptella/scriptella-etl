@@ -390,14 +390,22 @@ which will be used to configure the chosen Forrest skin.
     web pages  
    -->
 	<credits>
-		<credit box-location="alt">
+		<credit>
 			<name>Built with Apache Forrest</name>
 			<url>http://forrest.apache.org/</url>
 			<image>images/built-with-forrest-button.png</image>
 			<width>88</width>
 			<height>31</height>
 		</credit>
-		<!-- A credit with @role="pdf" will be used to compose a footer
+        <credit>
+            <name>Developed with Intellij IDEA</name>
+            <url>http://www.jetbrains.com/idea/</url>
+            <image>http://www.jetbrains.com/idea/opensource/img/banners/idea88x31_blue.gif</image>
+            <width>88</width>
+            <height>31</height>
+        </credit>
+
+        <!-- A credit with @role="pdf" will be used to compose a footer
      for each page in the PDF, using either "name" or "url" or both.
     -->
 		<!--
