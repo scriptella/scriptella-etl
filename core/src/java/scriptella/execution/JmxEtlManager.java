@@ -23,6 +23,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 @ThreadSafe
 public class JmxEtlManager implements JmxEtlManagerMBean {
     private static Logger LOG = Logger.getLogger(JmxEtlManager.class.getName());
+    private static final String MBEAN_NAME_PREFIX = "scriptella:type=etl";
     private static MBeanServer mbeanServer;
     private MBeanServer server;
     private EtlContext ctx;
@@ -87,7 +89,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         if (name != null) {
             throw new IllegalStateException("MBean already registered");
         }
-        server = mbeanServer == null ? ManagementFactory.getPlatformMBeanServer() : mbeanServer;
+        server = getMBeanServer();
         String url = ctx.getScriptFileURL().toString();
         boolean registered = false;
         for (int i = 0; i < 1000; i++) {
@@ -112,9 +114,37 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         }
     }
 
+    private static MBeanServer getMBeanServer() {
+        return mbeanServer == null ? ManagementFactory.getPlatformMBeanServer() : mbeanServer;
+    }
+
+    /**
+     * Cancels all in-progress ETL tasks.
+     * @return number of cancelled ETL tasks.
+     */
+    public static synchronized int cancelAll() {
+        MBeanServer srv = getMBeanServer();
+        Set<ObjectName> names;
+        try {
+            names = srv.queryNames(new ObjectName(MBEAN_NAME_PREFIX+",*"), null);
+        } catch (MalformedObjectNameException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+        int cancelled = 0;
+        for (ObjectName objectName : names) {
+            try {
+                srv.invoke(objectName, "cancel",null, null);
+                cancelled++;
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Cannot cancel ETL, MBean "+objectName, e);
+            }
+        }
+        return cancelled;
+    }
+
     static ObjectName toObjectName(String url, int n) {
         try {
-            return new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(url) + (n > 0 ? ",n=" + n : ""));
+            return new ObjectName(MBEAN_NAME_PREFIX+",url=" + ObjectName.quote(url) + (n > 0 ? ",n=" + n : ""));
         } catch (MalformedObjectNameException e) { //Should not happen
             throw new IllegalStateException("Cannot set MBean name", e);
         }

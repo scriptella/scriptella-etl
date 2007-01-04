@@ -37,7 +37,7 @@ public class JmxEtlManagerITest extends AbstractTestCase {
         final EtlExecutor e = newEtlExecutor();
         e.setJmxEnabled(true);
 
-        final ObjectName name = new ObjectName("scriptella:type=etl,url="+ObjectName.quote(e.getConfiguration().getDocumentUrl().toString()));
+        final ObjectName name = JmxEtlManager.toObjectName(e.getConfiguration().getDocumentUrl().toString(), 0);
         final MBeanServer srv = ManagementFactory.getPlatformMBeanServer();
         final long started = System.currentTimeMillis();
         e.execute(new ProgressIndicator() {
