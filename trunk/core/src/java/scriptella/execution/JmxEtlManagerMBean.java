@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * JMX MBean interface for ETL task.
  * <p>This interface specifies attributes and operations available via JMX.
- * <p>The ETL mbeans habe the following naming convention:
+ * <p>The ETL mbeans have the following naming convention:
  * <code>
  * <pre>
  * scriptella:type=etl,url=&lt;ETL_XML_FILE_URL&gt;[,n=&lt;COLLISION_ID&gt;]
