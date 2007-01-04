@@ -21,6 +21,7 @@ See http://forrest.apache.org/docs/linking.html for more info
 	<scriptella label="Scriptella">
 		<about label="About" href="index.html" description="About Scriptella"/>
 		<license label="License" href="license.html" description="Scriptella License"/>
+        <!--<changes label="Changes" href="changes.html"/>-->
         <javaforge label="Support" href="support.html" description="Scriptella Project Support"/>
         <donwload label="Download" href="download.html" description="Download Scriptella Binary and Source Distribution"/>
 	</scriptella>

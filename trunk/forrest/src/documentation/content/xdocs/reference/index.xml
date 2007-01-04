@@ -385,11 +385,6 @@
 							<td>If true, be extra quiet.</td>
 							<td>No, default value is false.</td>
 						</tr>
-                        <tr>
-                            <td>jmx</td>
-                            <td>If true the ETL mbean is registered for monitoring and management via JMX.</td>
-                            <td>No, default value is false.</td>
-                        </tr>
                     </table>
 				</section>
 				<section>

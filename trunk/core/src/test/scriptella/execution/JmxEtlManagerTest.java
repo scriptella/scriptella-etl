@@ -35,7 +35,7 @@ public class JmxEtlManagerTest extends AbstractTestCase {
         ctx.setBaseURL(new URL("file:/tmp"));
         JmxEtlManager m = new JmxEtlManager(ctx);
         m.register();
-        final ObjectName name = new ObjectName("scriptella:type=etl,url=\"file:/tmp\"");
+        final ObjectName name = JmxEtlManager.toObjectName("file:/tmp", 0);
         assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(name));
         m.unregister();
         assertFalse(ManagementFactory.getPlatformMBeanServer().isRegistered(name));
@@ -44,7 +44,7 @@ public class JmxEtlManagerTest extends AbstractTestCase {
         m.register();
         JmxEtlManager m2 = new JmxEtlManager(ctx);
         m2.register();
-        final ObjectName name2 = new ObjectName("scriptella:type=etl,url=\"file:/tmp\",n=1");
+        final ObjectName name2 = JmxEtlManager.toObjectName("file:/tmp", 1);
         assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(name));
         assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(name2));
         m.unregister();
@@ -61,6 +61,25 @@ public class JmxEtlManagerTest extends AbstractTestCase {
             //OK
         }
         m.unregister();
+    }
+
+    public void testCancelAll() throws MalformedURLException {
+        EtlContext ctx = new EtlContext();
+        ctx.setBaseURL(new URL("file:/tmp"));
+        JmxEtlManager m = new JmxEtlManager(ctx);
+        m.register();
+        JmxEtlManager m2 = new JmxEtlManager(ctx);
+        m2.register();
+        ctx.setBaseURL(new URL("file:/tmp2"));
+        JmxEtlManager m3 = new JmxEtlManager(ctx);
+        m3.register();
+        assertEquals(3,JmxEtlManager.cancelAll());
+        m.unregister();
+        m2.unregister();
+        m3.unregister();
+        //Check and clear the interrupted state
+        assertTrue(Thread.interrupted());
+
     }
 
 }

@@ -20,6 +20,7 @@ import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
+import scriptella.execution.JmxEtlManager;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
@@ -101,10 +102,10 @@ public class EtlLauncher {
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
     private Map<String,?> properties;
-    private boolean cancelOnVmExit=true;
     public static final String DEFAULT_FILE_NAME = "etl.xml";
 
     public EtlLauncher() {
+        exec.setJmxEnabled(true); //JMX monitoring is always enabled when launcher is used
     }
 
     /**
@@ -143,10 +144,6 @@ public class EtlLauncher {
                 if (arg.startsWith("-t")) {
                     template();
                     return ErrorCode.OK;
-                }
-                if (arg.startsWith("-jmx")) {
-                    setJmxEnabled(true);
-                    continue;
                 }
                 if (arg.startsWith("-")) {
                     err.println("Unrecognized option "+arg);
@@ -213,7 +210,6 @@ public class EtlLauncher {
         out.println("  -quiet,    -q        be extra quiet");
         out.println("  -version,  -v        print version");
         out.println("  -template, -t        creates an etl.xml template file in the current directory");
-        out.println("  -jmx                 enables ETL monitoring/management via JMX mbean");
     }
 
     protected void template() {
@@ -237,37 +233,6 @@ public class EtlLauncher {
         this.indicator = indicator;
     }
 
-
-    /**
-     * Returns <code>true</code> if ETL will be cancelled on VM exit.
-     */
-    public boolean isCancelOnVmExit() {
-        return cancelOnVmExit;
-    }
-
-    /**
-     * Sets ETL cancellation mode on VM shutdown.
-     * @param cancelOnVmExit <code>true</code> if ETL should be cancelled on VM exit.
-     * Default value is <code>true</code>.
-     */
-    public void setCancelOnVmExit(boolean cancelOnVmExit) {
-        this.cancelOnVmExit = cancelOnVmExit;
-    }
-
-    /**
-     * @see EtlExecutor#isJmxEnabled()
-     */
-    public boolean isJmxEnabled() {
-        return exec.isJmxEnabled();
-    }
-
-    /**
-     * @see EtlExecutor#setJmxEnabled(boolean)
-     */
-    public void setJmxEnabled(boolean jmxEnabled) {
-        exec.setJmxEnabled(jmxEnabled);
-    }
-
     public void execute(final File file)
             throws EtlExecutorException {
         try {
@@ -281,19 +246,7 @@ public class EtlLauncher {
         final ConfigurationEl c = factory.createConfiguration();
 
         exec.setConfiguration(c);
-        EtlShutdownHook etlShutdownHook = null;
-        if (cancelOnVmExit) {
-            etlShutdownHook = new EtlShutdownHook();
-            etlShutdownHook.register();
-        }
-        ExecutionStatistics st;
-        try {
-            st = exec.execute(indicator);
-        } finally {
-            if (etlShutdownHook != null) {
-                etlShutdownHook.unregister();
-            }
-        }
+        ExecutionStatistics st = exec.execute(indicator);
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("Execution statistics:\n" + st.toString());
             LOG.info("Successfully executed ETL file " + file);
@@ -338,5 +291,36 @@ public class EtlLauncher {
         EtlLauncher launcher=new EtlLauncher();
         System.exit(launcher.launch(args).getErrorCode());
     }
+
+    /**
+     * Shutdown hook for ETL cancellation.
+     */
+    private static class EtlShutdownHook extends Thread {
+        private static final EtlShutdownHook INSTANCE = new EtlShutdownHook();
+        private EtlShutdownHook() {
+            setName("ETL Cancellation Thread");
+        }
+
+        public void run() {
+            System.out.println("Cancelling ETL tasks and rolling back changes...");
+            int i = JmxEtlManager.cancelAll();
+            if (i>1) {
+                System.out.println(i+" ETL tasks cancelled");
+            } else if (i==1) {
+                System.out.println("ETL cancelled");
+            }
+        }
+    }
+
+    static {
+        //Register a system shutdown hook which cancels all
+        //in-progress ETL tasks on VM exit.
+        try {
+            Runtime.getRuntime().addShutdownHook(EtlShutdownHook.INSTANCE);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Unable to add shutdown hook. ETL will not be rolled back on abnormal termination.", e);
+        }
+    }
+
 
 }

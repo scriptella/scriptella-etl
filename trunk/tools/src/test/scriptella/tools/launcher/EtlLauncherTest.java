@@ -85,7 +85,6 @@ public class EtlLauncherTest extends DBTestCase {
      */
     public void testJmx() throws FileNotFoundException, MalformedURLException, MalformedObjectNameException {
         final EtlLauncher launcher  = new EtlLauncher();
-        launcher.setJmxEnabled(true);
         final String fileName = "tools/src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
         URL u = launcher.resolveFile(null, fileName).toURL();
         final ObjectName mbeanName = new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(u.toString()));
