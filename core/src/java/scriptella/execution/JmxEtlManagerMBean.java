@@ -47,7 +47,7 @@ public interface JmxEtlManagerMBean {
 
     /**
      * Returns the throughput of the managed ETL task.
-     * @return statemens/sec throughput or 0 if undefined.
+     * @return statements/sec throughput or 0 if undefined.
      */
     double getThroughput();
 
