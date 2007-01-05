@@ -106,26 +106,19 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 0.5dev Released (November 16, 2006)</title>
-                <p>We are pleased to announce that Scriptella 0.5dev has been released.
+                <title>Scriptella 0.6 Released (January 5, 2007)</title>
+                <p>We are pleased to announce that Scriptella 0.6 has been released.
                     New Features and Bug Fixes:</p>
                 <ul>
-                    <li>3621 TSK Log SQLWarnings</li>
-                    <li>3622 TSK Configurable sql delimiters for JDBC Bridge</li>
-                    <li>3653 BUG scriptella.bat not woking if no JAVA_HOME</li>
-                    <li>3654 BUG Illegal handling of -- comments</li>
-                    <li>3655 CRQ add lazy-init connection attribute</li>
-                    <li>3657 TSK Oracle driver</li>
-                    <li>3690 TSK Sybase driver</li>
-                    <li>3740 TSK Resultset Data types conversion (including BLOB/CLOB)</li>
-                    <li>3742 TSK Support for Oracle Hints</li>
-                    <li>3793 TSK MySQL driver</li>
-                    <li>Performance improvements</li>
-                    <li>Supported libraries upgraded to Janino 2.5.1, H2 1.0, HSQLDB 1.8.0.7, opencsv 1.7</li>
-                    <li>Improved code coverage</li>
+                    <li>Text Provider</li>
+                    <li>DB2, PostgreSQL Driver</li>
+                    <li>Lucene search engine driver</li>
+                    <li>Rollback ETL on Ctrl-C</li>
+                    <li>Monitoring and management via JMX</li>
+                    <li>transaction.isolation property for JDBC connection</li>
+                    <li>Improved test code coverage</li>
                 </ul>
-                <p>This release has been tested on Oracle, Sybase, Microsoft SQL Server,
-                    MySQL, HSQLDB and H2 databases.<br/>
+                <p>This release is actively used in our commercial GA projects and we are on the way to Scriptella 1.0.<br/>
                 <a href="download.html">Download now!</a></p>
             </section>
         </section>

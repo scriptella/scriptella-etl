@@ -34,11 +34,32 @@
     <!-- ===================================================================== -->
 
     <changes>
-        <release version="1.0" date="not yet released">
-        </release>
-        <release version="0.7" date="not yet released">
-        </release>
+        <!--<release version="1.0" date="not yet released">-->
+        <!--</release>-->
+        <!--<release version="0.7" date="not yet released">-->
+        <!--</release>-->
         <release version="0.6" date="not yet released">
+            <action context="code" type="add" dev="ejboy" fixes-bug="3903">
+                Text Provider
+            </action>
+            <action context="code" type="add" dev="volk" fixes-bug="3976">
+                PostgreSQL Driver
+            </action>
+            <action context="code" type="add" dev="volk" fixes-bug="3981">
+                DB2 Driver
+            </action>
+            <action context="code" type="add" dev="volk" fixes-bug="3987">
+                Lucene search engine driver
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="4061">
+                Rollback ETL on Ctrl-C
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="4062">
+                transaction.isolation property for JDBC connection
+            </action>
+            <action context="code" type="update" dev="ejboy">
+                Improved test code coverage
+            </action>
         </release>
         <release version="0.5dev" date="2006-11-16">
             <action context="code" type="add" dev="ejboy" fixes-bug="3621">
@@ -47,10 +68,10 @@
             <action context="code" type="add" dev="ejboy" fixes-bug="3622">
                  Configurable sql delimiters for JDBC Bridge
             </action>
-            <action context="code" type="update" dev="ejboy" fixes-bug="3653">
+            <action context="code" type="fix" dev="ejboy" fixes-bug="3653">
                 scriptella.bat not woking if no JAVA_HOME
              </action>
-            <action context="code" type="update" dev="ejboy" fixes-bug="3653">
+            <action context="code" type="fix" dev="ejboy" fixes-bug="3653">
                 Illegal handling of -- comments
              </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="3655">
