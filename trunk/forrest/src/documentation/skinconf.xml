@@ -116,7 +116,7 @@ which will be used to configure the chosen Forrest skin.
     feedback link in the footer with the page pathname appended:
     <a href="@href">{@to}</a>
     -->
-	<feedback to="scriptella@gmail.com" href="mailto:scriptella@gmail.com?subject=Feedback&#160;">
+	<feedback to="Fyodor Kupolov" href="mailto:scriptella@gmail.com?subject=Feedback&#160;">
     Send feedback about the website to:
   </feedback>
 	<!-- Optional message of the day (MOTD).
