@@ -237,18 +237,20 @@
 				<li>?Propery_Name or ?{expression} are used in SQL queries and scripts to set prepared statement parameters.
                 ? prefixed expressions are not substituted inside quotes and comments.</li>
 			</ul>
-			<warning>
+            <p>The properties syntax described above is allowed in the following places:</p>
+            <ul>
+                <li>Attributes of ETL <code>&lt;connection&gt;</code> element,</li>
+                <li><code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements,</li>
+                <li>SQL scripts/queries processed by the JDBC-based providers</li>
+            </ul>
+            <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
+                use <code>get(name)</code> to get variable's value.
+                For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
+            </p>
+            <note>
                 In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
                 In this case prepared statements may be cached thus increasing the performance of hot spot sections evaluated multiple times.
                 Use $ for direct substitution only if you have problems passing prepared statement parameters via ?, ?{} syntax.
-            </warning>
-			<note>
-                This syntax is only valid for Scriptella connection element attributes,
-                <code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements
-                and SQL scripts/queries processed by the JDBC Provider,
-                other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
-                you'll have to use get(name) to get value of the variable.
-                For details on variables/expressions syntax consult a <a href="../docs/api/">Javadoc</a> of your driver.
             </note>
 			<section>
 				<title>Implicit Variables</title>
@@ -278,8 +280,8 @@
 				<p>syntax.
                 Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
 				</p>
-				<p>File references are set as prepared statement parameters of stream type, so you can reference
-                LOBs of any size supported by your database driver.</p>
+				<p>File references are set as prepared statement parameters of stream type,
+                    so LOBs of virtually any size supported by the database driver can be referenced.</p>
 				<note>Music Store example demonstrates usage of file references</note>
 			</section>
 			<section>
@@ -448,8 +450,8 @@
 		<section>
 			<title>JDBC Adapters</title>
 			<p>Scriptella is bundled with a set of adapters for popular
-            JDBC drivers. You are free to use any JDBC vendor drivers, but
-            the Scriptella adapters provide the following benefits:</p>
+            JDBC drivers. It is allowed to use any JDBC vendor driver, but
+            Scriptella adapters provide the following benefits:</p>
 			<ul>
 				<li>Simplified naming. No need to specify a full driver's class
                 name, alias may be used, e.g. driver="hslqdb", "oracle" etc.</li>
@@ -460,7 +462,7 @@
 			</ul>
 			<p>See <a href="drivers.html#jdbcbridge">JDBC Bridge Drivers Matrix</a> for the complete list of supported adapters.</p>
 			<note>
-                Scriptella driver's package short name is an alias for driver, e.g. h2 is an alias
+                Scriptella driver's package short name is an alias for the driver, e.g. h2 is an alias
                 for scriptella.driver.h2.Driver
             </note>
 		</section>
