@@ -93,13 +93,10 @@
                 </li>
                 <li>Built-In
                     <a href="reference/drivers.html#nonjdbc">CSV, LDAP, Velocity and Janino</a>
-                    providers. Integration with
-                    <a href="reference/drivers.html#spring">Spring Framework</a>
-                    and
-                    <a href="reference/drivers.html#jndi">JNDI</a>
-                    for
-                    <strong>enterprise ready</strong>
-                    scripts.
+                    providers. Integration with <a href="reference/drivers.html#spring">Spring Framework</a>,
+                    <a href="reference/drivers.html#jmx">JMX</a>
+                    and <a href="reference/drivers.html#jndi">JNDI</a>
+                    for <strong>enterprise ready</strong> scripts.
                 </li>
             </ul>
         </section>
