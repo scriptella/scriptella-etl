@@ -38,7 +38,7 @@
         <!--</release>-->
         <!--<release version="0.7" date="not yet released">-->
         <!--</release>-->
-        <release version="0.6" date="not yet released">
+        <release version="0.6" date="2006-01-08">
             <action context="code" type="add" dev="ejboy" fixes-bug="3903">
                 Text Provider
             </action>
@@ -56,6 +56,9 @@
             </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="4062">
                 transaction.isolation property for JDBC connection
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="4034">
+                Add JMX mbean for monitoring
             </action>
             <action context="code" type="update" dev="ejboy">
                 Improved test code coverage
