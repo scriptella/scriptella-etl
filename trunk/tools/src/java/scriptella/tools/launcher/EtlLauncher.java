@@ -302,7 +302,11 @@ public class EtlLauncher {
         }
 
         public void run() {
-            System.out.println("Cancelling ETL tasks and rolling back changes...");
+            //if any mbean present - inform user about cancellation
+            if (!JmxEtlManager.findEtlMBeans().isEmpty()) {
+                System.out.println("Cancelling ETL tasks and rolling back changes...");
+            }
+            //Cancel all ETL task, the findEtlMBeans result may be stale 
             int i = JmxEtlManager.cancelAll();
             if (i>1) {
                 System.out.println(i+" ETL tasks cancelled");
