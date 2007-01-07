@@ -3,11 +3,11 @@
 <document>
 	<header>
 		<title>Scriptella Reference Documentation</title>
-        <version>0.6dev</version>
-        <authors>
+		<version>0.6dev</version>
+		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
-        <notice>Work in progress</notice>
+		<notice>Work in progress</notice>
 		<abstract class="pageBreakAfter">
 			<img src="../images/site-logo.png" alt=""/>
 		</abstract>
@@ -128,8 +128,8 @@
                     Alternatively you can add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
                     Boot classpath libraries take precedence over libraries specified in connection classpath attribute.
                 </p>
-                <p>
-                    <strong>lazy-init</strong>
+				<p>
+					<strong>lazy-init</strong>
                     optional attribute specifies connection initialization strategy.
                     <code>true</code>
                     if connection initialization should be deferred until it is actually used.
@@ -138,27 +138,26 @@
                     means that connection is initialized on ETL startup.
                     Lazy connection initialization may be useful in the following cases:
                 </p>
-                <ul>
-                    <li>A script or a query operating with this connection has conditional <strong>if</strong>
+				<ul>
+					<li>A script or a query operating with this connection has conditional <strong>if</strong>
                         attribute, in this case greedy initialization may be redundant
                     </li>
-                    <li>Other connections create database users or produce files required for this connection
+					<li>Other connections create database users or produce files required for this connection
                         to be initialized properly.</li>
-                </ul>
-                <p>Use element's content to set connection properties. Several drivers also recognize
-                    connection properties in a URL string, e.g. <code>jdbc:url:db;param=value</code></p>
-                <p>
-                    <strong>Example</strong>
-                </p>
-                <source><![CDATA[
+				</ul>
+				<p>Use element's content to set connection properties. Several drivers also recognize
+                    connection properties in a URL string, e.g. <code>jdbc:url:db;param=value</code>
+				</p>
+				<p>
+					<strong>Example</strong>
+				</p>
+				<source><![CDATA[
 <!-- Declare a connection to Oracle database using sys user-->
 <connection driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB" user="sys as sysdba" password="password">
     #Connection properties
     plsql=true
-</connection>]]>
-                </source>
-
-            </section>
+</connection>]]></source>
+			</section>
 			<section>
 				<title>&lt;script&gt;</title>
 				<p>Elements of this type contain executable content. The script language is connection specific.
@@ -237,17 +236,18 @@
 				<li>?Propery_Name or ?{expression} are used in SQL queries and scripts to set prepared statement parameters.
                 ? prefixed expressions are not substituted inside quotes and comments.</li>
 			</ul>
-            <p>The properties syntax described above is allowed in the following places:</p>
-            <ul>
-                <li>Attributes of ETL <code>&lt;connection&gt;</code> element,</li>
-                <li><code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements,</li>
-                <li>SQL scripts/queries processed by the JDBC-based providers</li>
-            </ul>
-            <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
+			<p>The properties syntax described above is allowed in the following places:</p>
+			<ul>
+				<li>Attributes of ETL <code>&lt;connection&gt;</code> element,</li>
+				<li>
+					<code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements,</li>
+				<li>SQL scripts/queries processed by the JDBC-based providers</li>
+			</ul>
+			<p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
                 use <code>get(name)</code> to get variable's value.
                 For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
             </p>
-            <note>
+			<note>
                 In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
                 In this case prepared statements may be cached thus increasing the performance of hot spot sections evaluated multiple times.
                 Use $ for direct substitution only if you have problems passing prepared statement parameters via ?, ?{} syntax.
@@ -387,7 +387,7 @@
 							<td>If true, be extra quiet.</td>
 							<td>No, default value is false.</td>
 						</tr>
-                    </table>
+					</table>
 				</section>
 				<section>
 					<title>Nested Elements</title>
@@ -447,6 +447,38 @@
                 to integrate with application deployment environment (Spring, J2EE or other).
             </note>
 		</section>
+		<section id="jmx">
+			<title>JMX Monitoring and Management</title>
+			<p>Scriptella supports JMX by registering  a dedicated MBean for each ETL operation.
+			ETL mbeans use the following naming convention:</p>
+			<source><![CDATA[    scriptella:type=etl,url=<ETL_XML_FILE_URL>[,n=<COLLISION_ID>]]]></source>
+            <note>
+                The COLLISION_ID is appended only if files with identical URLs are executed simultaneously.
+            </note>
+			<p>ETL MBeans are registered automatically when Scriptella is launched from the command line or Ant.
+			    If <code>EtlExecutor</code> is invoked directly from Java code, set <code>jmxEnabled</code> property to <code>true</code>
+			    by calling <code>etlExecutor.setJmxEnabled(true)</code> before executing the ETL.</p>
+			<p>By default the mbeans are registered in a platform default MBean server and
+                the Java Monitoring and Management Console (jconsole.exe) can be used for remote control over ETL tasks.</p>
+			<note>Since Java SE 6 it is allowed to monitor local JVM without additional configuration changes. Just run jconsole.exe and choose a required JVM<br/>
+			    For Java SE 5 -Dcom.sun.management.jmxremote system property enables the JMX agent for local access.<br/>
+                See also <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html">Monitoring and Management Using JMX</a> for more details.
+			</note>
+			<figure src="../images/reference/jmxconsole.gif" alt="Java SE Monitoring &amp; Management Console."/>
+			<section>
+				<title>Attributes</title>
+				<p>The following read-only attributes are available for monitoring:</p>
+				<ul>
+					<li><code>ExecutedStatementsCount</code> - number of executed statements by all connections of the ETL task.</li>
+					<li><code>StartDate</code> - date/time when ETL was started.</li>
+					<li><code>Throughput</code> - the throughput (number of statements per second) of the managed ETL task.</li>
+				</ul>
+			</section>
+			<section>
+				<title>Operations</title>
+				<p>Currently only cancellation is supported via JMX. The <code>cancel</code> operation terminates ETL and tries to roll back any changes made during the ETL execution.</p>
+			</section>
+		</section>
 		<section>
 			<title>JDBC Adapters</title>
 			<p>Scriptella is bundled with a set of adapters for popular
@@ -492,8 +524,8 @@
 			<section>
 				<title>Working with CSV data</title>
 				<p>The <a href="drivers.html#csv">built-in CSV driver</a> allows to easily query and generate CSV files.</p>
-                <p>The <a href="drivers.html#text">built-in Text driver</a> provides a generic way to handle text data.</p>
-                <p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
+				<p>The <a href="drivers.html#text">built-in Text driver</a> provides a generic way to handle text data.</p>
+				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
                     feature can be used to work
                     with CSV files.</p>
 				<p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>

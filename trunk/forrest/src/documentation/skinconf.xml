@@ -59,7 +59,7 @@ which will be used to configure the chosen Forrest skin.
 	<!-- mandatory project logo
        default skin: renders it at the top -->
 	<project-name>Scriptella</project-name>
-	<project-description>Database migration and SQL scripts execution tool.</project-description>
+	<project-description>Open Source ETL and Scripts Execution Tool.</project-description>
 	<project-url>http://scriptella.javaforge.com</project-url>
 	<project-logo>images/site-logo.png</project-logo>
 	<!-- Alternative static image:
