@@ -105,6 +105,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         if (!registered) {
             try {
                 server.registerMBean(this, name);
+                LOG.info("Registered JMX mbean: "+name);
             } catch (Exception e) {
                 throw new SystemException("Unable to register mbean " + name, e);
             }
@@ -123,13 +124,8 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
      * @return number of cancelled ETL tasks.
      */
     public static synchronized int cancelAll() {
+        Set<ObjectName> names = findEtlMBeans();
         MBeanServer srv = getMBeanServer();
-        Set<ObjectName> names;
-        try {
-            names = srv.queryNames(new ObjectName(MBEAN_NAME_PREFIX+",*"), null);
-        } catch (MalformedObjectNameException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
         int cancelled = 0;
         for (ObjectName objectName : names) {
             try {
@@ -140,6 +136,18 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
             }
         }
         return cancelled;
+    }
+
+    /**
+     * Find ETL mbeans.
+     * @return set of object names.
+     */
+    public static synchronized Set<ObjectName> findEtlMBeans() {
+        try {
+            return getMBeanServer().queryNames(new ObjectName(MBEAN_NAME_PREFIX+",*"), null);
+        } catch (MalformedObjectNameException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 
     static ObjectName toObjectName(String url, int n) {
