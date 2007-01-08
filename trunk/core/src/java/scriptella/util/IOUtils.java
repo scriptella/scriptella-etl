@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -241,6 +243,17 @@ public final class IOUtils {
     public static Writer getWriter(final OutputStream os, final String enc, final boolean buffered) throws IOException {
         Writer w = enc == null ? new OutputStreamWriter(os) : new OutputStreamWriter(os, enc);
         return buffered ? new BufferedWriter(w) : w;
+    }
+
+    /**
+     * A replacement for a deprecated File.toURL() method.
+     * @param file file to convert to URL.
+     * @return URL representing the file location.
+     * @throws MalformedURLException If a protocol handler for the URL could not be found,
+     * or if some other error occurred while constructing the URL.
+     */
+    public static URL toUrl(File file) throws MalformedURLException {
+        return file.toURI().toURL();
     }
 
 }

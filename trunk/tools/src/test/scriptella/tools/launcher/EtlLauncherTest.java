@@ -16,6 +16,7 @@
 package scriptella.tools.launcher;
 
 import scriptella.DBTestCase;
+import scriptella.util.IOUtils;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -86,7 +87,7 @@ public class EtlLauncherTest extends DBTestCase {
     public void testJmx() throws FileNotFoundException, MalformedURLException, MalformedObjectNameException {
         final EtlLauncher launcher  = new EtlLauncher();
         final String fileName = "tools/src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
-        URL u = launcher.resolveFile(null, fileName).toURL();
+        URL u = IOUtils.toUrl(launcher.resolveFile(null, fileName));
         final ObjectName mbeanName = new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(u.toString()));
         final MBeanServer srv = ManagementFactory.getPlatformMBeanServer();
         Callable r = new Callable() {

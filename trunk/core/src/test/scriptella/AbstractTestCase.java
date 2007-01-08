@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -94,8 +95,12 @@ public abstract class AbstractTestCase extends TestCase {
      * @param path file path relative to project's src/test directory
      * @return file with path relative to project's src/test directory
      */
-    protected File getFileResource(final String path) {
-        return new File(resourceBaseDir, path);
+    protected URL getResource(final String path) {
+        try {
+            return IOUtils.toUrl(new File(resourceBaseDir, path));
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 
     protected EtlExecutor newEtlExecutor() {

@@ -60,7 +60,7 @@ public class JdbcException extends ProviderException {
 
 
     protected void initVendorCodes(Throwable t) {
-        if (t != null && t instanceof SQLException) {
+        if (t instanceof SQLException) {
             SQLException sqlEx = (SQLException) t;
             addErrorCode(sqlEx.getSQLState()).addErrorCode(String.valueOf(sqlEx.getErrorCode()));
         }
