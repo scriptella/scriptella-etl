@@ -17,6 +17,7 @@ package scriptella.spi;
 
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
+import scriptella.util.IOUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -66,7 +67,7 @@ public class ConnectionParametersTest extends AbstractTestCase {
         //URLs parsing
         assertEquals("file://test", cp.getUrlProperty("url1").toString());
         assertEquals("file:/url#hash", cp.getUrlProperty("url2").toString());
-        assertEquals(f.toURL(), cp.getUrlProperty("url3"));
+        assertEquals(IOUtils.toUrl(f), cp.getUrlProperty("url3"));
         assertEquals("file:/file4", cp.getUrlProperty("url4").toString());
     }
 }

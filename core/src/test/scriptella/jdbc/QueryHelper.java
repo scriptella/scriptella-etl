@@ -59,4 +59,8 @@ public class QueryHelper {
         }
 
     }
+
+    protected void onSQLException(SQLException e) {
+        throw new IllegalStateException(e.getMessage(), e);
+    }
 }

@@ -22,6 +22,7 @@ import scriptella.core.ThreadSafe;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.util.CollectionUtils;
+import scriptella.util.IOUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -230,7 +231,7 @@ public class EtlExecutor {
      */
     public static EtlExecutor newExecutor(final File scriptFile) {
         try {
-            return newExecutor(scriptFile.toURL());
+            return newExecutor(IOUtils.toUrl(scriptFile));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }

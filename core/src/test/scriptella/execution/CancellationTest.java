@@ -21,6 +21,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Tests if ETL cancellation(interruption) is working.
@@ -57,7 +58,14 @@ public class CancellationTest extends DBTestCase {
         assertTrue(interrupted);
         assertTrue(ti < 1000); //Long running ETL must be terminated ASAP
         //Now check if the tables were removed
-        new QueryHelper("select count(*) from t1, t2").execute(c, new QueryCallback() {
+        @new QueryHelper("select count(*) from t1, t2") {
+            @Override protected void onSQLException(SQLException e) {
+                if (e.getMessage().indexOf("not found")<0) {
+                    super.onSQLException(e);
+                }
+
+            }
+        }.execute(c, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 assertEquals(0, parameters.getParameter("1"));
             }

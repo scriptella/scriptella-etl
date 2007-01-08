@@ -56,7 +56,7 @@ class PropertiesMerger implements ParametersCallback {
     void addProperties(final Map<String, ?> properties) {
         for (Map.Entry<String, ?> entry : properties.entrySet()) {
             Object v = entry.getValue();
-            if (v!=null && v instanceof CharSequence) {
+            if (v instanceof CharSequence) {
                 v = substitutor.substitute(v.toString());
             }
             this.properties.put(entry.getKey(), v);

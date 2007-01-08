@@ -98,9 +98,7 @@ class JdbcTypesConverter implements Closeable {
      */
     public void setObject(final PreparedStatement preparedStatement, final int index, final Object value) throws SQLException {
         //Choosing a setter strategy
-        if (value==null) {
-            preparedStatement.setObject(index, null);
-        } else if (value instanceof InputStream) {
+        if (value instanceof InputStream) {
             setBlob(preparedStatement, index, toBlob((InputStream) value));
         } else if (value instanceof Reader) {
             setClob(preparedStatement, index, toClob((Reader) value));

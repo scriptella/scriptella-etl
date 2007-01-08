@@ -51,7 +51,7 @@ public class JaninoConnectionTest extends AbstractTestCase {
             fail("This script should fail");
         } catch (ProviderException e) {
             Throwable ne = e.getNativeException();
-            assertTrue(ne !=null && ne instanceof CompileException);
+            assertTrue(ne instanceof CompileException);
             //OK
         }
         c.close();

@@ -17,7 +17,6 @@ package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -34,8 +33,8 @@ public class XIncludeTest extends AbstractTestCase {
         test(url);
     }
 
-    public void testFileResource() throws MalformedURLException {
-        URL u = getFileResource(getClass().getPackage().getName().replace('.','/')+"/XIncludeTest.xml").toURL();
+    public void testFileResource() {
+        URL u = getResource(getClass().getPackage().getName().replace('.','/')+"/XIncludeTest.xml");
         test(u);
     }
 

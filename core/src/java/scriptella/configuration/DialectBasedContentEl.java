@@ -73,7 +73,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
     }
 
     private static boolean isDialectElement(Node node) {
-        return node!=null && node instanceof Element && "dialect".equals(node.getNodeName());
+        return node instanceof Element && "dialect".equals(node.getNodeName());
     }
 
     /**

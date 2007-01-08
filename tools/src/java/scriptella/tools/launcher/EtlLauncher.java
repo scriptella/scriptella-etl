@@ -27,6 +27,7 @@ import scriptella.interactive.ProgressIndicator;
 import scriptella.tools.template.TemplateManager;
 import scriptella.util.BugReport;
 import scriptella.util.CollectionUtils;
+import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
 import java.io.File;
@@ -236,7 +237,7 @@ public class EtlLauncher {
     public void execute(final File file)
             throws EtlExecutorException {
         try {
-            factory.setResourceURL(file.toURL());
+            factory.setResourceURL(IOUtils.toUrl(file));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Wrong file path " +
                     file.getPath(), e);

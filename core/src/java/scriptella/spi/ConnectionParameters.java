@@ -19,6 +19,7 @@ package scriptella.spi;
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
 import scriptella.util.ExceptionUtils;
+import scriptella.util.IOUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -222,7 +223,7 @@ public class ConnectionParameters {
             }
             if (u instanceof File) {
                 File f = (File) u;
-                return f.toURL();
+                return IOUtils.toUrl(f);
             }
         } catch (MalformedURLException e) {
             ExceptionUtils.ignoreThrowable(e);
