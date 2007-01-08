@@ -56,7 +56,7 @@ public class EtlExecutorException extends Exception {
                 lastElementLocation = ((ExceptionInterceptor.ExecutionException) ex).getLocation();
             }
 
-            if (ex instanceof EtlCancelledException) {
+            if (ex instanceof EtlCancelledException || ex instanceof InterruptedException) {
                 cancelled = true;
             }
         }
