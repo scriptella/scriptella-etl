@@ -100,17 +100,20 @@ public class LuceneQuery implements ParametersCallback, Closeable {
             throw new LuceneProviderException("Failed to parse query.", e);
         } finally { //clean up
             IOUtils.closeSilently(queryReader);
-            try {
-                ir.close();
-            } catch (Exception e) {
-                ExceptionUtils.ignoreThrowable(e);
+            if (ir != null) {
+                try {
+                    ir.close();
+                } catch (Exception e) {
+                    ExceptionUtils.ignoreThrowable(e);
+                }
             }
-            try {
-                searcher.close();
-            } catch (Exception e) {
-                ExceptionUtils.ignoreThrowable(e);
+            if (searcher != null) {
+                try {
+                    searcher.close();
+                } catch (Exception e) {
+                    ExceptionUtils.ignoreThrowable(e);
+                }
             }
-
         }
 
     }
