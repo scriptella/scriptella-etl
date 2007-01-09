@@ -58,7 +58,7 @@ public class CancellationTest extends DBTestCase {
         assertTrue(interrupted);
         assertTrue(ti < 1000); //Long running ETL must be terminated ASAP
         //Now check if the tables were removed
-        @new QueryHelper("select count(*) from t1, t2") {
+        new QueryHelper("select count(*) from t1, t2") {
             @Override protected void onSQLException(SQLException e) {
                 if (e.getMessage().indexOf("not found")<0) {
                     super.onSQLException(e);
