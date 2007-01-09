@@ -38,9 +38,9 @@ public class XmlElement {
     private URL documentUrl;
     private PropertiesSubstitutor substitutor;
 
-    public XmlElement(Element element, URL documentURI, PropertiesSubstitutor substitutor) {
+    public XmlElement(Element element, URL documentUrl, PropertiesSubstitutor substitutor) {
         this.element = element;
-        this.documentUrl = documentURI;
+        this.documentUrl = documentUrl;
         this.substitutor = substitutor;
     }
 
