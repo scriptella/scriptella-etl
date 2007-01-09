@@ -58,7 +58,7 @@ public class ConnectionManager {
                     cl = new DriverClassLoader(urls);
                 }
             } catch (MalformedURLException e) {
-                throw new ConfigurationException("Unable to parse classpath parameter for " + connection, e);
+                throw new ConfigurationException("Unable to parse classpath parameter for " + c, e);
             }
         }
         connectionParameters = new ConnectionParameters(c, ctx);
