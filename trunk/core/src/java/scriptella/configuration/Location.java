@@ -15,6 +15,8 @@
  */
 package scriptella.configuration;
 
+import java.io.Serializable;
+
 
 /**
  * Defines xml element location.
@@ -23,10 +25,12 @@ package scriptella.configuration;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class Location {
+public class Location implements Serializable {
+    private static final long serialVersionUID = 1;
     private int row;
     private int column;
     private String xpath;
+
 
     public Location(int row, int column) {
         this.row = row;
@@ -53,11 +57,11 @@ public class Location {
         this.column = column;
     }
 
-    public String getXpath() {
+    public String getXPath() {
         return xpath;
     }
 
     public String toString() {
-        return getXpath();
+        return getXPath();
     }
 }
