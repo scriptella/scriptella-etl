@@ -25,7 +25,7 @@ import scriptella.core.SystemException;
  * @version 1.0
  */
 public class ConfigurationException extends SystemException {
-    private XmlElement element;
+    private transient XmlElement element;
 
     /**
      * Constructs a new runtime exception with <code>null</code> as its
