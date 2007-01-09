@@ -134,12 +134,12 @@ public class ExecutionStatisticsBuilder {
         if (executionStatistics==null) {
             throw new IllegalStateException("etlStarted must be invoked prior to calling this method");
         }
-        ExecutionStatistics.ElementInfo ei = executionStatistics.elements.get(loc.getXpath());
+        ExecutionStatistics.ElementInfo ei = executionStatistics.elements.get(loc.getXPath());
 
         if (ei == null) {
             ei = new ExecutionStatistics.ElementInfo();
-            ei.id = loc.getXpath();
-            executionStatistics.elements.put(loc.getXpath(), ei);
+            ei.id = loc.getXPath();
+            executionStatistics.elements.put(loc.getXPath(), ei);
         }
 
         return ei;
