@@ -69,7 +69,7 @@ public class IncludeEl extends XmlConfigurableBase implements Resource {
     }
 
     public void configure(final XmlElement element) {
-        url = element.getDocumentURL();
+        url = element.getDocumentUrl();
         setRequiredProperty(element, "href");
 
         String enc = element.getAttribute("encoding");
