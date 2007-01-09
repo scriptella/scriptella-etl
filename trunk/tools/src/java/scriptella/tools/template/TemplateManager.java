@@ -59,7 +59,7 @@ public class TemplateManager {
      */
     public void create() throws IOException {
         //Only default template supported yet
-        InputStream xml = getClass().getResourceAsStream(DEFAULT_ETL_XML);
+        InputStream xml = TemplateManager.class.getResourceAsStream(DEFAULT_ETL_XML);
         if (xml == null) {
             throw new IllegalArgumentException("Resource " + DEFAULT_ETL_XML + " not found");
         }
