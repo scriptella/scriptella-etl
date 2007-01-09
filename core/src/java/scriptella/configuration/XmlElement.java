@@ -35,17 +35,17 @@ import java.util.Set;
  */
 public class XmlElement {
     private Element element;
-    private URL documentURL;
+    private URL documentUrl;
     private PropertiesSubstitutor substitutor;
 
     public XmlElement(Element element, URL documentURI, PropertiesSubstitutor substitutor) {
         this.element = element;
-        this.documentURL = documentURI;
+        this.documentUrl = documentURI;
         this.substitutor = substitutor;
     }
 
     public XmlElement(Element element, XmlElement parent) {
-        this(element, parent.documentURL, parent.substitutor);
+        this(element, parent.documentUrl, parent.substitutor);
     }
 
     public String getTagName() {
@@ -56,8 +56,8 @@ public class XmlElement {
         return element;
     }
 
-    public URL getDocumentURL() {
-        return documentURL;
+    public URL getDocumentUrl() {
+        return documentUrl;
     }
 
     protected List<XmlElement> getChildren() {
