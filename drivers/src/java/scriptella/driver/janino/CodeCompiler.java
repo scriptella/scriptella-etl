@@ -96,16 +96,15 @@ final class CodeCompiler {
     }
 
     static String getLine(Resource resource, int line) {
-        Reader r = null;
+        BufferedReader r = null;
         try {
-            r = resource.open();
-            BufferedReader br = new BufferedReader(r);
+            r = new BufferedReader(resource.open());
             for (int i = 0; i < line - 1; i++) {
-                if (br.readLine() == null) {
+                if (r.readLine() == null) {
                     return null;
                 }
             }
-            return br.readLine();
+            return r.readLine();
         } catch (IOException e) {
             ExceptionUtils.ignoreThrowable(e);
         } finally {
