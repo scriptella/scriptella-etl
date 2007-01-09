@@ -15,6 +15,8 @@
  */
 package scriptella.driver.xpath;
 
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
@@ -22,6 +24,8 @@ import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.URL;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -33,7 +37,10 @@ import java.util.Map;
  * @version 1.0
  */
 public class XPathConnection extends AbstractConnection {
-    private Map<Resource, Object> queriesCache = new IdentityHashMap<Resource, Object>();
+    private Map<Resource, XPathQueryExecutor> queriesCache = new IdentityHashMap<Resource, XPathQueryExecutor>();
+    private Document document;
+    private URL url;
+    private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
 
     /**
      * For testing purposes only.
@@ -43,6 +50,7 @@ public class XPathConnection extends AbstractConnection {
 
     public XPathConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
+        url = parameters.getResolvedUrl();
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {
@@ -50,9 +58,27 @@ public class XPathConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
+        XPathQueryExecutor exec = queriesCache.get(queryContent);
+        if (exec == null) {
+            exec = new XPathQueryExecutor(getDocument(), queryContent);
+            queriesCache.put(queryContent, exec);
+        }
+        exec.execute(queryCallback, parametersCallback);
+    }
+
+    private Document getDocument() {
+        if (document == null) {
+            try {
+                document = DBF.newDocumentBuilder().parse(new InputSource(url.toString()));
+            } catch (Exception e) {
+                throw new XPathProviderException("Unable to parse document " + url, e);
+            }
+        }
+        return document;
     }
 
     public void close() throws ProviderException {
         queriesCache = null;
+        document = null;
     }
 }
