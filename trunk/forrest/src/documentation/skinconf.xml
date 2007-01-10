@@ -60,7 +60,7 @@ which will be used to configure the chosen Forrest skin.
        default skin: renders it at the top -->
 	<project-name>Scriptella</project-name>
 	<project-description>Open Source ETL and Script Execution Tool.</project-description>
-	<project-url>http://scriptella.javaforge.com</project-url>
+	<project-url>http://scriptella.javaforge.com/</project-url>
 	<project-logo>images/site-logo.png</project-logo>
 	<!-- Alternative static image:
   <project-logo>images/project-logo.gif</project-logo> -->
@@ -83,7 +83,7 @@ which will be used to configure the chosen Forrest skin.
 	<vendor>The Scriptella Project Team.</vendor>
 	<!-- The optional copyright-link URL will be used as a link in the
     copyright statement-->
-  <copyright-link>http://scriptella.javaforge.com/license.html</copyright-link>
+    <copyright-link>http://scriptella.javaforge.com/license.html</copyright-link>
 	<!-- Some skins use this to form a 'breadcrumb trail' of links.
     Use location="alt" to move the trail to an alternate location
     (if the skin supports it).
