@@ -15,7 +15,19 @@
  */
 package scriptella.driver.xpath;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import scriptella.AbstractTestCase;
+import scriptella.configuration.StringResource;
+import scriptella.spi.IndexedQueryCallback;
+import scriptella.spi.MockParametersCallbacks;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.Resource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  * Tests for {@link XPathQueryExecutor}.
@@ -24,7 +36,64 @@ import scriptella.AbstractTestCase;
  * @version 1.0
  */
 public class XPathQueryExecutorTest extends AbstractTestCase {
-    public void test() {
+    private DocumentBuilder documentBuilder;
 
+    protected void setUp() throws Exception {
+        documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     }
+
+    public void test() throws ParserConfigurationException, IOException, SAXException {
+        Document doc = documentBuilder.parse(getClass().getResourceAsStream("xml1.xml"));
+        Resource res = new StringResource("/html/body/table/tr");
+        XPathQueryExecutor exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler());
+        IndexedQueryCallback callback = new IndexedQueryCallback() {
+
+            protected void processRow(final ParametersCallback parameters, final int rowNumber) {
+                if (rowNumber == 0) {
+                    assertEquals("red", parameters.getParameter("bgcolor"));
+                    assertEquals("Column1", ((String[]) parameters.getParameter("th"))[0]);
+                    assertEquals("Column2", ((String[]) parameters.getParameter("th"))[1]);
+                } else {
+                    assertEquals(String.valueOf(rowNumber * 2 - 1), ((String[]) parameters.getParameter("td"))[0]);
+                    assertEquals(String.valueOf(rowNumber * 2), ((String[]) parameters.getParameter("td"))[1]);
+                }
+            }
+        };
+        exec.execute(callback, MockParametersCallbacks.NULL);
+        assertEquals(3,callback.getRowsNumber());
+    }
+
+    public void test2() throws ParserConfigurationException, IOException, SAXException {
+        Document doc = documentBuilder.parse(getClass().getResourceAsStream("xml2.xml"));
+        Resource res = new StringResource("  /xml/element[@attribute=1]  | /xml/element[not(@attribute)]");
+        XPathQueryExecutor exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler());
+        IndexedQueryCallback callback = new IndexedQueryCallback() {
+
+            protected void processRow(final ParametersCallback parameters, final int rowNumber) {
+                if (rowNumber == 0) {
+                    assertEquals("1", parameters.getParameter("attribute"));
+                } else {
+                    assertEquals("", parameters.getParameter("element"));
+                }
+            }
+        };
+        exec.execute(callback, MockParametersCallbacks.NULL);
+        assertEquals(2,callback.getRowsNumber());
+        //Now select element2, also test substitution
+        res = new StringResource(" /xml/$element2 ");
+        exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler());
+        callback = new IndexedQueryCallback() {
+
+            protected void processRow(final ParametersCallback parameters, final int rowNumber) {
+                if (rowNumber == 0) {
+                    assertEquals("1", parameters.getParameter("attribute"));
+                } else {
+                    assertEquals("el2", parameters.getParameter("element2"));
+                }
+            }
+        };
+        exec.execute(callback, MockParametersCallbacks.NAME);
+        assertEquals(2,callback.getRowsNumber());
+    }
+
 }

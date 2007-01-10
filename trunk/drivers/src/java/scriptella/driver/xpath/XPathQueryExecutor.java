@@ -16,35 +16,33 @@
 package scriptella.driver.xpath;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
+import org.w3c.dom.NodeList;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
-import scriptella.util.StringUtils;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Executor for XPath queries.
+ *
+ * @author Fyodor Kupolov
+ * @version 1.0
  */
 public class XPathQueryExecutor implements ParametersCallback {
     private Node node;
-    private NamedNodeMap attributes;
-    private ParametersCallback parentParameters;
+    private PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
     private Document document;
-    private Collection<XPathExpression> expressions;
-    private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+    private String expressionStr;
+    private XPathExpressionCompiler compiler;
+
 
 
     /**
@@ -53,27 +51,13 @@ public class XPathQueryExecutor implements ParametersCallback {
      * @param document      document to query.
      * @param xpathResource resource with xpath expression.
      */
-    public XPathQueryExecutor(Document document, Resource xpathResource) {
+    public XPathQueryExecutor(Document document, Resource xpathResource, XPathExpressionCompiler compiler) {
         this.document = document;
+        this.compiler = compiler;
         try {
-            BufferedReader reader = IOUtils.asBuffered(xpathResource.open());
-            XPath xPath = XPATH_FACTORY.newXPath();
-            expressions = new ArrayList<XPathExpression>();
-            for (String line; (line = reader.readLine()) != null;) {
-                line = line.trim();
-                if (line.length() > 0) {
-                    try {
-                        expressions.add(xPath.compile(line));
-                    } catch (XPathExpressionException e) {
-                        throw new XPathProviderException("Unable to compile XPath query: " + line, e);
-                    }
-                }
-            }
+            expressionStr = IOUtils.toString(xpathResource.open());
         } catch (IOException e) {
             throw new XPathProviderException("Unable to read XPath query content");
-        }
-        if (expressions.isEmpty()) {
-            throw new XPathProviderException("XPath query expected");
         }
     }
 
@@ -85,32 +69,51 @@ public class XPathQueryExecutor implements ParametersCallback {
      */
     public void execute(final QueryCallback queryCallback, final ParametersCallback parentParameters) {
         try {
-            this.parentParameters = parentParameters;
-            for (XPathExpression xpath : expressions) {
-                NodeIterator itt = (NodeIterator) xpath.evaluate(document, XPathConstants.NODESET);
-                for (; (node = itt.nextNode()) != null;) {
-                    attributes = node.getAttributes();
-                    queryCallback.processRow(this);
-                }
+            substitutor.setParameters(parentParameters);
+            XPathExpression xpathExpression = compiler.compile(substitutor.substitute(expressionStr));
+            NodeList nList = (NodeList) xpathExpression.evaluate(document, XPathConstants.NODESET);
+            int n = nList.getLength();
+            for (int i = 0; i < n; i++) {
+                node = nList.item(i);
+                queryCallback.processRow(this);
             }
         } catch (XPathExpressionException e) {
             throw new XPathProviderException("Failed to evaluate XPath query", e);
         } finally {
-            this.parentParameters = null;
+            substitutor.setParameters(null);
         }
     }
 
     public Object getParameter(final String name) {
         Object result = null;
         //If name is a number and node has attributes - try to get an attribute by index
-        if (attributes != null && StringUtils.isDecimalInt(name)) {
-            result = attributes.item(Integer.parseInt(name));
-        } else if ("row".equals(name)) {
-            result = node; //$row returns entire node
-        } else if (attributes != null) {
-            result = attributes.getNamedItem(name); //Get attribute value for name
+
+        if (node instanceof Element) { //if element
+            //Now we use a trick to determine if node contains "name" attribute
+            //element.getAttribute returns "" for declared and declared attributes
+            Node item = node.getAttributes().getNamedItem(name);
+            result = item == null ? null : item.getNodeValue(); //Get attribute value for name
+        }
+        //If previos check was unsucessful and the selected node has specified name
+        if (result == null && name.equals(node.getNodeName())) {
+            result = node.getTextContent(); //returns its text content
+        }
+        //If previos check was unsucessful and the selected node is an element
+        if (result == null && node instanceof Element) {
+            Element element = (Element) node;
+            NodeList list = element.getElementsByTagName(name);
+            int n = list.getLength();
+            //If element contains children with specified name
+            //Convert these elements to text and return a string instance or array
+            if (n > 0) {
+                String[] r = new String[n];
+                for (int i = 0; i < n; i++) {
+                    r[i] = list.item(i).getTextContent();
+                }
+                result = r.length > 1 ? r : r[0];
+            }
         }
         //if result=null fallback to parent parameters
-        return result == null ? parentParameters.getParameter(name) : result;
+        return result == null ? substitutor.getParameters().getParameter(name) : result;
     }
 }

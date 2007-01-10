@@ -86,6 +86,7 @@ public abstract class AbstractTestCase extends TestCase {
 
     public AbstractTestCase() {
         setName(getClass().getSimpleName());
+        testURLHandler=null;
     }
 
 

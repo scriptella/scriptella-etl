@@ -16,11 +16,11 @@
 package scriptella.jdbc;
 
 import scriptella.util.IOUtils;
+import scriptella.util.LRUMap;
 
 import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +31,6 @@ import java.util.Map;
  * @version 1.0
  */
 class StatementCache implements Closeable {
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private Map<String, StatementWrapper> map;
     private final Connection connection;
 
@@ -43,14 +42,9 @@ class StatementCache implements Closeable {
     public StatementCache(Connection connection, final int size) {
         this.connection = connection;
         if (size > 0) { //if cache is enabled
-            map = new LinkedHashMap<String, StatementWrapper>(size, DEFAULT_LOAD_FACTOR, true) {
-                protected boolean removeEldestEntry(Map.Entry<String, StatementWrapper> eldest) {
-                    boolean remove = size() > size;
-                    if (remove) {
-                        eldest.getValue().close();
-                    }
-
-                    return remove;
+            map = new LRUMap<String, StatementWrapper>(size) {
+                protected void onEldestEntryRemove(Map.Entry<String, StatementWrapper> eldest) {
+                    eldest.getValue().close();
                 }
             };
         }
