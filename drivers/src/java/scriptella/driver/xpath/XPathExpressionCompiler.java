@@ -20,6 +20,7 @@ import scriptella.util.LRUMap;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.util.Map;
 
 /**
  * Represents a facade for compiling xpath expressions.
@@ -31,7 +32,7 @@ import javax.xml.xpath.XPathFactory;
 class XPathExpressionCompiler {
     private static final int DEFAULT_SIZE = 100;
     private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
-    private LRUMap<String, XPathExpression> cache = new LRUMap<String, XPathExpression>(DEFAULT_SIZE);
+    private Map<String, XPathExpression> cache = new LRUMap<String, XPathExpression>(DEFAULT_SIZE);
 
     public XPathExpression compile(final String expression) {
         String trimmedEx = expression.trim();

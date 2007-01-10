@@ -167,7 +167,15 @@
 					<td>scriptella.driver.velocity.Driver</td>
 					<td>This driver allows to integrate velocity templates into script files.</td>
 				</tr>
-			</table>
+                <tr>
+					<td>
+						<anchor id="xpath"/>
+						<a href="../docs/api/scriptella/driver/xpath/package-summary.html">XPath</a>
+					</td>
+					<td>scriptella.driver.xpath.Driver</td>
+					<td>This driver allows querying XML files with XPath expressions.</td>
+				</tr>
+            </table>
 		</section>
 	</body>
 </document>

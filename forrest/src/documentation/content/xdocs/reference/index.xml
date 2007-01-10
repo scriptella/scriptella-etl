@@ -530,7 +530,12 @@
                     with CSV files.</p>
 				<p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
 			</section>
-			<section>
+            <section>
+                <title>Working with XML data</title>
+                <p>The <a href="drivers.html#xpath">built-in XPath driver</a> allows querying XML files with XPath expressions.</p>
+                <p><a href="drivers.html#text">Text driver</a> can be used to output XML files.</p>
+            </section>
+            <section>
 				<title>Using Java Code</title>
 				<p>Although Scriptella was designed for JDBC/SQL datasources under some circumstances it is
 				useful to embed or invoke Java from Scriptella file. The <a href="drivers.html#janino">Janino Provider</a>
