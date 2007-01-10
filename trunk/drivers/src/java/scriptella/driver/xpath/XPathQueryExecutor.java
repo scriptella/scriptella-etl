@@ -24,6 +24,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
+import scriptella.util.StringUtils;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -42,8 +43,6 @@ public class XPathQueryExecutor implements ParametersCallback {
     private Document document;
     private String expressionStr;
     private XPathExpressionCompiler compiler;
-
-
 
     /**
      * Crates executor to query document using a specified xpath expression.
@@ -92,11 +91,11 @@ public class XPathQueryExecutor implements ParametersCallback {
             //Now we use a trick to determine if node contains "name" attribute
             //element.getAttribute returns "" for declared and declared attributes
             Node item = node.getAttributes().getNamedItem(name);
-            result = item == null ? null : item.getNodeValue(); //Get attribute value for name
+            result = item == null ? null : StringUtils.nullsafeTrim(item.getNodeValue()); //Get attribute value for name
         }
         //If previos check was unsucessful and the selected node has specified name
         if (result == null && name.equals(node.getNodeName())) {
-            result = node.getTextContent(); //returns its text content
+            result = StringUtils.nullsafeTrim(node.getTextContent()); //returns its text content
         }
         //If previos check was unsucessful and the selected node is an element
         if (result == null && node instanceof Element) {
@@ -108,7 +107,7 @@ public class XPathQueryExecutor implements ParametersCallback {
             if (n > 0) {
                 String[] r = new String[n];
                 for (int i = 0; i < n; i++) {
-                    r[i] = list.item(i).getTextContent();
+                    r[i] = StringUtils.nullsafeTrim(list.item(i).getTextContent());
                 }
                 result = r.length > 1 ? r : r[0];
             }

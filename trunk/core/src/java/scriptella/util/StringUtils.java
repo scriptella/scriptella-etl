@@ -37,8 +37,20 @@ public final class StringUtils {
         return cs == null || cs.length() == 0;
     }
 
+
+    /**
+     * Returns a trimmed value for specified charsequence
+     *
+     * @param cs charsequence to trim.
+     * @return trimmed value for specified charsequence or empty string if cs=null
+     */
+    public static String nullsafeTrim(final CharSequence cs) {
+        return cs == null ? "" : cs.toString().trim();
+    }
+
     /**
      * Checks if specified characters sequence is empty or contains only ascii whitespace characters.
+     *
      * @param cs characters sequence to check.
      * @return true if characters sequence is empty or contains only ascii whitespace characters.
      */
@@ -51,7 +63,7 @@ public final class StringUtils {
             return true;
         }
         for (int i = 0; i < len; i++) {
-            if (cs.charAt(i)>' ') {
+            if (cs.charAt(i) > ' ') {
                 return false;
             }
         }
@@ -60,25 +72,26 @@ public final class StringUtils {
 
     /**
      * Checks if specified characters sequence represents a non negative decimal number.
+     *
      * @param cs characters sequence to check.
      * @return true if specified characters sequence represents a non negative decimal number.
      */
     public static boolean isDecimalInt(final CharSequence cs) {
-            if (cs == null) { //null is not a number.
-                return false;
-            }
-            int len = cs.length();
-            if (len == 0) { //empty string also
-                return false;
-            }
-            for (int i = 0; i < len; i++) {
-                int c = cs.charAt(i);
-                if (c<0x30 || c>0x39) {
-                    return false;
-                }
-            }
-            return true;
+        if (cs == null) { //null is not a number.
+            return false;
         }
+        int len = cs.length();
+        if (len == 0) { //empty string also
+            return false;
+        }
+        for (int i = 0; i < len; i++) {
+            int c = cs.charAt(i);
+            if (c < 0x30 || c > 0x39) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private static Pattern WHITESPACES = Pattern.compile("[\\x00-\\x20&&[^\\r\\n]]+");
     private static Pattern EOLS = Pattern.compile("[\\r\\n]+");
@@ -87,23 +100,23 @@ public final class StringUtils {
      * Formats specified string for console suitable representation.
      * <p>All EOL char sequences are replaced with a single system line.separator,
      * and all other whitespace sequences are replaced with a single space.
+     *
      * @param string string to format. Nulls are allowed.
      * @return formatted string.
      */
     public static String consoleFormat(String string) {
-        if (string==null) {
+        if (string == null) {
             return "";
         }
         String res = string.trim();
         String sep = System.getProperty("line.separator");
-        if (sep==null) {
-            sep="\n";
+        if (sep == null) {
+            sep = "\n";
         }
         res = EOLS.matcher(res).replaceAll(sep);
         res = WHITESPACES.matcher(res).replaceAll(" ");
         return res;
     }
-
 
 
 }
