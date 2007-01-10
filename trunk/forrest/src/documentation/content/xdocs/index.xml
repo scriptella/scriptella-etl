@@ -92,7 +92,7 @@
                     for interoperability with non-JDBC DataSources.
                 </li>
                 <li>Built-In
-                    <a href="reference/drivers.html#nonjdbc">CSV, LDAP, Velocity and Janino</a>
+                    <a href="reference/drivers.html#nonjdbc">CSV, TEXT, XML, LDAP, Velocity and Janino</a>
                     providers. Integration with <a href="reference/drivers.html#spring">Spring Framework</a>,
                     <a href="reference/index.html#jmx">JMX</a>
                     and <a href="reference/drivers.html#jndi">JNDI</a>

@@ -18,7 +18,7 @@ package scriptella.driver.xpath;
 import scriptella.spi.ProviderException;
 
 /**
- * Thrown to indicate a problem with XML file queriing.
+ * Thrown to indicate a problem with XML file querying.
  *
  * @author Fyodor Kupolov
  * @version 1.0

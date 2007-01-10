@@ -21,7 +21,7 @@ import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
 /**
- * Represents a driver for queriing XML files with XPath expressions.
+ * Represents a driver for querying XML files with XPath expressions.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
