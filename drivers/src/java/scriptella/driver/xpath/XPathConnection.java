@@ -52,6 +52,7 @@ public class XPathConnection extends AbstractConnection {
     public XPathConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
         url = parameters.getResolvedUrl();
+        //TODO implement trim option
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {
