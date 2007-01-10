@@ -38,9 +38,10 @@ import java.util.Map;
  */
 public class XPathConnection extends AbstractConnection {
     private Map<Resource, XPathQueryExecutor> queriesCache = new IdentityHashMap<Resource, XPathQueryExecutor>();
+    private XPathExpressionCompiler compiler = new XPathExpressionCompiler();
     private Document document;
     private URL url;
-    private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
+    static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
 
     /**
      * For testing purposes only.
@@ -60,7 +61,7 @@ public class XPathConnection extends AbstractConnection {
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         XPathQueryExecutor exec = queriesCache.get(queryContent);
         if (exec == null) {
-            exec = new XPathQueryExecutor(getDocument(), queryContent);
+            exec = new XPathQueryExecutor(getDocument(), queryContent, compiler);
             queriesCache.put(queryContent, exec);
         }
         exec.execute(queryCallback, parametersCallback);
