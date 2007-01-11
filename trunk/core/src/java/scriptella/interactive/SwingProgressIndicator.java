@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
  */
 package scriptella.interactive;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
 
 
 /**
