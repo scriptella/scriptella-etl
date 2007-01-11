@@ -62,7 +62,7 @@ public class XPathConnection extends AbstractConnection {
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         XPathQueryExecutor exec = queriesCache.get(queryContent);
         if (exec == null) {
-            exec = new XPathQueryExecutor(getDocument(), queryContent, compiler);
+            exec = new XPathQueryExecutor(getDocument(), queryContent, compiler, counter);
             queriesCache.put(queryContent, exec);
         }
         exec.execute(queryCallback, parametersCallback);
