@@ -15,7 +15,7 @@
 -->
 
 <project name="XML Import" default="run">
-    <description>Shows how process CSV data with Text driver.</description>
+    <description>Shows how to process CSV data with Text driver.</description>
     <!-- Registers scriptella ant task.
     Update classpath attribute if necessary-->
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
