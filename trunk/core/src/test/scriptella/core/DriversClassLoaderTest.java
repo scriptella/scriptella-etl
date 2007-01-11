@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.core;
 
 import scriptella.AbstractTestCase;
 import scriptella.jdbc.GenericDriver;
+import scriptella.spi.ScriptellaDriver;
 
 import java.net.URL;
 
 /**
- * Tests {@link DriverClassLoader}.
+ * Tests {@link scriptella.core.DriverClassLoader}.
  *
  * @author Fyodor Kupolov
  * @version 1.0

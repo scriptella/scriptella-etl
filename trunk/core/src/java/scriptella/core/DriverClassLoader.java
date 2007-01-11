@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.net.URLClassLoader;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class DriverClassLoader extends URLClassLoader {
+class DriverClassLoader extends URLClassLoader {
     public DriverClassLoader(URL[] urls) {
         super(urls, DriverClassLoader.class.getClassLoader());
     }
@@ -84,7 +84,7 @@ public class DriverClassLoader extends URLClassLoader {
      * @return class file content.
      */
     private static byte[] getClassBytes(final String name) {
-        String path = "/" + name.replace('.', '/') + ".class";
+        String path = '/' + name.replace('.', '/') + ".class";
         InputStream is = DriverClassLoader.class.getResourceAsStream(path);
         if (is == null) {
             return null;

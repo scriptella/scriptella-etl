@@ -17,9 +17,9 @@ package scriptella.driver.alljdbc;
 
 import scriptella.AbstractTestCase;
 import scriptella.configuration.ConfigurationFactory;
+import scriptella.core.DriverFactory;
 import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.JdbcUtils;
-import scriptella.spi.DriverFactory;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;

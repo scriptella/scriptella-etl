@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.core;
 
 import scriptella.jdbc.GenericDriver;
+import scriptella.spi.ScriptellaDriver;
 
 import java.sql.Driver;
 

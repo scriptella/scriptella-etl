@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.spi;
+package scriptella.core;
 
 import scriptella.AbstractTestCase;
 
 /**
- * Tests for {@link DriverFactory}.
+ * Tests for {@link scriptella.core.DriverFactory}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class DriversFactoryTest extends AbstractTestCase {
+public class DriverFactoryTest extends AbstractTestCase {
     /**
      * Tests correct handling of drivers in bootstrap classpath.
      */
