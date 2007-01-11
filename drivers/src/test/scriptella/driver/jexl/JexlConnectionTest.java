@@ -23,6 +23,7 @@ import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.Resource;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ public class JexlConnectionTest extends AbstractTestCase {
     private Object v;
     public void setValue(Object v) {
         this.v = v;
-
     }
 
     public void testExecuteScript() {
@@ -45,8 +45,7 @@ public class JexlConnectionTest extends AbstractTestCase {
         Resource r = new StringResource("x=0;while (x < 10) {x=x+2;};obj.setValue(x)");
         JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
         Map<String, Object> m = new HashMap<String, Object>();
-        m.put("obj", this);
-        jc.executeScript(r, MockParametersCallbacks.fromMap(m));
+        jc.executeScript(r, MockParametersCallbacks.fromMap(Collections.singletonMap("obj", this)));
         assertEquals(10, ((Number)v).intValue());
 
     }
