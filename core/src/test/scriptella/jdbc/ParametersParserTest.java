@@ -42,9 +42,9 @@ public class ParametersParserTest extends TestCase {
         Lobs.UrlBlob actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.UNSUPPORTED);
         URL expected = dc.resolve("myfile");
         assertEquals(expected, actual.getUrl());
-        expr = "file 'http'+'://host/'+name";
+        expr = "file 'http'+'://127.0.0.1/'+name";
         actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.SIMPLE);
-        expected = new URL("http://host/*name*");
+        expected = new URL("http://127.0.0.1/*name*");
         assertEquals(expected, actual.getUrl());
     }
 
