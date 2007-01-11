@@ -20,8 +20,6 @@ import scriptella.configuration.ConnectionEl;
 import scriptella.execution.EtlContext;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
-import scriptella.spi.DriverClassLoader;
-import scriptella.spi.DriverFactory;
 import scriptella.spi.ScriptellaDriver;
 import scriptella.util.UrlPathTokenizer;
 
