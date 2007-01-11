@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package scriptella.driver.lucene;
 
+import org.apache.lucene.index.IndexReader;
 import scriptella.driver.text.TextProviderException;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
@@ -29,8 +30,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.lucene.index.IndexReader;
 
 /**
  * Represents a connection to a Lucene index.
