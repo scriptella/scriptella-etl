@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
@@ -43,16 +44,19 @@ public class XPathQueryExecutor implements ParametersCallback {
     private Document document;
     private String expressionStr;
     private XPathExpressionCompiler compiler;
+    private AbstractConnection.StatementCounter counter;
 
     /**
      * Crates executor to query document using a specified xpath expression.
      *
      * @param document      document to query.
      * @param xpathResource resource with xpath expression.
+     * @param counter       statement counter.
      */
-    public XPathQueryExecutor(Document document, Resource xpathResource, XPathExpressionCompiler compiler) {
+    public XPathQueryExecutor(Document document, Resource xpathResource, XPathExpressionCompiler compiler, AbstractConnection.StatementCounter counter) {
         this.document = document;
         this.compiler = compiler;
+        this.counter = counter;
         try {
             expressionStr = IOUtils.toString(xpathResource.open());
         } catch (IOException e) {
@@ -71,6 +75,7 @@ public class XPathQueryExecutor implements ParametersCallback {
             substitutor.setParameters(parentParameters);
             XPathExpression xpathExpression = compiler.compile(substitutor.substitute(expressionStr));
             NodeList nList = (NodeList) xpathExpression.evaluate(document, XPathConstants.NODESET);
+            counter.statements++;
             int n = nList.getLength();
             for (int i = 0; i < n; i++) {
                 node = nList.item(i);

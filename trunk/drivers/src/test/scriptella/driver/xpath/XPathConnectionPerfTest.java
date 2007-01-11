@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
+import scriptella.spi.AbstractConnection;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.IndexedQueryCallback;
@@ -67,7 +68,7 @@ public class XPathConnectionPerfTest extends AbstractTestCase {
             root.appendChild(row);
         }
         //Quering 200 times.
-        XPathQueryExecutor qe = new XPathQueryExecutor(doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler());
+        XPathQueryExecutor qe = new XPathQueryExecutor(doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
         for (int i = 0; i < 20; i++) {
             IndexedQueryCallback queryCallback = new IndexedQueryCallback() {
                 protected void processRow(final ParametersCallback parameters, final int rowNumber) {
