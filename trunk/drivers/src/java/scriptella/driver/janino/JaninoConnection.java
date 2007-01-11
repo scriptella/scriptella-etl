@@ -63,7 +63,7 @@ public class JaninoConnection extends AbstractConnection {
      * @param queryCallback      callback to call for each result set element produced by this query.
      * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
      */
-    public synchronized void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
+    public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
 
         JaninoQuery q = compiler.compileQuery(queryContent);
         q.setParametersCallback(parametersCallback);
@@ -83,7 +83,7 @@ public class JaninoConnection extends AbstractConnection {
     /**
      * Finds an error statement by introspecting the stack trace of exception.
      * <p>Error statement is fetched from content resource.
-     * @param content
+     * @param content script content.
      * @param e exception to introspect.
      * @param scriptClass class to use when finding an error statement.
      * @return the same exception with a guessed error statement.
