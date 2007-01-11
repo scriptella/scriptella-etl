@@ -21,7 +21,7 @@ import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
 /**
- * Represents a connection to a Text file.
+ * Represents a Text file driver.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
