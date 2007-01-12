@@ -28,37 +28,39 @@ import scriptella.spi.Resource;
 import java.util.Collections;
 
 /**
- * Tests for {@link JexlConnection}.
- *
  * @author Fyodor Kupolov
  * @version 1.0
- * @since 11.01.2007
+ * @since 12.01.2007
  */
-public class JexlConnectionTest extends AbstractTestCase {
-    private Object v;
-    public void setValue(Object v) {
-        this.v = v;
-    }
+public class JexlConnectionPerfTest extends AbstractTestCase {
 
+    /**
+     * History:
+     * 12.01.2007 - Duron 1.7Mhz - 670 ms
+     */
     public void testExecuteScript() {
-        v=null;
-        Resource r = new StringResource("x=0;while (x < 10) {x=x+2;};obj.setValue(x)");
+        Resource r = new StringResource("x=0;while (x < 2000) {x=x+step;};");
         JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
-        jc.executeScript(r, MockParametersCallbacks.fromMap(Collections.singletonMap("obj", this)));
-        assertEquals(10, ((Number)v).intValue());
+        for (int i = 0; i < 200; i++) {
+            jc.executeScript(r, MockParametersCallbacks.fromMap(Collections.singletonMap("step", 1)));
+        }
     }
 
+    /**
+     * History:
+     * 12.01.2007 - Duron 1.7Mhz - 720 ms
+     */
     public void testExecuteQuery() {
-        Resource r = new StringResource("i=0;a=a0;s='test';while (i < 10) {i=i+1;query.next();}");
+        Resource r = new StringResource("i=0;while (i < maxI) {i=i+1;query.next();}");
         JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
         IndexedQueryCallback callback = new IndexedQueryCallback() {
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {
-                assertEquals(rowNumber+1, ((Number)parameters.getParameter("i")).intValue());
-                assertEquals(5, ((Number)parameters.getParameter("a")).intValue());
-                assertEquals("test", parameters.getParameter("s"));
+                parameters.getParameter("i");
             }
         };
-        jc.executeQuery(r, MockParametersCallbacks.fromMap(Collections.singletonMap("a0", 5)), callback);
+        for (int i=0;i<10;i++) {
+            jc.executeQuery(r, MockParametersCallbacks.fromMap(Collections.singletonMap("maxI", 20000)), callback);
+        }
 
     }
 
