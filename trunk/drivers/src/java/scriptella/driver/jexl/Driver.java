@@ -15,7 +15,6 @@
  */
 package scriptella.driver.jexl;
 
-import scriptella.driver.text.TextConnection;
 import scriptella.spi.AbstractScriptellaDriver;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
@@ -32,6 +31,6 @@ public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("JEXL", "1.0");
 
     public Connection connect(ConnectionParameters connectionParameters) {
-        return new TextConnection(connectionParameters);
+        return new JexlConnection(connectionParameters);
     }
 }

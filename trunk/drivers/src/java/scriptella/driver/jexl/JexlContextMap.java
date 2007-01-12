@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JexlContextMap implements ParametersCallback, JexlContext, Map<String, Object> {
+public final class JexlContextMap implements ParametersCallback, JexlContext, Map<String, Object> {
     private Map<String, Object> localVariables = new HashMap<String, Object>();
     private ParametersCallback parentParameters;
 
@@ -68,7 +68,7 @@ public class JexlContextMap implements ParametersCallback, JexlContext, Map<Stri
         localVariables.putAll(vars);
     }
 
-    public Map getVars() {
+    public Map<String, Object> getVars() {
         return this;
     }
 

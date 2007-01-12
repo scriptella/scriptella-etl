@@ -27,6 +27,8 @@ import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Scriptella connection adapter for JEXL.
@@ -36,9 +38,11 @@ import java.io.IOException;
  * @version 1.0
  */
 public class JexlConnection extends AbstractConnection {
+    private Map<Resource, Script> cache = new IdentityHashMap<Resource, Script>();
 
     /**
      * Instantiates a new connection to Janino Script Evaluator.
+     *
      * @param parameters connection parameters.
      */
     public JexlConnection(ConnectionParameters parameters) {
@@ -46,14 +50,8 @@ public class JexlConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
-        String s;
+        Script script = compile(scriptContent);
         try {
-            s = IOUtils.toString(scriptContent.open());
-        } catch (IOException e) {
-            throw new JexlProviderException("Failed to read JEXL script", e);
-        }
-        try {
-            Script script = ScriptFactory.createScript(s);
             JexlContext ctx = new JexlContextMap(parametersCallback);
             script.execute(ctx);
         } catch (Exception e) {
@@ -62,8 +60,33 @@ public class JexlConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
+        Script query = compile(queryContent);
+        try {
+            JexlContextMap ctx = new JexlContextMap(parametersCallback);
+            ctx.put("query", new Query(queryCallback, ctx));
+            query.execute(ctx);
+        } catch (Exception e) {
+            throw new JexlProviderException("Failed to execute JEXL script", e);
+        }
+    }
 
+    private Script compile(Resource resource) {
+        Script script = cache.get(resource);
+        if (script == null) {
+            String s;
+            try {
+                s = IOUtils.toString(resource.open());
+            } catch (IOException e) {
+                throw new JexlProviderException("Unable to open resource", e);
+            }
 
+            try {
+                cache.put(resource, script = ScriptFactory.createScript(s));
+            } catch (Exception e) {
+                throw new JexlProviderException("Failed to compile JEXL script", e);
+            }
+        }
+        return script;
     }
 
 
