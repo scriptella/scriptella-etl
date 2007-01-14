@@ -19,6 +19,7 @@ import scriptella.DBTestCase;
 import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Map;
 
@@ -137,6 +138,31 @@ public class ExecutionStatisticsTest extends DBTestCase {
                 fail("Unrecognized statistic element " + info.getId());
             }
         }
+    }
+
+    /**
+     * Tests if total time is correctly printed.
+     */
+    public void testTotalTime() throws EtlExecutorException {
+        DecimalFormat f = new DecimalFormat(ExecutionStatistics.DOUBLE_FORMAT_PTR);
+        char sep = f.getDecimalFormatSymbols().getDecimalSeparator();
+
+        long time = 288727350; //3d 8h 12m 7s 350ms
+        StringBuilder sb = new StringBuilder();
+        ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
+        assertEquals(" 3 days 8 hours 12 minutes 7"+sep+"35 seconds", sb.toString());
+        time = 3605001; //1h 5s 1ms
+        sb = new StringBuilder();
+        ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
+        assertEquals(" 1 hour 5 seconds", sb.toString());
+        time = 800; //800ms
+        sb = new StringBuilder();
+        ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
+        assertEquals(" 0,8 second", sb.toString());
+        time = 1000; //1000ms
+        sb = new StringBuilder();
+        ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
+        assertEquals(" 1 second", sb.toString());
     }
 
 }
