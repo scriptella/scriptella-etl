@@ -17,7 +17,10 @@
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
     <target name="main">
         <available file="Northwind.mdb" property="db_present"/>
-        <fail unless="db_present">In order to run this example copy Northwind.mdb from Microsoft Access Samples to the sample odbc directory.</fail>
+        <fail unless="db_present">
+            In order to run this example copy Northwind.mdb from Microsoft Access Samples to current directory.
+Northwind.mdb can be downloaded from http://office.microsoft.com/downloads/2000/Nwind2K.aspx
+        </fail>
         <!--Use debug="true" to see more execution details-->
         <etl/>
     </target>
