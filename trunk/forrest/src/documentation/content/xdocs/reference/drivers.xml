@@ -136,6 +136,14 @@
 				</tr>
 				<tr>
 					<td>
+						<anchor id="jexl"/>
+						<a href="../docs/api/scriptella/driver/jexl/package-summary.html">JEXL</a>
+					</td>
+					<td>scriptella.driver.jexl.Driver</td>
+					<td>Allows usage of JEXL scripts in &lt;query&gt; and &lt;script&gt; elements.</td>
+				</tr>
+                <tr>
+					<td>
 						<anchor id="ldap"/>
 						<a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
 					</td>
