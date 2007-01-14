@@ -22,8 +22,8 @@
         <include href="etl.properties"/>
     </properties>
 
-    <!--Set up a connection to janino compiler.-->
-    <connection id="janino" driver="janino" classpath="../lib/janino.jar"/>
+    <!--Set up a connection to JEXL driver.-->
+    <connection id="jexl" driver="jexl"/>
     <!--Set up a connection to velocity engine.
     url parameter specifies a path to file relative to a script file directory-->
     <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity-dep.jar"/>
@@ -47,28 +47,28 @@
             Number INTEGER PRIMARY KEY
         );
     </script>
-    <!--Use janino to produce prime numbers and expose a virtual row set
+    <!--Use JEXL to produce prime numbers and expose a virtual row set
     to be used by nested script element. Don't forget about using CDATA.-->
-    <query connection-id="janino">
+    <query connection-id="jexl">
         <![CDATA[
-        int n = Integer.parseInt((String)get("max_prime")); //reads a property
-        for (int i=2;i<=n;i++) {
-            boolean prime=true;
-            for (int j=2;j<i;j++) {
+        i = 2;
+        while(i<=max_prime) {
+            prime=true;
+            j=2; prime=true;
+            while (j<i && prime) {
                 if (i%j==0) {
                     prime=false;
-                    break;
                 }
+                j=j+1;
             }
-            if (prime) {
-                //produce a virtual row having one column "i"
-                set("i", new Integer(i));
-                next();
+            if (prime) { ##produce a virtual row
+                query.next();
             }
+            i=i+1;
         }
 
         ]]>
-        <!-- This script is called for each row produced by outer Janino query. -->
+        <!-- This script is called for each row produced by outer JEXL query. -->
         <script connection-id="db">
             INSERT INTO Primes VALUES(?i);
         </script>
