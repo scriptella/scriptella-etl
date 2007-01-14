@@ -95,12 +95,15 @@ public class TextScriptExecutor implements Closeable {
                 if (trim) {
                     line = line.trim();
                 }
-                try {
-                    out.write(ps.substitute(line));
-                    out.write(eol);
-                    counter.statements++;
-                } catch (IOException e) {
-                    throw new TextProviderException("Failed writing to a text file", e);
+                //If trimming is disabled (keeping format) or if line is not empty 
+                if (!trim || line.length()>0) {
+                    try {
+                        out.write(ps.substitute(line));
+                        out.write(eol);
+                        counter.statements++;
+                    } catch (IOException e) {
+                        throw new TextProviderException("Failed writing to a text file", e);
+                    }
                 }
             }
         } catch (IOException e) {

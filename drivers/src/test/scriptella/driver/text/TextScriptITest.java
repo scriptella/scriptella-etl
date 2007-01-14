@@ -65,7 +65,7 @@ public class TextScriptITest extends AbstractTestCase {
         EtlExecutor e = newEtlExecutor();
         e.execute();
         assertNotNull(o1);
-        assertEquals("Test Trim\n\n", new String(o1.toByteArray()));
+        assertEquals("Test Trim\n", new String(o1.toByteArray()));
         assertNotNull(o2);
         assertEquals("n1\rn22\rn333\r", new String(o2.toByteArray()));
 
