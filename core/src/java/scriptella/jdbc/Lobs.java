@@ -16,6 +16,7 @@
 package scriptella.jdbc;
 
 import scriptella.util.IOUtils;
+import scriptella.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,6 +53,7 @@ class Lobs {
     /**
      * Create a new read-only BLOB for specified input stream.
      * <p>The stream will be lazily read into memory or saved on disk depending on its length.
+     *
      * @param is input stream to create blob.
      * @return read-only Blob instance.
      */
@@ -62,7 +64,8 @@ class Lobs {
     /**
      * Create a new read-only BLOB for specified input stream.
      * <p>The stream will be lazily read into memory or saved on disk depending on its length.
-     * @param is input stream to create blob.
+     *
+     * @param is     input stream to create blob.
      * @param length input stream length.
      * @return read-only Blob instance.
      */
@@ -73,6 +76,7 @@ class Lobs {
     /**
      * Create a new read-only BLOB for specified URL.
      * <p>The URL content will be lazily fetched into memory or saved on disk depending on its length.
+     *
      * @param url URL of the blob content.
      * @return read-only Blob instance.
      * @see #newBlob(java.io.InputStream)
@@ -84,6 +88,7 @@ class Lobs {
     /**
      * Create a new read-only CLOB for specified reader.
      * <p>The reader will be lazily read into memory or saved on disk depending on its length.
+     *
      * @param reader reader to create CLOB.
      * @return read-only Clob instance.
      */
@@ -94,6 +99,7 @@ class Lobs {
     /**
      * Create a new read-only CLOB for specified reader.
      * <p>The reader will be lazily read into memory or saved on disk depending on its length.
+     *
      * @param reader reader to create CLOB.
      * @param length content length.
      * @return read-only Clob instance.
@@ -207,6 +213,7 @@ class Lobs {
 
         /**
          * Creates a temprorary file.
+         *
          * @return output stream for temprorary file created.
          * @throws IOException if I/O error occurs.
          */
@@ -262,12 +269,12 @@ class Lobs {
 
         @Override
         protected void init() {
-            if (length<0) {
+            if (length < 0) {
                 try {
                     final URLConnection c = url.openConnection();
                     source = c.getInputStream();
                     length = c.getContentLength();
-                    if (length<0) { //if length is undefined - fetch the url
+                    if (length < 0) { //if length is undefined - fetch the url
                         super.init();
                     }
                 } catch (IOException e) {
@@ -281,14 +288,14 @@ class Lobs {
         public InputStream getBinaryStream() {
             InputStream src = source;
             if (src != null) {
-                source=null;
+                source = null;
                 return src;
             } else {
-                length=-1;
+                length = -1;
                 init();
                 src = source;
-                source=null;
-                return (src==null)?super.getBinaryStream():src;
+                source = null;
+                return (src == null) ? super.getBinaryStream() : src;
             }
         }
     }
@@ -367,6 +374,14 @@ class Lobs {
             }
         }
 
+        public String toString() {
+            try {
+                return "BLOB: " + StringUtils.consoleFormat(
+                        new String(IOUtils.toByteArray(getBinaryStream(), 1024)));
+            } catch (Exception e) {
+                return "BLOB: " + e;
+            }
+        }
 
         //--------------- Unsupported methods
         public byte[] getBytes(long pos, int length) throws SQLException {
@@ -461,6 +476,16 @@ class Lobs {
             }
         }
 
+        /**
+         * For debug purposes.
+         */
+        public String toString() {
+            try {
+                return "CLOB: " + StringUtils.consoleFormat(IOUtils.toString(getCharacterStream(), 1024));
+            } catch (Exception e) {
+                return "CLOB: " + e;
+            }
+        }
 
         //--------------- Unsupported methods
         public String getSubString(long pos, int length) throws SQLException {
