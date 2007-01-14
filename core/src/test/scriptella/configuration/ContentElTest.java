@@ -31,11 +31,11 @@ public class ContentElTest extends AbstractTestCase {
         EtlExecutor ex = newEtlExecutor();
         List<ScriptingElement> elements = ex.getConfiguration().getScriptingElements();
         ScriptingElement element = elements.get(0);
-        assertEquals("/etl[1]/script[1]", element.getContent().toString());
+        assertEquals("/etl/script[1]", element.getContent().toString());
         QueryEl q = (QueryEl) elements.get(1);
-        assertEquals("/etl[1]/query[1]", q.getContent().toString());
+        assertEquals("/etl/query[1]", q.getContent().toString());
         element=q.getChildScriptinglElements().get(0);
-        assertEquals("/etl[1]/query[1]/script[1]", element.getContent().toString());
+        assertEquals("/etl/query[1]/script[1]", element.getContent().toString());
     }
 
     /**

@@ -88,11 +88,14 @@ public class XmlElement {
 
             tmp.setLength(0);
             tmp.append(curTagName);
-            tmp.append('[');
-            tmp.append(pos);
-            tmp.append(']');
-            l.add(tmp.toString());
             cur = cur.getParentNode();
+            if (!(cur instanceof Document)) {
+                tmp.append('[');
+                tmp.append(pos);
+                tmp.append(']');
+            }
+            l.add(tmp.toString());
+
         }
 
         StringBuilder res = new StringBuilder(100);
