@@ -63,7 +63,7 @@ public class XmlElementTest extends AbstractTestCase {
         XmlElement root = asElement(xml);
         //selecting second query, first script
         XmlElement el = root.getChildren("query").get(1).getChild("script");
-        assertEquals("/etl[1]/query[2]/script[1]", el.getXPath());
+        assertEquals("/etl/query[2]/script[1]", el.getXPath());
 
     }
 
