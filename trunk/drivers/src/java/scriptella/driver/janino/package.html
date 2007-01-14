@@ -1,7 +1,9 @@
 <body>
 Janino Driver for Scriptella.
 <p>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.
-This code is compiled by Janino and executed by Scriptella engine.</p>
+This code is compiled by Janino and executed by Scriptella engine. For  simple
+scripting solutions refer to <a href="../jexl/package-summary.html">JEXL</a> expression language
+which is interpreted and less powerful.</p>
 <p>Janino scripting elements are implicit subclasses of <a href="JaninoQuery.html">Query</a> and <a href="JaninoScript.html">Script</a>
 base classes.</p>
 
@@ -35,5 +37,9 @@ base classes.</p>
         &lt;/script&gt;
     &lt;/query&gt;
 </pre></code>
-
+In this example the query produces a row having a column name=John.
+The child script is executed on a query result set and prints the message
+<pre>Processing: John</pre> to the console.
+<p>ODBC sample from Scriptella examples distribution also shows
+several use-cases for Janino.</p>
 </body>
