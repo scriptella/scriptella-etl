@@ -561,7 +561,7 @@
 					<em>Primes</em> example demonstrates how to produce a simple report using Velocity.</p>
 				<note>
 				Velocity Driver does not support query element. This limitation may be eliminated in future, but currently we do not see Velocity strengths for querying the data.
-				JDBC or Janino drivers provide more powerful and easy-to-use solutions for queries.
+				JDBC, JEXL or Janino drivers provide more powerful and easy-to-use solutions for dynamic queries.
 				</note>
 			</section>
 		</section>
@@ -607,7 +607,7 @@
 				<tr>
 					<td>Primes</td>
 					<td>Fills the database with prime numbers and produces HTML/CSV reports.
-                    This example demonstrates a combined usage of Velocity, Janino, CSV Driver and SQL.</td>
+                    This example demonstrates a combined usage of Velocity, JEXL, CSV Driver and SQL.</td>
 				</tr>
 			</table>
 		</section>
