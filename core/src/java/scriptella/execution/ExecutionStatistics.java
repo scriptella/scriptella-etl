@@ -18,6 +18,7 @@ package scriptella.execution;
 import scriptella.spi.Connection;
 
 import java.text.DecimalFormat;
+import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +40,11 @@ public class ExecutionStatistics {
     Map<String, ElementInfo> elements = new LinkedHashMap<String, ElementInfo>();
     private Date started;
     private Date finished;
+    private static final int MINUTE_MILLIS = 60 * 1000;
+    private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
+    private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
+    static final String DOUBLE_FORMAT_PTR = "0.##";
+
 
     /**
      * @return number of statements executed for all elements.
@@ -58,13 +64,13 @@ public class ExecutionStatistics {
      *
      * @return xmlelement->count map .
      */
-    public Map<String,Integer> getCategoriesStatistics() {
-        Map<String,Integer> res = new HashMap<String, Integer>();
+    public Map<String, Integer> getCategoriesStatistics() {
+        Map<String, Integer> res = new HashMap<String, Integer>();
         for (String xpath : elements.keySet()) {
-            String elementName =  getElementName(xpath);
+            String elementName = getElementName(xpath);
             Integer cnt = res.get(elementName);
-            if (cnt==null) {
-                cnt=0;
+            if (cnt == null) {
+                cnt = 0;
             }
             res.put(elementName, ++cnt); //autoboxing works fine on small numbers
         }
@@ -77,10 +83,10 @@ public class ExecutionStatistics {
             return "No elements executed";
         }
         StringBuilder sb = new StringBuilder(1024);
-        NumberFormat doubleFormat = new DecimalFormat("0.00");
+        NumberFormat doubleFormat = new DecimalFormat(DOUBLE_FORMAT_PTR);
         sb.append("Executed ");
 
-        Map<String,Integer> cats = getCategoriesStatistics();
+        Map<String, Integer> cats = getCategoriesStatistics();
         for (Iterator<Map.Entry<String, Integer>> it = cats.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Integer> category = it.next();
             appendPlural(sb, category.getValue(), category.getKey());
@@ -98,13 +104,13 @@ public class ExecutionStatistics {
         for (ElementInfo ei : elements) {
             sb.append(ei.id).append(":");
 
-            if (ei.okCount>0) {
+            if (ei.okCount > 0) {
                 sb.append(" Element successfully executed");
                 if (ei.okCount > 1) {
                     sb.append(' ');
                     appendPlural(sb, ei.okCount, "time");
                 }
-                if (ei.statements>0) {
+                if (ei.statements > 0) {
                     sb.append(" (");
                     appendPlural(sb, ei.statements, "statement").append(')');
                 }
@@ -126,8 +132,9 @@ public class ExecutionStatistics {
 
         }
         long totalTime = getTotalTime();
-        if (totalTime>=0) {
-            sb.append("Total working time ").append(doubleFormat.format(totalTime / 1000d)).append(" seconds.");
+        if (totalTime >= 0) {
+            sb.append("Total working time:");
+            appendTotalTimeDuration(totalTime, sb, doubleFormat);
         }
         return sb.toString();
     }
@@ -159,6 +166,46 @@ public class ExecutionStatistics {
     }
 
     /**
+     * Appends total working time, i.e. d h m s ms
+     * The leading space is always present.
+     *
+     * @param timeMillis   time interval in millis.
+     * @param sb           output buffer.
+     * @param doubleFormat format seconds.
+     * @return the modified buffer.
+     */
+    static StringBuilder appendTotalTimeDuration(final long timeMillis, StringBuilder sb, Format doubleFormat) {
+        long time = timeMillis;
+        long days = time / DAY_MILLIS;
+        if (days > 0) {
+            time = time % DAY_MILLIS;
+            sb.append(' ');
+            appendPlural(sb, days, "day");
+        }
+        long hours = time / HOUR_MILLIS;
+        if (hours > 0) {
+            time = time % HOUR_MILLIS;
+            sb.append(' ');
+            appendPlural(sb, hours, "hour");
+        }
+        long minutes = time / MINUTE_MILLIS;
+        if (minutes > 0) {
+            time = time % MINUTE_MILLIS;
+            sb.append(' ');
+            appendPlural(sb, minutes, "minute");
+        }
+        double seconds = time / 1000d;
+        if (seconds > 0) {
+            sb.append(' ');
+            sb.append(doubleFormat.format(seconds)).append(" second");
+            if (seconds > 1) { //plural form
+                sb.append('s');
+            }
+        }
+        return sb;
+    }
+
+    /**
      * Total ETL execution time or -1 if ETL hasn't completed.
      *
      * @return ETL execution time in milliseconds.
@@ -169,28 +216,29 @@ public class ExecutionStatistics {
 
     /**
      * Returns date/time when ETL was started.
+     *
      * @return ETL start date/time.
      */
     public Date getStartDate() {
-        return started==null?null:(Date)started.clone();
+        return started == null ? null : (Date) started.clone();
     }
 
     void setStarted(Date started) {
-        this.started=started;
+        this.started = started;
     }
 
     /**
      * Returns date/time when ETL was completed.
+     *
      * @return ETL finish date/time.
      */
     public Date getFinishDate() {
-        return finished==null?null:(Date)finished.clone();
+        return finished == null ? null : (Date) finished.clone();
     }
 
     void setFinished(Date finished) {
-        this.finished=finished;
+        this.finished = finished;
     }
-
 
 
     public static class ElementInfo {
