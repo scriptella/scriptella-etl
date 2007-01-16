@@ -149,6 +149,10 @@ class Lobs {
             }
         }
 
+        public final void free() throws SQLException {
+            close();
+        }
+
         /**
          * Read bytes/chars from source stream/reader.
          *
@@ -412,6 +416,10 @@ class Lobs {
             throw new SQLException("Unsupported operation");
         }
 
+        public InputStream getBinaryStream(long pos, long length) throws SQLException {
+            throw new SQLException("Unsupported operation");
+        }
+
     }
 
     /**
@@ -522,6 +530,10 @@ class Lobs {
         }
 
         public void truncate(long len) throws SQLException {
+            throw new SQLException("Unsupported operation");
+        }
+
+        public Reader getCharacterStream(long pos, long length) throws SQLException {
             throw new SQLException("Unsupported operation");
         }
     }
