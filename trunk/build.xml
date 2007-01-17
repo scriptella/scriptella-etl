@@ -33,6 +33,7 @@
     <property name="jar.name" value="scriptella.jar"/>
     <property name="product.name" value="scriptella-${version}"/>
     <property name="zip.name" value="${product.name}.zip"/>
+    <property name="srcide.zip.name" value="scriptella-src-ide.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
     <fileset id="src.zip.fileset" dir="${basedir}"
              includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**"
@@ -89,12 +90,19 @@
         <description>Prepares binary distribution</description>
         <ant antfile="build-docs.xml" target="codereports"/>
         <delete file="${build.dir}/${zip.name}" failonerror="false"/>
+        <delete file="${tmp.dir}/${srcide.zip.name}" failonerror="false"/>
+        <zip destfile="${tmp.dir}/${srcide.zip.name}">
+            <fileset dir="${core}/src/java" includes="**/*.java"/>
+            <fileset dir="${drivers}/src/java" includes="**/*.java"/>
+            <fileset dir="${tools}/src/java" includes="**/*.java"/>
+        </zip>
         <zip destfile="${build.dir}/${zip.name}">
             <zipfileset dir="${lib.dir}" includes="commons-*.jar *license*.txt" prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
             <zipfileset dir="${basedir}" includes="README LICENSE NOTICE" prefix="${product.name}"/>
+            <zipfileset file="${tmp.dir}/${srcide.zip.name}" prefix="${product.name}"/>
         </zip>
     </target>
 
