@@ -54,7 +54,7 @@
 					<em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
                     or directly specify classpath attribute in script connection elements.</li>
 			</ul>
-			<p>The binary distribution of Scriptella consists of the following directory layout:</p>
+			<p>The binary distribution of Scriptella has the following directory layout:</p>
 			<source>
 +-+
   +--- bin - launch scripts
@@ -76,7 +76,9 @@
 				<li>
 					<code>scriptella.jar</code> - All-In-One jar containing all dependencies except the driver specific. You have to load additional driver dependencies in a connection classpath attrubute or by putting the jars into lib folder.</li>
 			</ul>
-		</section>
+            <p>For convenience the Java source files are stored inside <code>scriptella-src-ide.zip</code> file. This file can be used
+            inside IDE to attach sources for scriptella.jar</p>
+        </section>
 		<section>
 			<title>Scripts Syntax</title>
 			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
