@@ -49,6 +49,15 @@ public final class StringUtils {
     }
 
     /**
+     * Returns Null safe string representation of specified object.
+     * @param o object to convert to String.
+     * @return <code>o.toString()</code> or <code>&quot;&quot;</code> if <code>o==null</code>.
+     */
+    public static String nullsafeToString(final Object o) {
+        return o==null?"":o.toString();
+    }
+
+    /**
      * Checks if specified characters sequence is empty or contains only ascii whitespace characters.
      *
      * @param cs characters sequence to check.
