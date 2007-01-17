@@ -89,14 +89,17 @@ public class ConfigurationFactory {
      */
     @ThreadSafe
     public void setExternalProperties(final Map<String, ?> externalProperties) {
-        if (externalProperties==null) {
-            this.externalProperties=null;
+        if (externalProperties == null) {
+            this.externalProperties = null;
         } else {
             this.externalProperties = new LinkedHashMap<String, Object>(externalProperties);
         }
     }
 
     public ConfigurationEl createConfiguration() {
+        if (resourceURL == null) {
+            throw new ConfigurationException("Configuration URL is required");
+        }
         try {
             DocumentBuilder db = DBF.newDocumentBuilder();
             db.setEntityResolver(new EntityResolver() {

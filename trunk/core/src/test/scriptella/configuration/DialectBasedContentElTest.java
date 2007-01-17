@@ -16,8 +16,10 @@
 package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
+import scriptella.spi.DialectIdentifier;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Tests for {@link DialectBasedContentEl} class.
@@ -41,14 +43,41 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         XmlElement xmlElement = XmlElementTest.asElement(xml);
         DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
         List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
-        assertEquals(3, dialects.size());
+        assertEquals(5, dialects.size());
         DialectBasedContentEl.Dialect dialect = dialects.get(0);
-        assertEquals("D1", asString(dialect.getContentEl()));
+        assertEquals(" \nDef1Def2\n", asString(dialect.getContentEl()));
         dialect = dialects.get(1);
-        assertEquals("D2", asString(dialect.getContentEl()));
+        assertEquals("D1", asString(dialect.getContentEl()));
+        assertTrue(dialect.getName().matcher("d1").matches());
         dialect = dialects.get(2);
-        assertEquals(" \nDef1Def2\nDef3\nDef4  ", asString(dialect.getContentEl()));
+        assertEquals("Def3", asString(dialect.getContentEl()));
+        assertNull(dialect.getName());
+        dialect = dialects.get(3);
+        assertEquals("D2", asString(dialect.getContentEl()));
+        assertTrue(dialect.getName().matcher("d2").matches());
+        dialect = dialects.get(4);
+        assertEquals("\nDef4  ", asString(dialect.getContentEl()));
+        assertNull(dialect.getName());
 
+        //Now check if dialects are searched correctly
+        assertEquals(" \nDef1Def2\nDef3\nDef4  ", asString(d.getContent(null)));
+        assertEquals(" \nDef1Def2\nDef3\nDef4  ", asString(d.getContent(new DialectIdentifier("XDialect", "0.0"))));
+        assertEquals(" \nDef1Def2\nD1Def3\nDef4  ", asString(d.getContent(new DialectIdentifier("d1", "1.0"))));
+        assertEquals(" \nDef1Def2\nDef3D2\nDef4  ", asString(d.getContent(new DialectIdentifier("d2", "1.0"))));
+    }
+
+    /**
+     * Tests {@link scriptella.configuration.DialectBasedContentEl.Dialect} class.
+     */
+    public void testDialect() {
+        DialectBasedContentEl.Dialect d = new DialectBasedContentEl.Dialect();
+        //null dialect should be matched
+        assertTrue(d.matches(null));
+        assertTrue(d.matches(DialectIdentifier.NULL_DIALECT));
+        d.setName(Pattern.compile(".*"));
+        assertTrue(d.matches(DialectIdentifier.NULL_DIALECT));
+        d.setName(Pattern.compile("dl"));
+        assertFalse(d.matches(DialectIdentifier.NULL_DIALECT));
     }
 
 }

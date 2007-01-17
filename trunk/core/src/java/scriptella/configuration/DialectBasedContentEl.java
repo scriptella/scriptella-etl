@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import scriptella.spi.DialectIdentifier;
 import scriptella.spi.Resource;
+import scriptella.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,15 @@ import java.util.regex.Pattern;
 
 /**
  * Represents dialect based content used inside query/script/onerror elements.
+ * <p>When the DOM is traversed the internal representation model is built.
+ * This model contains enough info to speed up selection based on a requested dialect identifier.
+ * The following example demonstrates the algorithm
+ * using pseudo markup:
+ * <pre>
+ * AAA[Dialect1 111]BBB[Dialect2 222]
+ * </pre>
+ * The returned text for default Dialect is: AAABBB
+ * <br> The returned text for Dialect1 is: AAA111BBB
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -43,10 +53,14 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
 
     public void configure(final XmlElement element) {
         Dialect defaultDialect = null;
-        dialects=new ArrayList<Dialect>();
+        dialects = new ArrayList<Dialect>();
         //iterate through the child nodes of this element
-        for (Node node = element.getElement().getFirstChild();node != null;node = node.getNextSibling()) {
+        for (Node node = element.getElement().getFirstChild(); node != null; node = node.getNextSibling()) {
             if (isDialectElement(node)) {
+                if (defaultDialect != null) {
+                    dialects.add(defaultDialect);
+                    defaultDialect = null;
+                }
                 Dialect d = new Dialect();
                 d.configure(new XmlElement((Element) node, element));
                 dialects.add(d);
@@ -54,11 +68,11 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
                 //Try to convert the node to resource if possible
                 Resource resource = ContentEl.asResource(element, node);
                 //If it's a text or include
-                if (resource!=null) {
+                if (resource != null) {
                     //check if we have default dialect instance
-                    if (defaultDialect==null) {
+                    if (defaultDialect == null) {
                         //if no - create one
-                        defaultDialect=new Dialect();
+                        defaultDialect = new Dialect();
                         defaultDialect.configureDefault(element);
                     }
                     //append a resource to default dialect
@@ -66,7 +80,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
                 }
             }
         }
-        if (defaultDialect!=null) {
+        if (defaultDialect != null) {
             dialects.add(defaultDialect); //
         }
 
@@ -99,6 +113,8 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
 
     /**
      * For testing purposes
+     *
+     * @return internal list of dialects.
      */
     List<Dialect> getDialects() {
         return dialects;
@@ -138,6 +154,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
 
         /**
          * Configures default dialect.
+         *
          * @param parent parent element.
          */
         public void configureDefault(final XmlElement parent) {
@@ -152,13 +169,12 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
                 return name == null && version == null;
             }
 
-            if ((name != null) &&
-                    !name.matcher(id.getName()).matches()) {
-                return false;
-            }
+            String idName = StringUtils.nullsafeToString(id.getName());
+            String idVersion = StringUtils.nullsafeToString(id.getVersion());
 
-            return !((version != null) &&
-                    !version.matcher(id.getVersion()).matches());
+            return ((name == null) ||
+                    name.matcher(idName).matches()) && ((version == null) ||
+                    version.matcher(idVersion).matches());
 
         }
 
