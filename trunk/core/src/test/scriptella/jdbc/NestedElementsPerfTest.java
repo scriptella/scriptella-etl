@@ -26,10 +26,14 @@ import scriptella.execution.EtlExecutorException;
  * @version 1.0
  */
 public class NestedElementsPerfTest extends AbstractTestCase {
+    /**
+     * History:
+     * 19.01.2007 - Duron 1.7Mhz - 1500 ms
+     * @throws EtlExecutorException if ETL fails
+     */
     public void test() throws EtlExecutorException {
         EtlExecutor exec = newEtlExecutor();
         exec.execute();
-
     }
 
 }

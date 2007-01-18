@@ -33,7 +33,7 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class SqlReaderTokenizer implements SqlTokenizer {
+public final class SqlReaderTokenizer implements SqlTokenizer {
     private final ReaderWrapper reader;
     private final List<Integer> injections = new ArrayList<Integer>();
     private final StringBuilder sb = new StringBuilder(80);
@@ -151,8 +151,12 @@ public class SqlReaderTokenizer implements SqlTokenizer {
     }
 
     public int[] getInjections() {
-        int[] res = new int[injections.size()];
-        for (int i = 0; i < res.length; i++) {
+        int n = injections.size();
+        if (n==0) {
+            return EMPTY_INJECTIONS_ARRAY;
+        }
+        int[] res = new int[n];
+        for (int i = 0; i < n; i++) {
             res[i]=injections.get(i);
         }
         return res;

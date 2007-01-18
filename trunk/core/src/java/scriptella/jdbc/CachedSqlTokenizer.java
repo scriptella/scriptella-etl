@@ -27,10 +27,12 @@ import java.util.List;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-class CachedSqlTokenizer implements SqlTokenizer {
+final class CachedSqlTokenizer implements SqlTokenizer {
     private SqlTokenizer target;
     private List<String> statements;
+    private String[] statementsArray; //For better performance
     private List<int[]> injections;
+    private int[][] injectionsArray; //For better performance
     private int index=-1;
 
 
@@ -56,10 +58,10 @@ class CachedSqlTokenizer implements SqlTokenizer {
             return st;
         } else {
             index++;
-            if (statements == null || index >= statements.size()) {
+            if (statementsArray == null || index >= statementsArray.length) {
                 return null;
             }
-            return statements.get(index);
+            return statementsArray[index];
         }
     }
 
@@ -74,19 +76,31 @@ class CachedSqlTokenizer implements SqlTokenizer {
             injections.add(inj);
             return inj;
         } else {
-            if (injections != null && index < injections.size()) {
-                return injections.get(index);
+            if (injectionsArray != null && index<injectionsArray.length) {
+                return injectionsArray[index];
             }
             return null;
         }
     }
 
     /**
-     * Important note: calling close first time closes target tokenizer,
+     * Important notes:
+     * <ul>
+     * <li>calling close first time closes target tokenizer,
      * subsequent close invocations reset index to start iteration.
+     * <li>After close is called for the first time, unread statements
+     * are skipped and not returned in subsequent iterations.
+     * </ul>
+     *
      */
     public void close() throws IOException {
         if (target != null) {
+            if (statements!=null) {
+                statementsArray=statements.toArray(new String[statements.size()]);
+                injectionsArray=injections.toArray(new int[injections.size()][]);
+                statements=null;
+                injections=null;
+            }
             try {
                 target.close();
             } finally {

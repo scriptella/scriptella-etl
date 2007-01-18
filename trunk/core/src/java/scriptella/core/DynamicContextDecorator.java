@@ -28,6 +28,7 @@ import scriptella.spi.Connection;
  */
 public class DynamicContextDecorator extends DynamicContext {
     private DynamicContext context;
+    private Connection cachedConnection;
 
     public DynamicContextDecorator(DynamicContext context) {
         setContext(context);
@@ -47,7 +48,10 @@ public class DynamicContextDecorator extends DynamicContext {
 
     @Override
     public Connection getConnection() {
-        return context.getConnection();
+        if (cachedConnection==null) {
+            cachedConnection=context.getConnection();
+        }
+        return cachedConnection;
     }
 
 
@@ -59,7 +63,8 @@ public class DynamicContextDecorator extends DynamicContext {
      */
     void setContext(final DynamicContext context) {
         this.context = context;
-        this.globalContext = context.getGlobalContext();
+        globalContext = context.getGlobalContext();
+        cachedConnection = null;
     }
 
 }

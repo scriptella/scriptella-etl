@@ -26,7 +26,6 @@ import scriptella.spi.Resource;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +40,9 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class QueryExecutor extends ContentExecutor<QueryEl> {
-    private List<ExecutableElement> nestedElements;
+    private ExecutableElement[] nestedElements;
     private static final Logger LOG = Logger.getLogger(QueryExecutor.class.getName());
+    private final boolean debug=LOG.isLoggable(Level.FINE);
 
     private QueryExecutor(QueryEl queryEl) {
         super(queryEl);
@@ -51,13 +51,14 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
 
     private void initNestedExecutors() {
         final List<ScriptingElement> childElements = getElement().getChildScriptinglElements();
-        nestedElements = new ArrayList<ExecutableElement>(childElements.size());
+        nestedElements = new ExecutableElement[childElements.size()];
 
-        for (ScriptingElement element : childElements) {
+        for (int i = 0; i < nestedElements.length; i++) {
+            ScriptingElement element = childElements.get(i);
             if (element instanceof QueryEl) {
-                nestedElements.add(QueryExecutor.prepare((QueryEl) element));
+                nestedElements[i]=QueryExecutor.prepare((QueryEl) element);
             } else if (element instanceof ScriptEl) {
-                nestedElements.add(ScriptExecutor.prepare((ScriptEl) element));
+                nestedElements[i]=ScriptExecutor.prepare((ScriptEl) element);
             } else {
                 throw new IllegalStateException("Type " + element.getClass() +
                         " not supported");
@@ -74,7 +75,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
             return;
         }
         final QueryCtxDecorator ctxDecorator = new QueryCtxDecorator(ctx);
-        if (LOG.isLoggable(Level.FINE)) {
+        if (debug) {
             LOG.fine("Executing query " + getLocation());
         }
         c.executeQuery(content, ctx,
@@ -83,7 +84,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
                         EtlCancelledException.checkEtlCancelled();
                         ctxDecorator.rownum++;
                         ctxDecorator.setParams(params);
-                        if (LOG.isLoggable(Level.FINE)) {
+                        if (debug) {
                             LOG.fine("Processing row #" + ctxDecorator.rownum + " for query " + getLocation());
                         }
 
@@ -92,7 +93,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
                         }
                     }
                 });
-        if (LOG.isLoggable(Level.FINE)) {
+        if (debug) {
             if (ctxDecorator.rownum == 0) {
                 LOG.fine("Query " + getLocation() + " returned no results.");
             } else {

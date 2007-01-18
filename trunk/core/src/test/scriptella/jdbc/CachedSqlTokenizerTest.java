@@ -22,7 +22,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 /**
- * Tests for {@link scriptella.jdbc.CachedSqlTokenizer}.
+ * Tests for {@link CachedSqlTokenizer}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -43,18 +43,5 @@ public class CachedSqlTokenizerTest extends AbstractTestCase {
             assertTrue(tok.getInjections().length==0); //Null would be better, but need to fix SqlReaderTokenizer
             tok.close();
         }
-    }
-
-    /**
-     * Tests if closing cached tokenizer allows to refetch
-     * @throws IOException
-     */
-    public void testClose() throws IOException {
-        SqlTokenizer target = new SqlReaderTokenizer(new StringReader("s1;s2;s3?v"));
-        SqlTokenizer tok = new CachedSqlTokenizer(target);
-        tok.nextStatement();
-        tok.close();
-        assertEquals("s1", tok.nextStatement());
-        assertEquals("s2", tok.nextStatement());
     }
 }

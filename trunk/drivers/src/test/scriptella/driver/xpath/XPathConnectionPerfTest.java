@@ -39,6 +39,10 @@ import java.util.Map;
  * @version 1.0
  */
 public class XPathConnectionPerfTest extends AbstractTestCase {
+    /**
+     * History:
+     * 19.01.2007 - Duron 1.7Mhz - 1125 ms
+     */
     public void testQuery() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
@@ -57,12 +61,16 @@ public class XPathConnectionPerfTest extends AbstractTestCase {
         assertEquals(600, queryCallback.getRowsNumber());
     }
 
+    /**
+     * History:
+     * 19.01.2007 - Duron 1.7Mhz - 1220 ms
+     */
     public void testQueryLargeDOM() throws ParserConfigurationException {
         //Create a configuration with non default values
         Document doc = XPathConnection.DBF.newDocumentBuilder().newDocument();
         Element root = doc.createElement("table");
         doc.appendChild(root);
-        for (int i=0;i<4000;i++) {
+        for (int i = 0; i < 4000; i++) {
             Element row = doc.createElement("row");
             row.setAttribute("id", String.valueOf(i));
             root.appendChild(row);
@@ -72,13 +80,12 @@ public class XPathConnectionPerfTest extends AbstractTestCase {
         for (int i = 0; i < 20; i++) {
             IndexedQueryCallback queryCallback = new IndexedQueryCallback() {
                 protected void processRow(final ParametersCallback parameters, final int rowNumber) {
-                    assertTrue(Integer.parseInt((String) parameters.getParameter("id"))%2==0);
+                    assertTrue(Integer.parseInt((String) parameters.getParameter("id")) % 2 == 0);
                 }
             };
             qe.execute(queryCallback, MockParametersCallbacks.NULL);
             assertEquals(2000, queryCallback.getRowsNumber());
         }
-
 
 
     }
