@@ -56,7 +56,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         this.connection = connection;
         converter = new JdbcTypesConverter();
         cache = new StatementCache(connection.getNativeConnection(), connection.statementCacheSize);
-        this.counter = connection.getStatementCounter();
+        counter = connection.getStatementCounter();
     }
 
     final void execute(final ParametersCallback parametersCallback) {
@@ -70,7 +70,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
 
         try {
             final Reader reader = resource.open();
-            SqlTokenizer tok = new SqlTokenizer(reader, connection.separator,
+            SqlTokenizer tok = new SqlReaderTokenizer(reader, connection.separator,
                     connection.separatorSingleLine, connection.keepformat);
             parse(tok);
         } catch (IOException e) {

@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Integration test for {@link SqlTokenizer}.
+ * Integration test for {@link SqlReaderTokenizer}.
  *
  * @author Fyodor Kupolov
  * @version 1.0

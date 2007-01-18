@@ -15,29 +15,21 @@
  */
 package scriptella.jdbc;
 
-import java.io.Closeable;
-import java.io.IOException;
+import scriptella.AbstractTestCase;
+import scriptella.execution.EtlExecutor;
+import scriptella.execution.EtlExecutorException;
 
 /**
- * This interface provides a contract to iterate SQL statements.
+ * Tests for nested elements handling.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public interface SqlTokenizer extends Closeable {
-    /**
-     * Parses the following SQL statement from the source.
-     * <p>Use {@link #getInjections()} to obtain recognized injections, e.g.
-     * binding variables and/or expressions.
-     *
-     * @return parsed SQL statement or null if EOF.
-     * @throws IOException if I/O exception occurs
-     */
-    String nextStatement() throws IOException;
+public class NestedElementsPerfTest extends AbstractTestCase {
+    public void test() throws EtlExecutorException {
+        EtlExecutor exec = newEtlExecutor();
+        exec.execute();
 
-    /**
-     * This method returns list of injections for the last returned statement.
-     * @return injections for the last returned statement.
-     */
-    int[] getInjections();
+    }
+
 }

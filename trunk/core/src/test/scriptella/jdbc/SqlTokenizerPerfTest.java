@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Performance tests for {@link SqlTokenizer}.
+ * Performance tests for {@link SqlReaderTokenizer}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -33,7 +33,7 @@ public class SqlTokenizerPerfTest extends AbstractTestCase {
         String text = "INSERT INTO Table VALUES(?v,$v2);--Hint $v;\n" +
                 "/* Comment */\n//comment\nUPDATE Test SET V=?{v2}";
         RepeatingInputStream ris = new RepeatingInputStream(text.getBytes(), 20000);
-        SqlTokenizer tok = new SqlTokenizer(new InputStreamReader(ris));
+        SqlTokenizer tok = new SqlReaderTokenizer(new InputStreamReader(ris));
         while (tok.nextStatement()!=null) {
         }
     }
@@ -42,7 +42,7 @@ public class SqlTokenizerPerfTest extends AbstractTestCase {
         String text = "INSERT INTO Table VALUES(?v,$v2);--Hint $v\n  / \r" +
                 "/* Comment */\n//comment\nUPDATE Test SET V=?{v2}";
         RepeatingInputStream ris = new RepeatingInputStream(text.getBytes(), 20000);
-        SqlTokenizer tok = new SqlTokenizer(new InputStreamReader(ris));
+        SqlTokenizer tok = new SqlReaderTokenizer(new InputStreamReader(ris));
         while (tok.nextStatement()!=null) {
         }
     }
