@@ -22,7 +22,6 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
 import java.util.regex.Matcher;
 
 
@@ -64,13 +63,13 @@ public class SqlParserBase {
      * @param reader reader with SQL script.
      */
     public void parse(final Reader reader) {
-        parse(new SqlTokenizer(reader));
+        parse(new SqlReaderTokenizer(reader));
     }
 
     public void parse(final SqlTokenizer tok) {
         try {
-            for (StringBuilder sb;(sb=tok.nextStatement())!=null;) {
-                handleStatement(sb, tok.getInjections());
+            for (String s;(s=tok.nextStatement())!=null;) {
+                handleStatement(s, tok.getInjections());
             }
         } catch (IOException e) {
             throw new ConfigurationException("Failed to read element content", e);
@@ -84,20 +83,20 @@ public class SqlParserBase {
     private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
     private final StringBuilder tmpBuf = new StringBuilder();
 
-    private void handleStatement(final StringBuilder sql,
-                                 final List<Integer> injections) {
+    private void handleStatement(final String sql,
+                                 final int[] injections) {
         if (StringUtils.isAsciiWhitespacesOnly(sql)) {
             return;
         }
 
-        if (injections != null && !injections.isEmpty()) {
+        if (injections != null && injections.length>0) {
             m.reset(sql);
             extM.reset(sql);
 
             tmpBuf.setLength(0); //clearing the string builder
             int lastPos = 0;
 
-            for (Integer index : injections) {
+            for (int index : injections) {
                 int ind = index + 1;
                 Matcher found = null;
                 boolean expr = false;
@@ -109,10 +108,9 @@ public class SqlParserBase {
                     expr = true;
                 }
                 if (found != null) {
-                    int exprStart = ind - 1;
                     //? - jdbcParam, $ - insert value as text
-                    boolean jdbcParam = sql.charAt(exprStart) == '?';
-                    tmpBuf.append(sql.substring(lastPos, exprStart));
+                    boolean jdbcParam = sql.charAt(index) == '?';
+                    tmpBuf.append(sql.substring(lastPos, index));
                     lastPos = found.end();
                     tmpBuf.append(handleParameter(found.group(1), expr, jdbcParam));
                 }
@@ -124,7 +122,7 @@ public class SqlParserBase {
             }
             statementParsed(tmpBuf.toString());
         } else {
-            statementParsed(sql.toString());
+            statementParsed(sql);
         }
 
 

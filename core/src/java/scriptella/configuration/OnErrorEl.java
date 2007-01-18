@@ -103,11 +103,11 @@ public class OnErrorEl extends XmlConfigurableBase {
     }
 
     public Resource getContent(DialectIdentifier id) {
-        ContentEl content = this.content.getContent(id);
-        if (content==null) {
+        Resource r = content.getContent(id);
+        if (r==null) {
             return ContentEl.NULL_CONTENT;
         } else {
-            return content;
+            return r;
         }
     }
 

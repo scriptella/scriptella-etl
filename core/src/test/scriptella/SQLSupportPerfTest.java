@@ -39,6 +39,7 @@ import java.sql.SQLException;
 public class SQLSupportPerfTest extends DBTestCase {
     private static final byte SQL[] = "update ${'test'} set id=?{property};rollback;".getBytes();
     private static final byte SQL2[] = "update test set id=?{property};".getBytes();
+    private static final byte SQL3[] = "update test set id=12345;".getBytes();
 
     /**
      * History:
@@ -69,6 +70,7 @@ public class SQLSupportPerfTest extends DBTestCase {
      * History:
      * 04.11.2006 - Duron 1.7Mhz - 2300 ms
      * 11.09.2006 - Duron 1.7Mhz - 2578 ms
+     *
      * @throws EtlExecutorException
      * @throws SQLException
      * @throws IOException
@@ -76,7 +78,6 @@ public class SQLSupportPerfTest extends DBTestCase {
     public void testCompare() throws EtlExecutorException, SQLException, IOException {
         final int n = 20000;
         Connection con = getConnection("sqlsupport");
-        con.setAutoCommit(false);
         AbstractTestCase.testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
                 return new RepeatingInputStream(SQL2, n);
@@ -95,29 +96,48 @@ public class SQLSupportPerfTest extends DBTestCase {
         EtlExecutor se = newEtlExecutor();
         long ti = System.currentTimeMillis();
         se.execute();
-        ti = System.currentTimeMillis()-ti;
+        ti = System.currentTimeMillis() - ti;
         System.out.println("ti = " + ti);
         //Now let's test direct HSQL connection
         RepeatingInputStream ris = new RepeatingInputStream("update test set id=?\n".getBytes(), n);
         BufferedReader br = new BufferedReader(new InputStreamReader(ris));
         ti = System.currentTimeMillis();
-        for (String s;(s=br.readLine())!=null;) {
+        for (String s; (s = br.readLine()) != null;) {
             PreparedStatement ps = con.prepareStatement(s);
-            ps.setObject(1,1);
+            ps.setObject(1, 1);
             ps.execute();
             ps.close();
         }
         con.commit();
-        ti = System.currentTimeMillis()-ti;
+        ti = System.currentTimeMillis() - ti;
         System.out.println("ti hsql = " + ti);
-
 
 
     }
 
+    public void testBulkUpdates() throws EtlExecutorException {
+        //50000 identical statements
+        getConnection("sqlsupport");
+        AbstractTestCase.testURLHandler = new TestURLHandler() {
+            public InputStream getInputStream(final URL u) {
+                return new RepeatingInputStream(SQL3, 50000);
+            }
 
-    public static void main(final String args[])
-            throws EtlExecutorException {
+            public OutputStream getOutputStream(final URL u) {
+                throw new UnsupportedOperationException();
+            }
+
+            public int getContentLength(final URL u) {
+                return 50000 * SQL3.length;
+            }
+        };
+
+        EtlExecutor se = newEtlExecutor();
+        se.execute();
+    }
+
+
+    public static void main(final String args[]) throws EtlExecutorException {
         SQLSupportPerfTest t = new SQLSupportPerfTest();
         t.test();
     }
