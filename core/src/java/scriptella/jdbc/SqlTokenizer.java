@@ -25,6 +25,7 @@ import java.io.IOException;
  * @version 1.0
  */
 public interface SqlTokenizer extends Closeable {
+    int[] EMPTY_INJECTIONS_ARRAY = new int[0];
     /**
      * Parses the following SQL statement from the source.
      * <p>Use {@link #getInjections()} to obtain recognized injections, e.g.

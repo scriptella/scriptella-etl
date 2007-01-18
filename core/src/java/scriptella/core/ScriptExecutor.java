@@ -36,6 +36,7 @@ import java.util.logging.Logger;
  */
 public class ScriptExecutor extends ContentExecutor<ScriptEl> {
     private static final Logger LOG = Logger.getLogger(ScriptExecutor.class.getName());
+    private final boolean debug=LOG.isLoggable(Level.FINE);
 
     public ScriptExecutor(ScriptEl scriptEl) {
         super(scriptEl);
@@ -50,7 +51,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
             warnEmptyContent();
             return;
         }
-        if (LOG.isLoggable(Level.FINE)) {
+        if (debug) {
             LOG.fine("Executing script " + getLocation());
         }
         boolean repeat;
@@ -58,7 +59,7 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
             repeat = false;
             try {
                 con.executeScript(content, ctx);
-                if (LOG.isLoggable(Level.FINE)) {
+                if (debug) {
                     LOG.fine("Script " + getLocation() + " completed");
                 }
 

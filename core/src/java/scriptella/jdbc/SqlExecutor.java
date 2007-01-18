@@ -25,6 +25,7 @@ import scriptella.util.StringUtils;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     private List<Object> params = new ArrayList<Object>();
     private int updateCount;//number of updated rows
     private final AbstractConnection.StatementCounter counter;
+    private SqlTokenizer cachedTokenizer;
 
     public SqlExecutor(final Resource resource, final JdbcConnection connection) {
         this.resource = resource;
@@ -67,15 +69,29 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         paramsCallback = parametersCallback;
         callback = queryCallback;
         updateCount = 0;
-
-        try {
-            final Reader reader = resource.open();
-            SqlTokenizer tok = new SqlReaderTokenizer(reader, connection.separator,
-                    connection.separatorSingleLine, connection.keepformat);
-            parse(tok);
-        } catch (IOException e) {
-            throw new JdbcException("Failed to open resource", e);
+        SqlTokenizer tok = cachedTokenizer;
+        boolean cache = false;
+        if (tok==null) { //If not cached
+            try {
+                final Reader reader = resource.open();
+                tok = new SqlReaderTokenizer(reader, connection.separator,
+                        connection.separatorSingleLine, connection.keepformat);
+                cache = reader instanceof StringReader;
+                if (cache) { //If resource is a String - allow caching
+                    tok = new CachedSqlTokenizer(tok);
+                }
+            } catch (IOException e) {
+                throw new JdbcException("Failed to open resource", e);
+            }
         }
+        parse(tok);
+        //We should remember cached tokenizer only if all statements were parsed
+        //i.e. no errors occured
+        if (cache) {
+            cachedTokenizer=tok;
+        }
+        
+
     }
 
     int getUpdateCount() {

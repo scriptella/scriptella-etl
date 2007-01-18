@@ -115,6 +115,15 @@ public class SQLSupportPerfTest extends DBTestCase {
 
     }
 
+
+    /**
+     * History:
+     * 19.01.2007 - Duron 1.7Mhz - 330 ms
+     *
+     * @throws EtlExecutorException
+     * @throws SQLException
+     * @throws IOException
+     */
     public void testBulkUpdates() throws EtlExecutorException {
         //50000 identical statements
         getConnection("sqlsupport");
