@@ -3,7 +3,7 @@
 <document>
 	<header>
 		<title>Scriptella Reference Documentation</title>
-		<version>0.6dev</version>
+		<version>0.7dev</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
@@ -274,7 +274,9 @@
 				<p>Additionally SQL queries produce a set of implicit variables corresponding to selected column names.
                     These variables are available in nested elements.
                 Columns may also be referenced using a result set column number, e.g. ?1, ?2 ,...</p>
-			</section>
+                <p>Typically non-SQL queries also produce virtual row sets and expose
+                variables available in nested elements. Consult driver specific Javadoc for more details.</p>
+            </section>
 			<section>
 				<title>Adding references to files from SQL scripts</title>
 				<p>The JDBC bridge supports referencing file content via</p>

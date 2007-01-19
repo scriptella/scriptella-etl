@@ -47,7 +47,7 @@
                 </li>
                 <li>Support for
                     <strong>multiple datasources</strong>
-                    (or multiple connections to a single database) in a script file.
+                    (or multiple connections to a single database) in a ETL file.
                 </li>
                 <li>Support for many useful
                     <strong>JDBC features</strong>
@@ -79,7 +79,8 @@
                 </li>
                 <li>
                     <strong>Easy-to-Use</strong>
-                    as a standalone tool or Ant task. No deployment/installation required.
+                    as a standalone tool or Ant task. No deployment/installation required.<br/>
+                    <strong>Easy-To-Run</strong> ETL files directly from <a href="reference/#inprocess">Java code</a>.
                 </li>
                 <li>
                     <strong>Built-in adapters</strong> for popular <a href="reference/drivers.html#jdbc">databases</a>
@@ -93,7 +94,7 @@
                 </li>
                 <li>Built-In
                     <a href="reference/drivers.html#nonjdbc">CSV, TEXT, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
-                    providers. Integration with <a href="reference/drivers.html#spring">Spring Framework</a>,
+                    providers. Integration with Java EE, <a href="reference/drivers.html#spring">Spring Framework</a>,
                     <a href="reference/index.html#jmx">JMX</a>
                     and <a href="reference/drivers.html#jndi">JNDI</a>
                     for <strong>enterprise ready</strong> scripts.
