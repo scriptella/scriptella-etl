@@ -89,4 +89,25 @@
         <exec dir="forrest" executable="${forrest.dir}/bin/forrest${ext}"/>
     </target>
 
+    <target name="statistics" description="Adds Google Analytics js">
+        <target name="replace">
+            <replace dir="${basedir}/build/site">
+                <include name="**/*.html"/>
+                <exclude name="docs/** dtd/**"/>
+                <replacetoken><![CDATA[</div>
+</body>
+</html>
+]]></replacetoken>
+                <replacevalue><![CDATA[</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1210807-1";
+urchinTracker();
+</script>
+</body>
+</html>]]></replacevalue>
+            </replace>
+        </target>
+    </target>
 </project>
