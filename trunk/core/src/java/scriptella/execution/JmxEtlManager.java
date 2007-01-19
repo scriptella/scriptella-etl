@@ -42,7 +42,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
     private EtlContext ctx;
     private Thread etlThread;
     private ObjectName name;
-
+    private Date started;
 
     public JmxEtlManager(EtlContext ctx) {
         this.ctx = ctx;
@@ -53,23 +53,16 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
     }
 
     public synchronized Date getStartDate() {
-        ExecutionStatistics statistics = ctx.getStatisticsBuilder().getStatistics();
-        return statistics == null ? null : statistics.getStartDate();
+        return started;
     }
 
     public synchronized double getThroughput() {
-        ExecutionStatistics statistics = ctx.getStatisticsBuilder().getStatistics();
-
-        if (statistics != null && statistics.getExecutedStatementsCount() > 0) {
-            Date startDate = statistics.getStartDate();
-            if (startDate != null) {
-                double ti = System.currentTimeMillis() - startDate.getTime();
-                return (1000d * statistics.getExecutedStatementsCount()) / ti;
-            }
-
+        long cnt = getExecutedStatementsCount();
+        if (cnt > 0 && started != null) {
+            double ti = System.currentTimeMillis() - started.getTime();
+            return (1000 * cnt) / ti;
         }
         return 0;
-
     }
 
     /**
@@ -105,13 +98,13 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         if (!registered) {
             try {
                 server.registerMBean(this, name);
-                LOG.info("Registered JMX mbean: "+name);
+                started = new Date();
+                LOG.info("Registered JMX mbean: " + name);
             } catch (Exception e) {
                 throw new SystemException("Unable to register mbean " + name, e);
             }
         } else {
-            throw new SystemException("Unable to register mbean for url " + url +
-                    ": too many equal tasks already registered");
+            throw new SystemException("Unable to register mbean for url " + url + ": too many equal tasks already registered");
         }
     }
 
@@ -121,6 +114,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
 
     /**
      * Cancels all in-progress ETL tasks.
+     *
      * @return number of cancelled ETL tasks.
      */
     public static synchronized int cancelAll() {
@@ -129,10 +123,10 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         int cancelled = 0;
         for (ObjectName objectName : names) {
             try {
-                srv.invoke(objectName, "cancel",null, null);
+                srv.invoke(objectName, "cancel", null, null);
                 cancelled++;
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Cannot cancel ETL, MBean "+objectName, e);
+                LOG.log(Level.WARNING, "Cannot cancel ETL, MBean " + objectName, e);
             }
         }
         return cancelled;
@@ -140,11 +134,12 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
 
     /**
      * Find ETL mbeans.
+     *
      * @return set of object names.
      */
     public static synchronized Set<ObjectName> findEtlMBeans() {
         try {
-            return getMBeanServer().queryNames(new ObjectName(MBEAN_NAME_PREFIX+",*"), null);
+            return getMBeanServer().queryNames(new ObjectName(MBEAN_NAME_PREFIX + ",*"), null);
         } catch (MalformedObjectNameException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -152,7 +147,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
 
     static ObjectName toObjectName(String url, int n) {
         try {
-            return new ObjectName(MBEAN_NAME_PREFIX+",url=" + ObjectName.quote(url) + (n > 0 ? ",n=" + n : ""));
+            return new ObjectName(MBEAN_NAME_PREFIX + ",url=" + ObjectName.quote(url) + (n > 0 ? ",n=" + n : ""));
         } catch (MalformedObjectNameException e) { //Should not happen
             throw new IllegalStateException("Cannot set MBean name", e);
         }
