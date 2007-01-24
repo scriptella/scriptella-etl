@@ -19,11 +19,11 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
@@ -68,9 +68,12 @@ public class LuceneQuery implements ParametersCallback, Closeable {
     /**
      * Executes a query.
      * @param queryReader query content reader. Closed after this method completes.
-     * @throws java.io.IOException if IO error occurs.
+     * @param fields fields to be searched
+     * @param useMultiFieldParser whether {@link org.apache.lucene.queryParser.MultiFieldQueryParser}
+     * or {@link org.apache.lucene.queryParser.QueryParser} to be used
+     * @param useLowercaseExpandedTerms whether terms of wildcard, prefix, fuzzy and range queries are to be automatically lower-cased or not
      */
-    public void execute(Reader queryReader, final Collection<String> fields) {
+    public void execute(Reader queryReader, final Collection<String> fields, final Boolean useMultiFieldParser, final Boolean useLowercaseExpandedTerms) {
         IndexReader ir = null;
         Searcher searcher = null;
         try {
@@ -87,13 +90,23 @@ public class LuceneQuery implements ParametersCallback, Closeable {
             } catch (IOException e) {
                 throw new LuceneProviderException("Failed to load query content.", e);
             }
-            for (String field : fields) {
-                QueryParser parser = new QueryParser(field, analyzer);
-                Query query = parser.parse(queryContent);
+            if (useMultiFieldParser) {
+                QueryParser p = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]), analyzer);
+                p.setLowercaseExpandedTerms(useLowercaseExpandedTerms);
                 try {
-                    iterate(searcher.search(query));
+                    iterate(searcher.search(p.parse(queryContent)));
                 } catch (IOException e) {
                     throw new LuceneProviderException("Failed to search query.", e);
+                }
+            } else {
+                for (String field : fields) {
+                    QueryParser parser = new QueryParser(field, analyzer);
+                    parser.setLowercaseExpandedTerms(useLowercaseExpandedTerms);
+                    try {
+                        iterate(searcher.search(parser.parse(queryContent)));
+                    } catch (IOException e) {
+                        throw new LuceneProviderException("Failed to search query.", e);
+                    }
                 }
             }
         } catch (ParseException e) {
@@ -124,7 +137,6 @@ public class LuceneQuery implements ParametersCallback, Closeable {
      */
     void iterate(Hits hits) {
         for (int i = 0; i < hits.length(); i++) {
-
             try {
                 result = hits.doc(i);
                 if (LOG.isLoggable(Level.FINE)) {
