@@ -17,12 +17,7 @@ package scriptella.driver.lucene;
 
 import org.apache.lucene.index.IndexReader;
 import scriptella.driver.text.TextProviderException;
-import scriptella.spi.AbstractConnection;
-import scriptella.spi.ConnectionParameters;
-import scriptella.spi.ParametersCallback;
-import scriptella.spi.ProviderException;
-import scriptella.spi.QueryCallback;
-import scriptella.spi.Resource;
+import scriptella.spi.*;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;
@@ -45,6 +40,8 @@ public class LuceneConnection extends AbstractConnection {
     private URL url;
     private Set<String> fields;
     private static final String DEFAULT_FIELD = "contents";
+    private Boolean useMultiFieldQueryParser;
+    private Boolean useLowercaseExpandedTerms;
 
     /**
      * Instantiates a new connection to Lucene Query.
@@ -54,6 +51,8 @@ public class LuceneConnection extends AbstractConnection {
         super(Driver.DIALECT_IDENTIFIER, parameters);
         url = parameters.getResolvedUrl();
         parseFields((String)parameters.getProperty("fields"));
+        useMultiFieldQueryParser = parameters.getBooleanProperty("useMultiFieldQueryParser", false);
+        useLowercaseExpandedTerms = parameters.getBooleanProperty("useLowercaseExpandedTerms", true);
     }
 
 
@@ -81,7 +80,7 @@ public class LuceneConnection extends AbstractConnection {
         }
         try {
             query = new LuceneQuery(url.getFile(), parametersCallback, queryCallback);
-            query.execute(r, fields);
+            query.execute(r, fields, useMultiFieldQueryParser, useLowercaseExpandedTerms);
         } finally {
             IOUtils.closeSilently(query);
         }
