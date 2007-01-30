@@ -80,7 +80,7 @@
                 <li>
                     <strong>Easy-to-Use</strong>
                     as a standalone tool or Ant task. No deployment/installation required.<br/>
-                    <strong>Easy-To-Run</strong> ETL files directly from <a href="reference/#inprocess">Java code</a>.
+                    <strong>Easy-To-Run</strong> ETL files directly from <a href="reference/index.html#inprocess">Java code</a>.
                 </li>
                 <li>
                     <strong>Built-in adapters</strong> for popular <a href="reference/drivers.html#jdbc">databases</a>
