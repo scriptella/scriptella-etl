@@ -90,8 +90,7 @@
     </target>
 
     <target name="statistics" description="Adds Google Analytics js">
-        <target name="replace">
-            <replace dir="${basedir}/build/site">
+            <replace dir="${basedir}/forrest/build/site">
                 <include name="**/*.html"/>
                 <exclude name="docs/** dtd/**"/>
                 <replacetoken><![CDATA[</div>
@@ -108,6 +107,5 @@ urchinTracker();
 </body>
 </html>]]></replacevalue>
             </replace>
-        </target>
     </target>
 </project>
