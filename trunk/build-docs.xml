@@ -90,10 +90,10 @@
     </target>
 
     <target name="statistics" description="Adds Google Analytics js">
-            <replace dir="${basedir}/forrest/build/site">
-                <include name="**/*.html"/>
-                <exclude name="docs/** dtd/**"/>
-                <replacetoken><![CDATA[</div>
+        <replace dir="${basedir}/forrest/build/site">
+            <include name="**/*.html"/>
+            <exclude name="docs/** dtd/**"/>
+            <replacetoken><![CDATA[</div>
 </body>
 </html>
 ]]></replacetoken>
@@ -106,6 +106,25 @@ urchinTracker();
 </script>
 </body>
 </html>]]></replacevalue>
-            </replace>
+        </replace>
     </target>
+
+    <target name="adsense" description="Adds Google Adsense js">
+        <replace dir="${basedir}/forrest/build/site">
+            <include name="**/*.html"/>
+            <exclude name="docs/** dtd/**"/>
+            <replacetoken><![CDATA[<div id="credit"></div>]]></replacetoken>
+            <replacevalue><![CDATA[<div id="credit"><script type="text/javascript"><!--
+google_ad_client = "pub-2238727709579520";
+google_ad_width = 120;
+google_ad_height = 240;
+google_ad_format = "120x240_as_rimg";
+google_cpa_choice = "CAAQ7fKXhAIaCDUO32UPN1OQKPG193M";
+google_ad_channel = "7398924152";
+//--></script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>]]></replacevalue>
+        </replace>
+    </target>
+
 </project>
