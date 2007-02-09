@@ -2,7 +2,8 @@
 <etl>
     <description>
         Quieries XML with XPath expression and store the results in a CSV file.
-        Buil-in text driver is used.
+        Buil-in xpath driver is used for input.
+        Buil-in text driver is used for output.
     </description>
     <connection id="in" driver="xpath" url="cd_catalog.xml"/>
 
