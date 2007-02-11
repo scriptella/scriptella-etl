@@ -58,6 +58,9 @@
             <action context="code" type="update" dev="ejboy">
                 Various performance optimizations.
             </action>
+            <action context="code" type="fix" dev="ejboy">
+                Improved examples, ODBC example was not working.
+            </action>
 
         </release>
         <release version="0.6" date="2006-01-08">
