@@ -101,18 +101,41 @@ java -jar scriptella.jar [arguments]
 			</section>
 			<section>
 				<title>Supporting several SQL dialects</title>
-				<p>TODO: Add example here</p>
-				<p>etl.xml:</p>
-				<source><![CDATA[
+                <p>&lt;dialect&gt; element allows including vendor specific content.
+                    The following example creates database schema for Oracle/HSQLDB or MySql
+                    depending on a selected driver:</p>
+                <source><![CDATA[
     <etl>
-    </etl>
-                    ]]></source>
+        <properties><!-- Reference external properties -->
+            <include href="etl.properties"/>
+        </properties>
+        <connection driver="$driver" url="$url" user="$user"
+            password="$password" classpath="$classpath"/>
+        <script>
+            -- In this example dialects are used to
+            -- include different DDLs for data types:
+            -- Example: oracle-schema.sql for Oracle
+            <dialect name=".*hsql.*"> <!-- Regular expression-->
+                <include href="hsqldb-schema.sql"/>
+            </dialect>
+            <dialect name=".*oracle.*">
+                <include href="oracle-schema.sql"/>
+            </dialect>
+            <dialect name=".*mysql.*">
+                <include href="mysql-schema.sql"/>
+            </dialect>
+            -- SQL92 inserts - no need to use dialects
+            INSERT INTO Product(id, category, product_name)
+                VALUES (1, 'ETL', 'Scriptella ETL');
+            INSERT INTO Product(id, category, product_name)
+                VALUES (2, 'Development', 'Java SE 6');
+         </script>
+    </etl>]]></source>
 			</section>
             <note>
-                For additional samples <a href="download.html">download</a> 
+                For additional samples <a href="download.html">download</a>
                 Scriptella examples distribution.
             </note>
         </section>
-        <fixme author="ejboy">TODO</fixme>
-	</body>
+    </body>
 </document>
