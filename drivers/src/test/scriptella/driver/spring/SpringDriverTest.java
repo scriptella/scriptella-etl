@@ -16,8 +16,7 @@
 package scriptella.driver.spring;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import scriptella.AbstractTestCase;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
@@ -34,9 +33,10 @@ import java.sql.SQLException;
  */
 public class SpringDriverTest extends AbstractTestCase {
     public void test() throws SQLException, ClassNotFoundException, EtlExecutorException {
-        BeanFactory bf = new XmlBeanFactory(new ClassPathResource("springbeans.xml", getClass()));
+        BeanFactory bf = new ClassPathXmlApplicationContext("scriptella/driver/spring/springbeans.xml");
         DataSource ds = (DataSource) bf.getBean("datasource"); //Test if bean factory contain correct data
         Connection con = ds.getConnection();
+        con.createStatement().executeQuery("select * from AutoStart"); //A table should be created on startup
         EtlExecutor exec = (EtlExecutor) bf.getBean("executor");
         exec.execute();
         con.createStatement().executeQuery("select * from SpringTable"); //A table should be created

@@ -15,4 +15,8 @@
             </map>
         </property>
     </bean>
+    <bean class="scriptella.driver.spring.EtlExecutorBean">
+        <property name="configLocation"><value>/scriptella/driver/spring/autostart.etl.xml</value></property>
+        <property name="autostart"><value>true</value></property>
+    </bean>
 </beans>
