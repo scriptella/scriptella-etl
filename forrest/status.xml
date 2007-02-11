@@ -19,7 +19,7 @@
 <status>
     <developers>
         <person name="Fyodor Kupolov" email="kupolov@gmail.com" id="ejboy"/>
-        <person name="Kirill Volgin" id="volk"/>
+        <person name="Kirill Volgin" email="k.volgin@gmail.com" id="volk"/>
     </developers>
     <contexts>
         <context id="code" title="Changes to the Code Base"/>
@@ -36,8 +36,30 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
-        <!--<release version="0.7" date="not yet released">-->
-        <!--</release>-->
+        <release version="0.7" date="not yet released">
+            <action context="code" type="add" dev="ejboy" fixes-bug="3792">
+                JEXL driver
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="4291">
+                Compile error on JDK 6
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="4308">
+                XML XPath provider
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="4338">
+                XML example
+            </action>
+            <action context="build" type="add" dev="ejboy" fixes-bug="4386">
+                Include scriptella-src-ide.zip in a binary distribution
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="4397">
+                Make "throughput" parameter in JMX mbean more accurate
+            </action>
+            <action context="code" type="update" dev="ejboy">
+                Various performance optimizations.
+            </action>
+
+        </release>
         <release version="0.6" date="2006-01-08">
             <action context="code" type="add" dev="ejboy" fixes-bug="3903">
                 Text Provider
