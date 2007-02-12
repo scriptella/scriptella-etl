@@ -22,11 +22,12 @@ See http://forrest.apache.org/docs/linking.html for more info
 		<about label="About" href="index.html" description="About Scriptella"/>
 		<license label="License" href="license.html" description="Scriptella License"/>
         <changes label="Change History" href="changes.html"/>
-        <javaforge label="Support" href="support.html" description="Scriptella Project Support"/>
-        <donwload label="Download" href="download.html" description="Download Scriptella Binary and Source Distribution"/>
-	</scriptella>
+        <support label="Support" href="support.html" description="Scriptella Project Support"/>
+        <download label="Download" href="download.html" description="Download Scriptella Binary and Source Distribution"/>
+        <links label="Links" href="links.html" description="Scriptella related links"/>
+    </scriptella>
 	<getstart label="Getting Started">
-        <tutorial label="Two Minute Tutotial" href="tutorial.html" description="Two Minute Tutorial"/>
+        <tutorial label="Two Minute Tutorial" href="tutorial.html" description="Two Minute Tutorial"/>
         <faq label="FAQ" href="faq.html" description="Frequently Asked Questions"/>
     </getstart>
 	<doc label="Documentation" tab="reference" description="Scriptella Documentation">
@@ -37,6 +38,7 @@ See http://forrest.apache.org/docs/linking.html for more info
         <dtd label="DTD Reference" href="docs/dtd/"/>
         <howtos label="How-Tos" tab="howto">
             <ant label="Migrate from Ant SQL Task" href="howto/migrate-from-ant.html"/>
+            <ant label="Automated DB Initialization" href="howto/initialize-database.html"/>
          </howtos>
         <!--For now API Docs links breaks wholesite generation, resolve the problem and uncomment 
         <whole_site_html label="Whole Site HTML" href="wholesite.html"/>
