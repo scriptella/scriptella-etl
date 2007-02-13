@@ -37,7 +37,8 @@ public class Driver extends GenericDriver {
     public static final String MSSQL_2000_DRIVER_NAME = "com.microsoft.jdbc.sqlserver.SQLServerDriver";
     public static final String MSSQL_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
 
-    static {
+
+    public Driver() {
         //trying to initialize by turn known Microsoft SQL Server drivers
         boolean driverLoaded = false;
         Exception exception = null;
@@ -59,9 +60,7 @@ public class Driver extends GenericDriver {
             }
         }
         if (!driverLoaded) {
-            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception);            
+            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception);
         }
-
     }
-
 }

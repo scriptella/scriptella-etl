@@ -33,7 +33,8 @@ import java.util.Properties;
 public class Driver extends GenericDriver {
     public static final String ORACLE_DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
 
-    static {
+
+    public Driver() {
         try {
             Class.forName(ORACLE_DRIVER_NAME);
         } catch (ClassNotFoundException e) {

@@ -61,7 +61,8 @@ public class Driver extends GenericDriver {
         }
     };
 
-    static {
+
+    public Driver() {
         try {
             Class.forName(HSQLDB_DRIVER_NAME);
         } catch (ClassNotFoundException e) {

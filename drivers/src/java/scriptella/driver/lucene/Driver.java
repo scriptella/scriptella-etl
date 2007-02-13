@@ -29,7 +29,10 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
-    static {
+    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Lucene", "2.0.0");
+
+
+    public Driver() {
         try {
             Class.forName("org.apache.lucene.store.Directory");
         } catch (ClassNotFoundException e) {
@@ -37,7 +40,6 @@ public class Driver extends AbstractScriptellaDriver {
                     "Check if connection classpath attribute points to lucene.jar", e);
         }
     }
-    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Lucene", "2.0.0");
 
     public Connection connect(ConnectionParameters connectionParameters) {
         return new LuceneConnection(connectionParameters);
