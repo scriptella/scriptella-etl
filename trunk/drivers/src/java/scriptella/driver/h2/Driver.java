@@ -16,7 +16,6 @@
 package scriptella.driver.h2;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,20 +32,17 @@ public class Driver extends GenericDriver {
     public static final String H2_DRIVER_NAME = "org.h2.Driver";
 
 
-    public Driver() {
-        try {
-            Class.forName(Driver.H2_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new JdbcException(H2_DRIVER_NAME + " driver not found. Please check class path settings", e);
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[] {H2_DRIVER_NAME};
     }
 
+    @Override
     protected Connection getConnection(final String url, final Properties props) throws SQLException {
         String h2Url = url;
         if (h2Url == null || h2Url.length()==0) { //if no url, use the default one
             h2Url = "jdbc:h2:mem:";//private in-memory database connection
         }
-
         return super.getConnection(h2Url, props);
     }
 

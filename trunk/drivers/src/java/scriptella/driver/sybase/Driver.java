@@ -16,7 +16,6 @@
 package scriptella.driver.sybase;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 /**
  * Scriptella Adapter for Sybase database.
@@ -31,22 +30,10 @@ public class Driver extends GenericDriver {
     public static final String SYBASE_JDBC2_DRIVER_NAME = "com.sybase.jdbc2.jdbc.SybDriver";
     public static final String SYBASE_JDBC3_DRIVER_NAME = "com.sybase.jdbc3.jdbc.SybDriver";
 
-    static {
-        //trying to initialize by turn Sybase drivers
-        try {
-            Class.forName(SYBASE_JDBC3_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            try {
-                Class.forName(SYBASE_JDBC2_DRIVER_NAME);
-            } catch (ClassNotFoundException e1) {
-                try {
-                    Class.forName(SYBASE_DRIVER_NAME);
-                } catch (ClassNotFoundException e2) {
-                    throw new JdbcException(SYBASE_JDBC3_DRIVER_NAME + " driver were not found. Please check class path settings", e);
-                }
-            }
 
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[] {SYBASE_JDBC3_DRIVER_NAME, SYBASE_JDBC2_DRIVER_NAME, SYBASE_DRIVER_NAME};
     }
 
 }
