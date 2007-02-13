@@ -28,6 +28,11 @@ import scriptella.jdbc.GenericDriver;
 public class Driver extends GenericDriver {
     public static final String DB2_DRIVER_NAME = "com.ibm.db2.jcc.DB2Driver";
 
+
+    public Driver() {
+        loadDrivers(DB2_DRIVER_NAME);
+    }
+
     @Override
     protected String[] getDriverNames() {
         return new String[] {DB2_DRIVER_NAME};
