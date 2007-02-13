@@ -53,7 +53,7 @@ public class GenericDriver extends AbstractScriptellaDriver {
     }
 
     /**
-     * Tries to load at least one of the specified driver class names.
+     * Tries to load one of the specified driver class names.
      *
      * @param drivers database driver candidate names.
      * @throws JdbcException if no drivers were loaded
