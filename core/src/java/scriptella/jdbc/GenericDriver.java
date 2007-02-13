@@ -53,15 +53,6 @@ public class GenericDriver extends AbstractScriptellaDriver {
     }
 
     /**
-     * Returns array of vendor-known driver' names for the corresponding Scriptella JDBC Driver Adapter
-     *
-     * @return driver' names array
-     */
-    protected String[] getDriverNames() {
-        return EMPTY_DRIVER_ARRAY;
-    }
-
-    /**
      * Tries to load at least one of the specified driver class names.
      *
      * @param drivers database driver candidate names.
@@ -89,7 +80,7 @@ public class GenericDriver extends AbstractScriptellaDriver {
             }
             if (throwable != null) {
                 throw new JdbcException("Couldn't find appropriate jdbc driver : " + drivers[0] +
-                        ". Please check class path settings", t);
+                        ". Please check class path settings", throwable);
             }
         }
     }

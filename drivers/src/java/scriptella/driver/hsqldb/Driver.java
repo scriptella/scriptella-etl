@@ -61,9 +61,8 @@ public class Driver extends GenericDriver {
     };
 
 
-    @Override
-    protected String[] getDriverNames() {
-        return new String[] {HSQLDB_DRIVER_NAME};
+    public Driver() {
+        loadDrivers(HSQLDB_DRIVER_NAME);
     }
 
     @Override

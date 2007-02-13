@@ -31,8 +31,7 @@ import scriptella.jdbc.GenericDriver;
 public class Driver extends GenericDriver {
     public static final String POSTGRESQL_DRIVER_NAME = "org.postgresql.Driver";
 
-    @Override
-    protected String[] getDriverNames() {
-        return new String[]{POSTGRESQL_DRIVER_NAME};
+    public Driver() {
+        loadDrivers(POSTGRESQL_DRIVER_NAME);
     }
 }

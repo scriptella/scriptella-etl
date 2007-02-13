@@ -36,9 +36,8 @@ public class Driver extends GenericDriver {
     public static final String MSSQL_2000_DRIVER_NAME = "com.microsoft.jdbc.sqlserver.SQLServerDriver";
     public static final String MSSQL_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
 
-
-    @Override
-    protected String[] getDriverNames() {
-        return new String[]{MSSQL_2005_DRIVER_NAME, MSSQL_2000_DRIVER_NAME, MSSQL_TDS_DRIVER_NAME};
+    public Driver() {
+        loadDrivers(MSSQL_2005_DRIVER_NAME, MSSQL_2000_DRIVER_NAME, MSSQL_TDS_DRIVER_NAME);
     }
+
 }
