@@ -32,7 +32,8 @@ import java.util.Properties;
 public class Driver extends GenericDriver {
     public static final String H2_DRIVER_NAME = "org.h2.Driver";
 
-    static {
+
+    public Driver() {
         try {
             Class.forName(Driver.H2_DRIVER_NAME);
         } catch (ClassNotFoundException e) {

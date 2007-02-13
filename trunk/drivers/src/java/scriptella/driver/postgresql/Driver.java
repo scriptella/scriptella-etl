@@ -32,12 +32,13 @@ import scriptella.jdbc.JdbcException;
 public class Driver extends GenericDriver {
     public static final String POSTGRESQL_DRIVER_NAME = "org.postgresql.Driver";
 
-    static {
+
+    public Driver() {
         try {
             Class.forName(POSTGRESQL_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
             throw new JdbcException(POSTGRESQL_DRIVER_NAME + " driver were not found. Please check class path settings", e);
         }
-    }
 
+    }
 }

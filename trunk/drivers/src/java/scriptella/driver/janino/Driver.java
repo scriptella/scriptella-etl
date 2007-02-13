@@ -28,7 +28,10 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
-    static {
+    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Janino", "2.45");
+
+
+    public Driver() {
         try {
             Class.forName("org.codehaus.janino.ScriptEvaluator");
         } catch (ClassNotFoundException e) {
@@ -36,7 +39,6 @@ public class Driver extends AbstractScriptellaDriver {
                     "Check if connection classpath attribute points to janino.jar", e);
         }
     }
-    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Janino", "2.45");
 
     public Connection connect(ConnectionParameters connectionParameters) {
         return new JaninoConnection(connectionParameters);

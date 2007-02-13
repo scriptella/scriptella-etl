@@ -20,8 +20,6 @@ import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
-import java.util.logging.Logger;
-
 /**
  * Scriptella Driver for LDAP.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
@@ -31,7 +29,6 @@ import java.util.logging.Logger;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("LDAP", "1.0");
-    private static final Logger LOG = Logger.getLogger(Driver.class.getName());
     /**
      * Implementor should create a new connection based on specified parameters.
      *

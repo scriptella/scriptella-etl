@@ -28,7 +28,9 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
-    static {
+    static final DialectIdentifier DIALECT = new DialectIdentifier("CSV", "1.0");
+
+    public Driver() {
         try {
             Class.forName("au.com.bytecode.opencsv.CSVReader");
         } catch (ClassNotFoundException e) {
@@ -37,7 +39,6 @@ public class Driver extends AbstractScriptellaDriver {
         }
     }
 
-    static final DialectIdentifier DIALECT = new DialectIdentifier("CSV", "1.0");
     public Connection connect(ConnectionParameters connectionParameters) {
         return new CsvConnection(connectionParameters);
     }

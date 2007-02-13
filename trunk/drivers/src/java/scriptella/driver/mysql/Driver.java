@@ -28,12 +28,12 @@ import scriptella.jdbc.JdbcException;
 public class Driver extends GenericDriver {
     public static final String MYSQL_DRIVER_NAME = "com.mysql.jdbc.Driver";
 
-    static {
+
+    public Driver() {
         try {
             Class.forName(MYSQL_DRIVER_NAME);
         } catch (ClassNotFoundException e) {
             throw new JdbcException(MYSQL_DRIVER_NAME+ " driver was not found. Please check class path settings", e);
         }
     }
-
 }

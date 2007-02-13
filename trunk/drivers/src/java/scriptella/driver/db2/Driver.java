@@ -29,7 +29,7 @@ import scriptella.jdbc.JdbcException;
 public class Driver extends GenericDriver {
     public static final String DB2_JCC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
 
-    static {
+    public Driver() {
         try {
             Class.forName(DB2_JCC_DRIVER);
         } catch (ClassNotFoundException e) {
