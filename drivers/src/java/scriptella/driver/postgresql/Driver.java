@@ -16,7 +16,6 @@
 package scriptella.driver.postgresql;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 /**
  * Scriptella Adapter for PostgreSQL database.
@@ -32,13 +31,8 @@ import scriptella.jdbc.JdbcException;
 public class Driver extends GenericDriver {
     public static final String POSTGRESQL_DRIVER_NAME = "org.postgresql.Driver";
 
-
-    public Driver() {
-        try {
-            Class.forName(POSTGRESQL_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new JdbcException(POSTGRESQL_DRIVER_NAME + " driver were not found. Please check class path settings", e);
-        }
-
+    @Override
+    protected String[] getDriverNames() {
+        return new String[]{POSTGRESQL_DRIVER_NAME};
     }
 }

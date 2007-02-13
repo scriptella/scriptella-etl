@@ -16,7 +16,6 @@
 package scriptella.driver.mysql;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 /**
  * Scriptella Adapter for MySQL database.
@@ -28,12 +27,8 @@ import scriptella.jdbc.JdbcException;
 public class Driver extends GenericDriver {
     public static final String MYSQL_DRIVER_NAME = "com.mysql.jdbc.Driver";
 
-
-    public Driver() {
-        try {
-            Class.forName(MYSQL_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new JdbcException(MYSQL_DRIVER_NAME+ " driver was not found. Please check class path settings", e);
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[]{MYSQL_DRIVER_NAME};
     }
 }

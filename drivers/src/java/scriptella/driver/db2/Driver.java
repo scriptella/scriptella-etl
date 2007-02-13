@@ -16,7 +16,6 @@
 package scriptella.driver.db2;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 /**
  * Scriptella Adapter for DB2 database.
@@ -27,14 +26,10 @@ import scriptella.jdbc.JdbcException;
  * @version 1.0
  */
 public class Driver extends GenericDriver {
-    public static final String DB2_JCC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
+    public static final String DB2_DRIVER_NAME = "com.ibm.db2.jcc.DB2Driver";
 
-    public Driver() {
-        try {
-            Class.forName(DB2_JCC_DRIVER);
-        } catch (ClassNotFoundException e) {
-            throw new JdbcException("Couldn't find appropriate jdbc driver for DB2 Server. Please check class path settings", e);
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[] {DB2_DRIVER_NAME};
     }
-
 }

@@ -16,7 +16,6 @@
 package scriptella.driver.mssql;
 
 import scriptella.jdbc.GenericDriver;
-import scriptella.jdbc.JdbcException;
 
 /**
  * Scriptella Adapter for Microsoft SQL Server  database.
@@ -38,29 +37,8 @@ public class Driver extends GenericDriver {
     public static final String MSSQL_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
 
 
-    public Driver() {
-        //trying to initialize by turn known Microsoft SQL Server drivers
-        boolean driverLoaded = false;
-        Exception exception = null;
-        try {
-            Class.forName(MSSQL_TDS_DRIVER_NAME);
-            driverLoaded = true;
-        } catch (ClassNotFoundException e) {
-            exception = e;
-        }
-        try {
-            Class.forName(MSSQL_2005_DRIVER_NAME);
-            driverLoaded = true;
-        } catch (ClassNotFoundException e) {
-            try {
-                Class.forName(MSSQL_2000_DRIVER_NAME);
-                driverLoaded = true;
-            } catch (ClassNotFoundException driverNotFoundException) {
-                exception = driverNotFoundException;//save last exception
-            }
-        }
-        if (!driverLoaded) {
-            throw new JdbcException("Couldn't find appropriate jdbc driver for Microsoft SQL Server. Please check class path settings", exception);
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[]{MSSQL_2005_DRIVER_NAME, MSSQL_2000_DRIVER_NAME, MSSQL_TDS_DRIVER_NAME};
     }
 }

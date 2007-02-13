@@ -17,7 +17,6 @@ package scriptella.driver.oracle;
 
 import scriptella.jdbc.GenericDriver;
 import scriptella.jdbc.JdbcConnection;
-import scriptella.jdbc.JdbcException;
 import scriptella.spi.ConnectionParameters;
 
 import java.sql.SQLException;
@@ -34,12 +33,9 @@ public class Driver extends GenericDriver {
     public static final String ORACLE_DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
 
 
-    public Driver() {
-        try {
-            Class.forName(ORACLE_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new JdbcException(ORACLE_DRIVER_NAME + " driver not found. Please check class path settings", e);
-        }
+    @Override
+    protected String[] getDriverNames() {
+        return new String[]{ORACLE_DRIVER_NAME};
     }
 
     @Override

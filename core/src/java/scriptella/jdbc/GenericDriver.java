@@ -23,6 +23,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +35,9 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class GenericDriver extends AbstractScriptellaDriver {
+
+    private static final String[] EMPTY_DRIVER_ARRAY = new String[0];
+
     static {
         //Redirects DriverManager's logging
         final Logger LOG = Logger.getLogger("scriptella.DriverManagerLog");
@@ -44,6 +49,41 @@ public class GenericDriver extends AbstractScriptellaDriver {
                     }
                 });
 
+            }
+        }
+    }
+
+    public GenericDriver() {
+        loadDrivers(getDriverNames());
+    }
+
+    /**
+     * Returns array of vendor-known driver' names for the corresponding Scriptella JDBC Driver Adapter
+     * @return driver' names array
+     */
+    protected String[] getDriverNames() {
+        return EMPTY_DRIVER_ARRAY;
+    }
+
+    /**
+     * Looks in classpath for the passed drivers until any driver from the list loaded successfully 
+     * @param drivers database appropriate driver names
+     * @throws JdbcException if no drivers were loaded
+     */
+    protected void loadDrivers(String... drivers) {
+        if (drivers.length > 0) {
+            List<Throwable> list = new ArrayList<Throwable>();
+            for (String driver : drivers) {
+                try {
+                    Class.forName(driver);
+                    break;
+                } catch (ClassNotFoundException e) {
+                    list.add(e);
+                }
+            }
+            if (list.size() == drivers.length) {
+                throw new JdbcException("Couldn't find appropriate jdbc driver : " + drivers[0] +
+                        ". Please check class path settings", list.get(0));
             }
         }
     }
