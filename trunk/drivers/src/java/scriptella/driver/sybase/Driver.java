@@ -31,9 +31,8 @@ public class Driver extends GenericDriver {
     public static final String SYBASE_JDBC3_DRIVER_NAME = "com.sybase.jdbc3.jdbc.SybDriver";
 
 
-    @Override
-    protected String[] getDriverNames() {
-        return new String[] {SYBASE_JDBC3_DRIVER_NAME, SYBASE_JDBC2_DRIVER_NAME, SYBASE_DRIVER_NAME};
+    public Driver() {
+        loadDrivers(SYBASE_JDBC3_DRIVER_NAME, SYBASE_JDBC2_DRIVER_NAME, SYBASE_DRIVER_NAME);
     }
 
 }

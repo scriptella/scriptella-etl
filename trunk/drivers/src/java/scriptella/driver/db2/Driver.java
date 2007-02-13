@@ -33,8 +33,4 @@ public class Driver extends GenericDriver {
         loadDrivers(DB2_DRIVER_NAME);
     }
 
-    @Override
-    protected String[] getDriverNames() {
-        return new String[] {DB2_DRIVER_NAME};
-    }
 }

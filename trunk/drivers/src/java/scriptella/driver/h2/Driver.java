@@ -31,12 +31,6 @@ import java.util.Properties;
 public class Driver extends GenericDriver {
     public static final String H2_DRIVER_NAME = "org.h2.Driver";
 
-
-    @Override
-    protected String[] getDriverNames() {
-        return new String[] {H2_DRIVER_NAME};
-    }
-
     @Override
     protected Connection getConnection(final String url, final Properties props) throws SQLException {
         String h2Url = url;
