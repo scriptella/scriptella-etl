@@ -6,7 +6,7 @@
 		<version>0.7</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
-		</authors>
+        </authors>
 		<notice>Work in progress</notice>
 		<abstract>
 			<img src="../images/site-logo.png" alt=""/>
@@ -32,20 +32,31 @@
 					<th>Native Driver</th>
 					<th>Notes</th>
 				</tr>
+                <tr>
+                    <td>
+                        <anchor id="db2"/>
+                        <a href="../docs/api/scriptella/driver/db2/package-summary.html">DB2 Database</a>
+                    </td>
+                    <td>scriptella.driver.db2.Driver</td>
+                    <td>com.ibm.db2.jcc.DB2Driver</td>
+                    <td/>
+                </tr>
+                <tr>
+                    <td>
+                        <anchor id="h2"/>
+                        <a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
+                    </td>
+                    <td>scriptella.driver.h2.Driver</td>
+                    <td>org.h2.Driver</td>
+                    <td/>
+                </tr>
 				<tr>
 					<td>
-						<a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
+                        <anchor id="hsqldb"/>
+                        <a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
 					</td>
 					<td>scriptella.driver.hsqldb.Driver</td>
 					<td>org.hsqldb.jdbcDriver</td>
-					<td/>
-				</tr>
-				<tr>
-					<td>
-						<a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
-					</td>
-					<td>scriptella.driver.h2.Driver</td>
-					<td>org.h2.Driver</td>
 					<td/>
 				</tr>
 				<tr>
@@ -60,6 +71,7 @@
 				</tr>
                 <tr>
                     <td>
+                        <anchor id="mssql"/>
                         <a href="../docs/api/scriptella/driver/mssql/package-summary.html">Microsoft SQL Server Database</a>
                     </td>
                     <td>scriptella.driver.mssql.Driver</td>
@@ -69,6 +81,7 @@
                 </tr>
                 <tr>
                     <td>
+                        <anchor id="mysql"/>
                         <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
                     </td>
                     <td>scriptella.driver.mysql.Driver</td>
@@ -88,6 +101,14 @@
 						</ul>
 					</td>
 				</tr>
+                <tr>
+					<td>
+						<anchor id="postgresql"/>
+						<a href="../docs/api/scriptella/driver/postgresql/package-summary.html">PostgreSQL Database</a>
+					</td>
+					<td>scriptella.driver.postgresql.Driver</td>
+					<td>org.postgresql.Driver</td>
+				</tr>
 				<tr>
 					<td>
 						<anchor id="spring"/>
@@ -102,7 +123,8 @@
 				</tr>
 				<tr>
 					<td>
-						<a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
+                        <anchor id="sybase"/>
+                        <a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
 					</td>
 					<td>scriptella.driver.sybase.Driver</td>
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
