@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  */
 public class GenericDriver extends AbstractScriptellaDriver {
 
-    private static final String[] EMPTY_DRIVER_ARRAY = new String[0];
     private static final Logger LOG = Logger.getLogger(GenericDriver.class.getName());
 
     static {
