@@ -55,6 +55,9 @@
             <action context="code" type="update" dev="ejboy" fixes-bug="4397">
                 Make "throughput" parameter in JMX mbean more accurate
             </action>
+            <action context="code" type="fix" dev="ejboy,volk" fixes-bug="4668">
+                Do not produce bug report if no driver on classpath
+            </action>
             <action context="code" type="update" dev="ejboy">
                 Various performance optimizations.
             </action>
