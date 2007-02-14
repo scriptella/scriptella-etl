@@ -18,7 +18,7 @@
 <howto>
 	<header>
 		<title>Migrating from Ant SQL Task.</title>
-		<version>0.7dev</version>
+		<version>0.7</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
@@ -68,7 +68,6 @@
 	INSERT INTO Table VALUES (2,3,4,5);
     </script>
 </etl>        			
-			
 			]]>
 			</source>
 		</section>

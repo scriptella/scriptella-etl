@@ -104,20 +104,21 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 0.6 Released (January 8, 2007)</title>
-                <p>We are pleased to announce that Scriptella 0.6 has been released.
+                <title>Scriptella 0.7 Released (February 14, 2007)</title>
+                <p>We are pleased to announce the release of Scriptella 0.7.
                     New Features and Bug Fixes:</p>
                 <ul>
-                    <li>Text Provider</li>
-                    <li>DB2, PostgreSQL Driver</li>
-                    <li>Lucene search engine driver</li>
-                    <li>Rollback ETL on Ctrl-C</li>
-                    <li>Monitoring and management via JMX</li>
-                    <li>transaction.isolation property for JDBC connection</li>
-                    <li>Improved test code coverage</li>
+                    <li>JEXL driver</li>
+                    <li>XML XPath provider, XML example</li>
+                    <li>Include scriptella-src-ide.zip in a binary distribution.</li>
+                    <li>Various performance optimizations.</li>
+                    <li>Improved examples, ODBC example was not working.</li>
+                    <li>Make "throughput" parameter in JMX mbean more accurate</li>
+                    <li>Compile error on JDK 6</li>
+                    <li>Do not produce bug report if no driver on classpath</li>
                 </ul>
-                <p>This release is actively used in our commercial GA projects and we are on the way to Scriptella 1.0.<br/>
-                <a href="download.html">Download now!</a></p>
+                <p>We wish everyone a Happy Valentine's Day (or night :) !<br/>
+                Make ETL easier - <a href="download.html">Download Scriptella Now!</a></p>
             </section>
         </section>
         </body>
