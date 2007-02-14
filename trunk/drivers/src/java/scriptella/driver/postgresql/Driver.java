@@ -22,7 +22,7 @@ import scriptella.jdbc.GenericDriver;
  *
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
- * NOTE: Problems during migrating from/to Oracle(and DB2) RDBMS could be occurred due to Not Supported Bit/Boolean 
+ * NOTE: Problems during migration from/to Oracle(and DB2) RDBMS could be occurred due to not supported Bit/Boolean 
  * data types equality by Postgre SQL DB
  * 
  * @author Kirill Volgin
