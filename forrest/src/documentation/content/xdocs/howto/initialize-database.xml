@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2006-2007 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE howto PUBLIC "-//APACHE//DTD How-to V2.0//EN" "dtd/howto-v20.dtd">
+<howto>
+	<header>
+		<title>How to initialize a database on application startup.</title>
+		<version>0.7</version>
+		<authors>
+			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+		</authors>
+		<notice>Work in progress</notice>
+		<abstract>This How-To describes the steps for automated database schema initialization.</abstract>
+		<last-modified-content-date date="12.02.2007"/>
+	</header>
+	<audience title="Intended Audience">
+		<p>Developers/DBAs.</p>
+	</audience>
+	<purpose title="Purpose">
+		<p>Database initialization is an important part of application deployment.
+        Typically a DBA applies a set of SQL scripts to initialize a database or perform an upgrade.
+        While this manual step is reasonable for large applications with complex deployment scenarios
+        there are plenty of projects where DB can be initialized automatically on application startup. Examples:</p>
+        <ul>
+            <li>Demo applications. Many example applications require the user to run db init scripts thus making an entry level more complex.</li>
+            <li>Applications with automated installation procedure. The database can be initialized during a setup process or on application startup.</li>
+            <li>Small to medium-sized projects where deployment is performed by a customer and has to be as simple as possible.</li>
+        </ul>
+        <p>This how-to we describes one of the possible approaches to automate DB initialization.
+        "Image Database" example from the Spring Framework distribution is used as a base application.</p>
+
+	</purpose>
+	<prerequisites title="Prerequisites">
+        <p>If you want to reproduce the below mentioned steps manually
+            <a href="http://sourceforge.net/project/showfiles.php?group_id=73357">download</a>
+            Spring 2.0 binary distribution with dependencies and unpack it.
+            The <em>ImageDB</em> example files are located in a <em>samples/imagedb</em> folder.</p>
+    </prerequisites>
+    <steps title="Steps">
+		<section>
+			<title>Database schema initialization script</title>
+            <figure src="../images/howto/imagedb-schema.png" alt="ImageDB Schema"/>
+            <p>The ImageDB database model has only one table. Nevertheless filling the database can be tricky
+                due to several reasons:</p>
+            <ul>
+                <li>DB script contains vendor specific SQL data types.</li>
+                <li>It's problematic to upload BLOB content using a database neutral way.</li>
+            </ul>
+            <p>And now Scriptella comes into play. The following script creates a database and populates it with the initial dataset:</p>
+            <source><![CDATA[
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        <include href="webinit.etl.properties"/>
+    </properties>
+    <connection driver="$driver" url="$url" user="$user" password="$password" />
+    <script>
+        <!-- Metainf table stores version information -->
+        CREATE TABLE Metainf (
+            buildnum INTEGER
+        );
+        INSERT INTO Metainf VALUES (1);
+        <!-- Conditional schema creation scripts-->
+        <dialect name=".*hsql.*">
+            <include href="hsqldb-schema.sql"/>
+        </dialect>
+        <dialect name=".*oracle.*">
+            <include href="oracle-schema.sql"/>
+        </dialect>
+        <dialect name=".*mysql.*">
+            <include href="mysql-schema.sql"/>
+        </dialect>
+        <!-- Fill the table with data -->
+        <include href="data.sql"/>
+
+        <!-- If Metainf present, skip schema creation and continue-->
+        <onerror message=".*Metainf.*"/>
+    </script>
+    <!-- Optional upgrade procedure -->
+    <query>
+        <!-- Selects current DB build -->
+        SELECT * FROM Metainf
+        <!-- Check if upgrade is necessary -->
+        <script if="buildnum lt 1">
+            <!--Upgrades DB to build 1 -->
+            <!--...-->
+            <!-- Update Metainf to confirm upgrading -->
+            UPDATE Metainf SET buildnum=1;
+        </script>
+        <!-- upgrade scripts for subsequent builds -->
+    </query>
+</etl>
+            ]]>
+			</source>
+            <ul>
+                <li>The <em>*-schema.sql</em> files are simple SQL files identical to the txt files located in a db folder of the ImageDB example.</li>
+                <li>The <em>data.sql</em> file contains insert statements for initial dataset:
+                    <source>
+INSERT INTO imagedb(image_name, content,description) VALUES ('scriptella-logo.png',
+            ?{file 'blobs/scriptella-logo.png'}, 'Scriptella ETL logo');
+INSERT INTO imagedb(image_name, content,description) VALUES ('scriptella-powered.gif',
+            ?{file 'blobs/scriptella-powered.gif'}, 'Powered by Scriptella ETL banner');
+                    </source>
+                </li>
+            </ul>
+            <p>The content placed in external files is referenced by a <code>?{file ... }</code> SQL syntax extension.
+When the ETL script is executed second time on a created database the initializing procedure is skipped and the information message is printed using INFO priority.
+</p>
+		</section>
+        <section>
+            <title>Integration with a web application</title>
+            <p>To integrate a DB initializing procedure with a web application put the following files into a folder inside the WAR file, e.g. <em>/WEB-INF/db</em>:</p>
+            <ul>
+                <li><em>webinit.etl.xml</em> – Scriptella database initialization file.</li>
+                <li><em>webinit.etl.properties</em> – Configuration properties for webinit.etl.xml. Spring or JNDI managed data sources or driver classes can be specified here.</li>
+                <li><em>...-schema.xml</em> schema creation scripts for different databases. These scripts are included by a main etl.xml file.</li>
+                <li><em>data.sql</em> – initial dataset.</li>
+                <li><em>blobs</em> – binary data referenced from data.sql file.</li>
+            </ul>
+            <p>Additionally the <em>hsqldb.jar</em> (or other JDBC driver) should be copied to <em>WEB-INF/lib</em> dir.</p>
+        </section>
+        <section>
+            <title>Automatic initialization in a ServletContextListener</title>
+            <p>To execute <em>webinit.etl.xml</em> on web application startup create an implementation of
+                <code>ServletContextListener</code>:</p>
+            <source><![CDATA[
+    public class WebDbInitializer implements ServletContextListener {
+        private static final String WEBINIT_ETL_PATH = "webinit.etl.path";
+        /**
+         * Executes script which inits the database.
+         * @param etlUrl ETL file URL.
+         * @throws EtlExecutorException if script execution fails.
+         */
+        static void initDatabase(URL etlUrl) throws EtlExecutorException {
+            EtlExecutor exec = EtlExecutor.newExecutor(etlUrl);
+            exec.execute();
+        }
+
+        public void contextInitialized(ServletContextEvent servletContextEvent) {
+            ServletContext ctx = servletContextEvent.getServletContext();
+            try {
+                initDatabase(ctx.getResource("/WEB-INF/db/webinit.etl.xml"));
+                ctx.log("DB script executed");
+            } catch (Exception e) {
+                ctx.log("Unable to execute DB script", e);
+            }
+        }
+    . . .
+    }]]></source>
+            <p>This listener is registered in the web.xml file using the following snippet:</p>
+            <source><![CDATA[
+    <web-app>
+        <listener>
+            <listener-class>scriptella.imagedb.WebDbInitializer</listener-class>
+        </listener>
+    </web-app>]]></source>
+            <p>The <em>webinit.etl.properties</em> file has the following content for deployment on Tomcat:</p>
+            <source><![CDATA[
+    driver=hsqldb
+    url=jdbc:hsqldb:file:${catalina.home}/db/imagedb
+    user=sa
+    password=]]></source>
+        </section>
+        <section>
+            <title>Integration with Spring Framework</title>
+            <p>Integration with Spring is even simpler, just add the following XML bean declaration
+                to the application context xml file:</p>
+            <source><![CDATA[
+    <bean class="scriptella.driver.spring.EtlExecutorBean">
+        <property name="configLocation" value="/WEB-INF/db/webinit.etl.xml"/>
+        <property name="autostart" value="true"/>
+    </bean>]]></source>
+            <p>In this case the <em>webinit.etl.properties</em> file has the following content:</p>
+            <source><![CDATA[
+driver=spring
+url=dataSource]]>
+            </source>
+        </section>
+    </steps>
+</howto>

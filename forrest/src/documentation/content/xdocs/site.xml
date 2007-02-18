@@ -29,6 +29,8 @@ See http://forrest.apache.org/docs/linking.html for more info
 	<getstart label="Getting Started">
         <tutorial label="Two Minute Tutorial" href="tutorial.html" description="Two Minute Tutorial"/>
         <faq label="FAQ" href="faq.html" description="Frequently Asked Questions"/>
+        <snippets label="Code Snippets" description="Scriptella examples and code snippets at snippets.dzone.com"
+            href="http://snippets.dzone.com/tag/scriptella"/>
     </getstart>
 	<doc label="Documentation" tab="reference" description="Scriptella Documentation">
         <index label="Reference Documentation" href="reference/index.html" description="Scriptella Reference Documentation"/>
@@ -38,7 +40,7 @@ See http://forrest.apache.org/docs/linking.html for more info
         <dtd label="DTD Reference" href="docs/dtd/"/>
         <howtos label="How-Tos" tab="howto">
             <ant label="Migrate from Ant SQL Task" href="howto/migrate-from-ant.html"/>
-            <!--<ant label="Automated DB Initialization" href="howto/initialize-database.html"/>-->
+            <ant label="Automated Database Initialization" href="howto/initialize-database.html"/>
          </howtos>
         <!--For now API Docs links breaks wholesite generation, resolve the problem and uncomment 
         <whole_site_html label="Whole Site HTML" href="wholesite.html"/>
