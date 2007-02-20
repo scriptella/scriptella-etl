@@ -190,4 +190,15 @@ url=dataSource]]>
             </source>
         </section>
     </steps>
+    <references title="Resources">
+        <ul>
+            <li>
+                <a href="imagedb-spring.war">imagedb-spring.war</a> - Patched ImageDB WAR file for <a href="http://springframework.org">Spring Framework</a>.
+                Simply deploy it to Tomcat and run, the database will be created automatically in a TOMCAT_HOME/db directory.
+            </li>
+            <li>
+                <a href="imagedb.war">imagedb.war</a> - Demo WAR file which creates ImageDB database automatically (No Spring integration).
+            </li>
+        </ul>
+    </references>
 </howto>
