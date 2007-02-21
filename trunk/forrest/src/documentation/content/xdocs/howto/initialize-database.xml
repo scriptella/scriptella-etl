@@ -41,8 +41,8 @@
         </ul>
         <p>This how-to we describes one of the possible approaches to automate DB initialization.
         "Image Database" example from the Spring Framework distribution is used as a base application.</p>
-
-	</purpose>
+        <figure src="../images/howto/db-auto-init.png" alt="Automatic Database Initialization Diagram"/>
+    </purpose>
 	<prerequisites title="Prerequisites">
         <p>If you want to reproduce the below mentioned steps manually
             <a href="http://sourceforge.net/project/showfiles.php?group_id=73357">download</a>
@@ -193,11 +193,11 @@ url=dataSource]]>
     <references title="Resources">
         <ul>
             <li>
-                <a href="imagedb-spring.war">imagedb-spring.war</a> - Patched ImageDB WAR file for <a href="http://springframework.org">Spring Framework</a>.
-                Simply deploy it to Tomcat and run, the database will be created automatically in a TOMCAT_HOME/db directory.
+                <a href="http://www.javaforge.com/displayDocument/imagedb-spring.war?doc_id=28427">imagedb-spring.war</a> - Modified ImageDB WAR file for <a href="http://springframework.org">Spring Framework</a>.
+                Simply deploy it to Tomcat and <a href="http://localhost:8080/imagedb-spring">run</a>, the database will be created automatically in a &lt;TOMCAT_HOME&gt;/db directory.
             </li>
             <li>
-                <a href="imagedb.war">imagedb.war</a> - Demo WAR file which creates ImageDB database automatically (No Spring integration).
+                <a href="http://www.javaforge.com/displayDocument/imagedb.war?doc_id=28426">imagedb.war</a> - Demo WAR file which creates ImageDB database automatically (No Spring integration).
             </li>
         </ul>
     </references>
