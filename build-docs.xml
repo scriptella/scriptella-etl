@@ -98,12 +98,16 @@
 </html>
 ]]></replacetoken>
                 <replacevalue><![CDATA[</div>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+<!-- Start of StatCounter Code -->
+<script type="text/javascript" language="javascript">
+var sc_project=2292342; 
+var sc_invisible=1; 
+var sc_partition=21; 
+var sc_security="748ecb1a"; 
 </script>
-<script type="text/javascript">
-_uacct = "UA-1210807-1";
-urchinTracker();
-</script>
+
+<script type="text/javascript" language="javascript" src="http://www.statcounter.com/counter/counter.js"></script><noscript><a href="http://www.statcounter.com/" target="_blank"><img  src="http://c22.statcounter.com/counter.php?sc_project=2292342&java=0&security=748ecb1a&invisible=1" alt="free stats" border="0"></a> </noscript>
+<!-- End of StatCounter Code -->
 </body>
 </html>]]></replacevalue>
         </replace>
