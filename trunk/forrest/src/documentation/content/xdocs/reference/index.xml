@@ -18,7 +18,7 @@
 			<p>Scriptella is a Java-based ETL and scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge.
 			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
 			<p>The following diagram is an overview of the Scriptella execution model:</p>
-			<figure src="../images/reference/intro.gif" alt="Architecture Overview"/>
+			<figure src="../images/reference/intro.png" alt="Architecture Overview"/>
 			<section>
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
@@ -468,7 +468,7 @@
 			    For Java SE 5 -Dcom.sun.management.jmxremote system property enables the JMX agent for local access.<br/>
                 See also <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html">Monitoring and Management Using JMX</a> for more details.
 			</note>
-			<figure src="../images/reference/jmxconsole.gif" alt="Java SE Monitoring &amp; Management Console."/>
+			<figure src="../images/reference/jmxconsole.png" alt="Java SE Monitoring &amp; Management Console."/>
 			<section>
 				<title>Attributes</title>
 				<p>The following read-only attributes are available for monitoring:</p>

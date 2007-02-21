@@ -41,7 +41,8 @@
         </ul>
         <p>This how-to we describes one of the possible approaches to automate DB initialization.
         "Image Database" example from the Spring Framework distribution is used as a base application.</p>
-        <figure src="../images/howto/db-auto-init.png" alt="Automatic Database Initialization Diagram"/>
+        <p>The following diagram demonstates a simplified database initialization/upgrading scenario:</p>
+        <figure src="../images/howto/db-auto-init.png" alt="Automatic Database Initialization Scenario"/>
     </purpose>
 	<prerequisites title="Prerequisites">
         <p>If you want to reproduce the below mentioned steps manually
