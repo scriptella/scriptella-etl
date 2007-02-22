@@ -42,29 +42,33 @@
         <p>This how-to we describes one of the possible approaches to automate DB initialization.
         "Image Database" example from the Spring Framework distribution is used as a base application.</p>
         <p>The following diagram demonstates a simplified database initialization/upgrading scenario:</p>
-        <figure src="../images/howto/db-auto-init.png" alt="Automatic Database Initialization Scenario"/>
+        <figure src="../images/howto/db-auto-init.png" alt="Automatic Database Initialization Diagram"/>
+        <p>MetaInf table is used as a flag to check if the database has already been created.
+            Additionally this table stores the database model meta information,
+            e.g. build number or an application version. For simple deployment cases
+            which do not require an upgrade procedure, this table may be omitted.</p>
     </purpose>
 	<prerequisites title="Prerequisites">
-        <p>If you want to reproduce the below mentioned steps manually
+        <p>If you want to reproduce the how-to steps manually
             <a href="http://sourceforge.net/project/showfiles.php?group_id=73357">download</a>
             Spring 2.0 binary distribution with dependencies and unpack it.
             The <em>ImageDB</em> example files are located in a <em>samples/imagedb</em> folder.</p>
     </prerequisites>
     <steps title="Steps">
 		<section>
-			<title>Database schema initialization script</title>
+			<title>Database Schema Initialization Script</title>
             <figure src="../images/howto/imagedb-schema.png" alt="ImageDB Schema"/>
-            <p>The ImageDB database model has only one table. Nevertheless filling the database can be tricky
+            <p>The ImageDB database model consists of the only one table. Nevertheless filling the database can be tricky
                 due to several reasons:</p>
             <ul>
-                <li>DB script contains vendor specific SQL data types.</li>
-                <li>It's problematic to upload BLOB content using a database neutral way.</li>
+                <li>DB script contains vendor specific SQL data types, e.g. BLOB/LONGVARBINARY or LONGTEXT/CLOB etc.</li>
+                <li>It's problematic to upload BLOB content in a database neutral way.</li>
             </ul>
             <p>And now Scriptella comes into play. The following script creates a database and populates it with the initial dataset:</p>
             <source><![CDATA[
 <!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
-    <properties>
+    <properties> <!-- Just include external properties -->
         <include href="webinit.etl.properties"/>
     </properties>
     <connection driver="$driver" url="$url" user="$user" password="$password" />
@@ -87,7 +91,8 @@
         <!-- Fill the table with data -->
         <include href="data.sql"/>
 
-        <!-- If Metainf present, skip schema creation and continue-->
+        <!-- If Metainf present (table Metainf already exists),
+             skip schema creation and continue -->
         <onerror message=".*Metainf.*"/>
     </script>
     <!-- Optional upgrade procedure -->
@@ -98,36 +103,47 @@
         <script if="buildnum lt 1">
             <!--Upgrades DB to build 1 -->
             <!--...-->
-            <!-- Update Metainf to confirm upgrading -->
+            <!-- Update Metainf to confirm successful upgrade -->
             UPDATE Metainf SET buildnum=1;
         </script>
         <!-- upgrade scripts for subsequent builds -->
     </query>
 </etl>
-            ]]>
-			</source>
+            ]]></source>
             <ul>
-                <li>The <em>*-schema.sql</em> files are simple SQL files identical to the txt files located in a db folder of the ImageDB example.</li>
+                <li>The <em>*-schema.sql</em> files are simple SQL files identical to the txt files located in a
+                    <em>db</em> folder of the ImageDB example.</li>
                 <li>The <em>data.sql</em> file contains insert statements for initial dataset:
                     <source>
+-- ImageDB initial dataset.
+-- <code>?{file ... }</code> SQL syntax extension allows referencing BLOBs in external files.
+-- See <a href="../reference/index.html">Reference Manual</a> for more details on JDBC escaping and other syntax extensions.                        
 INSERT INTO imagedb(image_name, content,description) VALUES ('scriptella-logo.png',
-            ?{file 'blobs/scriptella-logo.png'}, 'Scriptella ETL logo');
+      <code>?{file 'blobs/scriptella-logo.png'}</code>, 'Scriptella ETL logo');
 INSERT INTO imagedb(image_name, content,description) VALUES ('scriptella-powered.gif',
-            ?{file 'blobs/scriptella-powered.gif'}, 'Powered by Scriptella ETL banner');
+      <code>?{file 'blobs/scriptella-powered.gif'}</code>, 'Powered by Scriptella Logo');
                     </source>
                 </li>
             </ul>
-            <p>The content placed in external files is referenced by a <code>?{file ... }</code> SQL syntax extension.
-When the ETL script is executed second time on a created database the initializing procedure is skipped and the information message is printed using INFO priority.
-</p>
-		</section>
+            <p>The database is created when a web application is started for the first time.
+               For subequent startups the initializing procedure is skipped and the information message
+               similar to the following one is printed on the console:</p>
+            <source>
+INFO: Script /etl/script[1] failed: scriptella.jdbc.JdbcException:
+Unable to execute statement. Error statement:
+CREATE TABLE Metainf (
+buildnum INTEGER
+). Error codes: [S0001, -21]
+Using onError handler: OnError{message=.*Metainf.*, codes=[], retry=false}</source>
+
+        </section>
         <section>
             <title>Integration with a web application</title>
             <p>To integrate a DB initializing procedure with a web application put the following files into a folder inside the WAR file, e.g. <em>/WEB-INF/db</em>:</p>
             <ul>
                 <li><em>webinit.etl.xml</em> – Scriptella database initialization file.</li>
                 <li><em>webinit.etl.properties</em> – Configuration properties for webinit.etl.xml. Spring or JNDI managed data sources or driver classes can be specified here.</li>
-                <li><em>...-schema.xml</em> schema creation scripts for different databases. These scripts are included by a main etl.xml file.</li>
+                <li><em>...-schema.sql</em> schema creation scripts for different databases. These scripts are included by a main etl.xml file.</li>
                 <li><em>data.sql</em> – initial dataset.</li>
                 <li><em>blobs</em> – binary data referenced from data.sql file.</li>
             </ul>
@@ -187,11 +203,11 @@ When the ETL script is executed second time on a created database the initializi
             <p>In this case the <em>webinit.etl.properties</em> file has the following content:</p>
             <source><![CDATA[
 driver=spring
-url=dataSource]]>
-            </source>
+url=dataSource]]></source>
         </section>
     </steps>
     <references title="Resources">
+        <p>Sample application downloads:</p>
         <ul>
             <li>
                 <a href="http://www.javaforge.com/displayDocument/imagedb-spring.war?doc_id=28427">imagedb-spring.war</a> - Modified ImageDB WAR file for <a href="http://springframework.org">Spring Framework</a>.
@@ -200,6 +216,10 @@ url=dataSource]]>
             <li>
                 <a href="http://www.javaforge.com/displayDocument/imagedb.war?doc_id=28426">imagedb.war</a> - Demo WAR file which creates ImageDB database automatically (No Spring integration).
             </li>
+        </ul>
+        <p>Articles:</p>
+        <ul>
+            <li>"<a href="http://www.martinfowler.com/articles/evodb.html">Evolutionary Database Design</a>" (Martin Fowler, Pramod Sadalage)</li>
         </ul>
     </references>
 </howto>
