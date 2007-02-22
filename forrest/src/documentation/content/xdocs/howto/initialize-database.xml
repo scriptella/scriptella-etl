@@ -17,7 +17,7 @@
 <!DOCTYPE howto PUBLIC "-//APACHE//DTD How-to V2.0//EN" "dtd/howto-v20.dtd">
 <howto>
 	<header>
-		<title>How to initialize a database on application startup.</title>
+		<title>How to Initialize a Database on Application Startup.</title>
 		<version>0.7</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
