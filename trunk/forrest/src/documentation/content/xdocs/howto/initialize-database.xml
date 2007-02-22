@@ -142,8 +142,8 @@ Using onError handler: OnError{message=.*Metainf.*, codes=[], retry=false}</sour
             <p>To integrate a DB initializing procedure with a web application put the following files into a folder inside the WAR file, e.g. <em>/WEB-INF/db</em>:</p>
             <ul>
                 <li><em>webinit.etl.xml</em> – Scriptella database initialization file.</li>
-                <li><em>webinit.etl.properties</em> – Configuration properties for webinit.etl.xml. Spring or JNDI managed data sources or driver classes can be specified here.</li>
-                <li><em>...-schema.sql</em> schema creation scripts for different databases. These scripts are included by a main etl.xml file.</li>
+                <li><em>webinit.etl.properties</em> – configuration properties for webinit.etl.xml. Spring or JNDI managed data sources or driver classes can be specified here.</li>
+                <li><em>...-schema.sql</em> - schema creation scripts for different databases. These scripts are included by a main etl.xml file.</li>
                 <li><em>data.sql</em> – initial dataset.</li>
                 <li><em>blobs</em> – binary data referenced from data.sql file.</li>
             </ul>
