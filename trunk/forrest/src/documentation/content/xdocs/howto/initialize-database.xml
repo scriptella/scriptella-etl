@@ -126,7 +126,7 @@ INSERT INTO imagedb(image_name, content,description) VALUES ('scriptella-powered
                 </li>
             </ul>
             <p>The database is created when a web application is started for the first time.
-               For subequent startups the initializing procedure is skipped and the information message
+               For subsequent startups the initializing procedure is skipped and the information message
                similar to the following one is printed on the console:</p>
             <source>
 INFO: Script /etl/script[1] failed: scriptella.jdbc.JdbcException:
