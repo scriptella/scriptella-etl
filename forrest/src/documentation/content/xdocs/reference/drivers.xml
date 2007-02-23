@@ -108,7 +108,8 @@
 					</td>
 					<td>scriptella.driver.postgresql.Driver</td>
 					<td>org.postgresql.Driver</td>
-				</tr>
+                    <td/>
+                </tr>
 				<tr>
 					<td>
 						<anchor id="spring"/>
