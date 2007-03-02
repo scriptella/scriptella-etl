@@ -113,21 +113,17 @@ var sc_security="748ecb1a";
         </replace>
     </target>
 
-    <target name="adsense" description="Adds Google Adsense js">
+    <target name="bookmarks" description="Adds social bookmarks">
         <replace dir="${basedir}/forrest/build/site">
             <include name="**/*.html"/>
             <exclude name="docs/** dtd/**"/>
             <replacetoken><![CDATA[<div id="credit"></div>]]></replacetoken>
-            <replacevalue><![CDATA[<div id="credit" style="margin-top:10px"><script type="text/javascript"><!--
-google_ad_client = "pub-2238727709579520";
-google_ad_width = 125;
-google_ad_height = 125;
-google_ad_format = "125x125_as_rimg";
-google_cpa_choice = "CAAQ9YCYhAIaCKRaB5-eKO08KK2293M";
-google_ad_channel = "7398924152";
-//--></script>
-<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script></div>]]></replacevalue>
+            <replacevalue><![CDATA[<div id="credit">
+<!-- AddThis Bookmark Button BEGIN -->
+<a href="http://www.addthis.com/bookmark.php" onclick="window.open('http://www.addthis.com/bookmark.php?pub=ejboy&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'addthis', 'scrollbars=yes,menubar=no,width=620,height=520,resizable=yes,toolbar=no,location=no,status=no'); return false;" title="Bookmark using any bookmark manager!" target="_blank"><img src="http://www.addthis.com/images/button1-bm.gif" width="125" height="16" border="0" alt="AddThis Social Bookmark Button" /></a>
+<!-- AddThis Bookmark Button END -->
+</div>]]>
+</replacevalue>
         </replace>
     </target>
 
