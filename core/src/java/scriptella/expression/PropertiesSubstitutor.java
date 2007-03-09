@@ -99,52 +99,48 @@ public class PropertiesSubstitutor {
             return s;
         }
         StringBuilder res = null;
-        final char[] sChars = s.toCharArray();
         int lastPos = 0;
         m1.reset(s);
         m2.reset(s);
-        for (int i = 0; i < len; i++) {
-            if (sChars[i]=='$') {
-                //Start of expression
-                Matcher m;
-                if (m1.find(i + 1) && m1.start() == i + 1) {
-                    m = m1;
-                } else if (m2.find(i + 1) && m2.start() == i + 1) {
-                    m = m2;
-                } else { //not an expression
-                    m = null;
+
+        for (int i = s.indexOf('$'); i >= 0 && i < len; i = s.indexOf('$', i + 1)) {
+            //Start of expression
+            Matcher m;
+            if (m1.find(i + 1) && m1.start() == i + 1) {
+                m = m1;
+            } else if (m2.find(i + 1) && m2.start() == i + 1) {
+                m = m2;
+            } else { //not an expression
+                m = null;
+            }
+            if (m != null) {
+                final String name = m.group(1);
+                String v;
+
+                if (m == m1) {
+                    v = toString(parameters.getParameter(name));
+                } else {
+                    v = toString(Expression.compile(name).evaluate(parameters));
                 }
-                if (m != null) {
+
+                if (v != null) {
                     if (res == null) {
                         res = new StringBuilder(s.length());
                     }
                     if (i > lastPos) { //if we have unflushed character
-                        res.append(sChars, lastPos, i - lastPos);
+                        res.append(s.substring(lastPos, i));
                     }
-                    final String name = m.group(1);
-                    String v;
-
-                    if (m == m1) {
-                        v = toString(parameters.getParameter(name));
-                    } else {
-                        v = toString(Expression.compile(name).evaluate(parameters));
-                    }
-
                     lastPos = m.end();
-                    if (v != null) {
-                        res.append(v);
-                    } else { //appends the original string
-                        res.append(sChars, i, lastPos - i);
-                    }
-
+                    res.append(v);
                 }
+
             }
         }
         if (res == null) {
             return s;
         }
         if (lastPos <= len) {
-            res.append(sChars, lastPos, s.length() - lastPos);
+            res.append(s.substring(lastPos, s.length()));
         }
 
 

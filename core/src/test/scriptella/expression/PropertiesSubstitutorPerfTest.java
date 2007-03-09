@@ -29,6 +29,8 @@ import java.util.Arrays;
 public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
     /**
      * History:
+     * 09.03.2007 - Athlon 64 X2 2GHz - 1330 ms
+     * 08.03.2007 - Athlon 64 X2 2GHz - 1850 ms
      * 05.09.2006 - Duron 1700 Mhz - 4078 ms
      */
     public void test() {
