@@ -170,6 +170,10 @@ class Lobs {
          */
         protected abstract void flushToDisk() throws IOException;
 
+        /**
+         * Invoked when on initialization phase complete.
+         * <p>Subclasses should close unused and opened resources.
+         */
         protected abstract void onInitComplete();
 
         /**
@@ -315,6 +319,7 @@ class Lobs {
         private byte[] buffer = new byte[8192];
         private ByteArrayOutputStream memStream;
         private OutputStream diskStream;
+        private static final byte[] EMPTY_BYTES = new byte[0];
 
         /**
          * For custom instantion.
@@ -352,12 +357,12 @@ class Lobs {
         }
 
         protected void onInitComplete() {
-            if (diskStream != null) {
+            if (diskStream != null) { //If large content
                 IOUtils.closeSilently(diskStream);
                 diskStream = null;
-            }
-            if (memStream != null) {
-                bytes = memStream.toByteArray();
+            } else { //otherwise in-memory content
+                //don't forget to check memStream for null in case of empty input stream
+                bytes = memStream == null ? EMPTY_BYTES : memStream.toByteArray();
                 memStream = null;
             }
         }
@@ -464,9 +469,9 @@ class Lobs {
             if (diskWriter != null) {
                 IOUtils.closeSilently(diskWriter);
                 diskWriter = null;
-            }
-            if (mem != null) {
-                string = mem.toString();
+            } else { //otherwise in-memory content
+                //don't forget to check mem buffer for null in case of empty input reader
+                string = mem == null ? "" : mem.toString();
                 mem = null;
             }
         }
