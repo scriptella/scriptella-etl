@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.sql.SQLException;
@@ -158,4 +159,24 @@ public class LobsTest extends AbstractTestCase {
         assertNull(c.tmpFile); //tmp file should not created
         c.close();
     }
+
+    /**
+     * Test for bug #4903 Java Null Pointer Exception
+     * @throws IOException if IO error occurs
+     */
+    public void testEmptyClob() throws IOException {
+        Lobs.ReadonlyClob c = (Lobs.ReadonlyClob) Lobs.newClob(new StringReader(""));
+        Reader r = c.getCharacterStream();
+        assertEquals("", IOUtils.toString(r));
+        assertEquals(0, c.length());
+        assertNull(c.tmpFile);
+    }
+
+    public void testEmptyBlob() throws IOException {
+        Lobs.ReadonlyBlob b = (Lobs.ReadonlyBlob) Lobs.newBlob(new ByteArrayInputStream(new byte[0]));
+        InputStream is = b.getBinaryStream();
+        assertEquals(0, IOUtils.toByteArray(is).length);
+        assertEquals(0, b.length());
+    }
+
 }
