@@ -18,6 +18,7 @@ package scriptella.execution;
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
 import scriptella.core.Session;
+import scriptella.core.SystemException;
 import scriptella.core.ThreadSafe;
 import scriptella.interactive.ProgressCallback;
 import scriptella.interactive.ProgressIndicator;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,11 +59,15 @@ import java.util.logging.Logger;
  * the engine tries to roll back all changes made during the ETL operation.
  * <p>{@link java.util.concurrent.ExecutorService} and {@link java.util.concurrent.Future}
  * can also be used to control ETL execution.
+ * <h3>Integration with third-party systems</h3>
+ * For convenience EtlExecutor implements {@link Runnable} and {@link java.util.concurrent.Callable}.
+ * This feature simplifies integration of Scriptella executors with {@link java.util.concurrent.Executors}
+ * or other systems like Spring/Quartz etc. It also minimizes application code dependency on Scriptella.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class EtlExecutor {
+public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     private static final Logger LOG = Logger.getLogger(EtlExecutor.class.getName());
     private ConfigurationEl configuration;
     private boolean jmxEnabled;
@@ -127,6 +133,10 @@ public class EtlExecutor {
 
     /**
      * Executes ETL based on a specified configuration.
+     *
+     * @return execution statistics for ETL execution.
+     * @throws EtlExecutorException if ETL fails.
+     * @see #execute(scriptella.interactive.ProgressIndicator)
      */
     @ThreadSafe
     public ExecutionStatistics execute() throws EtlExecutorException {
@@ -137,6 +147,8 @@ public class EtlExecutor {
      * Executes ETL based on a specified configuration.
      *
      * @param indicator progress indicator to use.
+     * @return execution statistics for ETL execution.
+     * @throws EtlExecutorException if ETL fails.
      */
     @ThreadSafe
     public ExecutionStatistics execute(final ProgressIndicator indicator)
@@ -268,4 +280,29 @@ public class EtlExecutor {
         return new EtlExecutor(cf.createConfiguration());
     }
 
+    //Runnable/Callable convenience interfaces
+
+    /**
+     * A runnable adapter for {@link #execute()} method.
+     * <p>Please note that due to a checked
+     * exceptions limitation a {@link scriptella.core.SystemException} is thrown instead of
+     * the {@link scriptella.execution.EtlExecutorException}.
+     *
+     * @throws SystemException a wrapped {@link scriptella.execution.EtlExecutorException}.
+     * @see #execute()
+     */
+    public void run() throws SystemException {
+        try {
+            execute();
+        } catch (EtlExecutorException e) {
+            throw new SystemException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * A synonym for {@link #execute()}.
+     */
+    public ExecutionStatistics call() throws EtlExecutorException {
+        return execute();
+    }
 }

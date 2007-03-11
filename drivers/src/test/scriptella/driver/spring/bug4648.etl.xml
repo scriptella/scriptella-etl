@@ -1,0 +1,12 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <!-- See Bug #4648 Fix Spring context propagation.
+     Classpath attribute is used to enable DriverClassLoader-->
+    <connection driver="spring" url="datasource" classpath="eeeee"/>
+    <script>
+        CREATE TABLE Bug4648TestTable (
+            ID INT
+        );
+    </script>
+
+</etl>
