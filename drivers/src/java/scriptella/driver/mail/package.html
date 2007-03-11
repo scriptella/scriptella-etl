@@ -1,0 +1,128 @@
+<body>
+<h1>E-Mail Driver for Scriptella.</h1>
+Allows sending E-Mails via SMTP.
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.mail.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>URL specifies TO recipients using the <a href="http://www.ietf.org/rfc/rfc2368.txt">mailto scheme</a>: <code>mailto:sAddress[sHeaders]</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>
+        <a href="http://java.sun.com/products/javamail/downloads/index.html">mail.jar</a>
+        and <a href="http://java.sun.com/products/javabeans/jaf/downloads/index.html">activation.jar</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>type</td>
+        <td>Specifies type of E-Mail message content: <code>text</code> or <code>html</code>.</td>
+        <td>No, default value is <code>text</code>.</td>
+    </tr>
+    <tr>
+        <td>subject</td>
+        <td>Specifies e-mail subject.</td>
+        <td>No.</td>
+    </tr>
+    <tr>
+        <td>mail.host</td>
+        <td>Specifies the default Mail server.
+        <td>No, see JavaMail Environment Properties for details</td>
+    </tr>
+    <tr>
+        <td>mail.from</td>
+        <td>Specifies e-mail address of sender.
+        <td>No, see JavaMail Environment Properties for details</td>
+    </tr>
+
+</table>
+<h2>Properties substitution</h2>
+Mail script elements support ${property} or $property syntax for properties/variables substition.
+Additionally connection URL parameter supports dynamically resolved binding variables.
+<br><b>Example:</b><br>
+<code>mailto:$email</code>, the email variable would be reevaluated if mail script is executed by a parent query.
+<h2>Notes:</h2>
+<ul>
+    <li>In addition to the above mentioned properties the driver supports all JavaMail environment properties.</li>
+    <li>Connection properties may be specified inside a connection element or as a a part of URL, e.g.
+    mailto:user@nosuchhost.com?subject=Hello</li>
+    <li>This driver supports dynamic properties substitution in an URL,
+        e.g. <code>mailto:$email?subject=$subject</code>
+        ,it makes possible sending emails to recipients specified by in a row set.</li>
+</ul>
+<h2>Examples</h2>
+<p>The following example sends a simple text message</p>
+<code>
+    <pre>
+&lt;etl&gt;
+    &lt;connection driver="mail" url="mailto:user@nosuchhost.com?subject=Hello"
+            classpath="mail.jar:activation.jar"&gt;
+        mail.smtp.host=mail.host.name
+        mail.user=user
+        mail.password=password
+        mail.from=Firstname Lastname &amp;lt;user@nosuchhost.com&amp;gt;
+    &lt;/connection&gt;
+    &lt;script&gt;Message produced by Scriptella ETL&lt;/script&gt;
+&lt;/etl&gt;
+    </pre>
+</code>
+<p>Use <code>type=html</code> property to send HTML content.</p>
+<code>
+    <pre>
+&lt;etl&gt;
+    &lt;connection driver="mail" url="mailto:user@nosuchhost.com?subject=Hello"
+            classpath="mail.jar:activation.jar"&gt;
+        type=html
+        mail.smtp.host=mail.host.name
+        mail.user=user
+        mail.password=password
+        mail.from=Firstname Lastname &amp;lt;user@nosuchhost.com&amp;gt;
+    &lt;/connection&gt;
+    &lt;script&gt;&lt;![CDATA[
+        &lt;html&gt;
+            &lt;body&gt;
+                Hello,
+                &lt;hr&gt;
+                &lt;a href="http://scriptella.javaforge.com/" title="Powered by Scriptella ETL"&gt;
+                    &lt;img src="http://scriptella.javaforge.com/images/scriptella-powered.gif" 
+                            width="88" height="31" border="0" alt="Powered by Scriptella ETL">
+                &lt;/a&gt;
+            &lt;/body&gt;
+        &lt;/html&gt;]]&gt;
+    &lt;/script&gt;
+&lt;/etl&gt;
+    </pre>
+</code>
+<p>The following example sends a message to a list selected from the database</p>
+<code>
+    <pre>
+&lt;etl&gt;
+    &lt;connection id="mail" driver="mail" url="mailto:$email?subject=Hello $name"
+            classpath="mail.jar:activation.jar"&gt;
+        mail.smtp.host=mail.host.name
+        mail.user=user
+        mail.password=password
+        mail.from=Administrator &amp;lt;user@nosuchhost.com&amp;gt;
+    &lt;/connection&gt;
+    &lt;connection id="db" .../&gt;
+    &lt;query connection-id="db" &gt;
+        SELECT * FROM Users
+        &lt;script connection-id="mail"&gt;
+            #$rownum
+            Message produced by Scriptella ETL
+        &lt;/script&gt;
+   &lt;/query&gt;
+&lt;/etl&gt;
+    </pre>
+</code>
+
+
+</body>
