@@ -96,7 +96,7 @@
                     <a href="reference/drivers.html#nonjdbc">CSV, TEXT, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
                     providers. Integration with Java EE, <a href="reference/drivers.html#spring">Spring Framework</a>,
                     <a href="reference/index.html#jmx">JMX</a>
-                    and <a href="reference/drivers.html#jndi">JNDI</a>
+                    , <a href="reference/drivers.html#jndi">JNDI</a> and <a href="reference/drivers.html#mail">JavaMail</a> 
                     for <strong>enterprise ready</strong> scripts.
                 </li>
             </ul>

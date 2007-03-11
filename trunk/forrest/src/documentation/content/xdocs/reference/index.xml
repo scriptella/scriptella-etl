@@ -595,7 +595,11 @@
                         This example shows 2 ways to access LDAP directories from Scriptella:
                         built-in LDAP driver and JDBC-LDAP Driver from OctetString.</td>
 				</tr>
-				<tr>
+                <tr>
+                    <td>Mail</td>
+                    <td>This example shows how to produce and send E-Mails from Scriptella.</td>
+                </tr>
+                <tr>
 					<td>Music Store</td>
 					<td>This script create a sample database of music track. This sample shows how to
                 reference BLOB content in external files and use JDBC escaping syntax to pass dates
