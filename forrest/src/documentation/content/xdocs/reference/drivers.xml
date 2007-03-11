@@ -183,6 +183,14 @@
                 </tr>
                 <tr>
                     <td>
+                        <anchor id="mail"/>
+                        <a href="../docs/api/scriptella/driver/mail/package-summary.html">Mail</a>
+                    </td>
+                    <td>scriptella.driver.mail.Driver</td>
+                    <td>Allows sending E-Mails via SMTP.</td>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="text"/>
                         <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>
                     </td>
