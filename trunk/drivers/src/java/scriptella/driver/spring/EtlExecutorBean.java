@@ -19,6 +19,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.access.BeanFactoryLocator;
+import org.springframework.beans.factory.access.BeanFactoryReference;
+import org.springframework.beans.factory.access.SingletonBeanFactoryLocator;
+import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.io.Resource;
 import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutor;
@@ -40,9 +44,11 @@ import java.util.concurrent.Callable;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class EtlExecutorBean extends EtlExecutor implements InitializingBean, BeanFactoryAware, Callable<ExecutionStatistics> {
+public class EtlExecutorBean extends EtlExecutor implements InitializingBean, BeanFactoryAware {
+    private static final String BEAN_FACTORY_XML_PATH = "classpath:scriptella/driver/spring/beanFactory.xml";
+    private static final String FACTORY_BEAN_NAME = "scriptella.driver.spring.factory";
+    private static final String THREAD_LOCAL_BEAN_NAME = "scriptella.driver.spring.threadLocal";
 
-    private static final ThreadLocal<BeanFactory> LOCAL_BEAN_FACTORY = new ThreadLocal<BeanFactory>();
     private BeanFactory beanFactory;
     private ProgressIndicator progressIndicator;
     private boolean autostart;
@@ -133,20 +139,50 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
 
     @Override
     public ExecutionStatistics execute(final ProgressIndicator indicator) throws EtlExecutorException {
-        LOCAL_BEAN_FACTORY.set(beanFactory);
+        setContextBeanFactory(beanFactory);
         try {
             return super.execute(indicator);
         } finally {
-            LOCAL_BEAN_FACTORY.remove();
+            setContextBeanFactory(null);
         }
     }
 
 
     /**
+     * This method obtains a global ThreadLocal class independent of the classloader (JVM-scope singleton).
+     * The easiest solution is to use System.getProperties().get/put, but this solution violate
+     * Properties contract and have other drawbacks.
+     * <p>Current solution relies on the idea behind
+     * {@link org.springframework.beans.factory.access.SingletonBeanFactoryLocator}. See also bug #4648
+     *
+     * @return Global ThreadLocal (JVM-scope singleton).
+     */
+    @SuppressWarnings("unchecked")
+    private static ThreadLocal<BeanFactory> getGlobalThreadLocal() {
+        BeanFactoryLocator locator = SingletonBeanFactoryLocator.getInstance(BEAN_FACTORY_XML_PATH);
+        BeanFactoryReference ref = locator.useBeanFactory(FACTORY_BEAN_NAME);
+        StaticApplicationContext ctx = (StaticApplicationContext) ref.getFactory();
+        if (!ctx.containsBean(THREAD_LOCAL_BEAN_NAME)) {
+            ctx.registerSingleton(THREAD_LOCAL_BEAN_NAME, ThreadLocal.class);
+        }
+        return (ThreadLocal) ctx.getBean(THREAD_LOCAL_BEAN_NAME);
+    }
+
+    /**
+     * Associates specified beanfactory with the current thread.
+     * @param f bean factory, may be null (to clear ThreadLocal state)
+     */
+    private static synchronized void setContextBeanFactory(BeanFactory f) {
+        getGlobalThreadLocal().set(f);
+    }
+
+    /**
+     * Return the bean factory associated with the current thread.
      * @return bean factory associated with the current thread.
      */
-    static BeanFactory getContextBeanFactory() {
-        BeanFactory f = LOCAL_BEAN_FACTORY.get();
+    static synchronized BeanFactory getContextBeanFactory() {
+        ThreadLocal threadLocal = getGlobalThreadLocal();
+        BeanFactory f = (BeanFactory) threadLocal.get();
         if (f == null) {
             throw new IllegalStateException("No beanfactory associated with the current thread");
         }
