@@ -134,7 +134,8 @@ java -jar scriptella.jar [arguments]
 			</section>
             <note>
                 For additional samples <a href="download.html">download</a>
-                Scriptella examples distribution.
+                Scriptella examples distribution. See also
+                <a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples on DZone Snippets</a>
             </note>
         </section>
     </body>
