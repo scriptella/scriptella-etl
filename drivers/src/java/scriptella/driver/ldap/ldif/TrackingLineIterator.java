@@ -15,52 +15,45 @@
  */
 package scriptella.driver.ldap.ldif;
 
+import scriptella.expression.LineIterator;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
+import scriptella.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Buffered reader which overrides {@link #readLine()} to
- * allow substitution of context variables.
+ * Line iterator which tracks read lines.
  *
  * @author Fyodor Kupolov
  * @version 1.0
- * @see PropertiesSubstitutor
  */
-public class SubstitutingLineReader extends BufferedReader {
-    private final PropertiesSubstitutor substitutor;
+public class TrackingLineIterator extends LineIterator {
     private List<String> lines;
     private int len;
 
 
     /**
-     * Creates instance of buffered reader.
+     * Creates instance of line iterator.
      *
      * @param in       a reader to wrap.
      * @param callback callback to use for variables substitution.
      */
-    public SubstitutingLineReader(final Reader in, final ParametersCallback callback) {
-        super(in);
-        this.substitutor = new PropertiesSubstitutor(callback);
+    public TrackingLineIterator(final Reader in, final ParametersCallback callback) {
+        super(in, new PropertiesSubstitutor(callback));
     }
 
-    public String readLine() throws IOException {
-        String s = super.readLine();
-        if (s==null || s.length()==0) {
-            return s;
-        }
-        s = substitutor.substitute(s);
-        if (lines!=null) { //if track lines
+    protected String format(String line) {
+        String s = super.format(line);
+        if (lines!=null && !StringUtils.isEmpty(s)) { //if track lines
             lines.add(s); //remember the string
             len+=s.length()+1;//and increase the len (\n is included)
         }
         return s;
     }
+
 
     /**
      * @return read lines after calling the {@link #trackLines()}.
@@ -77,7 +70,7 @@ public class SubstitutingLineReader extends BufferedReader {
     }
 
     /**
-     * Starts to track lines obtained by {@link #readLine()}.
+     * Starts to track lines.
      * <p>The previously tracked content is cleared.
      * @see #getTrackedLines()
      */

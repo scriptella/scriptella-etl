@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 /**
- * Tests for {@link SubstitutingLineReader}.
+ * Tests for {@link TrackingLineIterator}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -36,16 +36,17 @@ public class SubstitutingLineReaderTest extends AbstractTestCase {
                 "Line2 $var:\n" +
                 "\n" +
                 "Line${a}4";
-        SubstitutingLineReader reader = new SubstitutingLineReader(new StringReader(test), pc);
-        String s = reader.readLine();
+        TrackingLineIterator iterator = new TrackingLineIterator(new StringReader(test), pc);
+        String s = iterator.next();
         assertEquals("Just a *test*", s);
-        s = reader.readLine();
+        assertTrue(iterator.hasNext());
+        s = iterator.next();
         assertEquals("Line2 *var*:", s);
-        s = reader.readLine();
+        s = iterator.next();
         assertEquals("", s);
-        s = reader.readLine();
+        s = iterator.next();
         assertEquals("Line*a*4", s);
-        assertEquals(null, reader.readLine()); //EOF
+        assertFalse(iterator.hasNext()); //EOF
     }
 
     /**
@@ -80,12 +81,12 @@ public class SubstitutingLineReaderTest extends AbstractTestCase {
                 "uid: gernj\n" +
                 "telephonenumber: +1 408 555 1212\n" +
                 "description:: $desc";
-        SubstitutingLineReader r = new SubstitutingLineReader(new StringReader(str), pc);
+        TrackingLineIterator r = new TrackingLineIterator(new StringReader(str), pc);
         BufferedReader r2 = new BufferedReader(new StringReader(expected));
-        for (int i=0;i<8;i++) {
-            assertEquals(r2.readLine(), r.readLine());
+        for (int i=0;i<7;i++) {
+            assertEquals(r2.readLine(), r.next());
         }
-
-
+        assertFalse(r.hasNext());
+        assertNull(r2.readLine());
     }
 }

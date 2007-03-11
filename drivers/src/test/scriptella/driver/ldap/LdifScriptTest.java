@@ -315,7 +315,7 @@ public class LdifScriptTest extends AbstractTestCase {
      * @return entry from ldif
      */
     private static Entry readEntry(String s) {
-        LdifReader lr = new LdifReader(new StringReader(s));
+        LdifReader lr = new LdifReader(s);
         return lr.next();
     }
 

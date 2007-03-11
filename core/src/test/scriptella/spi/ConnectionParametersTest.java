@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,5 +70,37 @@ public class ConnectionParametersTest extends AbstractTestCase {
         assertEquals("file:/url#hash", cp.getUrlProperty("url2").toString());
         assertEquals(IOUtils.toUrl(f), cp.getUrlProperty("url3"));
         assertEquals("file:/file4", cp.getUrlProperty("url4").toString());
+    }
+
+    public void testGetUrlQueryMap() {
+        //Simple test
+        Map<String, String> map = Collections.emptyMap();
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(map, "jdbc:demo?p1=v1&p2=v2"),
+                MockDriverContext.INSTANCE);
+        Map<String, String> m = cp.getUrlQueryMap();
+        assertEquals(2, m.size());
+        assertEquals("v1", m.get("p1"));
+        assertEquals("v2", m.get("p2"));
+
+        //No query params tests
+        cp = new ConnectionParameters(new MockConnectionEl(map, "jdbc:demo"),
+                MockDriverContext.INSTANCE);
+        m = cp.getUrlQueryMap();
+        assertTrue(m.isEmpty());
+
+        cp = new ConnectionParameters(new MockConnectionEl(map, "jdbc:demo  ? "),
+                MockDriverContext.INSTANCE);
+        m = cp.getUrlQueryMap();
+        assertTrue(m.isEmpty());
+
+        //More complex ones
+        cp = new ConnectionParameters(new MockConnectionEl(map, "jdbc:demo  ?  p1  =  v0 & p1= v1& flag&"),
+                MockDriverContext.INSTANCE);
+        m = cp.getUrlQueryMap();
+        assertEquals(2, m.size());
+        assertEquals("v1", m.get("p1"));
+        assertEquals("flag", m.get("flag"));
+
+
     }
 }

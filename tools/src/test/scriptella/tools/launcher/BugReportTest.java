@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.util;
+package scriptella.tools.launcher;
 
 import scriptella.AbstractTestCase;
 import scriptella.configuration.ConfigurationException;

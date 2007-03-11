@@ -25,7 +25,6 @@ import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
 import scriptella.tools.template.TemplateManager;
-import scriptella.util.BugReport;
 import scriptella.util.CollectionUtils;
 import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;

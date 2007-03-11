@@ -79,13 +79,13 @@ public final class IOUtils {
 
     /**
      * Loads a reader content into a string.
+     * <p><em>Note:</em>The content length is limited by {@link #MAX_LENGTH} characters.
      *
      * @param reader reader to load content from. Closed at the end of the operation.
      * @return string representation of reader content.
      */
     public static String toString(Reader reader) throws IOException {
         return toString(reader, MAX_LENGTH);
-
     }
 
     /**
@@ -117,6 +117,7 @@ public final class IOUtils {
 
     /**
      * Loads an input stream content into a byte array.
+     * <p><em>Note:</em>The content length is limited by {@link #MAX_LENGTH} bytes.
      *
      * @param is stream to load. Closed at the end of the operation.
      * @return stream bytes

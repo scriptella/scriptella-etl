@@ -17,6 +17,7 @@
 package scriptella.driver.ldap.ldif;
 
 import junit.framework.TestCase;
+import scriptella.expression.LineIterator;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -27,6 +28,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
@@ -81,8 +83,7 @@ public class LdifReaderTest extends TestCase {
     public void testLdifEmpty() throws NamingException {
         String ldif = "";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(0, entries.size());
     }
@@ -90,8 +91,7 @@ public class LdifReaderTest extends TestCase {
     public void testLdifEmptyLines() throws NamingException {
         String ldif = "\n\n\r\r\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(0, entries.size());
     }
@@ -104,8 +104,7 @@ public class LdifReaderTest extends TestCase {
                         " is is still a comment\n" +
                         "\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(0, entries.size());
     }
@@ -121,8 +120,9 @@ public class LdifReaderTest extends TestCase {
                 " 2\n" +
                 "# end";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        LdifReader reader = new LdifReader(ldif);
+        reader.asList();
+        List entries = reader.asList();
 
         assertEquals(0, entries.size());
         assertEquals(2, reader.getVersion());
@@ -144,9 +144,7 @@ public class LdifReaderTest extends TestCase {
                         "dependencies:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
         assertNotNull(entries);
 
         Entry entry = (Entry) entries.get(0);
@@ -184,10 +182,8 @@ public class LdifReaderTest extends TestCase {
                         "control: 1.2.840.11A556.1.4.805 true\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -218,10 +214,8 @@ public class LdifReaderTest extends TestCase {
                         "dn: ou=Product Development, dc=airius, dc=com\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -253,10 +247,8 @@ public class LdifReaderTest extends TestCase {
                         "dependencies:\n" +
                         "envVars:\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -287,10 +279,8 @@ public class LdifReaderTest extends TestCase {
                         "dependencies:\n" +
                         "envVars:\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -309,8 +299,7 @@ public class LdifReaderTest extends TestCase {
                         "dependencies:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertNotNull(entries);
 
@@ -351,8 +340,7 @@ public class LdifReaderTest extends TestCase {
                         "startupOptions:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertNotNull(entries);
 
@@ -393,8 +381,7 @@ public class LdifReaderTest extends TestCase {
                         "startupOptions:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertNotNull(entries);
 
@@ -434,8 +421,7 @@ public class LdifReaderTest extends TestCase {
                         "startupOptions:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertNotNull(entries);
 
@@ -476,8 +462,7 @@ public class LdifReaderTest extends TestCase {
                         "startupOptions:\n" +
                         "envVars:";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertNotNull(entries);
 
@@ -526,8 +511,7 @@ public class LdifReaderTest extends TestCase {
                         "sn: Jensen\n" +
                         "telephonenumber: +1 408 555 1212";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(2, entries.size());
 
@@ -597,8 +581,7 @@ public class LdifReaderTest extends TestCase {
                         " rch of perfect sailing conditions.\n" +
                         "title:Product Manager, Rod and Reel Division";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(1, entries.size());
 
@@ -653,8 +636,7 @@ public class LdifReaderTest extends TestCase {
                         " VyIGluIGl0IChhIENSKS4NICBCeSB0aGUgd2F5LCB5b3Ugc2hvdWxkIHJlYWxseSBnZXQg\n" +
                         " b3V0IG1vcmUu";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(1, entries.size());
 
@@ -705,8 +687,7 @@ public class LdifReaderTest extends TestCase {
                         " VyIGluIGl0IChhIENSKS4NICBCeSB0aGUgd2F5LCB5b3Ugc2hvdWxkIHJlYWxseSBnZXQg\n" +
                         " b3V0IG1vcmUu  ";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         assertEquals(1, entries.size());
 
@@ -796,8 +777,7 @@ public class LdifReaderTest extends TestCase {
                         "cn;lang-en: Rodney Ogasawara\n" +
                         "title;lang-en: Sales, Director\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         String[][][] values =
                 {
@@ -877,8 +857,7 @@ public class LdifReaderTest extends TestCase {
                         "telephonenumber: +1 408 555 1212\n" +
                         "jpegphoto:< file:" + HJENSEN_JPEG_FILE.getAbsolutePath() + "\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         String[][] values =
                 {
@@ -932,11 +911,8 @@ public class LdifReaderTest extends TestCase {
                         "telephonenumber: +1 408 555 1212\n" +
                         "jpegphoto:< file:" + HJENSEN_JPEG_FILE.getAbsolutePath() + "\n";
 
-        LdifReader reader = new LdifReader();
-        reader.setSizeLimit(128);
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(new LineIterator(new StringReader(ldif)), 128);
             fail();
         }
         catch (LdifParseException e) {
@@ -1016,8 +992,7 @@ public class LdifReaderTest extends TestCase {
                         "delete: description\n" +
                         "-\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         String[][][] values =
                 {
@@ -1174,8 +1149,7 @@ public class LdifReaderTest extends TestCase {
                         "control: 1.2.840.113556.1.4.805 true\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         Entry entry = (Entry) entries.get(0);
 
@@ -1200,8 +1174,7 @@ public class LdifReaderTest extends TestCase {
                         "control: 1.2.840.11556.1.4.805\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         Entry entry = (Entry) entries.get(0);
 
@@ -1226,8 +1199,7 @@ public class LdifReaderTest extends TestCase {
                         "control: 1.2.840.11556.1.4.805:control-value\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-        List entries = reader.parseLdif(ldif);
+        List entries = new LdifReader(ldif).asList();
 
         Entry entry = (Entry) entries.get(0);
 
@@ -1253,10 +1225,8 @@ public class LdifReaderTest extends TestCase {
                         "control: true\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -1275,10 +1245,8 @@ public class LdifReaderTest extends TestCase {
                         "control: 1.2.840.11A556.1.4.805 true\n" +
                         "changetype: delete\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {
@@ -1303,10 +1271,8 @@ public class LdifReaderTest extends TestCase {
                         "delete: facsimiletelephonenumber\n" +
                         "facsimiletelephonenumber: +1 408 555 9876\n";
 
-        LdifReader reader = new LdifReader();
-
         try {
-            reader.parseLdif(ldif);
+            new LdifReader(ldif).asList();
             fail();
         }
         catch (LdifParseException e) {

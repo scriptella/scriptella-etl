@@ -19,7 +19,8 @@ import scriptella.core.EtlCancelledException;
 import scriptella.driver.ldap.ldif.Entry;
 import scriptella.driver.ldap.ldif.LdifParseException;
 import scriptella.driver.ldap.ldif.LdifReader;
-import scriptella.driver.ldap.ldif.SubstitutingLineReader;
+import scriptella.driver.ldap.ldif.TrackingLineIterator;
+import scriptella.expression.LineIterator;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
 
@@ -81,15 +82,15 @@ public class LdifScript {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameters cannot be null");
         }
-        SubstitutingLineReader in = new SubstitutingLineReader(reader, parameters);
+        TrackingLineIterator in = new TrackingLineIterator(reader, parameters);
         AbstractConnection.StatementCounter counter = connection.getStatementCounter();
         try {
             in.trackLines();
-            for (LdifIterator it = new LdifIterator(in); it.hasNext(); in.trackLines()) {
+            for (LdifIterator it = newLdifIterator(in); it.hasNext(); in.trackLines()) {
                 EtlCancelledException.checkEtlCancelled();
                 Entry e = it.next();
                 if (isReadonly()) {
-                    LOG.info("Readonly Mode - "+e+" has been skipped.");
+                    LOG.info("Readonly Mode - " + e + " has been skipped.");
                 } else {
                     modify(ctx, e);
                 }
@@ -170,14 +171,20 @@ public class LdifScript {
         return connection != null && connection.isReadonly();
     }
 
+    private LdifIterator newLdifIterator(LineIterator in) {
+        Long mx = getMaxFileLength();
+        return mx == null ? new LdifIterator(in) : new LdifIterator(in, mx);
+
+    }
+
     private class LdifIterator extends LdifReader {
 
-        public LdifIterator(Reader in) {
+        public LdifIterator(LineIterator in, long sizeLimit) {
+            super(in, sizeLimit);
+        }
+
+        public LdifIterator(LineIterator in) {
             super(in);
-            final Long maxFileLength = getMaxFileLength();
-            if (maxFileLength != null) {
-                setSizeLimit(maxFileLength * 1024);
-            }
         }
 
         protected InputStream getUriStream(String uri) throws IOException {

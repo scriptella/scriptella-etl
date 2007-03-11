@@ -36,17 +36,17 @@ public final class CollectionUtils {
      */
     private static final Comparator<String> ASCII_CASE_INSENSITIVE_ORDER = new Comparator<String>() {
         public int compare(String s1, String s2) {
-            int n1=s1.length(), n2=s2.length();
-            int n=n1<n2?n1:n2;
-            for (int i=0; i<n; i++) {
+            int n1 = s1.length(), n2 = s2.length();
+            int n = n1 < n2 ? n1 : n2;
+            for (int i = 0; i < n; i++) {
                 char c1 = s1.charAt(i);
                 char c2 = s2.charAt(i);
                 if (c1 != c2) {
-                    if (c1>='A' && c1<='Z') { //Fast lower case
-                        c1=(char)(c1|0x20);
+                    if (c1 >= 'A' && c1 <= 'Z') { //Fast lower case
+                        c1 = (char) (c1 | 0x20);
                     }
-                    if (c2>='A' && c2<='Z') {
-                        c2=(char)(c2|0x20);
+                    if (c2 >= 'A' && c2 <= 'Z') {
+                        c2 = (char) (c2 | 0x20);
                     }
                     if (c1 != c2) {
                         return c1 - c2;
@@ -70,10 +70,30 @@ public final class CollectionUtils {
     /**
      * Returns parameterized version of {@link Properties} the instance
      * remains the same.
+     *
      * @param properties properties to represent as a map.
      */
     @SuppressWarnings("unchecked")
-    public static Map<String,String> asMap(Properties properties) {
-        return (Map)properties;
+    public static Map<String, String> asMap(Properties properties) {
+        return (Map) properties;
     }
+
+    /**
+     * Converts specified map to {@link java.util.Properties}. The keys and String values
+     * are migrated unchnaged, other types of values are {@link Object#toString() converted to String}.
+     * @param map map to convert.
+     * @return converted map as Properties.
+     */
+    public static Properties asProperties(Map<String, ?> map) {
+        Properties props = new Properties();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            Object v = entry.getValue();
+            if (v != null) {
+                props.put(entry.getKey(), v.toString());
+            }
+        }
+        return props;
+    }
+
+
 }

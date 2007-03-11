@@ -42,7 +42,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
                         "ERROR: msg1 error: msg2\n" +
                         "text\r\n" +
                         "ERROR: msg3");
-        TextQueryExecutor tq = new TextQueryExecutor(new StringReader("$severity: (\\w+).*"), true, in, new ParametersCallback() {
+        TextQueryExecutor tq = new TextQueryExecutor(new StringReader("$severity: (\\w+).*"), true, new ParametersCallback() {
             public Object getParameter(final String name) {
                 if ("severity".equals(name)) {
                     return "ERROR";
@@ -55,7 +55,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         expected.add("msg1");
         expected.add("msg3");
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        tq.execute(new QueryCallback() {
+        tq.execute(in, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("1");
                 assertTrue("Unexpected element " + p, expected.remove(p));
@@ -67,12 +67,12 @@ public class TextQueryExecutorTest extends AbstractTestCase {
 
     public void testEmptyQuery() {
         StringReader in = new StringReader("line1\nline2");
-        TextQueryExecutor tq = new TextQueryExecutor(new StringReader(""), false, in, MockParametersCallbacks.UNSUPPORTED);
+        TextQueryExecutor tq = new TextQueryExecutor(new StringReader(""), false, MockParametersCallbacks.UNSUPPORTED);
         final Set<String> expected = new HashSet<String>();
         expected.add("line1");
         expected.add("line2");
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        tq.execute(new QueryCallback() {
+        tq.execute(in, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("0");
                 assertTrue("Unexpected element " + p, expected.remove(p));
@@ -87,12 +87,12 @@ public class TextQueryExecutorTest extends AbstractTestCase {
      */
     public void testQueryMultiline() {
         StringReader in = new StringReader("line1\nline2\nline3\nline4");
-        TextQueryExecutor tq = new TextQueryExecutor(new StringReader("line2\nline4"), false, in, MockParametersCallbacks.UNSUPPORTED);
+        TextQueryExecutor tq = new TextQueryExecutor(new StringReader("line2\nline4"), false, MockParametersCallbacks.UNSUPPORTED);
         final Set<String> expected = new HashSet<String>();
         expected.add("line2");
         expected.add("line4");
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        tq.execute(new QueryCallback() {
+        tq.execute(in, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("0");
                 assertTrue("Unexpected element " + p, expected.remove(p));
@@ -111,11 +111,11 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         Arrays.fill(b, 'a');
 
         StringReader in = new StringReader(new String(b)+"match111111");
-        TextQueryExecutor tq = new TextQueryExecutor(new StringReader(".*(match).*"), true, in, MockParametersCallbacks.SIMPLE);
+        TextQueryExecutor tq = new TextQueryExecutor(new StringReader(".*(match).*"), true, MockParametersCallbacks.SIMPLE);
         final Set<String> expected = new HashSet<String>();
         expected.add("match");
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        tq.execute(new QueryCallback() {
+        tq.execute(in, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 String p = (String) parameters.getParameter("1");
                 String p2 = (String) parameters.getParameter("column1");

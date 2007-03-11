@@ -16,7 +16,11 @@
 package scriptella.expression;
 
 import scriptella.spi.ParametersCallback;
+import scriptella.util.IOUtils;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,6 +150,34 @@ public class PropertiesSubstitutor {
 
         return res.toString();
     }
+
+    /**
+     * Copies content from reader to writer and expands properties.
+     * @param reader reader to process.
+     * @param writer writer to output substituted content to.
+     * @throws IOException if I/O error occurs.
+     */
+    public void substitute(final Reader reader, final Writer writer) throws IOException {
+        //Current implementation is too simple,
+        // we need to provide a better implementation for stream based content.
+        writer.write(substitute(IOUtils.toString(reader)));
+    }
+
+    /**
+     * Reads content from reader and expands properties.
+     * <p><b>Note:</b> For performance reasons use
+     * {@link #substitute(java.io.Reader, java.io.Writer)} if possible.
+     * @param reader reader to process.
+     * @return reader's content with properties expanded.
+     * @throws IOException if I/O error occurs.
+     * @see #substitute(java.io.Reader, java.io.Writer)
+     */
+    public String substitute(final Reader reader) throws IOException {
+        //Current implementation is too simple,
+        // we need to provide a better implementation for stream based content.
+        return substitute(IOUtils.toString(reader));
+    }
+
 
     /**
      * @return parameter callback used for substitution.

@@ -43,8 +43,6 @@ public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
         String line = "Text ${subst1} $subst2 "+fill+":$end //";
         String exp = "Text subst1 subst2 "+fill+":end //";
 
-
-
         for (int i=0;i<100000;i++) {
             String s = ps.substitute(line);
             assertEquals(exp, s);
