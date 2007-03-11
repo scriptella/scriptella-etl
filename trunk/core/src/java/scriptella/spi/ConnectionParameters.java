@@ -20,12 +20,15 @@ import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
 import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
+import scriptella.util.StringUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -166,13 +169,11 @@ public class ConnectionParameters {
         }
         String s = a.toString().trim();
 
-        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
-        {
+        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s)) {
             return true;
         }
 
-        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s))
-        {
+        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
             return false;
         }
         throw new ConfigurationException("Unrecognized boolean property value " + a);
@@ -202,7 +203,7 @@ public class ConnectionParameters {
 
     /**
      * Parses property value as URL parameter.
-     * <p>The URL is resolved relative to script file location.
+     * <p>Relative URIs are resolved using a script file location as a base.
      *
      * @param name property name
      * @return value of the property or null if connection has no such property.
@@ -250,13 +251,57 @@ public class ConnectionParameters {
     }
 
     /**
+     * Convenience method which parses URL string, extracts a query string and returns a map of URL query parameters.
+     * <p>The query is assumed to have the following syntax: ?param=value&param2=value&param3
+     * <p>If parameter is declared twice, only the last value is returned in a map.
+     * If parameter has only a key, but no value part than the returned map would contain key=key mapping, e.g.
+     * jdbc:url?readonly produces a map of 1 entry <code>readonly=readonly</code>.
+     * <p>The drivers may use this method to support overriding connection parameters in an URL string.
+     *
+     * @return map of parsed parameters.
+     */
+    public Map<String, String> getUrlQueryMap() {
+        if (StringUtils.isEmpty(url)) {
+            return Collections.emptyMap();
+        }
+        int lastInd = url.indexOf('?') + 1;
+        if (lastInd > 0) {
+            Map<String, String> map = new HashMap<String, String>();
+            final int urlLength = url.length();
+            do {
+                int i = url.indexOf('&', lastInd);
+                if (i < 0) {
+                    i = urlLength;
+                }
+                String keyValue = url.substring(lastInd, i).trim();
+                if (!StringUtils.isEmpty(keyValue)) {
+                    int eqPos = keyValue.indexOf('=');
+                    if (eqPos > 0) { //If '=' present, split key and value
+                        String key = keyValue.substring(0, eqPos).trim();
+                        String value = keyValue.substring(eqPos + 1).trim();
+                        map.put(key, value);
+                    } else { //otherwise use key=value=keyValue
+                        map.put(keyValue, keyValue);
+                    }
+                }
+                lastInd = i + 1;
+            } while (lastInd < urlLength);
+            return map;
+        } else {
+            return Collections.emptyMap();
+        }
+
+
+    }
+
+    /**
      * Returns the url property resolved relative to a script location.
      *
      * @throws ConfigurationException if connection URL is malformed or null.
      */
     public URL getResolvedUrl() throws ConfigurationException {
         if (url == null) {
-            throw new ConfigurationException("URL connection property is requred");
+            throw new ConfigurationException("URL connection attribute is requred");
         }
         try {
             return getContext().resolve(url);

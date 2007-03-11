@@ -29,8 +29,6 @@ See http://forrest.apache.org/docs/linking.html for more info
 	<getstart label="Getting Started">
         <tutorial label="Two Minute Tutorial" href="tutorial.html" description="Two Minute Tutorial"/>
         <faq label="FAQ" href="faq.html" description="Frequently Asked Questions"/>
-        <snippets label="Code Snippets" description="Scriptella examples and code snippets at snippets.dzone.com"
-            href="http://snippets.dzone.com/tag/scriptella"/>
     </getstart>
 	<doc label="Documentation" tab="reference" description="Scriptella Documentation">
         <index label="Reference Documentation" href="reference/index.html" description="Scriptella Reference Documentation"/>

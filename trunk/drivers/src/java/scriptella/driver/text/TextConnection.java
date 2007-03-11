@@ -89,16 +89,11 @@ public class TextConnection extends AbstractTextConnection {
             throw new TextProviderException("Cannot read a text query", e);
         }
 
-        TextQueryExecutor tq = null;
         try {
-            tq = new TextQueryExecutor(q, trim, in , parametersCallback);
-            tq.execute(queryCallback, counter);
+            new TextQueryExecutor(q, trim, parametersCallback).execute(in, queryCallback, counter);
         } finally {
-            if (tq!=null) {
-                IOUtils.closeSilently(tq);
-            } else {
-                IOUtils.closeSilently(in);
-            }
+            IOUtils.closeSilently(q);
+            IOUtils.closeSilently(in);
         }
     }
 

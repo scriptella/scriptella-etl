@@ -109,11 +109,25 @@ public final class StringUtils {
      * Formats specified string for console suitable representation.
      * <p>All EOL char sequences are replaced with a single system line.separator,
      * and all other whitespace sequences are replaced with a single space.
+     * <p>String larger than 10KB are trimmed.
      *
      * @param string string to format. Nulls are allowed.
      * @return formatted string.
      */
     public static String consoleFormat(String string) {
+        return consoleFormat(string, 10000);
+    }
+
+    /**
+     * Formats specified string for console suitable representation.
+     * <p>All EOL char sequences are replaced with a single system line.separator,
+     * and all other whitespace sequences are replaced with a single space.
+     *
+     * @param string string to format. Nulls are allowed.
+     * @param maxLength maximum number of characters to show or negative if the string cannot be trimmed.
+     * @return formatted string.
+     */
+    public static String consoleFormat(String string, int maxLength) {
         if (string == null) {
             return "";
         }
@@ -124,6 +138,9 @@ public final class StringUtils {
         }
         res = EOLS.matcher(res).replaceAll(sep);
         res = WHITESPACES.matcher(res).replaceAll(" ");
+        if (maxLength>0 && res.length()>maxLength) {
+            res=res.substring(0, maxLength)+" ...";
+        }
         return res;
     }
 

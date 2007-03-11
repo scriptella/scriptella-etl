@@ -48,7 +48,7 @@ public abstract class AbstractConnection implements Connection {
     }
 
     /**
-     * Instantiates a connection with dialectIdentifier and connection parameters.
+     * Instantiates a connection with parameters.
      * @param parameters connection parameters to use for general properties.
      */
     protected AbstractConnection(ConnectionParameters parameters) {

@@ -16,15 +16,14 @@
  */
 package scriptella.driver.ldap.ldif;
 
+import scriptella.expression.LineIterator;
 import scriptella.util.StringUtils;
 
 import javax.naming.directory.DirContext;
 import javax.naming.ldap.BasicControl;
 import javax.naming.ldap.Control;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -159,7 +158,7 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
     /**
      * Size limit for file contained values
      */
-    private long sizeLimit = SIZE_LIMIT_DEFAULT;
+    private final long sizeLimit;
 
     /**
      * The default size limit : 1Mo
@@ -181,9 +180,9 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
     private Entry prefetched;
 
     /**
-     * The ldif Reader
+     * The ldif LineIterator
      */
-    private Reader in;
+    private LineIterator in;
 
     /**
      * A flag set if the ldif contains entries
@@ -197,31 +196,34 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
 
 
     /**
-     * Constructors
+     * A constructor which takes a line iterator.
+     *
+     * @param in A Reader containing ldif formated input
+     * @throws LdifParseException If the file cannot be processed or if the format is incorrect
      */
-    public LdifReader() {
+    public LdifReader(LineIterator in) {
+        this(in, SIZE_LIMIT_DEFAULT);
     }
 
-    private void init(BufferedReader in) throws LdifParseException {
+    /**
+     * * A constructor which takes a line iterator and a size limit.
+     *
+     * @param in A Reader containing ldif formated input
+     * @param sizeLimit maximum file size that can be accepted for an attribute value
+     */
+    public LdifReader(LineIterator in, long sizeLimit) {
         this.in = in;
-
+        this.sizeLimit = sizeLimit;
         // First get the version - if any -
         version = parseVersion();
         prefetched = parseEntry();
     }
 
     /**
-     * A constructor which takes a Reader
-     *
-     * @param in A Reader containing ldif formated input
-     * @throws LdifParseException If the file cannot be processed or if the format is incorrect
+     * For testing purposes.
      */
-    public LdifReader(Reader in) {
-        if (in instanceof BufferedReader) {//check to avoid double buffering
-            init((BufferedReader) in);
-        } else {
-            init(new BufferedReader(in));
-        }
+    public LdifReader(String string) {
+        this(new LineIterator(new StringReader(string)));
     }
 
     /**
@@ -237,16 +239,6 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
     public long getSizeLimit() {
         return sizeLimit;
     }
-
-    /**
-     * Set the maximum file size that can be accepted for an attribute value
-     *
-     * @param sizeLimit The size in bytes
-     */
-    public void setSizeLimit(long sizeLimit) {
-        this.sizeLimit = sizeLimit;
-    }
-
 
     /**
      * Parse the changeType
@@ -895,57 +887,53 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
         lines.clear();
         StringBuilder sb = new StringBuilder(128);
 
-        try {
-            while ((line = ((BufferedReader) in).readLine()) != null) { //while not EOF
-                if (StringUtils.isAsciiWhitespacesOnly(line)) { //if line is empty
-                    if (isFirstLine) {
+        while (in.hasNext()) { //while not EOF
+            line = in.next();
+            if (StringUtils.isAsciiWhitespacesOnly(line)) { //if line is empty
+                if (isFirstLine) {
+                    continue;
+                } else {
+                    // The line is empty, we have read an entry
+                    insideComment = false;
+                    if (lines.isEmpty()) { //if block is empty, i.e. comments section - read the next entry
                         continue;
-                    } else {
-                        // The line is empty, we have read an entry
-                        insideComment = false;
-                        if (lines.isEmpty()) { //if block is empty, i.e. comments section - read the next entry
-                            continue;
-                        } else { //otherwise stop
-                            break;
-                        }
+                    } else { //otherwise stop
+                        break;
                     }
                 }
-
-                isFirstLine = false;
-
-                // We will read the first line which is not a comment
-                switch (line.charAt(0)) {
-                    case '#':
-                        insideComment = true;
-                        break;
-
-                    case ' ':
-                        if (insideComment) {
-                            continue;
-                        } else if (sb.length() == 0) {
-                            throw new LdifParseException("Ldif Parsing error: Cannot have an empty continuation line");
-                        } else {
-                            sb.append(line.substring(1));
-                        }
-
-                        insideComment = false;
-                        break;
-
-                    default:
-                        // We have found a new entry
-                        // First, stores the previous one if any.
-                        if (sb.length() != 0) {
-                            lines.add(sb.toString());
-                        }
-
-                        sb = new StringBuilder(line);
-                        insideComment = false;
-                        break;
-                }
             }
-        }
-        catch (IOException ioe) {
-            throw new LdifParseException("Error while reading ldif lines");
+
+            isFirstLine = false;
+
+            // We will read the first line which is not a comment
+            switch (line.charAt(0)) {
+                case '#':
+                    insideComment = true;
+                    break;
+
+                case ' ':
+                    if (insideComment) {
+                        continue;
+                    } else if (sb.length() == 0) {
+                        throw new LdifParseException("Ldif Parsing error: Cannot have an empty continuation line");
+                    } else {
+                        sb.append(line.substring(1));
+                    }
+
+                    insideComment = false;
+                    break;
+
+                default:
+                    // We have found a new entry
+                    // First, stores the previous one if any.
+                    if (sb.length() != 0) {
+                        lines.add(sb.toString());
+                    }
+
+                    sb = new StringBuilder(line);
+                    insideComment = false;
+                    break;
+            }
         }
 
         // Stores the current line if necessary.
@@ -1004,20 +992,10 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
     }
 
 
-    List parseLdif(String s) {
-        return parseLdif(new BufferedReader(new StringReader(s)));
-    }
-
     /**
-     * The main entry point of the LdifParser. It reads a buffer and returns a
-     * List of entries.
-     *
-     * @param in The buffer being processed
-     * @return A list of entries
-     * @throws LdifParseException If something went wrong
+     * Just a helper method
      */
-    public List<Entry> parseLdif(BufferedReader in) {
-        init(in);
+    List<Entry> asList() {
         // Create a list that will contain the read entries
         List<Entry> entries = new ArrayList<Entry>();
 
@@ -1026,7 +1004,6 @@ public class LdifReader implements Iterator<Entry>, Iterable<Entry> {
             Entry entry = next();
             entries.add(entry);
         }
-
         return entries;
     }
 

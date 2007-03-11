@@ -15,6 +15,7 @@
  */
 package scriptella.driver.text;
 
+import scriptella.expression.LineIterator;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ParametersCallback;
@@ -24,7 +25,6 @@ import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -71,17 +71,16 @@ import java.util.regex.Pattern;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-class TextQueryExecutor implements ParametersCallback, Closeable {
+class TextQueryExecutor implements ParametersCallback {
     private static final Logger LOG = Logger.getLogger(TextQueryExecutor.class.getName());
     private final ParametersCallback params;
     private final PropertiesSubstitutor ps;
     private Pattern[] query;
-    private BufferedReader reader;
     private Matcher result;
     private boolean trim;
     private static final String COLUMN_PREFIX = "column";
 
-    public TextQueryExecutor(final Reader queryReader, final boolean trim, final Reader in, final ParametersCallback parentParametersCallback) {
+    public TextQueryExecutor(final Reader queryReader, final boolean trim, final ParametersCallback parentParametersCallback) {
         if (queryReader == null) {
             throw new IllegalArgumentException("Query cannot be null");
         }
@@ -116,8 +115,6 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
             result.add(Pattern.compile(".*"));
         }
         query = result.toArray(new Pattern[result.size()]);
-        reader = IOUtils.asBuffered(in);
-
     }
 
     /**
@@ -126,33 +123,28 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
      * @param qc callback to notify on each row.
      * @param counter statements counter.
      */
-    public void execute(final QueryCallback qc,  AbstractConnection.StatementCounter counter) {
+    public void execute(Reader reader, final QueryCallback qc,  AbstractConnection.StatementCounter counter) {
         int qCount = query.length;
-        try {
-            Matcher[] matchers = new Matcher[qCount];
-            for (String line; (line = reader.readLine()) != null;) {
-                if (trim) {
-                    line = line.trim();
+        Matcher[] matchers = new Matcher[qCount];
+        LineIterator it = new LineIterator(reader, ps, trim);
+        while (it.hasNext()) {
+            String line = it.next();
+            for (int i = 0; i < qCount; i++) {
+                Matcher m = matchers[i];
+                if (m == null) { //First time initialization
+                    m = query[i].matcher(line);
+                    matchers[i] = m;
+                } else { //Reuse matcher for better performance
+                    m.reset(line);
                 }
-                for (int i = 0; i < qCount; i++) {
-                    Matcher m = matchers[i];
-                    if (m == null) { //First time initialization
-                        m = query[i].matcher(line);
-                        matchers[i] = m;
-                    } else { //Reuse matcher for better performance
-                        m.reset(line);
+                if (m.matches()) {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.info("Pattern matched: " + m);
                     }
-                    if (m.matches()) {
-                        if (LOG.isLoggable(Level.FINE)) {
-                            LOG.info("Pattern matched: " + m);
-                        }
-                        result = m;
-                        qc.processRow(this);
-                    }
+                    result = m;
+                    qc.processRow(this);
                 }
             }
-        } catch (IOException e) {
-            throw new TextProviderException("Unable to read a text file", e);
         }
         counter.statements+=qCount;
     }
@@ -181,10 +173,5 @@ class TextQueryExecutor implements ParametersCallback, Closeable {
             }
         }
         return params.getParameter(name);
-    }
-
-    public void close() throws IOException {
-        IOUtils.closeSilently(reader);
-        reader = null;
     }
 }

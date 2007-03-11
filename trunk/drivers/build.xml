@@ -7,6 +7,8 @@
         <pathelement location="${basedir}/../lib/spring.jar"/>
         <pathelement location="${basedir}/../lib/lucene-core.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
+        <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
+        <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>

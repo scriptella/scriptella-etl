@@ -126,13 +126,12 @@ public class PropertiesMap implements Map<String, Object> {
      * @throws IOException if I/O error occurs.
      */
     public void load(InputStream is) throws IOException {
-        Properties tmp = new Properties() { //Overrides Properties to preserve insertion order
+        new Properties() { //Overrides Properties to preserve insertion order
 
             public Object put(final Object k, final Object v) {
                 return PropertiesMap.this.put((String) k, v);
             }
-        };
-        tmp.load(is);
+        }.load(is);
     }
 
 
