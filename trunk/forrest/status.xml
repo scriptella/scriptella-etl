@@ -36,6 +36,17 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
+        <release version="0.8dev" date="Unreleased">
+            <action context="code" type="add" dev="ejboy" fixes-bug="5009">
+                Runnable and Callable façade for EtlExecutor
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5007">
+                Mail provider
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="4648">
+                Fix Spring context propagation
+            </action>
+        </release>
         <release version="0.7" date="2007-02-14">
             <action context="code" type="add" dev="ejboy" fixes-bug="3792">
                 JEXL driver
