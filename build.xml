@@ -47,6 +47,9 @@
             Optional temp files cleanup.
         </description>
         <delete dir="${tmp.dir}" failonerror="no"/>
+        <ant dir="${core}" inheritall="false" target="clean"/>
+        <ant dir="${tools}" inheritall="false" target="clean"/>
+        <ant dir="${drivers}" inheritall="false" target="clean"/>
     </target>
 
     <target name="jar" depends="clean">
