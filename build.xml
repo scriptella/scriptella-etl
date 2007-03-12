@@ -97,7 +97,7 @@
             <fileset dir="${tools}/src/java" includes="**/*.java"/>
         </zip>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${lib.dir}" includes="commons-*.jar *license*.txt" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt" prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
