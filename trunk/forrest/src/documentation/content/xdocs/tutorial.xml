@@ -8,47 +8,47 @@
 		<section>
 			<title>Installation</title>
 			<ul>
-				<li><a href="download.html">Download</a> scriptella binary distribution.</li>
-				<li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to your system path.</li>
-				<li>Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+				<li><a href="download.html">Download</a> Scriptella binary distribution.</li>
+                <li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to system path variable.</li>
+                <li>Check if JRE has been installed correctly by running java -version.
+                <p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p></li>
+                <li><em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
                     or directly specify classpath attribute in script connection elements.</li>
 			</ul>
 		</section>
 		<section>
-			<title>Use scriptella as Ant task</title>
-			<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
-			<source><![CDATA[
-<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar;additional_drivers.jar"/>
-                ]]></source>
-            <note>Additional drivers classpath elements are optional. You may directly specify classpath attribute in
-            connection XML element.</note>
+			<title>Use Scriptella as Ant Task</title>
+			<p>In order to use Scriptella as Ant task you will need the following taskdef declaration:</p>
+			<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar[;additional_drivers.jar]"/>]]></source>
+            <note>Additional drivers classpath entries are optional. You may directly specify classpath attribute in
+            a connection XML element declaration. Example:<br/><code>&lt;connection driver="sybase" classpath="jconn3.jar"/&gt;
+            </code></note>
             <p>Running Scriptella files from Ant is simple:</p>
-			<source><![CDATA[
-<etl/>
-                ]]></source>
+			<source><![CDATA[<etl/> <!-- Execute etl.xml file in the current directory -->]]></source>
                 <p>or</p>
-			<source><![CDATA[
-<etl file="path/to/your/file/>
-                ]]></source>
-
-			<note>
-By default the current directory file etl.xml is executed. Use file attribute to specify another path.
-            </note>
+			<source><![CDATA[<etl file="path/to/your/file/> <!-- Execute ETL file from specified location -->]]></source>
 		</section>
 		<section>
-			<title>Command-line execution</title>
+			<title>Command-Line Execution</title>
 			<p>Just type <code>scriptella</code> to run the file named etl.xml in the current directory.
 			Alternatively you can use java launcher:</p>
-			<source><![CDATA[
-java -jar scriptella.jar [arguments]
-                ]]></source>
-            <note>
-                You may use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar
-                to specify additional classpath (overcomes -jar option limitation). In this case
-                you don't have to define connection classpath attributes.
-            </note>
+			<source><![CDATA[java -jar scriptella.jar [arguments]]]></source>
         </section>
-		<section>
+        <section>
+            <title>Executing ETL Files from Java</title>
+            <p>It is extremely easy to run Scriptella ETL files from java code.
+                Just make sure scriptella.jar is on classpath and use any of the following methods to execute an ETL file:</p>
+            <source><![CDATA[
+EtlExecutor.newExecutor(new File("etl.xml")).execute(); //Execute etl.xml file
+EtlExecutor.newExecutor(getClass().getResource("etl.xml")).execute(); //Execute etl.xml file loaded from classpath
+EtlExecutor.newExecutor(
+    servletContext.getResource("/WEB-INF/db/init.etl.xml")).execute(); //Execute init.etl.xml file from web application WEB-INF directory]]></source>
+            <p>See <a href="../docs/api/scriptella/execution/EtlExecutor.html">EtlExecutor Javadoc</a>
+                for more details on how to execute ETL files from Java code.
+            </p>
+        </section>
+
+        <section>
 			<title>Examples</title>
             <p>For a quick start type <code>scriptella -t</code> to create a template etl.xml file.</p>
             <section>
@@ -106,7 +106,7 @@ java -jar scriptella.jar [arguments]
                     depending on a selected driver:</p>
                 <source><![CDATA[
     <etl>
-        <properties><!-- Reference external properties -->
+        <properties><!-- Load external properties -->
             <include href="etl.properties"/>
         </properties>
         <connection driver="$driver" url="$url" user="$user"
@@ -115,7 +115,7 @@ java -jar scriptella.jar [arguments]
             -- In this example dialects are used to
             -- include different DDLs for data types:
             -- Example: oracle-schema.sql for Oracle
-            <dialect name=".*hsql.*"> <!-- Regular expression-->
+            <dialect name=".*hsql.*"> <!-- Regular expressions supported-->
                 <include href="hsqldb-schema.sql"/>
             </dialect>
             <dialect name=".*oracle.*">
