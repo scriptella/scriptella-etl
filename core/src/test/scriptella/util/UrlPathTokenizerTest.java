@@ -56,6 +56,7 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
     /**
      * See CR #5029 Automatically convert windows DRIVE:/ paths to file:/ URL
      * Additionally unix absolute paths should be supported.
+     * @throws java.net.MalformedURLException if URL is malformed
      */
     public void testAbsolutePathConversion() throws MalformedURLException {
         //Windows path matcher
