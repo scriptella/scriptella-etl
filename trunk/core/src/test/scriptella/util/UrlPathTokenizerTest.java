@@ -32,7 +32,7 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
         String s = "  1.jar;;;:::: lib/second.jar   ;../third.jar:http://5.jar; file:/file name ;    ";
         UrlPathTokenizer tok = new UrlPathTokenizer(base);
         URL[] actual = tok.split(s);
-        String[] expected = new String[] {"file:/c:/docs/1.jar", "file:/c:/docs/lib/second.jar",
+        String[] expected = new String[]{"file:/c:/docs/1.jar", "file:/c:/docs/lib/second.jar",
                 "file:/c:/third.jar", "http://5.jar", "file:/file name"};
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -45,7 +45,7 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
         String s = "1.jar: lib/second.jar :third.jar:;http://5.jar;  ::;  http://ftp:/user";
         UrlPathTokenizer tok = new UrlPathTokenizer(base);
         URL[] actual = tok.split(s);
-        String[] expected = new String[] {"file:/var/1.jar", "file:/var/lib/second.jar",
+        String[] expected = new String[]{"file:/var/1.jar", "file:/var/lib/second.jar",
                 "file:/var/third.jar", "http://5.jar", "http://ftp:/user"};
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -56,6 +56,7 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
     /**
      * See CR #5029 Automatically convert windows DRIVE:/ paths to file:/ URL
      * Additionally unix absolute paths should be supported.
+     *
      * @throws java.net.MalformedURLException if URL is malformed
      */
     public void testAbsolutePathConversion() throws MalformedURLException {
@@ -76,8 +77,6 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
         assertEquals(new URL("file:/tmp"), urls[1]);
         assertEquals(new URL("file:/c:/docs/test"), urls[2]);
     }
-
-
 
 
 }
