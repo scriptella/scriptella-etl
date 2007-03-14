@@ -33,7 +33,7 @@ import java.net.URL;
  * <ul>
  * <li>?{file 'http://site.com/img.gif')
  * <li>?{file 'file:/path/img.gif')
- * <li>?{file 'file:img.gif') - represents a reference relative to a directory where script file located.
+ * <li>?{file 'img.gif') - represents a reference relative to a directory where script file located.
  * </ul>
  * @see Expression
  *
