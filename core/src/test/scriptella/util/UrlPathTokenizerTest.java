@@ -53,5 +53,30 @@ public class UrlPathTokenizerTest extends AbstractTestCase {
         }
     }
 
+    /**
+     * See CR #5029 Automatically convert windows DRIVE:/ paths to file:/ URL
+     * Additionally unix absolute paths should be supported.
+     */
+    public void testAbsolutePathConversion() throws MalformedURLException {
+        //Windows path matcher
+        //Matching examples: C: C:/ D:/prj/file.etl
+        //Not matches: C:// D:test
+        UrlPathTokenizer t = new UrlPathTokenizer(new URL("file:/c:/docs/etl.xml"));
+        URL[] urls = t.split("d:/;c:/test.txt:e:");
+        assertEquals(3, urls.length);
+        assertEquals(new URL("file:/d:/"), urls[0]);
+        assertEquals(new URL("file:/c:/test.txt"), urls[1]);
+        assertEquals(new URL("file:/e:"), urls[2]);
+
+        //Now test absolute unix paths
+        urls = t.split("/usr/java;/tmp:test");
+        assertEquals(3, urls.length);
+        assertEquals(new URL("file:/usr/java"), urls[0]);
+        assertEquals(new URL("file:/tmp"), urls[1]);
+        assertEquals(new URL("file:/c:/docs/test"), urls[2]);
+    }
+
+
+
 
 }
