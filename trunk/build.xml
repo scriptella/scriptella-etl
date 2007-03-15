@@ -71,12 +71,13 @@
             </filterchain>
         </copy>
         <jar destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF">
-            <fileset dir="${core}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
-            <fileset dir="${tools}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
-            <fileset dir="${drivers}/build/tmp/classes" includes="**" excludes="META-INF/*"/>
+            <fileset dir="${core}/build/tmp/classes" excludes="META-INF/*"/>
+            <fileset dir="${tools}/build/tmp/classes" excludes="META-INF/*"/>
+            <fileset dir="${drivers}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset file="${basedir}/version.properties"/>
-            <zipfileset src="${lib.dir}/commons-jexl.jar" includes="**" excludes="META-INF/*"/>
-            <zipfileset src="${lib.dir}/commons-logging.jar" includes="**" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-jexl.jar" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-logging.jar"
+                        excludes="META-INF/* **/NoOpLog* **/SimpleLog* **/LogSource*"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
