@@ -15,6 +15,8 @@
  */
 package scriptella.spi;
 
+import scriptella.util.IOUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -34,7 +36,7 @@ public class MockDriverContext implements DriverContext {
     }
 
     public URL resolve(final String uri) throws MalformedURLException {
-        return new URL(getScriptFileURL(),uri);
+        return IOUtils.resolve(getScriptFileURL(),uri);
     }
 
     public static final DriverContext INSTANCE = new MockDriverContext();

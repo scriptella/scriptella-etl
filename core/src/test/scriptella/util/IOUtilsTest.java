@@ -36,13 +36,26 @@ public class IOUtilsTest extends AbstractTestCase {
     }
 
     public void testToByteArray() throws IOException {
-        byte[] expected = new byte[] {1,2,3,4};
+        byte[] expected = new byte[]{1, 2, 3, 4};
         assertTrue(Arrays.equals(expected, IOUtils.toByteArray(new ByteArrayInputStream(expected))));
     }
 
     public void testToCharArray() throws IOException {
         String expected = "test1234\u0000";
         assertEquals(expected, IOUtils.toString(new StringReader(expected)));
+    }
+
+    public void testResolve() throws MalformedURLException {
+        URL base = new URL("file:/c:/docs/etl.xml");
+        assertEquals(new URL("file:/d:"), IOUtils.resolve(base, "d:"));
+        assertEquals(new URL("file:/d:/test.txt"), IOUtils.resolve(base, "d:/test.txt"));
+        try {
+            String malformed = "d://test.txt";
+            IOUtils.resolve(base, malformed);
+            fail("Malformed url " + malformed + " must be rejected");
+        } catch (MalformedURLException e) {
+            //OK
+        }
     }
 
 }

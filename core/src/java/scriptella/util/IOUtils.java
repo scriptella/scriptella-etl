@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 /**
  * I/O utility methods.
@@ -256,5 +257,42 @@ public final class IOUtils {
     public static URL toUrl(File file) throws MalformedURLException {
         return file.toURI().toURL();
     }
+
+
+    //Windows path matcher. Examples:
+    //Matches : C: C:/ D:/prj/file.etl
+    //No match: C:// D:test
+    private static final Pattern WINDOWS_PATH = Pattern.compile("[a-zA-Z]\\:/?([^/]|$).*");
+
+    /**
+     * Resolves specified uri to a specified base URL.
+     * <p>This method use {@link URL#URL(URL,String)} constructor and handles additional checks
+     * if URL cannot be resolved by a standard mechanism.
+     * <p>Typical example is handling windows absolute paths with forward slashes.
+     * These paths are malformed URIs, but Scriptella recognize them and converts to URL
+     * if no protocol handler has been registered.
+     * <p>In future we can add support for default URL stream handlers in addition to the ones
+     * supported by the JRE.
+     *
+     * @param base base URL to use for resulution.
+     * @param uri  a relative or an absolute URI.
+     * @return URL resolved relatively to the base URL.
+     * @throws java.net.MalformedURLException if specified URI cannot be resolved.
+     */
+    public static URL resolve(URL base, String uri) throws MalformedURLException {
+        try {
+            return new URL(base, uri);
+        } catch (MalformedURLException e) {
+            //if windows path, e.g. DRIVE:/, see CR #5029
+            if (WINDOWS_PATH.matcher(uri).matches()) {
+                //Add file:/ prefix and create URL
+                return new URL("file:/" + uri);
+            } else { //otherwise rethrow
+                throw e;
+            }
+
+        }
+    }
+
 
 }

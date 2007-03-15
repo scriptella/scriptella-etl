@@ -85,7 +85,7 @@ public class IncludeEl extends XmlConfigurableBase implements Resource {
 
     public Reader open() throws IOException {
         try {
-            URL u = new URL(url, href);
+            URL u = IOUtils.resolve(url, href);
             return IOUtils.getReader(u.openStream(), charset);
         } catch (MalformedURLException e) {
             throw (IOException) new IOException("Malformed include url: " + href).initCause(e);
