@@ -37,13 +37,7 @@ public class UrlPathTokenizer {
     //Path separator regexp,
     // \\s* - means extra whitespaces
     // \\:(?=[^/]{2} - means do not treat protocol:// as two paths - protocol and //
-    private static final Pattern SEPARATOR = Pattern.compile("\\s*(\\;|(\\:(?=[^/]{2})))\\s*");
-
-    //Windows path matcher. Examples:
-    //Matches : C: C:/ D:/prj/file.etl
-    //No match: C:// D:test
-    private static final Pattern WINDOWS_PATH = Pattern.compile("[a-zA-Z]\\:/?([^/]|$).*");
-
+    private static final Pattern SEPARATOR = Pattern.compile("\\s*(;|(:(?=[^/]{2})))\\s*");
 
     private final URL baseURL;
 
@@ -67,18 +61,7 @@ public class UrlPathTokenizer {
         for (String s : strings) {
             String u = s.trim();
             if (u.length() > 0) {
-                try {
-                    res.add(new URL(baseURL, u));
-                } catch (MalformedURLException e) {
-                    //if windows path, e.g. DRIVE:/, see CR #5029
-                    if (WINDOWS_PATH.matcher(u).matches()) {
-                        //Add file:/ prefix and create URL
-                        res.add(new URL("file:/" + u));
-                    } else { //otherwise rethrow
-                        throw e;
-                    }
-
-                }
+                res.add(IOUtils.resolve(baseURL, u));
             }
         }
         return res.toArray(new URL[res.size()]);

@@ -19,6 +19,7 @@ import scriptella.core.Session;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
+import scriptella.util.IOUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,7 +72,7 @@ public class EtlContext implements ParametersCallback, DriverContext {
     }
 
     public URL resolve(final String uri) throws MalformedURLException {
-        return new URL(baseURL, uri);
+        return IOUtils.resolve(baseURL, uri);
     }
 
 
