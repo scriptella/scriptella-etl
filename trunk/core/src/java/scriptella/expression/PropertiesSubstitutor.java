@@ -99,7 +99,11 @@ public class PropertiesSubstitutor {
         }
 
         final int len = s.length() - 1; //Last character is not checked - optimization
-        if (len <= 0 || s.indexOf('$') < 0) { //skip empty strings, single characters or other strings without $ char
+        if (len <= 0) { //skip empty strings or single characters
+            return s;
+        }
+        int i = s.indexOf('$'); //Remember the first index of $
+        if (i < 0 || i >= len) { //skip strings without $ char, or when the $ is the last char
             return s;
         }
         StringBuilder res = null;
@@ -107,7 +111,7 @@ public class PropertiesSubstitutor {
         m1.reset(s);
         m2.reset(s);
 
-        for (int i = s.indexOf('$'); i >= 0 && i < len; i = s.indexOf('$', i + 1)) {
+        for (; i >= 0 && i < len; i = s.indexOf('$', i + 1)) {
             //Start of expression
             Matcher m;
             if (m1.find(i + 1) && m1.start() == i + 1) {
