@@ -15,14 +15,11 @@
  */
 package scriptella.driver.velocity;
 
-import org.apache.velocity.runtime.RuntimeServices;
-import org.apache.velocity.runtime.log.LogSystem;
 import scriptella.spi.AbstractScriptellaDriver;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -33,37 +30,16 @@ import java.util.logging.Logger;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Velocity", "1.4");
-    private static final Logger LOG = Logger.getLogger(Driver.class.getName());
-    static final LogSystem LOG_SYSTEM = new LogSystem() {
-        public void init(RuntimeServices rs) {
-        }
+    static final Logger LOG = Logger.getLogger(Driver.class.getName());
 
-        public void logVelocityMessage(int level, String message) {
-            if (level < 0) {
-                return;
-            }
-            Level lev; //converting velocity level to JUL
-            switch (level) {
-                case DEBUG_ID:
-                    lev = Level.FINE;
-                    break;
-                case INFO_ID: //Velocity INFO is too verbose
-                    lev = Level.CONFIG;
-                    break;
-                case WARN_ID:
-                    lev = Level.INFO;
-                    break;
-                case ERROR_ID:
-                    lev = Level.WARNING;
-                    break;
-                default:
-                    lev = Level.INFO;
-            }
-            if (LOG.isLoggable(lev)) {
-                LOG.log(lev, "Engine: " + message);
-            }
+
+    public Driver() {
+        try { //Check if velocity is on classpath
+            Class.forName("org.apache.velocity.VelocityContext");
+        } catch (ClassNotFoundException e) {
+            throw new VelocityProviderException("Velocity not found on classpath. Check if connection classpath attribute points to velocity-dep.jar");
         }
-    };
+    }
 
     /**
      * Implementor should create a new connection based on specified parameters.
