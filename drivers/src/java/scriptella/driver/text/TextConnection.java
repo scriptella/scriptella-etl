@@ -51,6 +51,9 @@ public class TextConnection extends AbstractTextConnection {
         try {
             reader = scriptContent.open();
             out.execute(reader, parametersCallback, counter);
+            if (flush) {
+                out.flush();
+            }
         } catch (IOException e) {
             throw new TextProviderException("Failed to produce a text file", e);
         } finally {
@@ -64,7 +67,7 @@ public class TextConnection extends AbstractTextConnection {
     protected void initOut() {
         if (out == null) {
             try {
-                out = new TextScriptExecutor(IOUtils.getWriter(IOUtils.getOutputStream(url), encoding), trim, eol);
+                this.out = new TextScriptExecutor(newOutputWriter(), trim, eol);
             } catch (IOException e) {
                 throw new TextProviderException("Unable to open file " + url + " for writing", e);
             }
@@ -78,7 +81,7 @@ public class TextConnection extends AbstractTextConnection {
 
         Reader in;
         try {
-            in = IOUtils.getReader(url.openStream(), encoding);
+            in = newInputReader();
         } catch (IOException e) {
             throw new TextProviderException("Cannot open a text file for reading", e);
         }

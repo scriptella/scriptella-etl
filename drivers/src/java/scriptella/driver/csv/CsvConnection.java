@@ -30,6 +30,7 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
 public class CsvConnection extends AbstractTextConnection {
     private static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
+    private Writer writer;
 
 
     /**
@@ -93,13 +95,16 @@ public class CsvConnection extends AbstractTextConnection {
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
         try {
             executeScript(scriptContent.open(), parametersCallback);
+            if (flush && writer != null) {
+                writer.flush();
+            }
         } catch (IOException e) {
             throw new CsvProviderException("Cannot read script.", e);
         }
     }
 
 
-     void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
+    void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
 
         CSVReader r = new CSVReader(reader);//Parsing rules of script in XML is always standard
         CSVWriter out = getOut();
@@ -116,7 +121,7 @@ public class CsvConnection extends AbstractTextConnection {
                 }
             }
             //If only one column and empty - skip this row
-            if (row.length==1 && StringUtils.isAsciiWhitespacesOnly(row[0])) {
+            if (row.length == 1 && StringUtils.isAsciiWhitespacesOnly(row[0])) {
                 continue;
             }
 
@@ -140,7 +145,7 @@ public class CsvConnection extends AbstractTextConnection {
             throw new CsvProviderException("Cannot query and update a CSV file simultaneously.");
         }
         try {
-            CSVReader in = new CSVReader(IOUtils.getReader(url.openStream(), encoding), separator, quote);
+            CSVReader in = new CSVReader(newInputReader(), separator, quote);
             CsvQuery q = new CsvQuery(in, headers, trim);
             try {
                 q.execute(new CSVReader(queryContent.open()), parametersCallback, queryCallback, counter);
@@ -160,7 +165,8 @@ public class CsvConnection extends AbstractTextConnection {
     protected CSVWriter getOut() {
         if (out == null) {
             try {
-                out = new CSVWriter(IOUtils.getWriter(IOUtils.getOutputStream(url), encoding), separator, quote, eol);
+                writer = newOutputWriter();
+                out = new CSVWriter(writer, separator, quote, eol);
             } catch (IOException e) {
                 throw new CsvProviderException("Unable to open URL " + url + " for output", e);
             }
@@ -173,6 +179,7 @@ public class CsvConnection extends AbstractTextConnection {
         if (out != null) {
             try {
                 out.close();
+                writer = null;
             } catch (Exception e) {
                 LOG.log(Level.INFO, "A problem occured while trying to close CSV writer", e);
             }

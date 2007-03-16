@@ -24,7 +24,7 @@ is sent to the URL specified as connection parameter.</p>
         <th>Required</th>
     </tr>
     <tr>
-        <td>output.encoding</td>
+        <td>encoding</td>
         <td>Character encoding for output streams.</td>
         <td>No, the JVM default charset is used.</td>
     </tr>
@@ -34,7 +34,7 @@ is sent to the URL specified as connection parameter.</p>
 <h2>Example</h2>
 <code><pre>
 &lt;connection driver="scriptella.spi.velocity.Driver" url="report.html"&gt;
-    output.encoding=UTF-8;
+    encoding=UTF-8;
 &lt;/connection&gt;
 </pre></code>
 Registers a velocity connection which renders its output to a file report.html in the same directory

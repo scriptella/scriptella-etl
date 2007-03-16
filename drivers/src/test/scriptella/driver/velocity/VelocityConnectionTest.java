@@ -72,7 +72,13 @@ public class VelocityConnectionTest extends AbstractTestCase {
                     };
                 }
             });
+
             ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(), MockDriverContext.INSTANCE) {
+
+                public String getUrl() {
+                    return u.toString();
+                }
+
                 @Override
                 public URL getResolvedUrl() {
                     return u;

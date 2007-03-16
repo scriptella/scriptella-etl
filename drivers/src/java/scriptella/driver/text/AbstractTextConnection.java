@@ -18,11 +18,16 @@ package scriptella.driver.text;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
+import scriptella.util.IOUtils;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 
 /**
  * Base class for Text/CSV connections.
+ * <p>TODO: Move this class to a spi.support.text package.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -30,7 +35,8 @@ import java.net.URL;
 public abstract class AbstractTextConnection extends AbstractConnection {
     protected final String encoding;
     protected final boolean trim;
-    protected final URL url;
+    protected final boolean flush;
+    protected final URL url; //if null - use console
     protected final String eol;
     /**
      * Name of the <code>encoding</code> connection property.
@@ -51,11 +57,20 @@ public abstract class AbstractTextConnection extends AbstractConnection {
     public static final String TRIM = "trim";
 
     /**
+     * Name of the <code>flush</code> connection property.
+     * Value of <code>true</code> specifies that the outputted content should flushed immediately after
+     * the &lt;script&gt; element completes.
+     */
+    public static final String FLUSH = "flush";
+
+
+    /**
      * For testing only.
      */
     protected AbstractTextConnection() {
         encoding = null;
         trim = false;
+        flush = false;
         url = null;
         eol = "\n";
     }
@@ -68,16 +83,18 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      */
     protected AbstractTextConnection(DialectIdentifier dialectIdentifier, ConnectionParameters parameters) {
         super(dialectIdentifier, parameters);
-        url = parameters.getResolvedUrl();
+        //URL can be set null, in this case console is used for reading/writing
+        url = parameters.getUrl() == null ? null : parameters.getResolvedUrl();
         encoding = parameters.getCharsetProperty(ENCODING);
-        trim = parameters.getBooleanProperty("trim", true);
+        trim = parameters.getBooleanProperty(TRIM, true);
+        //When printing to console - flushing is enabled
+        flush = url==null || parameters.getBooleanProperty(FLUSH, false);
         String eolStr = parameters.getStringProperty(TextConnection.EOL);
         if (eolStr != null && eolStr.length() > 0) {
             eol = eolStr;
         } else {
             eol = "\n"; //Default value
         }
-
     }
 
     public String getEncoding() {
@@ -88,12 +105,40 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         return trim;
     }
 
+    /**
+     * Returns resolved URL for this connection.
+     * <p>If null, the console is used for reading/writing.
+     *
+     * @return resolved URL or null.
+     */
     public URL getUrl() {
         return url;
     }
 
     public String getEol() {
         return eol;
+    }
+
+    /**
+     * Creates a new writer to send output to.
+     *
+     * @return writer for output.
+     * @throws IOException if IO error occured.
+     */
+    protected Writer newOutputWriter() throws IOException {
+        return url == null ? ConsoleAdapters.getConsoleWriter(encoding):
+                IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
+    }
+
+    /**
+     * Creates a new reader for input.
+     *
+     * @return reader for input.
+     * @throws IOException if IO error occured.
+     */
+    protected Reader newInputReader() throws IOException {
+        return url == null ? ConsoleAdapters.getConsoleReader(encoding) :
+                IOUtils.getReader(url.openStream(), encoding);
     }
 
 }

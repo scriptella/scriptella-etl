@@ -155,7 +155,18 @@ public class CsvConnectionTest extends AbstractTestCase {
 
     }
 
+    public void testAutoFlush() throws UnsupportedEncodingException {
+        //Create a configuration with non default values
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(CsvConnection.FLUSH, "true");
+        props.put(CsvConnection.QUOTE, "");
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
-
+        CsvConnection con = new CsvConnection(cp);
+        String str = "-test-";
+        con.executeScript(new StringResource(str), MockParametersCallbacks.NULL);
+        assertNotNull(out);
+        assertEquals(str+"\n", new String(out.toByteArray()));
+    }
 
 }
