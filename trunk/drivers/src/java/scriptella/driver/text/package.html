@@ -11,7 +11,8 @@ simple output with properties substitution.
         <td><b>Driver class:</b></td><td><code>scriptella.driver.text.Driver</code></td>
     </tr>
     <tr>
-        <td><b>URL:</b></td><td><code>Text file URL. URIs are resolved relative to a script file directory.</code></td>
+        <td><b>URL:</b></td><td><code>Text file URL. URIs are resolved relative to a script file directory.
+    If url has no value the output is read from/printed to the console (System.out).</code></td>
     </tr>
     <tr>
         <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
@@ -37,9 +38,16 @@ simple output with properties substitution.
     <tr>
         <td>trim</td>
         <td>Value of <code>true</code> specifies that the leading and trailing
-     whitespaces in text file lines should be omitted..
+     whitespaces in text file lines should be omitted.
         <td>No, the default value is <code>true</code>.</td>
     </tr>
+    <tr>
+        <td>flush</td>
+        <td>Value of <code>true</code> specifies that the outputted content should flushed immediately when
+            the &lt;script&gt; element completes.
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+
 </table>
 <h2>Query Syntax</h2>
 Text driver supports Regular expressions syntax to query text files.

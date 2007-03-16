@@ -111,9 +111,12 @@ public class CsvConnectionPerfTest extends AbstractTestCase {
         CsvConnection con = new CsvConnection(cp);
         String expected = "\"*col1*\",\"col2\",\"col3\"\n\"*col21*\",\"col22\",\"col23\"\n";
         for (int i = 0; i < 10000; i++) {
+            if (out != null) {
+                out.reset();
+            }
             con.executeScript(new StringResource("$col1,\"col2\",col3\n${col21},col22,col23"),
                     MockParametersCallbacks.SIMPLE);
-            out.reset();
+
         }
 
         con.close();

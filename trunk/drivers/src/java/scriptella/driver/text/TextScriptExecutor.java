@@ -24,6 +24,7 @@ import scriptella.util.IOUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -62,7 +63,7 @@ import java.io.Writer;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class TextScriptExecutor implements Closeable {
+public class TextScriptExecutor implements Closeable, Flushable {
     private BufferedWriter out;
     private boolean trim;
     private String eol;
@@ -109,6 +110,11 @@ public class TextScriptExecutor implements Closeable {
         } catch (IOException e) {
             throw new TextProviderException("Failed reading a script file", e);
         }
+    }
+
+
+    public void flush() throws IOException {
+        out.flush();
     }
 
     public void close() throws IOException {

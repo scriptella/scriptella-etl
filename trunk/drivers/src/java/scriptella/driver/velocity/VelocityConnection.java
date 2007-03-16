@@ -19,25 +19,27 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogSystem;
-import scriptella.spi.*;
+import scriptella.driver.text.AbstractTextConnection;
+import scriptella.spi.ConnectionParameters;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.ProviderException;
+import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URL;
 import java.util.logging.Level;
 
 /**
  * Represents a session to velocity engine.
  */
-public class VelocityConnection extends AbstractConnection {
+public class VelocityConnection extends AbstractTextConnection {
     public static final String OUTPUT_ENCODING = "output.encoding";
-    private final URL url;
     private final VelocityEngine engine;
     private final VelocityContextAdapter adapter;
     private Writer writer;//lazy initialized
-    private String encoding;//encoding for writer
 
 
     /**
@@ -47,7 +49,6 @@ public class VelocityConnection extends AbstractConnection {
      */
     public VelocityConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
-        url = parameters.getResolvedUrl();
         engine = new VelocityEngine();
         engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, LOG_SYSTEM);
         engine.setProperty("velocimacro.library", "");//unnecessary file in our case
@@ -57,7 +58,6 @@ public class VelocityConnection extends AbstractConnection {
             throw new VelocityProviderException("Unable to initialize engine", e);
         }
         adapter = new VelocityContextAdapter();
-        encoding = parameters.getCharsetProperty(OUTPUT_ENCODING);
     }
 
     /**
@@ -77,7 +77,11 @@ public class VelocityConnection extends AbstractConnection {
         Reader reader = null;
         try {
             reader = scriptContent.open();
-            engine.evaluate(adapter, getWriter(), url.getFile(), reader);
+            Writer w = getWriter();
+            engine.evaluate(adapter, w, url == null ? "System.out" : url.getFile(), reader);
+            if (flush) {
+                w.flush();
+            }
         } catch (Exception e) {
             throw new VelocityProviderException("Unable to execute script", e);
         } finally {
@@ -93,7 +97,7 @@ public class VelocityConnection extends AbstractConnection {
      * @param queryContent       query content.
      * @param parametersCallback callback to get parameter values.
      * @param queryCallback      callback to call for each result set element produced by this query.
-     * @see #executeScript(scriptella.spi.Resource, scriptella.spi.ParametersCallback)
+     * @see #executeScript(scriptella.spi.Resource,scriptella.spi.ParametersCallback)
      */
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         throw new UnsupportedOperationException("Query execution is not supported yet");
@@ -102,7 +106,7 @@ public class VelocityConnection extends AbstractConnection {
     private Writer getWriter() {
         if (writer == null) {
             try {
-                writer = IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
+                writer = IOUtils.asBuffered(newOutputWriter());
             } catch (IOException e) {
                 throw new VelocityProviderException("Unable to open URL " + url + " for output", e);
             }
