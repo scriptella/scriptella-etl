@@ -1,0 +1,56 @@
+/*
+ * Copyright 2006-2007 The Scriptella Project Team.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package scriptella.expression;
+
+import scriptella.AbstractTestCase;
+import scriptella.spi.MockParametersCallbacks;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Fyodor Kupolov
+ * @version 1.0
+ */
+public class EtlVariableTest extends AbstractTestCase {
+    /**
+     * Simple tests.
+     *
+     * @throws ParseException if parsing fails.
+     */
+    public void test() throws ParseException {
+        EtlVariable etl = EtlVariable.get();
+        EtlVariable.DateUtils d = etl.getDate();
+        assertTrue(d.now().getTime() >= System.currentTimeMillis());
+        assertEquals("2007", d.format(d.parse("18.03.2007", "dd.MM.yyyy"), "yyyy"));
+    }
+
+    /**
+     * Test support of etl variable in expressions.
+     */
+    public void testExpression() {
+        Date d = (Date) Expression.compile("etl.date.now()").evaluate(MockParametersCallbacks.NULL);
+        assertTrue(d.getTime() >= System.currentTimeMillis());
+        String format = "MMddyyyy";
+        Map<String, Object> m = new HashMap<String, Object>();
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.fromMap(m));
+        String s = ps.substitute("${etl.date.today('" + format + "')}");
+        assertEquals(new SimpleDateFormat(format).format(new Date()), s);
+    }
+}

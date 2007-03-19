@@ -107,7 +107,11 @@ public class JexlExpression extends Expression {
         }
 
         public Object get(final Object key) {
-            return callback.getParameter((String) key);
+            String name = (String) key;
+            if (EtlVariable.NAME.equals(key)) {
+                return EtlVariable.get();
+            }
+            return callback.getParameter(name);
         }
 
         public Object put(final Object key, final Object o1) {
