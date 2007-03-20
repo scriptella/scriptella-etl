@@ -37,6 +37,24 @@
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
         <release version="0.8dev" date="Unreleased">
+            <action context="build" type="update" dev="ejboy" fixes-bug="5036">
+                Remove unused commons-logging classes from scriptella.jar
+            </action>
+            <action context="admin" type="update" dev="ejboy" fixes-bug="5033">
+                Upgrade to Janino 2.5.6
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="5031">
+                Send output to the console if no output file URL was specified for Velocity and Text driver
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="5029">
+                Automatically convert windows DRIVE:/ paths to file:/ URL
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5024">
+                Add a feature to work with dates in ${ ... } JEXL expressions
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="5016">
+                NULL not handled for CLOBs and BLOBs
+            </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="5009">
                 Runnable and Callable façade for EtlExecutor
             </action>
