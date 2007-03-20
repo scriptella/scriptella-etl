@@ -18,9 +18,12 @@ width="88" height="31" border="0" alt="Powered by Scriptella ETL"></a>]]></td></
         <section>
             <title>Scriptella-Related Sites</title>
             <ul>
+                <li><a href="http://scriptella.wordpress.com">Scriptella Blog</a></li>
+                <li><a href="http://jroller.com/page/ejboy">Author's Blog</a></li>
                 <li><a href="http://www.ohloh.net/projects/4526"><img src="http://www.ohloh.net/projects/4526/badge.gif" alt="Metrics by Ohloh"/></a> - Scriptella ETL metrics by Ohloh</li>
                 <li><a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples at DZone Snippets</a></li>
                 <li>Vote for Scriptella on <a href="http://javapowertools.wikidot.com/cooltools">Java Power Tools</a></li>
+                
             </ul>
         </section>
     </body>

@@ -48,7 +48,8 @@ public class EtlVariable {
     }
 
     /**
-     * Utility class for ETL file expressions
+     * Utility class for ETL file expressions.
+     * <p>Provides format/parse operation for date/time.
      */
     public static class DateUtils {
         /**
