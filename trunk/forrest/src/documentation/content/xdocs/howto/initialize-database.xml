@@ -18,7 +18,6 @@
 <howto>
 	<header>
 		<title>How to Initialize a Database on Application Startup.</title>
-		<version>0.7</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
