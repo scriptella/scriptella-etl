@@ -18,7 +18,6 @@
 <howto>
 	<header>
 		<title>Migrating from Ant SQL Task.</title>
-		<version>0.7</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
