@@ -104,20 +104,21 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 0.7 Released (February 14, 2007)</title>
-                <p>We are pleased to announce the release of Scriptella 0.7.
-                    New Features and Bug Fixes:</p>
+                <title>Scriptella 0.8 Released (March 28, 2007)</title>
+                <p>We are pleased to announce the availability release of Scriptella 0.8.
+                    New and Notable Features and Bug Fixes:</p>
                 <ul>
-                    <li>JEXL driver</li>
-                    <li>XML XPath provider, XML example</li>
-                    <li>Include scriptella-src-ide.zip in a binary distribution.</li>
-                    <li>Various performance optimizations.</li>
-                    <li>Improved examples, ODBC example was not working.</li>
-                    <li>Make "throughput" parameter in JMX mbean more accurate</li>
-                    <li>Compile error on JDK 6</li>
-                    <li>Do not produce bug report if no driver on classpath</li>
+                    <li>Working with dates in ${ ... } JEXL expressions</li>
+                    <li>Runnable and Callable façade for EtlExecutor.</li>
+                    <li>Mail provider.</li>
+                    <li>NULL not handled for CLOBs and BLOBs.</li>
+                    <li>Fix Spring context propagation.</li>
+                    <li>Send output to the console if no output file URL was specified for Velocity and Text driver.</li>
+                    <li>Automatically convert windows DRIVE:/ paths to file:/ URL (ejboy)</li>
+                    <li>Upgraded to Janino 2.5.6</li>
+                    <li>Removed unused commons-logging classes from scriptella.jar</li>
                 </ul>
-                <p>We wish everyone a Happy Valentine's Day (and night :) !<br/>
+                <p>Thank you for your contributions and ideas!<br/>
                 Make ETL easier - <a href="download.html">Download Scriptella Now!</a></p>
             </section>
         </section>
