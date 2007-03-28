@@ -105,7 +105,7 @@
             <title>News</title>
             <section>
                 <title>Scriptella 0.8 Released (March 28, 2007)</title>
-                <p>We are pleased to announce the availability release of Scriptella 0.8.
+                <p>We are pleased to announce the availability of Scriptella 0.8.
                     New and Notable Features and Bug Fixes:</p>
                 <ul>
                     <li>Working with dates in ${ ... } JEXL expressions</li>
@@ -114,7 +114,7 @@
                     <li>NULL not handled for CLOBs and BLOBs.</li>
                     <li>Fix Spring context propagation.</li>
                     <li>Send output to the console if no output file URL was specified for Velocity and Text driver.</li>
-                    <li>Automatically convert windows DRIVE:/ paths to file:/ URL (ejboy)</li>
+                    <li>Automatically convert windows DRIVE:/ paths to file:/ URL</li>
                     <li>Upgraded to Janino 2.5.6</li>
                     <li>Removed unused commons-logging classes from scriptella.jar</li>
                 </ul>
