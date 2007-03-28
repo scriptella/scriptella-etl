@@ -36,7 +36,7 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
-        <release version="0.8dev" date="Unreleased">
+        <release version="0.8" date="2007-03-28">
             <action context="build" type="update" dev="ejboy" fixes-bug="5036">
                 Remove unused commons-logging classes from scriptella.jar
             </action>
@@ -47,7 +47,7 @@
                 Send output to the console if no output file URL was specified for Velocity and Text driver
             </action>
             <action context="code" type="update" dev="ejboy" fixes-bug="5029">
-                Automatically convert windows DRIVE:/ paths to file:/ URL
+                Automatically convert windows DRIVE:/ paths to file:/DRIVE:/ URL
             </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="5024">
                 Add a feature to work with dates in ${ ... } JEXL expressions
