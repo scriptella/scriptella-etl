@@ -97,6 +97,7 @@
             <fileset dir="core/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
             <fileset dir="core/src/conf" includes="**"/>
             <fileset dir="drivers/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
+            <fileset dir="drivers/src/conf" includes="**"/>
             <fileset dir="tools/src/test" includes="**/*.properties **/*.sql **/*.xml"/>
             <fileset dir="tools/src/conf" includes="**"/>
         </copy>
