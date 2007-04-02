@@ -142,9 +142,6 @@ public class VelocityConnection extends AbstractTextConnection {
                 case INFO_ID: //Velocity INFO is too verbose
                     lev = Level.CONFIG;
                     break;
-                case WARN_ID:
-                    lev = Level.INFO;
-                    break;
                 case ERROR_ID:
                     lev = Level.WARNING;
                     break;
