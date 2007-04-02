@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    private static long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
     private int size;
 
     public LRUMap(int size) {
