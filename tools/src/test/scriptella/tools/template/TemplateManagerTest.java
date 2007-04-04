@@ -49,10 +49,30 @@ public class TemplateManagerTest extends AbstractTestCase {
                 return true;
             }
         };
-        tm.create();
+        tm.create(null);
         assertEquals(2, files.size());
         assertTrue(files.containsKey("etl[1].xml"));
         assertTrue(files.containsKey("etl[1].properties"));
 
+    }
+
+    /**
+     * Test {@link scriptella.tools.template.TemplateManager#create(String, String)} method.
+     * @throws IOException if I/O error occurs.
+     */
+    public void testCreate() throws IOException {
+        TestTemplate.created=false;
+        TemplateManager.create("TemplateManagerTest$TestTemplate", null);
+        assertTrue(TestTemplate.created);
+    }
+
+    /**
+     * Mock template class.
+     */
+    public static class TestTemplate extends TemplateManager {
+        public static boolean created;
+        public void create(Map<String, String> properties) throws IOException {
+            created=true;
+        }
     }
 }
