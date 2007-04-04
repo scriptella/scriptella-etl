@@ -16,6 +16,7 @@
 package scriptella.tools.launcher;
 
 import scriptella.DBTestCase;
+import scriptella.tools.template.TemplateManagerTest;
 import scriptella.util.IOUtils;
 
 import javax.management.MBeanServer;
@@ -109,6 +110,16 @@ public class EtlLauncherTest extends DBTestCase {
 
         assertEquals(EtlLauncher.ErrorCode.FAILED, launcher.launch(new String[] {fileName}));
         assertFalse(srv.isRegistered(mbeanName));
+    }
+
+    /**
+     * Tests -t option
+     */
+    public void testTemplate() {
+        EtlLauncher etl = new EtlLauncher();
+        TemplateManagerTest.TestTemplate.created=false;
+        etl.launch(new String[] {"-t", "TemplateManagerTest$TestTemplate"});
+        assertTrue(TemplateManagerTest.TestTemplate.created);
     }
 
 

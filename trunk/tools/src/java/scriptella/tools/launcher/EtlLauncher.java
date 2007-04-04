@@ -35,6 +35,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +61,11 @@ public class EtlLauncher {
      * Error codes returned by the launcher.
      */
     public enum ErrorCode {
-       OK(0), FAILED(1), FILE_NOT_FOUND(2), UNRECOGNIZED_OPTION(3);
+        OK(0), FAILED(1), FILE_NOT_FOUND(2), UNRECOGNIZED_OPTION(3);
 
-       ErrorCode(int code) {
-           errorCode = code;
-       }
+        ErrorCode(int code) {
+            errorCode = code;
+        }
 
         private int errorCode;
 
@@ -101,7 +102,7 @@ public class EtlLauncher {
     private EtlExecutor exec = new EtlExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
-    private Map<String,?> properties;
+    private Map<String, ?> properties;
     public static final String DEFAULT_FILE_NAME = "etl.xml";
 
     public EtlLauncher() {
@@ -110,6 +111,7 @@ public class EtlLauncher {
 
     /**
      * Launches ETL script using command line arguments.
+     *
      * @param args command line arguments.
      * @return exit error code.
      * @see System#exit(int)
@@ -124,7 +126,10 @@ public class EtlLauncher {
         ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Execution Progress");
 
         try {
-            for (String arg : args) {
+            List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+            while (!arguments.isEmpty()) {
+                String arg = arguments.get(0);
+                arguments.remove(0);
                 if (arg.startsWith("-h")) {
                     printUsage();
                     return ErrorCode.OK;
@@ -142,18 +147,16 @@ public class EtlLauncher {
                     return ErrorCode.OK;
                 }
                 if (arg.startsWith("-t")) {
-                    template();
-                    return ErrorCode.OK;
+                    return template(arguments);
                 }
                 if (arg.startsWith("-")) {
-                    err.println("Unrecognized option "+arg);
+                    err.println("Unrecognized option " + arg);
                     return ErrorCode.UNRECOGNIZED_OPTION;
                 }
                 if (!arg.startsWith("-")) {
                     files.add(resolveFile(null, arg));
                 }
             }
-
 
             if (files.isEmpty()) { //adding default name if no files specified
                 files.add(resolveFile(null, null));
@@ -190,7 +193,7 @@ public class EtlLauncher {
         }
         LoggingConfigurer.remove(h);
 
-        return failed?ErrorCode.FAILED:ErrorCode.OK;
+        return failed ? ErrorCode.FAILED : ErrorCode.OK;
     }
 
     protected void printVersion() {
@@ -212,21 +215,30 @@ public class EtlLauncher {
         out.println("  -template, -t        creates an etl.xml template file in the current directory");
     }
 
-    protected void template() {
+    protected ErrorCode template(List<String> args) {
         try {
-            new TemplateManager().create();
+            String name = args.isEmpty() ? null : args.get(0);
+            String props = null;
+            if (name != null) { //if not an option - shift the argument
+                args.remove(0);
+                props = args.isEmpty() ? null : args.get(0);
+            }
+            TemplateManager.create(name, props);
         } catch (Exception e) {
             err.println(e.getMessage());
+            return ErrorCode.FAILED;
         }
+        return ErrorCode.OK;
     }
 
     /**
      * Sets additional properties available for ETL.
      * <p>By default {@link System#getProperties()} is used.
+     *
      * @param props properties map.
      */
-    public void setProperties(final Map<String,?> props) {
-        properties=props;
+    public void setProperties(final Map<String, ?> props) {
+        properties = props;
     }
 
     public void setProgressIndicator(final ProgressIndicator indicator) {
@@ -288,7 +300,7 @@ public class EtlLauncher {
     }
 
     public static void main(final String args[]) {
-        EtlLauncher launcher=new EtlLauncher();
+        EtlLauncher launcher = new EtlLauncher();
         System.exit(launcher.launch(args).getErrorCode());
     }
 
@@ -297,6 +309,7 @@ public class EtlLauncher {
      */
     private static class EtlShutdownHook extends Thread {
         private static final EtlShutdownHook INSTANCE = new EtlShutdownHook();
+
         private EtlShutdownHook() {
             setName("ETL Cancellation Thread");
         }
@@ -308,9 +321,9 @@ public class EtlLauncher {
             }
             //Cancel all ETL task, the findEtlMBeans result may be stale 
             int i = JmxEtlManager.cancelAll();
-            if (i>1) {
-                System.out.println(i+" ETL tasks cancelled");
-            } else if (i==1) {
+            if (i > 1) {
+                System.out.println(i + " ETL tasks cancelled");
+            } else if (i == 1) {
                 System.out.println("ETL cancelled");
             }
         }

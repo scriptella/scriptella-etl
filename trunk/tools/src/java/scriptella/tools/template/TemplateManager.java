@@ -15,20 +15,26 @@
  */
 package scriptella.tools.template;
 
+import scriptella.core.SystemException;
+import scriptella.util.CollectionUtils;
 import scriptella.util.IOUtils;
+import scriptella.util.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * ETL files template manager.
- * <p>TODO Add support for DB migration script templates
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -36,34 +42,26 @@ import java.util.Map;
 public class TemplateManager {
     private static final String DEFAULT_ETL_XML = "default.etl.xml";
     private static final String DEFAULT_ETL_PROPS = "default.etl.properties";
-    private Map<String, String> properties;
     private static final String DEFAULT_BASE_NAME = "etl";
     private static final String XML_EXT = ".xml";
     private static final String PROPS_EXT = ".properties";
-
-    public TemplateManager() {
-    }
-
-    /**
-     * Creates a template manager using configuration properties.
-     */
-    public TemplateManager(Map<String, String> properties) {
-        this.properties = properties;
-    }
+    private static final String PACKAGE_NAME = TemplateManager.class.getName().substring(0,
+            TemplateManager.class.getName().lastIndexOf('.'));
 
 
     /**
      * Produce template files.
      *
+     * @param properties configuration properties.
      * @throws IOException if output fails.
      */
-    public void create() throws IOException {
+    public void create(Map<String, String> properties) throws IOException {
         //Only default template supported yet
         InputStream xml = TemplateManager.class.getResourceAsStream(DEFAULT_ETL_XML);
         if (xml == null) {
             throw new IllegalArgumentException("Resource " + DEFAULT_ETL_XML + " not found");
         }
-        InputStream props = getClass().getResourceAsStream(DEFAULT_ETL_PROPS);
+        InputStream props = TemplateManager.class.getResourceAsStream(DEFAULT_ETL_PROPS);
         if (props == null) {
             throw new IllegalArgumentException("Resource " + DEFAULT_ETL_PROPS + " not found");
         }
@@ -82,6 +80,7 @@ public class TemplateManager {
         w.close();
         System.out.println("Files " + xmlName + ", " + propsName + " have been successfully created.");
     }
+
 
     /**
      * Defines base name for ETL.
@@ -112,4 +111,39 @@ public class TemplateManager {
         File f = new File(name);
         return !f.exists();
     }
+
+    /**
+     * Creates an ETL template using a specified template manager name and properties file.
+     *
+     * @param name           etl template name.
+     * @param propertiesFile configuration properties file.
+     * @throws IOException if I/O error occurs.
+     */
+    public static void create(final String name, final String propertiesFile) throws IOException {
+        String className = PACKAGE_NAME + '.' + name;
+        TemplateManager template;
+        Map<String, String> map = Collections.emptyMap();
+        if (StringUtils.isEmpty(name)) {
+            template = new TemplateManager();
+        } else {
+            try {
+                Class cl = Class.forName(className);
+                template = (TemplateManager) cl.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new SystemException("Template " + name + " not found", e);
+            } catch (Exception e) {
+                throw new SystemException("Cannot initialize template " + name, e);
+            }
+            final File filePath = new File(StringUtils.isEmpty(propertiesFile) ? name + ".properties" : propertiesFile);
+            if (filePath.isFile()) {
+                Properties props = new Properties();
+                props.load(new FileInputStream(filePath));
+                map = CollectionUtils.asMap(props);
+            } else if (!StringUtils.isEmpty(propertiesFile)) { //If file was specified but absent - throw an exception
+                throw new FileNotFoundException("File " + filePath.toString() + " not found");
+            }
+        }
+        template.create(map);
+    }
+
 }
