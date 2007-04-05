@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Represents a persistent set of properties.
  * <p>This class is a replacement for {@link Properties} class.
- * <p>Please note that {@link #put(String, Object)} has additional semantics.
+ * <p>Please note that {@link #put(String,Object)} has additional semantics.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -45,6 +45,18 @@ public class PropertiesMap implements Map<String, Object> {
     public PropertiesMap(Map<String, ?> props) {
         this(props.size());
         putAll(props);
+    }
+
+    /**
+     * Creates a properties map from the stream.
+     *
+     * @param is stream to {@link #load(java.io.InputStream) load} properties from.
+     * @throws IOException if I/O error occurs
+     * @see #load(java.io.InputStream)
+     */
+    public PropertiesMap(InputStream is) throws IOException {
+        this();
+        load(is);
     }
 
     public int size() {
@@ -78,7 +90,7 @@ public class PropertiesMap implements Map<String, Object> {
      */
     public Object put(String key, Object value) {
         Object old = props.get(key);
-        if (old==null) {
+        if (old == null) {
             props.put(key, value);
         }
         return old;
