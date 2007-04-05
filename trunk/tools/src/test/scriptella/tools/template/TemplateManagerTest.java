@@ -71,7 +71,9 @@ public class TemplateManagerTest extends AbstractTestCase {
      */
     public static class TestTemplate extends TemplateManager {
         public static boolean created;
-        public void create(Map<String, String> properties) throws IOException {
+
+        @Override
+        public void create(Map<String, ?> properties) throws IOException {
             created=true;
         }
     }

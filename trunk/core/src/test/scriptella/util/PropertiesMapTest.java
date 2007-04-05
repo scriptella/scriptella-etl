@@ -34,6 +34,9 @@ public class PropertiesMapTest extends AbstractTestCase {
         assertEquals("1", pm.get("p1"));
         assertEquals("2", pm.get("p2"));
         assertEquals("p1", pm.keySet().iterator().next());
+        //Now test the stream based constructor
+        pm = new PropertiesMap(new ByteArrayInputStream("p=1".getBytes()));
+        assertEquals("1", pm.get("p"));
     }
 
     public void testPut() throws IOException {
