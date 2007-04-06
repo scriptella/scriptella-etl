@@ -42,8 +42,8 @@ public class TemplateManager {
     private static final String DEFAULT_ETL_XML = "default.etl.xml";
     private static final String DEFAULT_ETL_PROPS = "default.etl.properties";
     private static final String DEFAULT_BASE_NAME = "etl";
-    private static final String XML_EXT = ".xml";
-    private static final String PROPS_EXT = ".properties";
+    protected static final String XML_EXT = ".xml";
+    protected static final String PROPS_EXT = ".properties";
     private static final String PACKAGE_NAME = TemplateManager.class.getName().substring(0,
             TemplateManager.class.getName().lastIndexOf('.'));
     static final TemplateManager DEFAULT = new TemplateManager();
