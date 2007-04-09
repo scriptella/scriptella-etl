@@ -21,6 +21,7 @@ import scriptella.util.IOUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,6 +79,15 @@ public class PropertiesSubstitutor {
      */
     public PropertiesSubstitutor(ParametersCallback parameters) {
         this.parameters = parameters;
+    }
+
+
+    /**
+     * Creates a properties substitutor based on specified properties map.
+     * @param map parameters to substitute.
+     */
+    public PropertiesSubstitutor(Map<String,?> map) {
+        this(new MapParametersCallback(map));
     }
 
     private ParametersCallback parameters;

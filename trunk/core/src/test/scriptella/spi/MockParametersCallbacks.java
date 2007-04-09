@@ -15,6 +15,8 @@
  */
 package scriptella.spi;
 
+import scriptella.expression.MapParametersCallback;
+
 import java.util.Map;
 
 /**
@@ -50,11 +52,7 @@ public class MockParametersCallbacks {
     };
 
     public static ParametersCallback fromMap(final Map map) {
-        return new ParametersCallback() {
-            public Object getParameter(final String name) {
-                return map.get(name);
-            }
-        };
+        return new MapParametersCallback(map);
     }
 
 }
