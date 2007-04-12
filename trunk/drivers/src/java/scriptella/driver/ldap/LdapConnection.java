@@ -137,7 +137,7 @@ public class LdapConnection extends AbstractConnection {
                 throw new LdapProviderException("Unsupported " + SEARCH_SCOPE_KEY + "=" + scope);
             }
         }
-        String baseDn = parameters.getStringProperty(SEARCH_SCOPE_KEY);
+        String baseDn = parameters.getStringProperty(SEARCH_BASEDN_KEY);
         this.baseDn = baseDn == null ? "" : baseDn;
 
         Integer tl = parameters.getIntegerProperty(SEARCH_TIMELIMIT_KEY);
