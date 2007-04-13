@@ -80,12 +80,12 @@ public class CsvQuery implements ParametersCallback, Closeable {
             if (headers) {
                 String[] row = reader.readNext();
                 for (int i = 0; i < row.length; i++) {
-                    columnsMap.registerColumn(row[i], i + 1);
+                    columnsMap.registerColumn(row[i].trim(), i + 1);
                 }
             }
             //For each row
 
-            while ((row = reader.readNext()) != null) {
+            while ((row = trim(reader.readNext())) != null) {
                 if (rowMatches()) {
                     queryCallback.processRow(this);
                 }
@@ -167,8 +167,9 @@ public class CsvQuery implements ParametersCallback, Closeable {
         List<Pattern[]> res = null;
         for (String[] columns : list) {
             Pattern[] patterns = null;
+            trim(columns);
             for (int i = 0; i < columns.length; i++) {
-                String s = trim(columns[i]);
+                String s = columns[i];
                 if (s != null && s.length() > 0) {
                     if (patterns == null) {
                         patterns = new Pattern[columns.length];
@@ -202,13 +203,19 @@ public class CsvQuery implements ParametersCallback, Closeable {
     }
 
     /**
-     * Trims string if {@link #trim} flag is true.
-     *
-     * @param s string to trim. May be null.
-     * @return possibly trimmed string or null.
+     * Trims array of strings if {@link #trim} flag is true.
+     * @param s array of strings.
+     * @return the same array instance.
      */
-    private String trim(String s) {
-        return (trim && s != null) ? s.trim() : s;
+    private String[] trim(String[] s) {
+        if (s != null && trim) {
+            for (int i = 0; i < s.length; i++) {
+                if (s[i] != null) {
+                    s[i] = s[i].trim();
+                }
+            }
+        }
+        return s;
     }
 
     public Object getParameter(final String name) {
