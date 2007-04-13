@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * ETL files template manager.
@@ -47,7 +48,7 @@ public class TemplateManager {
     private static final String PACKAGE_NAME = TemplateManager.class.getName().substring(0,
             TemplateManager.class.getName().lastIndexOf('.'));
     static final TemplateManager DEFAULT = new TemplateManager();
-
+    protected final Logger logger = Logger.getLogger(getClass().getName());
 
 
     /**
@@ -69,7 +70,7 @@ public class TemplateManager {
         w = newFileWriter(propsName);
         w.write(loadResourceAsString(DEFAULT_ETL_PROPS));
         w.close();
-        System.out.println("Files " + xmlName + ", " + propsName + " have been successfully created.");
+        logger.info("Files " + xmlName + ", " + propsName + " have been successfully created.");
     }
 
     /**
