@@ -15,15 +15,16 @@
  */
 package scriptella.tools.template;
 
-import scriptella.jdbc.GenericDriver;
+import scriptella.core.SystemException;
 import scriptella.jdbc.JdbcException;
 import scriptella.jdbc.JdbcUtils;
-import scriptella.spi.ConnectionParameters;
+import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -59,45 +60,13 @@ public class DataMigrator extends TemplateManager {
         String etlXml = loadResourceAsString(DATA_MIGRATOR_ETL_XML);
         String block = loadResourceAsString(DATA_MIGRATOR_BLOCK_ETL_XML);
         Writer w = newFileWriter(xmlName);
-
-
-    }
-
-
-    public static void main(final String args[]) {
-        //Currently this class is just a sample of how to generate a migration script template
-        //Rewite it
-
-        ConnectionParameters params = new ConnectionParameters(null, null);
-        GenericDriver jdbcDriver = new GenericDriver();
-
-
-        final Connection con = jdbcDriver.connect(params).getNativeConnection();
-        DbSchema schema = new DbSchema(con, "", "");
+        DbSchema schema = DbSchema.initialize(properties);
         final Set<String> tables = sortTables(schema);
-        StringBuilder o = new StringBuilder();
-        o.append("<etl>\n" +
-                "    <connection id=\"in\" driver=\"com.sybase.jdbc2.jdbc.SybDriver\" url=\"jdbc:sybase:Tds:localhost:2638\" user=\"DBA\" password=\"SQL\"/>\n" +
-                "    <connection id=\"out\" driver=\"org.hsqldb.jdbcDriver\" url=\"jdbc:hsqldb:file:D:/tools/hsqldb/data/dbm\" user=\"sa\" password=\"\"/>\n");
+        
 
-        for (String t : tables) {
-            o.append("    <query connection-id=\"in\">\n")
-                    .append("      select ");
-            appendColumnNames(schema, t, o).append(" from ").append(t);
 
-            o.append("      <script connection-id=\"out\">\n")
-                    .append("         insert into ").append(t).append("(");
-            appendColumnNames(schema, t, o).append(") VALUES (");
-            appendColumnNames(schema, t, o, ", ", "?").append(")")
-                    .append("\n      </script>\n").
-                    append("\n    </query>\n");
-        }
-
-        o.append("</etl>\n");
-        System.out.println("o = " + o);
-
-        //        JdbcUtils.getTableColumns(con, c,)
     }
+
 
     private static StringBuilder appendColumnNames(DbSchema schema, final String table, final StringBuilder sql) {
         return appendColumnNames(schema, table, sql, ", ", "");
@@ -271,6 +240,23 @@ public class DataMigrator extends TemplateManager {
             this.schema = schema;
         }
 
+        static DbSchema initialize(Map<String,?> props) {
+            String driver = StringUtils.nullsafeToString(props.get("driver"));
+            String jdbcUrl = StringUtils.nullsafeToString(props.get("url"));
+            String user = StringUtils.nullsafeToString(props.get("user"));
+            String password = StringUtils.nullsafeToString(props.get("password"));
+            String catalog = StringUtils.nullsafeToString(props.get("catalog"));
+            String schema = StringUtils.nullsafeToString(props.get("schema"));
+            try {
+                Class.forName(driver);
+                return new DbSchema(DriverManager.getConnection(jdbcUrl, user, password), catalog, schema);
+            } catch (ClassNotFoundException e) {
+                throw new SystemException("Cannot lookup JDBC driver "+driver, e);
+            } catch (SQLException e) {
+                throw new SystemException("Cannot initialize JDBC connection "+jdbcUrl, e);
+            }
+        }
+
 
         List<String> getTables() {
             try {
@@ -322,6 +308,10 @@ public class DataMigrator extends TemplateManager {
             return l;
         }
 
+        /**
+         * Returns lazily initialized meta data.
+         * @return db meta data.
+         */
         public DatabaseMetaData getMetaData() {
             if (metaData == null) {
                 try {

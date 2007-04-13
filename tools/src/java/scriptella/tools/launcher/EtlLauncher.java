@@ -225,7 +225,7 @@ public class EtlLauncher {
             }
             TemplateManager.create(name, props);
         } catch (Exception e) {
-            err.println(e.getMessage());
+            LOG.log(Level.SEVERE, "Template generation failed", e);
             return ErrorCode.FAILED;
         }
         return ErrorCode.OK;
