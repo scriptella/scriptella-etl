@@ -49,7 +49,7 @@
             <packageset dir="tools/src/java"/>
             <doctitle><![CDATA[<h1>Scriptella API Documentation</h1>]]></doctitle>
             <bottom>
-                <![CDATA[<i>Copyright &#169; Copyright 2006 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
+                <![CDATA[<i>Copyright &#169; Copyright 2006-2007 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
         </javadoc>
     </target>
 
