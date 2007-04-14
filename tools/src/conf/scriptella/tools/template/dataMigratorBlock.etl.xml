@@ -1,7 +1,9 @@
-    <!-- Data migration for $table data -->
-    <query connection-id="in">
+
+    <!-- Data migration for $table table -->
+    <query connection-id="from">
          SELECT $columns FROM $table
-         <script connection-id="out">
-             INSERT INTO $table ({$columns}) VALUES ({$values})
+         <script connection-id="to">
+             INSERT INTO $table ({$columns})
+             VALUES ({$values})
          </script>
     </query>
