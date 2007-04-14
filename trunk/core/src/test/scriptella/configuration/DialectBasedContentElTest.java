@@ -80,4 +80,16 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         assertFalse(d.matches(DialectIdentifier.NULL_DIALECT));
     }
 
+    /**
+     * Tests if substring matching is performed. See CR #5252 for more details.
+     */
+    public void testSubstringMatching() {
+        DialectBasedContentEl.Dialect d = new DialectBasedContentEl.Dialect();
+        d.setName(Pattern.compile("tr"));
+        d.setVersion(Pattern.compile("1.0"));
+        //Substring matching is used for names but not versions
+        assertFalse(d.matches(new DialectIdentifier("string", "2.1.0")));
+        assertTrue(d.matches(new DialectIdentifier("string", "1.0")));
+    }
+
 }

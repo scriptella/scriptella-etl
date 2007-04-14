@@ -171,9 +171,9 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
 
             String idName = StringUtils.nullsafeToString(id.getName());
             String idVersion = StringUtils.nullsafeToString(id.getVersion());
-
+            //Substring matching is used for names. Versions are matched entirely
             return ((name == null) ||
-                    name.matcher(idName).matches()) && ((version == null) ||
+                    name.matcher(idName).find()) && ((version == null) ||
                     version.matcher(idVersion).matches());
 
         }
