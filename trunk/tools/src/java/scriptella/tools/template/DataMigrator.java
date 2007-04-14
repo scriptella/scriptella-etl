@@ -16,9 +16,9 @@
 package scriptella.tools.template;
 
 import scriptella.core.SystemException;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.jdbc.JdbcException;
 import scriptella.jdbc.JdbcUtils;
-import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -39,17 +40,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * TODO: Add documentation
+ * Data migration template manager.
+ * <p>Configuration properties:
+ * <ul>
+ * <li>driver - JDBC driver class name. Required.
+ * <li>url - JDBC URL of the database. Required.
+ * <li>user - database user name.
+ * <li>password - database user password.
+ * <li>catalog - database catalog name.
+ * <li>catalog - database schema name.
+ * </ul>
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class DataMigrator extends TemplateManager {
+    static final String DRIVER_PROPERTY_NAME = "driver";
+    static final String URL_PROPERTY_NAME = "url";
+    static final String USER_PROPERTY_NAME = "user";
+    static final String PASSWORD_PROPERTY_NAME = "password";
+    static final String CATALOG_PROPERTY_NAME = "catalog";
+    static final String SCHEMA_PROPERTY_NAME = "schema";
+
     private static final String DATA_MIGRATOR_ETL_XML = "dataMigrator.etl.xml";
+    private static final String DATA_MIGRATOR_ETL_PROPERTIES = "dataMigrator.etl.properties";
     private static final String DATA_MIGRATOR_BLOCK_ETL_XML = "dataMigratorBlock.etl.xml";
     private static Logger LOG = Logger.getLogger(DataMigrator.class.getName());
     static boolean DEBUG = LOG.isLoggable(Level.FINE);
-
 
 
     public void create(Map<String, ?> properties) throws IOException {
@@ -59,12 +76,32 @@ public class DataMigrator extends TemplateManager {
 
         String etlXml = loadResourceAsString(DATA_MIGRATOR_ETL_XML);
         String block = loadResourceAsString(DATA_MIGRATOR_BLOCK_ETL_XML);
-        Writer w = newFileWriter(xmlName);
         DbSchema schema = DbSchema.initialize(properties);
         final Set<String> tables = sortTables(schema);
-        
-
-
+        StringBuilder queriesXml = new StringBuilder(block.length() * tables.size());
+        final Map<String, String> params = new HashMap<String, String>();
+        final PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
+        StringBuilder tmp = new StringBuilder();
+        for (String table : tables) {
+            params.put("table", table);
+            tmp.setLength(0);
+            appendColumnNames(schema, table, tmp);
+            params.put("columns", tmp.toString());
+            tmp.setLength(0);
+            appendColumnNames(schema, table, tmp, ", ", "?");
+            params.put("values", tmp.toString());
+            queriesXml.append(ps.substitute(block));
+        }
+        params.put("etl.properties", propsName);
+        params.put("queries", queriesXml.toString());
+        //Writing an ETL file
+        Writer w = newFileWriter(xmlName);
+        w.write(ps.substitute(etlXml));
+        w.close();
+        //Writing properties
+        w = newFileWriter(propsName);
+        w.write(loadResourceAsString(DATA_MIGRATOR_ETL_PROPERTIES));
+        w.close();
     }
 
 
@@ -96,16 +133,10 @@ public class DataMigrator extends TemplateManager {
         int n = tables.size();
 
         String tbls[] = tables.toArray(new String[n]);
-        int[][] m;
 
         try {
-            try {
-                m=getTablesMatrix(schema, tbls);
-            } catch (SQLException e) { //on error try alternative algorithm
-                LOG.log(Level.WARNING, "Unable to define order of tables, trying the simplified algorithm");
-                m=getAlternativeTablesMatrix(schema, tbls);
-            }
-            StringBuilder msg = DEBUG?new StringBuilder() : null;
+            int[][] m = getTablesMatrix(schema, tbls);
+            StringBuilder msg = DEBUG ? new StringBuilder() : null;
 
 
             for (int i = 0; i < n; i++) {
@@ -120,7 +151,7 @@ public class DataMigrator extends TemplateManager {
                 }
             }
             if (DEBUG) {
-                LOG.fine("Tables dependencies matrix: \n"+msg);
+                LOG.fine("Tables dependencies matrix: \n" + msg);
             }
 
             boolean free[] = new boolean[n];
@@ -189,35 +220,6 @@ public class DataMigrator extends TemplateManager {
         return m;
     }
 
-    static int[][] getAlternativeTablesMatrix(DbSchema schema, String[] tables) throws SQLException {
-        int n = tables.length;
-        int m[][] = new int[n][n];
-        for (int[] a : m) {
-            Arrays.fill(a, 0);
-        }
-
-        Set[] pks = new Set[n];
-        for (int i = 0; i < n; i++) {
-            pks[i] = schema.getPrimaryKeys(tables[i]);
-        }
-
-        for (int i = 0; i < n; i++) {
-            Set<String> columns = schema.getTableColumns(tables[i]);
-            for (String column : columns) { //Iterate through all non-PK columns
-                if (!pks[i].contains(column)) {
-                    //Search for tables which export foreign keys into tables[i]
-                    for (int j = 0; j != i && j < n; j++) {
-                        if (pks[j].contains(column)) {
-                            m[j][i]+=1;
-                        }
-                    }
-                }
-            }
-        }
-        return m;
-    }
-
-
     private static int indexOf(final String list[], final String element) {
         for (int i = 0; i < list.length; i++) {
             if (list[i].equalsIgnoreCase(element)) {
@@ -240,20 +242,27 @@ public class DataMigrator extends TemplateManager {
             this.schema = schema;
         }
 
-        static DbSchema initialize(Map<String,?> props) {
-            String driver = StringUtils.nullsafeToString(props.get("driver"));
-            String jdbcUrl = StringUtils.nullsafeToString(props.get("url"));
-            String user = StringUtils.nullsafeToString(props.get("user"));
-            String password = StringUtils.nullsafeToString(props.get("password"));
-            String catalog = StringUtils.nullsafeToString(props.get("catalog"));
-            String schema = StringUtils.nullsafeToString(props.get("schema"));
+        static DbSchema initialize(Map<String, ?> props) {
+            String driver = (String) props.get(DRIVER_PROPERTY_NAME);
+            if (driver == null) {
+                throw new IllegalArgumentException(DRIVER_PROPERTY_NAME + " property is required");
+            }
+            String jdbcUrl = (String) props.get(URL_PROPERTY_NAME);
+            if (jdbcUrl == null) {
+                throw new IllegalArgumentException(URL_PROPERTY_NAME + " property is required");
+            }
+
+            String user = (String) props.get(USER_PROPERTY_NAME);
+            String password = (String) props.get(PASSWORD_PROPERTY_NAME);
+            String catalog = (String) props.get(CATALOG_PROPERTY_NAME);
+            String schema = (String) props.get(SCHEMA_PROPERTY_NAME);
             try {
                 Class.forName(driver);
                 return new DbSchema(DriverManager.getConnection(jdbcUrl, user, password), catalog, schema);
             } catch (ClassNotFoundException e) {
-                throw new SystemException("Cannot lookup JDBC driver "+driver, e);
+                throw new SystemException("Cannot lookup JDBC driver " + driver, e);
             } catch (SQLException e) {
-                throw new SystemException("Cannot initialize JDBC connection "+jdbcUrl, e);
+                throw new SystemException("Cannot initialize JDBC connection " + jdbcUrl, e);
             }
         }
 
@@ -262,15 +271,6 @@ public class DataMigrator extends TemplateManager {
             try {
                 return getColumn(getMetaData()
                         .getTables(catalog, schema, null, new String[]{"TABLE"}), 3);
-            } catch (SQLException e) {
-                throw new JdbcException(e.getMessage(), e);
-            }
-        }
-
-        Set<String> getPrimaryKeys(final String tableName) {
-            try {
-                return new HashSet<String>(
-                        getColumn(getMetaData().getPrimaryKeys(catalog, schema, tableName), 6));
             } catch (SQLException e) {
                 throw new JdbcException(e.getMessage(), e);
             }
@@ -310,6 +310,7 @@ public class DataMigrator extends TemplateManager {
 
         /**
          * Returns lazily initialized meta data.
+         *
          * @return db meta data.
          */
         public DatabaseMetaData getMetaData() {

@@ -4,11 +4,11 @@
     <properties>
         <include href="$etl.properties"/> <!--Load from external properties file-->
     </properties>
-    <!-- Source database (in) connection declaration -->
-    <connection id="in" driver="$in.driver" url="$in.url" user="$in.user" password="$in.password" classpath="$in.classpath"/>
-    <!-- Destination database (out) connection declaration -->
-    <connection id="out" driver="$out.driver" url="$out.url" user="$out.user" password="$out.password" classpath="$out.classpath"/>
+    
+    <!-- Source database (from) connection declaration -->
+    <connection id="from" driver="$from.driver" url="$from.url" user="$from.user" password="$from.password" classpath="$from.classpath"/>
 
-    <!-- Migration scripts for all tables -->
+    <!-- Destination database (to) connection declaration -->
+    <connection id="to" driver="$to.driver" url="$to.url" user="$to.user" password="$to.password" classpath="$to.classpath"/>
 $queries
 </etl>
