@@ -32,6 +32,8 @@ import javax.naming.directory.SearchControls;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a connection to a directory context.
@@ -41,6 +43,7 @@ import java.util.Hashtable;
  * @version 1.0
  */
 public class LdapConnection extends AbstractConnection {
+    private static final Logger LOG = Logger.getLogger(LdapConnection.class.getName());
     private DirContext ctx;
     private final SearchControls searchControls; //default search controls
     private final Long maxFileLength;
@@ -152,9 +155,13 @@ public class LdapConnection extends AbstractConnection {
 
     /**
      * Creates a directory context.
+     *
      * @param env environment to create initial context.
      */
     protected void initializeContext(Hashtable<String, Object> env) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Creating initial context, environment: " + env);
+        }
         try {
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
