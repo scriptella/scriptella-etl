@@ -118,11 +118,6 @@ public class LdapConnection extends AbstractConnection {
         }
         //Override env with user specified connection properties
         env.putAll(parameters.getProperties());
-        try {
-            ctx = new InitialDirContext(env);
-        } catch (NamingException e) {
-            throw new LdapProviderException("Unable to establish directory connection", e);
-        }
         //Set the search controls used for queries
         searchControls = new SearchControls();
         String scope = parameters.getStringProperty(SEARCH_SCOPE_KEY);
@@ -152,6 +147,19 @@ public class LdapConnection extends AbstractConnection {
         maxFileLength = mfl == null ? null : mfl.longValue();
 
         driverContext = parameters.getContext();
+        initializeContext(env); //Initializing context
+    }
+
+    /**
+     * Creates a directory context.
+     * @param env environment to create initial context.
+     */
+    protected void initializeContext(Hashtable<String, Object> env) {
+        try {
+            ctx = new InitialDirContext(env);
+        } catch (NamingException e) {
+            throw new LdapProviderException("Unable to establish directory connection", e);
+        }
     }
 
     DirContext getCtx() {
