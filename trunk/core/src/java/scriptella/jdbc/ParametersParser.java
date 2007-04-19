@@ -19,6 +19,8 @@ import scriptella.expression.Expression;
 import scriptella.spi.DriverContext;
 import scriptella.spi.ParametersCallback;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -35,10 +37,10 @@ import java.net.URL;
  * <li>?{file 'file:/path/img.gif')
  * <li>?{file 'img.gif') - represents a reference relative to a directory where script file located.
  * </ul>
- * @see Expression
  *
  * @author Fyodor Kupolov
  * @version 1.0
+ * @see Expression
  */
 public class ParametersParser {
     private DriverContext driverContext;
@@ -46,6 +48,7 @@ public class ParametersParser {
 
     /**
      * Creates a file reference parser.
+     *
      * @param driverContext drivers content to use for URL resolution.
      */
     public ParametersParser(DriverContext driverContext) {
@@ -54,6 +57,7 @@ public class ParametersParser {
 
     /**
      * Parses specified expression and returns the result of evaluation.
+     *
      * @param expression expression to parse.
      * @return result of parse.
      */
@@ -61,25 +65,53 @@ public class ParametersParser {
         if (expression.startsWith("file ")) {
             //now checking the syntax
             try {
-                final Expression ex = Expression.compile(expression.substring(5));//file prefix removed
-                final Object o = ex.evaluate(parameters);
-                if (o==null) {
-                    throw new JdbcException("Failed to evaluate file URL", expression);
-                }
-                if (o instanceof URL) {
-                    return Lobs.newBlob((URL) o);
-                } else {
-                    try {
-                        return Lobs.newBlob(driverContext.resolve(String.valueOf(o)));
-                    } catch (MalformedURLException e) {
-                        throw new JdbcException("Wrong file URL \""+o+"\"", e, expression);
-                    }
-                }
+                URL u = getFileUrl(expression.substring(5), parameters);//file prefix removed
+                return Lobs.newBlob(u);
             } catch (Expression.ParseException e) {
                 //If parsing fails try to evaluate the whole expression not the file reference
             }
+        } else if (expression.startsWith("textfile ")) {
+            //now checking the syntax
+            try {
+                URL u = getFileUrl(expression.substring(9), parameters);//textfile prefix removed
+                //IMPORTANT NOTE
+                //The JVM default encoding is used to create reader,
+                //currently we have no way to specify text file encoding.
+                return Lobs.newClob(new InputStreamReader(u.openStream()));
+            } catch (Expression.ParseException e) {
+                //If parsing fails try to evaluate the whole expression not the file reference
+            } catch (IOException e) {
+                throw new JdbcException("Failed to open reader for expression " + expression, e);
+            }
         }
+        //Try to eval the whole expression if subexpression is illegal
         return Expression.compile(expression).evaluate(parameters);
+    }
+
+
+    /**
+     * Evaluates given expression and resolves specified URL.
+     *
+     * @param expression expression to evaluate.
+     * @param parameters parameters to use for evaluation.
+     * @return resolved URL.
+     * @throws scriptella.expression.Expression.ParseException
+     *          if expression has wrong syntax
+     */
+    private URL getFileUrl(final String expression, final ParametersCallback parameters) throws Expression.ParseException {
+        final Object o = Expression.compile(expression).evaluate(parameters);
+        if (o == null) {
+            throw new JdbcException("Failed to evaluate file URL", expression);
+        }
+        if (o instanceof URL) {
+            return (URL) o;
+        } else {
+            try {
+                return driverContext.resolve(String.valueOf(o));
+            } catch (MalformedURLException e) {
+                throw new JdbcException("Wrong file URL \"" + o + "\"", e, expression);
+            }
+        }
     }
 
 }

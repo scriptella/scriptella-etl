@@ -10,4 +10,12 @@
         insert into t(id, c) values(2,?{file 'tst://file'});
         insert into t(id, c) values(3,?{file 'tst://file'})
     </script>
+    <script><!-- uploading a text file -->
+        create table txt (
+        id int,
+        c longvarchar
+        );
+        insert into txt(id, c) values(1,?{textfile 'tst://file'});
+    </script>
+
 </etl>

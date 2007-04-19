@@ -288,12 +288,15 @@
 			<section>
 				<title>Adding references to files from SQL scripts</title>
 				<p>The JDBC bridge supports referencing file content via</p>
-				<source>?{file &lt;Expression&gt;}</source>
+				<source>?{file &lt;Expression&gt;}</source> and <source>?{textfile &lt;Expression&gt;}</source>
 				<p>syntax.
                 Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
 				</p>
-				<p>File references are set as prepared statement parameters of stream type,
-                    so LOBs of virtually any size supported by the database driver can be referenced.</p>
+				<p>The <code>file</code> prefix is used to reference binary files inserted as BLOB and 
+                    <code>textfile</code> references text files inserted as CLOBs.
+                    File references are set as prepared statement parameters of stream type,
+                    so LOBs of virtually any size supported by the database driver can be referenced.
+                    Please note that uploading large <strong>text</strong> files may create a temporary file on disk.</p>
 				<note>Music Store example demonstrates usage of file references</note>
 			</section>
 			<section>
