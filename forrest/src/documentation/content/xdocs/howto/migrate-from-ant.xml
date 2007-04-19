@@ -17,7 +17,7 @@
 <!DOCTYPE howto PUBLIC "-//APACHE//DTD How-to V2.0//EN" "dtd/howto-v20.dtd">
 <howto>
 	<header>
-		<title>Migrating from Ant SQL Task.</title>
+		<title>Migrating from Ant SQL Task to Scriptella ETL.</title>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
