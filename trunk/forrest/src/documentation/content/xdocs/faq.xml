@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE faqs PUBLIC "-//APACHE//DTD FAQ V2.0//EN" "dtd/faq-v20.dtd">
 <faqs>
-	<title>Frequently Asked Questions</title>
+	<title>Scriptella ETL Frequently Asked Questions</title>
 	<authors>
 		<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 	</authors>

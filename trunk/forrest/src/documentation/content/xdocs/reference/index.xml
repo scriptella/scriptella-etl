@@ -2,7 +2,7 @@
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
 <document>
 	<header>
-		<title>Scriptella Reference Documentation</title>
+		<title>Scriptella ETL Reference Documentation</title>
 		<version>0.8</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
