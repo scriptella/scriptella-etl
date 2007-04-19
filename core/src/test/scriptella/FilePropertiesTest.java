@@ -20,11 +20,13 @@ import scriptella.execution.EtlExecutorException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
+import scriptella.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.util.Arrays;
 
@@ -33,7 +35,8 @@ import java.util.Arrays;
  *
  */
 public class FilePropertiesTest extends DBTestCase {
-    private static final byte FILE[] = "test file/////".getBytes();
+    private static final String TEST_FILE = "test file/////";
+    private static final byte FILE[] = TEST_FILE.getBytes();
 
     public void test() throws EtlExecutorException {
         final Connection con = getConnection("fileproptst");
@@ -63,5 +66,20 @@ public class FilePropertiesTest extends DBTestCase {
                         assertEquals(3, rowEvaluator.getParameter("1")); //3 rows
                     }
                 });
+        //Now check if text files are correctly inserted
+        q = new QueryHelper("select (select count(id) from txt), c from txt");
+        q.execute(con,
+                new QueryCallback() {
+                    public void processRow(final ParametersCallback rowEvaluator) {
+                        final Clob c = (Clob) rowEvaluator.getParameter("c");
+                        try {
+                            assertEquals(TEST_FILE, IOUtils.toString(c.getCharacterStream()));
+                        } catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                        assertEquals(1, rowEvaluator.getParameter("1")); //3 rows
+                    }
+                });
+
     }
 }
