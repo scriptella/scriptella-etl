@@ -287,9 +287,9 @@
             </section>
 			<section>
 				<title>Adding references to files from SQL scripts</title>
-				<p>The JDBC bridge supports referencing file content via</p>
-				<source>?{file &lt;Expression&gt;}</source> and <source>?{textfile &lt;Expression&gt;}</source>
-				<p>syntax.
+				<p>The JDBC bridge supports referencing file content via
+				<code>?{file &lt;Expression&gt;}</code> and <code>?{textfile &lt;Expression&gt;}</code>
+				syntax.
                 Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
 				</p>
 				<p>The <code>file</code> prefix is used to reference binary files inserted as BLOB and 
