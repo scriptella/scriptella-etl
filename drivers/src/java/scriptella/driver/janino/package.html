@@ -25,6 +25,18 @@ base classes.</p>
     </tr>
 </table>
 
+<h2>Script Syntax</h2>
+In Scriptella Janino script is a Java "block", i.e. the body of a method. For convenience protected and
+public methods of <a href="JaninoScript.html">JaninoScript</a> are accessible from Janino &lt;script&gt; elements.
+<p>In other words the script element is an implementation of <code>execute</code> method of <code>JaninoScript</code> class.</p>
+<h2>Query Syntax</h2>
+Queries are written using the same syntax as script elements with the only difference that protected/public methods from
+<a href="JaninoQuery.html">Query</a> class are accessible from &lt;query&gt; element.
+<p>In other words the query element is an implementation of <code>execute</code> method of <code>JaninoQuery</code> class.</p>
+<h2>Properties substitution</h2>
+The standard ant-style properties substitution is not supported.
+Instead, use get("variableName") to get the variable value and
+set("variableName", value) to set the variable value.
 <h2>Example</h2>
 <code><pre>
     &lt;connection driver="janino"&gt;/&gt;
