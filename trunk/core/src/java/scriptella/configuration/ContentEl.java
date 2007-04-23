@@ -18,6 +18,7 @@ package scriptella.configuration;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.Resource;
 
 import java.io.BufferedReader;
@@ -41,6 +42,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
      */
     private static final int MAX_CONCAT_RESOURCE_LENGTH = 1024 * 128; //128Kb
     private List<Resource> content = new ArrayList<Resource>();
+    private PropertiesSubstitutor propertiesSubstitutor;
     /**
      * Null-Object to use instead of null if necessary
      */

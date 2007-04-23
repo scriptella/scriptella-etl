@@ -84,9 +84,10 @@ public class PropertiesSubstitutor {
 
     /**
      * Creates a properties substitutor based on specified properties map.
+     *
      * @param map parameters to substitute.
      */
-    public PropertiesSubstitutor(Map<String,?> map) {
+    public PropertiesSubstitutor(Map<String, ?> map) {
         this(new MapParametersCallback(map));
     }
 
@@ -101,21 +102,15 @@ public class PropertiesSubstitutor {
      * @return substituted string.
      */
     public String substitute(final String s) {
-        if (s == null) {
-            return null;
-        }
         if (parameters == null) {
             throw new IllegalStateException("setParameters must be called before calling substitute");
         }
 
+        int i = firstCandidate(s); //Remember the first index of $
+        if (i < 0) { //skip strings without $ char, or when the $ is the last char
+            return s;
+        }
         final int len = s.length() - 1; //Last character is not checked - optimization
-        if (len <= 0) { //skip empty strings or single characters
-            return s;
-        }
-        int i = s.indexOf('$'); //Remember the first index of $
-        if (i < 0 || i >= len) { //skip strings without $ char, or when the $ is the last char
-            return s;
-        }
         StringBuilder res = null;
         int lastPos = 0;
         m1.reset(s);
@@ -160,13 +155,12 @@ public class PropertiesSubstitutor {
         if (lastPos <= len) {
             res.append(s.substring(lastPos, s.length()));
         }
-
-
         return res.toString();
     }
 
     /**
      * Copies content from reader to writer and expands properties.
+     *
      * @param reader reader to process.
      * @param writer writer to output substituted content to.
      * @throws IOException if I/O error occurs.
@@ -180,11 +174,12 @@ public class PropertiesSubstitutor {
     /**
      * Reads content from reader and expands properties.
      * <p><b>Note:</b> For performance reasons use
-     * {@link #substitute(java.io.Reader, java.io.Writer)} if possible.
+     * {@link #substitute(java.io.Reader,java.io.Writer)} if possible.
+     *
      * @param reader reader to process.
      * @return reader's content with properties expanded.
      * @throws IOException if I/O error occurs.
-     * @see #substitute(java.io.Reader, java.io.Writer)
+     * @see #substitute(java.io.Reader,java.io.Writer)
      */
     public String substitute(final Reader reader) throws IOException {
         //Current implementation is too simple,
@@ -218,6 +213,26 @@ public class PropertiesSubstitutor {
      */
     protected String toString(final Object o) {
         return o == null ? null : o.toString();
+    }
+
+    /**
+     * Tests if the given string contains properties/expressions.
+     * @param string string to check.
+     * @return true if a given string contains properties/expressions.
+     */
+    public boolean hasProperties(String string) {
+        return firstCandidate(string) >= 0;
+    }
+
+    int firstCandidate(String string) {
+        if (string == null) {
+            return -1;
+        }
+        int n = string.length();
+        if (n < 2) {
+            return -1;
+        }
+        return string.indexOf('$');
     }
 
 }
