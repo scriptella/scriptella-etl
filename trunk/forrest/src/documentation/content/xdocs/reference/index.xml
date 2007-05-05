@@ -23,16 +23,18 @@
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
 				<ul>
-					<li>Storing database SQL scripts. Scriptella allows you to easily execute SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other JDBC features in your scripts.</li>
+					<li>Storing database SQL scripts. Scriptella allows to easily execue SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other JDBC features in your scripts.</li>
 					<li>Working with several datasources. For example gathering statistics from the one database and store it inside the other one</li>
 					<li>If you prefer to write <source>SELECT * FROM Account WHERE login=?name</source> instead of using a "Smart Query Designer GUI"</li>
-					<li>Test data generation. You don't have to store huge random filled test files - produce
+					<li>Test data generation. You don't have to store huge random generated test files - produce
                     test data during script execution.</li>
-				</ul>
+                    <li>Migrations. Scriptella supports multiple migrations styles
+                        including Ruby-on-Rails-like schema evolution and data migration.</li>
+                </ul>
 				<p>Of course there are situations when you'd probably try to find a better tool:</p>
 				<ul>
 					<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier.</li>
-				</ul>
+                </ul>
 			</section>
 		</section>
 		<section>
@@ -343,7 +345,8 @@
 					</tr>
 					<tr>
 						<td>-template, -t</td>
-						<td>creates an etl.xml template file in the current directory</td>
+						<td>creates an etl.xml template file in the current directory.
+                            See the list of <a href="#supported_templates">supported templates.</a></td>
 					</tr>
 				</table>
 			</section>
@@ -373,7 +376,7 @@
 			<p>These drivers will be available on the boot classpath.
                 In this case you don't have to specify classpath in &lt;connection&gt; elements.</p>
 			<section>
-				<title>Scriptella &quot;etl&quot; Task</title>
+				<title>&quot;etl&quot; Task</title>
 				<section>
 					<title>Parameters</title>
 					<table>
@@ -431,7 +434,69 @@
 </etl>]]></source>
 				</section>
 			</section>
-		</section>
+            <section>
+                <title>&lt;etl-template&gt; Task</title>
+                <section>
+                    <title>Parameters</title>
+                    <table>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Description</th>
+                            <th>Required</th>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>ETL template name.</td>
+                            <td>No, default ETL template is generated.</td>
+                        </tr>
+                        <tr>
+                            <td>inheritAll</td>
+                            <td>If true, pass all properties to Scriptella. Defaults to <code>true</code>.
+                            </td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>debug</td>
+                            <td>If true print debugging information.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                        <tr>
+                            <td>quiet</td>
+                            <td>If true be extra quiet.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <title>Nested Elements</title>
+                    <p>The task has no nested elements.</p>
+                </section>
+                <anchor id="supported_templates"/>
+                <section>
+                    <title>Supported Templates</title>
+                    <ul>
+                        <li>Default(no name) - Produces a simple ETL template for a quick start.</li>
+                        <li><a href="../docs/api/scriptella/tools/template/DataMigrator.html">DataMigrator</a> - Produces an ETL template for
+                            transferring data between tables of different databases.</li>
+                    </ul>
+                </section>
+                <section>
+                    <title>Examples</title>
+                    <p><strong>Produces default ETL template named etl.xml in the current directory:</strong></p>
+                    <source>    &lt;etl-template/&gt;</source>
+                    <p><strong>Produces data migration template named etl.xml in the current directory:</strong></p>
+                    <source><![CDATA[
+    <property file="etl.properties"/>
+    <!--
+    Properties
+        driver,class,user,password
+    must be set before calling etl-template task
+    -->
+    &lt;etl-template name="DataMigrator"/>]]>
+                    </source>
+                </section>
+            </section>
+        </section>
 		<section id="inprocess">
 			<title>In-Process Java Integration</title>
 			<p>Although Ant and command line execution are the most typical usage scenarious, it may be helpful to
