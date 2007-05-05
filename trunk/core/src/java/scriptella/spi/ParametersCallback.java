@@ -16,8 +16,6 @@
 package scriptella.spi;
 
 
-
-
 /**
  * Callback interface to obtain parameter values.
  *
@@ -28,8 +26,9 @@ public interface ParametersCallback {
     /**
      * Returns the value of parameter specified by name.
      * <p>The callback internally delegates a call to parent callbacks if the parameter cannot be found.
-     * @param name parameter name. Providers are allowed (but not have to) to ignore case of name parameter to comply with
-     * their internal model, e.g. JDBC providers interaction with RDMBS table column names.
+     *
+     * @param name parameter name. Providers are allowed (but not required) to ignore a case of the name parameter
+     *             to comply with their internal model. For example JDBC drivers are case-insensitive to column names.
      * @return parameter value or null if parameter doesn't exist.
      */
     Object getParameter(final String name);

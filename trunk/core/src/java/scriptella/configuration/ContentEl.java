@@ -18,7 +18,6 @@ package scriptella.configuration;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.Resource;
 
 import java.io.BufferedReader;
@@ -42,7 +41,6 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
      */
     private static final int MAX_CONCAT_RESOURCE_LENGTH = 1024 * 128; //128Kb
     private List<Resource> content = new ArrayList<Resource>();
-    private PropertiesSubstitutor propertiesSubstitutor;
     /**
      * Null-Object to use instead of null if necessary
      */
@@ -132,6 +130,16 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
         }
     }
 
+
+    /**
+     * Returns resources represented by this content.
+     *
+     * @return list of resources represented by this content.
+     */
+    public List<Resource> getResources() {
+        return content;
+    }
+
     @Override
     public String toString() {
         Location loc = getLocation();
@@ -141,7 +149,7 @@ public class ContentEl extends XmlConfigurableBase implements Resource {
     class MultipartReader extends Reader {
         private int pos = 0;
         private Reader current;
-        private int blocksCount=content.size();
+        private int blocksCount = content.size();
 
         public int read(final char cbuf[], final int off, final int len) throws IOException {
             if ((pos < 0) || ((pos >= blocksCount) && (current == null))) {

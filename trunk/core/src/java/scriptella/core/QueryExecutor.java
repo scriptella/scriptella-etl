@@ -15,7 +15,6 @@
  */
 package scriptella.core;
 
-import scriptella.configuration.ContentEl;
 import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
@@ -29,20 +28,16 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * &lt;query&gt; element executor.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class QueryExecutor extends ContentExecutor<QueryEl> {
     private ExecutableElement[] nestedElements;
-    private static final Logger LOG = Logger.getLogger(QueryExecutor.class.getName());
-    private final boolean debug=LOG.isLoggable(Level.FINE);
 
     private QueryExecutor(QueryEl queryEl) {
         super(queryEl);
@@ -66,26 +61,20 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         }
     }
 
-    public void execute(final DynamicContext ctx) {
-        final Connection c = ctx.getConnection();
 
-        final Resource content = getContent(c.getDialectIdentifier());
-        if (content == ContentEl.NULL_CONTENT) {
-            //skip queries without content
-            return;
-        }
+    protected void execute(Connection connection, Resource resource, DynamicContext ctx) {
         final QueryCtxDecorator ctxDecorator = new QueryCtxDecorator(ctx);
         if (debug) {
-            LOG.fine("Executing query " + getLocation());
+            log.fine("Executing query " + getLocation());
         }
-        c.executeQuery(content, ctx,
+        connection.executeQuery(resource, ctx,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback params) {
                         EtlCancelledException.checkEtlCancelled();
                         ctxDecorator.rownum++;
                         ctxDecorator.setParams(params);
                         if (debug) {
-                            LOG.fine("Processing row #" + ctxDecorator.rownum + " for query " + getLocation());
+                            log.fine("Processing row #" + ctxDecorator.rownum + " for query " + getLocation());
                         }
 
                         for (ExecutableElement exec : nestedElements) {
@@ -95,9 +84,9 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
                 });
         if (debug) {
             if (ctxDecorator.rownum == 0) {
-                LOG.fine("Query " + getLocation() + " returned no results.");
+                log.fine("Query " + getLocation() + " returned no results.");
             } else {
-                LOG.fine("Query " + getLocation() + " processed.");
+                log.fine("Query " + getLocation() + " processed.");
             }
 
         }

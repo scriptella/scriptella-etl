@@ -25,45 +25,34 @@ import scriptella.util.ExceptionUtils;
 import scriptella.util.StringUtils;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * &lt;script&gt; element executor.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class ScriptExecutor extends ContentExecutor<ScriptEl> {
-    private static final Logger LOG = Logger.getLogger(ScriptExecutor.class.getName());
-    private final boolean debug=LOG.isLoggable(Level.FINE);
-
     public ScriptExecutor(ScriptEl scriptEl) {
         super(scriptEl);
     }
 
-    public void execute(final DynamicContext ctx) {
-        Connection con = ctx.getConnection();
-        ScriptEl scriptEl = getElement();
-
-        Resource content = getContent(con.getDialectIdentifier());
-        if (content == ContentEl.NULL_CONTENT) {
-            warnEmptyContent();
-            return;
-        }
+    protected void execute(Connection connection, Resource resource, DynamicContext ctx) {
         if (debug) {
-            LOG.fine("Executing script " + getLocation());
+            log.fine("Executing script " + getLocation());
         }
         boolean repeat;
         do {
             repeat = false;
             try {
-                con.executeScript(content, ctx);
+                connection.executeScript(resource, ctx);
                 if (debug) {
-                    LOG.fine("Script " + getLocation() + " completed");
+                    log.fine("Script " + getLocation() + " completed");
                 }
 
             } catch (Throwable t) {
+                ScriptEl scriptEl = getElement();
                 if (scriptEl.getOnerrorElements() != null) {
                     repeat = onError(t, new OnErrorHandler(scriptEl), ctx);
                 } else {
@@ -73,16 +62,12 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         } while (repeat); //repeat while onError returns retry
     }
 
-    private void warnEmptyContent() {
-        LOG.info("Script " + getLocation() + " has no supported dialects");
-    }
-
     /**
      * Recursive on error fallback.
      *
-     * @param t
-     * @param errorHandler
-     * @param ctx
+     * @param t error to handle.
+     * @param errorHandler error handler to use.
+     * @param ctx dynamic context/
      * @return true if script execution should be retried
      */
     private boolean onError(Throwable t, OnErrorHandler errorHandler, DynamicContext ctx) {
@@ -90,14 +75,14 @@ public class ScriptExecutor extends ContentExecutor<ScriptEl> {
         Connection con = ctx.getConnection();
         DialectIdentifier dialectId = con.getDialectIdentifier();
         if (onErrorEl != null) { //if error handler present for this case
-            Resource content = onErrorEl.getContent(dialectId);
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, StringUtils.consoleFormat("Script " + getLocation() + " failed: " + t +
+            ContentEl content = prepareContent(onErrorEl.getContent(dialectId));
+            if (log.isLoggable(Level.INFO)) {
+                log.log(Level.INFO, StringUtils.consoleFormat("Script " + getLocation() + " failed: " + t +
                         "\nUsing onError handler: " + onErrorEl));
             }
 
             try {
-                con.executeScript(content, ctx);
+                con.executeScript(content == null ? ContentEl.NULL_CONTENT : content, ctx);
                 return onErrorEl.isRetry();
             } catch (Exception e) {
                 return onError(e, errorHandler, ctx); //calling this method again and triying to find another onerror
