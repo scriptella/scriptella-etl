@@ -41,14 +41,17 @@ import java.util.logging.Logger;
 
 /**
  * Data migration template manager.
- * <p>Configuration properties:
+ * <p>Produces an ETL template for tranferring
+ * data between tables of different databases.
+ * The tables are ascendingly ordered by a number of foreign keys.
+ * <h2>Configuration properties</h2>
  * <ul>
  * <li>driver - JDBC driver class name. Required.
  * <li>url - JDBC URL of the database. Required.
  * <li>user - database user name.
  * <li>password - database user password.
  * <li>catalog - database catalog name.
- * <li>catalog - database schema name.
+ * <li>schema - database schema name.
  * </ul>
  *
  * @author Fyodor Kupolov

@@ -1,10 +1,7 @@
 <body>
 Ant tasks.
-
-<h2>EtlExecuteTask (etl)</h2>
-
-<h3>How to register</h3>
-To use the task in a build file, the following taskdef declaration should be added:
+<h2>How to register</h2>
+To use Scriptella tasks in a build file, the following taskdef declaration should be added:
 <pre><code>
     &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar"/&gt;
 </code></pre>
@@ -13,7 +10,7 @@ To use the task in a build file, the following taskdef declaration should be add
     &lt;taskdef resource="antscriptella.properties" classpath="scriptella.jar;hsqldb.jar"/&gt;
 </code></pre>
 
-<p>
+<h2>EtlExecuteTask (etl)</h2>
 
 <h3>Parameters</h3>
 <table>
@@ -27,7 +24,7 @@ To use the task in a build file, the following taskdef declaration should be add
         </p></td><td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
     </tr>
     <tr>
-        <td>inheritAll</td><td>If true, pass all properties to the Script Executor. Defaults to <code>true</code>.</td><td>No</td>
+        <td>inheritAll</td><td>If true, pass all properties to ETL executor. Defaults to <code>true</code>.</td><td>No</td>
     </tr>
     <tr>
         <td>debug</td><td>If true print debugging information.</td><td>No, default value is false.</td>
@@ -66,5 +63,49 @@ The task supports nested <a href="http://ant.apache.org/manual/CoreTypes/fileset
 &lt;/etl&gt;
 </code></pre>
 
+
+<h2>EtlTemplateTask (etl-template)</h2>
+
+<h3>Parameters</h3>
+<table>
+
+    <tr>
+        <th>Attribute</th><th>Description</th><th>Required</th>
+    </tr>
+    <tr>
+        <td>name</td><td>ETL template name.</td><td>No, default ETL template is generated.</td>
+    </tr>
+    <tr>
+        <td>inheritAll</td><td>If true, pass all properties to Scriptella. Defaults to <code>true</code>.</td><td>No</td>
+    </tr>
+    <tr>
+        <td>debug</td><td>If true print debugging information.</td><td>No, default value is false.</td>
+    </tr>
+    <tr>
+        <td>quiet</td><td>If true be extra quiet.</td><td>No, default value is false.</td>
+    </tr>
+</table>
+
+<h3>Nested Elements</h3>
+The task has no nested elements.
+<h3>Supported Templates</h3>
+<ul>
+    <li>Default(no name) - Produces a simple ETL template for a quick start.</li>
+    <li><a href="../../../scriptella/tools/template/DataMigrator.html">DataMigrator</a> - Produces an ETL template for
+        transferring data between tables of different databases.</li>
+</ul>
+<h3>Examples</h3>
+<strong>Produce default ETL template</strong>
+<pre><code>&lt;etl-template/&gt;</code></pre>
+<strong>Produce data migration template:</strong>
+<pre><code>
+    &lt;property file="etl.properties"/>
+    &lt;!--
+    Properties
+        driver,class,user,password
+    must be set before calling etl-template task
+    -->
+    &lt;etl-template name="DataMigrator"/>
+</code></pre>
 
 </body>

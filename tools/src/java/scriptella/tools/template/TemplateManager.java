@@ -97,6 +97,8 @@ public class TemplateManager {
             String name = DEFAULT_BASE_NAME + ((i > 0) ? ("[" + i + "]") : "");
             if (checkFile(name + XML_EXT) && checkFile(name + PROPS_EXT)) {
                 return name;
+            } else {
+                logger.info("File for template "+name+" already exists, trying the next available name.");
             }
         }
         throw new IllegalStateException("Too many templates generated. Remove unused.");
@@ -141,14 +143,13 @@ public class TemplateManager {
         template.create(map);
     }
 
-
     /**
      * Loads a specified by name.
      *
      * @param name template name. Cannot be null.
      * @return loaded template manager.
      */
-    static TemplateManager forName(final String name) {
+    public static TemplateManager forName(final String name) {
         String className = PACKAGE_NAME + '.' + name;
         try {
             Class cl = Class.forName(className);
