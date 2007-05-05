@@ -36,7 +36,7 @@ import java.util.logging.LogRecord;
 
 
 /**
- * Ant task for STL scripts execution.
+ * Ant task for ETL scripts execution.
  *
  * @author Fyodor Kupolov
  * @version 1.0
