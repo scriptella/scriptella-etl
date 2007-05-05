@@ -16,6 +16,7 @@
 package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
+import static scriptella.configuration.XmlElementTest.asElement;
 import scriptella.spi.DialectIdentifier;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class DialectBasedContentElTest extends AbstractTestCase {
                 "<dialect name=\"d2\"><!--Commend-->D2</dialect>" +
                 "<!--Comment-->\nDef4<!--Comment-->  " +
                 "</query>";
-        XmlElement xmlElement = XmlElementTest.asElement(xml);
+        XmlElement xmlElement = asElement(xml);
         DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
         List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
         assertEquals(5, dialects.size());
@@ -91,5 +92,25 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         assertFalse(d.matches(new DialectIdentifier("string", "2.1.0")));
         assertTrue(d.matches(new DialectIdentifier("string", "1.0")));
     }
+
+    /**
+     * Tests when no content was matched.
+     */
+    public void testNullDialect() {
+        String xml = "<query><dialect name='ru'>preved</dialect></query>";
+        XmlElement xmlElement = asElement(xml);
+        DialectBasedContentEl d = new DialectBasedContentEl(xmlElement);
+        List<DialectBasedContentEl.Dialect> dialects = d.getDialects();
+        assertEquals(1, dialects.size());
+        DialectBasedContentEl.Dialect dialect = dialects.get(0);
+        assertEquals("preved", asString(dialect.getContentEl()));
+
+        //Now check if null is returned
+        assertNull(d.getContent(null));
+        assertNull(d.getContent(new DialectIdentifier("en", null)));
+        //And now check if content is returned for dialect "ru"
+        assertEquals("preved", asString(d.getContent(new DialectIdentifier("ru", null))));
+    }
+
 
 }

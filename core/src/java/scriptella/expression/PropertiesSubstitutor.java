@@ -220,11 +220,11 @@ public class PropertiesSubstitutor {
      * @param string string to check.
      * @return true if a given string contains properties/expressions.
      */
-    public boolean hasProperties(String string) {
+    public static boolean hasProperties(String string) {
         return firstCandidate(string) >= 0;
     }
 
-    int firstCandidate(String string) {
+    static int firstCandidate(String string) {
         if (string == null) {
             return -1;
         }

@@ -60,7 +60,7 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
     }
 
 
-    public Resource getDialectContent(DialectIdentifier id) {
+    public ContentEl getDialectContent(DialectIdentifier id) {
         return contentEl.getContent(id);
     }
 

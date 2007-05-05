@@ -40,5 +40,7 @@
             select * from test2
         </dialect>
     </script>
+    <!-- getContent should return null -->
+    <script><dialect name="BAR">---</dialect></script>
 
 </etl>

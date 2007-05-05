@@ -15,6 +15,7 @@
  */
 package scriptella.configuration;
 
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * Represents <code>include</code> XML configuration element.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -39,6 +40,7 @@ public class IncludeEl extends XmlConfigurableBase implements Resource {
     private String charset;
     private static final Logger LOG = Logger.getLogger(IncludeEl.class.getName());
     private FallbackEl fallbackEl;
+    private PropertiesSubstitutor substitutor;
 
     public IncludeEl(XmlElement element) {
         configure(element);
@@ -68,10 +70,19 @@ public class IncludeEl extends XmlConfigurableBase implements Resource {
         this.fallbackEl = fallbackEl;
     }
 
+
+    /**
+     * Sets the properties substitutor to expand properties inside href attribute.
+     *
+     * @param substitutor properties substitutor.
+     */
+    public void setPropertiesSubstitutor(PropertiesSubstitutor substitutor) {
+        this.substitutor = substitutor;
+    }
+
     public void configure(final XmlElement element) {
         url = element.getDocumentUrl();
         setRequiredProperty(element, "href");
-
         String enc = element.getAttribute("encoding");
         if (enc != null && !Charset.isSupported(enc)) {
             throw new ConfigurationException("Encoding " + enc + " is not supported", element);
@@ -85,7 +96,10 @@ public class IncludeEl extends XmlConfigurableBase implements Resource {
 
     public Reader open() throws IOException {
         try {
-            URL u = IOUtils.resolve(url, href);
+            //If properties substitutor has been specified - expand properties. See also CR #5473
+            String path = substitutor == null || substitutor.getParameters() == null
+                    ? href : substitutor.substitute(href);
+            URL u = IOUtils.resolve(url, path);
             return IOUtils.getReader(u.openStream(), charset);
         } catch (MalformedURLException e) {
             throw (IOException) new IOException("Malformed include url: " + href).initCause(e);

@@ -96,7 +96,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
      * @param id dialect identifier. null if any dialect.
      * @return content for specified dialect id or null - if script doesn't support this dialect.
      */
-    public Resource getContent(final DialectIdentifier id) {
+    public ContentEl getContent(final DialectIdentifier id) {
         ContentEl result = null;
         for (Dialect d : dialects) {
             if (d.matches(id)) {
@@ -109,7 +109,6 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
         }
         return result;
     }
-
 
     /**
      * For testing purposes

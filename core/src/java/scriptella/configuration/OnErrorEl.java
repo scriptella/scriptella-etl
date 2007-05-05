@@ -16,7 +16,6 @@
 package scriptella.configuration;
 
 import scriptella.spi.DialectIdentifier;
-import scriptella.spi.Resource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,13 +101,8 @@ public class OnErrorEl extends XmlConfigurableBase {
         this.retry = retry;
     }
 
-    public Resource getContent(DialectIdentifier id) {
-        Resource r = content.getContent(id);
-        if (r==null) {
-            return ContentEl.NULL_CONTENT;
-        } else {
-            return r;
-        }
+    public ContentEl getContent(DialectIdentifier id) {
+        return content.getContent(id);
     }
 
 
