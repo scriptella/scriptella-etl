@@ -33,9 +33,6 @@
     <tstamp/>
     <property file="${root.dir}/version.properties"/>
 
-
-
-
     <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
@@ -48,7 +45,7 @@
 
     <target name="compile" depends="init">
         <javac srcdir="${java.dir}" destdir="${classes.dir}" classpathref="classpath"
-               debug="on" debuglevel="lines,vars,source"/>
+               debug="on" debuglevel="lines,vars,source" target="1.5"/>
     </target>
 
     <target name="resources" if="resources_present" depends="init">
@@ -93,8 +90,5 @@
                 <fileset dir="${test.dir}" includes="**/*Test.java"/>
             </batchtest>
         </junit>
-
     </target>
-
-
 </project>
