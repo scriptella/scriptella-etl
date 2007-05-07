@@ -36,17 +36,14 @@ class StatementCache implements Closeable {
 
     /**
      * Creates a statement cache for specified connection.
+     *
      * @param connection connection to create cache for.
-     * @param size cache size, 0 or negative means disable cache.
+     * @param size       cache size, 0 or negative means disable cache.
      */
     public StatementCache(Connection connection, final int size) {
         this.connection = connection;
         if (size > 0) { //if cache is enabled
-            map = new LRUMap<String, StatementWrapper>(size) {
-                protected void onEldestEntryRemove(Map.Entry<String, StatementWrapper> eldest) {
-                    eldest.getValue().close();
-                }
-            };
+            map = new CacheMap(size);
         }
     }
 
@@ -55,8 +52,8 @@ class StatementCache implements Closeable {
      * <p>The sql is used as a key to lookup a {@link StatementWrapper},
      * if cache miss the statement is created and put to cache.
      *
-     * @param sql statement SQL.
-     * @param params parameters for SQL.
+     * @param sql       statement SQL.
+     * @param params    parameters for SQL.
      * @param converter types converter to use.
      * @return a wrapper for specified SQL.
      * @throws SQLException
@@ -66,7 +63,7 @@ class StatementCache implements Closeable {
         StatementWrapper sw = map == null ? null : map.get(sql);
 
         if (sw == null) { //If not cached
-            if (params==null || params.isEmpty()) {
+            if (params == null || params.isEmpty()) {
                 sw = create(sql, converter);
             } else {
                 sw = prepare(sql, converter);
@@ -128,4 +125,18 @@ class StatementCache implements Closeable {
         }
     }
 
+    /**
+     * LRU Map implementation for statement cache.
+     */
+    private static class CacheMap extends LRUMap<String, StatementWrapper> {
+        private static final long serialVersionUID = 1;
+
+        public CacheMap(int size) {
+            super(size);
+        }
+
+        protected void onEldestEntryRemove(Map.Entry<String, StatementWrapper> eldest) {
+            eldest.getValue().close();
+        }
+    }
 }
