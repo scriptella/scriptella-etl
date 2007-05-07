@@ -1,6 +1,9 @@
 <body>
-<h1>Spring Framework Integration Driver for Scriptella.</h1>
-This driver allows to work in <a href="http://www.springframework.org">The Spring Framework</a> environment.
+Spring Framework Integration Driver for Scriptella.
+<p>This driver allows working in <a href="http://www.springframework.org">The Spring Framework</a> environment
+and provides an ability to locate Spring-managed data sources.</p>
+<p>This driver acts as a proxy and relies on <a href="../../jdbc/package-summary.html">JDBC Bridge</a>.</p>
+
 <p><u>Important:</u></p>
 The driver requires <a href="EtlExecutorBean.html">EtlExecutorBean</a>
 to operate, see examples below.
@@ -68,8 +71,8 @@ The usage of <code>executor</code> is straightforward:
 EtlExecutor exec = (EtlExecutor) beanFactory.getBean("executor");
 exec.execute();
 </pre></code>
-Additionally you can use <code>java.util.concurrent.Callable</code> invocation interface to avoid
-    unnecessary dependency on Scriptella in application code:
+Additionally you can use <code>java.util.concurrent.Callable</code> or <code>java.lang.Runnable</code>
+invocation interface to avoid unnecessary dependency on Scriptella in application code:
 <code><pre>
 Callable exec = (Callable) beanFactory.getBean("executor");
 exec.call();
