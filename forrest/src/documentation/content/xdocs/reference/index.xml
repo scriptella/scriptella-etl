@@ -495,9 +495,9 @@
                     <source><![CDATA[
     <property file="etl.properties"/>
     <!--
-    Properties
+    Ant properties
         driver,class,user,password
-    must be set before calling etl-template task
+    must be set before calling "DataMigrator" etl-template
     -->
     &lt;etl-template name="DataMigrator"/>]]>
                     </source>
