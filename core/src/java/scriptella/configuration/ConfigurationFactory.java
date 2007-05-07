@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * Factory class for ETL {@link ConfigurationEl configuration} files.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -96,58 +96,19 @@ public class ConfigurationFactory {
         }
     }
 
+    /**
+     * Parses XML file and creates a configuration based on a specified parameters.
+     *
+     * @return configuration element.
+     */
     public ConfigurationEl createConfiguration() {
         if (resourceURL == null) {
             throw new ConfigurationException("Configuration URL is required");
         }
         try {
             DocumentBuilder db = DBF.newDocumentBuilder();
-            db.setEntityResolver(new EntityResolver() {
-                public InputSource resolveEntity(final String publicId,
-                                                 final String systemId) {
-                    if (systemId != null && systemId.trim().endsWith(DTD_NAME)) {
-                        return new InputSource(ConfigurationFactory.class.getResourceAsStream(
-                                "/scriptella/dtd/" + DTD_NAME));
-                    }
-
-                    return null;
-                }
-            });
-            db.setErrorHandler(new ErrorHandler() {
-                public void warning(final SAXParseException exception) {
-                    LOG.warning(messageFor(exception));
-                }
-
-                public void error(final SAXParseException exception) {
-                    LOG.warning(messageFor(exception));
-                }
-
-                private String messageFor(final SAXParseException exception) {
-                    StringBuilder sb = new StringBuilder(32);
-                    sb.append("XML configuration warning in ");
-
-                    final String sid = exception.getSystemId();
-
-                    if (sid != null) {
-                        sb.append(sid);
-                    } else {
-                        sb.append("the document");
-                    }
-
-                    sb.append('(');
-                    sb.append(exception.getLineNumber());
-                    sb.append(':');
-                    sb.append(exception.getColumnNumber());
-                    sb.append("): ");
-                    sb.append(exception.getMessage());
-
-                    return sb.toString();
-                }
-
-                public void fatalError(final SAXParseException exception) {
-                    LOG.severe(messageFor(exception));
-                }
-            });
+            db.setEntityResolver(ETL_ENTITY_RESOLVER);
+            db.setErrorHandler(ETL_ERROR_HANDLER);
 
             final InputSource inputSource = new InputSource(resourceURL.toString());
             final Document document = db.parse(inputSource);
@@ -162,4 +123,51 @@ public class ConfigurationFactory {
             throw new ConfigurationException("Unable to parse document: " + e.getMessage(), e);
         }
     }
+
+    //XML-related stuff -  resolver+error handler
+    private static final EntityResolver ETL_ENTITY_RESOLVER = new EntityResolver() {
+        public InputSource resolveEntity(final String publicId, final String systemId) {
+            if (systemId != null && systemId.trim().endsWith(DTD_NAME)) {
+                return new InputSource(ConfigurationFactory.class.getResourceAsStream(
+                        "/scriptella/dtd/" + DTD_NAME));
+            }
+            return null;
+        }
+    };
+    private static final ErrorHandler ETL_ERROR_HANDLER = new ErrorHandler() {
+        public void warning(final SAXParseException exception) {
+            LOG.warning(messageFor(exception));
+        }
+
+        public void error(final SAXParseException exception) {
+            LOG.warning(messageFor(exception));
+        }
+
+        private String messageFor(final SAXParseException exception) {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("XML configuration warning in ");
+
+            final String sid = exception.getSystemId();
+
+            if (sid != null) {
+                sb.append(sid);
+            } else {
+                sb.append("the document");
+            }
+
+            sb.append('(');
+            sb.append(exception.getLineNumber());
+            sb.append(':');
+            sb.append(exception.getColumnNumber());
+            sb.append("): ");
+            sb.append(exception.getMessage());
+
+            return sb.toString();
+        }
+
+        public void fatalError(final SAXParseException exception) {
+            LOG.severe(messageFor(exception));
+        }
+    };
+
 }
