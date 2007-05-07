@@ -12,7 +12,39 @@
 			<answer><p>The up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
 			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</p></answer>
         </faq>
-		<!-- More faqs or parts here -->
+        <faq id="BIND_VARS">
+            <question>What is the difference between $variable / ${expression} and ?variable / ?{expression} syntax.</question>
+			<answer><p>Binding variables syntax varies between drivers. JDBC drivers use the following rules
+                for properties substitution:</p>
+                <ul>
+                    <li>$variable - inserts a value of the variable as text content.</li>
+                    <li>${expression} - braces are used for JEXL expressions. For example
+                    ${column1+column2} inserts the sum of 2 columns.</li>
+                    <li>?variable, ?{expression} - syntax is the same as in 2 previous examples, but the
+                    result of evaluation is set as a prepared statement parameter, thus increasing the performance
+                    and eliminating the need to escape values.
+                    <br/>Please note that currently ?{} syntax is only supported by the JDBC drivers.</li>
+                </ul>
+                <p>See <a href="reference/index.html#BIND_VARIABLES">Reference Manual</a> for additional details.</p>
+            </answer>
+        </faq>
+
+        <faq id="COLUMN_SPACES">
+            <question>How to escape spaces in field names?</question>
+            <answer><p>Scriptella does not support whitespaces in field names, nevertheless several drivers
+                including CSV and JDBC allow referencing columns by an index, i.e. $1, $2 ... $n.
+                <br/>Example:
+            </p>
+                <source><![CDATA[
+<query connection-id="csv"> <!-- Read CSV file content -->
+    <script connection-id="text">
+        $1,$2,$3,$4 <!-- Print columns 1-4 -->
+    </script>
+</query>]]>
+                </source>
+            </answer>
+        </faq>
+        <!-- More faqs or parts here -->
 	</faqsection>
     <faqsection>
         <title>SQL</title>
