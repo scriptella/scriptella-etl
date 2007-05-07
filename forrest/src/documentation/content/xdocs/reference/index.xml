@@ -229,14 +229,18 @@
 			</section>
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
-		<section>
+		<anchor id="BIND_VARIABLES"/>
+        <section>
 			<title>Expressions and Variables Substitution</title>
-			<p>Scriptella supports variables substitution and expression evaluation based on the following syntax:</p>
+			<p>Binding variables syntax varies between drivers. JDBC drivers support variables substitution and
+                expression evaluation based on the following syntax:</p>
 			<ul>
 				<li>$Property_Name - inserts a value of the specified property or variable.
                     $ prefixed expressions are substituted in all parts except comments.</li>
 				<li>${expression} - inserts a value of the expression evaluation.
-                    <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.</li>
+                    <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.<br/>
+                    $property and ${property} return the same value, but the first one is faster, because JEXL expression engine
+                    is not used to evaluate the expression.</li>
 				<li>?Propery_Name or ?{expression} are used <em>only in SQL queries and scripts</em> to set prepared statement parameters.
                 ? prefixed expressions are not substituted inside quotes, comments and outside of query/script elements.</li>
 			</ul>
@@ -257,7 +261,10 @@
             </ul>
             <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
                 use <code>get(name)</code> to get variable's value.
-                For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
+                 For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
+                The basic support for properties substitution
+                is provided by <a href="../docs/api/scriptella/expression/PropertiesSubstitutor.html">PropertiesSubstitutor</a>
+                core class which is based on a ${} syntax and used by drivers unless other rules are described.
             </p>
 			<note>
                 In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
