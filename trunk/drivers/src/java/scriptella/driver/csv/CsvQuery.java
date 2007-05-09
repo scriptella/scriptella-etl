@@ -129,7 +129,7 @@ public class CsvQuery implements ParametersCallback {
                     } else { //reuse
                         m.reset(col);
                     }
-                    if (!m.matches()) {
+                    if (!m.find()) {
                         rowMatches = false;
                         break;
                     }

@@ -138,7 +138,7 @@ class TextQueryExecutor implements ParametersCallback {
                 } else { //Reuse matcher for better performance
                     m.reset(line);
                 }
-                if (m.matches()) {
+                if (m.find()) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.info("Pattern matched: " + m);
                     }

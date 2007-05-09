@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class CsvConnection extends AbstractTextConnection {
+public class  CsvConnection extends AbstractTextConnection {
     private static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
     private Writer writer;
