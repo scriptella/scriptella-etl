@@ -18,21 +18,22 @@ package scriptella.driver.sybase;
 import scriptella.jdbc.GenericDriver;
 
 /**
- * Scriptella Adapter for Sybase database.
- *
+ * Scriptella Adapter for Sybase ASE/ASA databases.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Kirill Volgin
+ * @author Fyodor Kupolov
  * @version 1.0
  */
 public class Driver extends GenericDriver {
     public static final String SYBASE_DRIVER_NAME = "com.sybase.jdbc.SybDriver";
     public static final String SYBASE_JDBC2_DRIVER_NAME = "com.sybase.jdbc2.jdbc.SybDriver";
     public static final String SYBASE_JDBC3_DRIVER_NAME = "com.sybase.jdbc3.jdbc.SybDriver";
+    public static final String SYBASE_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
 
 
     public Driver() {
-        loadDrivers(SYBASE_JDBC3_DRIVER_NAME, SYBASE_JDBC2_DRIVER_NAME, SYBASE_DRIVER_NAME);
+        loadDrivers(SYBASE_JDBC3_DRIVER_NAME, SYBASE_JDBC2_DRIVER_NAME, SYBASE_DRIVER_NAME, SYBASE_TDS_DRIVER_NAME);
     }
 
 }

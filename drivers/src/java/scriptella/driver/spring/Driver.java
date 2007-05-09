@@ -41,6 +41,9 @@ public class Driver extends GenericDriver {
         }
         try {
             BeanFactory beanFactory = EtlExecutorBean.getContextBeanFactory();
+            if (url.startsWith("spring:")) { //Remove spring:: URL prefix used for autodiscovery
+                url = url.substring(7);
+            }
             DataSource ds = (DataSource) beanFactory.getBean(url);
             return ds.getConnection();
         } catch (Exception e) {

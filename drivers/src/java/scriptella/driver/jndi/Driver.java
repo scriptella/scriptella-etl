@@ -42,6 +42,9 @@ public class Driver extends GenericDriver {
         }
         try {
             InitialContext ctx = new InitialContext(props);
+            if (url.startsWith("jndi:")) { //Remove jndi: URL prefix used for autodiscovery
+                url = url.substring(5);
+            }
             DataSource ds = (DataSource) ctx.lookup(url);
             return ds.getConnection();
         } catch (NamingException e) {

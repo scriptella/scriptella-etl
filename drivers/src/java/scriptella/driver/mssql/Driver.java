@@ -18,7 +18,7 @@ package scriptella.driver.mssql;
 import scriptella.jdbc.GenericDriver;
 
 /**
- * Scriptella Adapter for Microsoft SQL Server  database.
+ * Scriptella Adapter for Microsoft SQL Server database JDBC driver.
  *
  * This driver looks in classpath for the following drivers(in search order) :
  * <ul>
