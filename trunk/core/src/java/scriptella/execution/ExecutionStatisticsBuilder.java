@@ -18,8 +18,8 @@ package scriptella.execution;
 import scriptella.configuration.Location;
 import scriptella.spi.Connection;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Stack;
 
 
 /**
@@ -27,7 +27,7 @@ import java.util.Stack;
  * <p>This class collects runtime ETL execution statistics, the usage contract is the following:</p>
  * <ul>
  * <li>{@link #etlStarted()} invoked on ETL start.
- * <li>Call {@link #elementStarted(Location, Connection)} before executing an element.
+ * <li>Call {@link #elementStarted(Location,Connection)} before executing an element.
  * <li>Call {@link #elementExecuted()} or {@link #elementFailed()} after executing an element.
  * <li>{@link #etlComplete()} invoked when ETL completes.
  * <li>{@link #getStatistics() Obtain statistics} after ETL completes.
@@ -35,7 +35,7 @@ import java.util.Stack;
  * <em>Notes:</em>
  * <ul>
  * <li>Start/End element callbacks sequence must comply with executing elements position in a XML file.
-*  <li>This class is not thread safe.
+ * <li>This class is not thread safe.
  * </ul>
  *
  * @author Fyodor Kupolov
@@ -45,7 +45,7 @@ public class ExecutionStatisticsBuilder {
     private ExecutionStatistics executionStatistics;
 
     //Execution stack for nested elements
-    protected Stack<ExecutionStatistics.ElementInfo> executionStack = new Stack<ExecutionStatistics.ElementInfo>();
+    protected ElementsStack executionStack = new ElementsStack();
 
     /**
      * Called when new element execution started.
@@ -57,7 +57,7 @@ public class ExecutionStatisticsBuilder {
         executionStack.push(ei);
         ei.statementsOnStart = connection.getExecutedStatementsCount();
         ei.connection = connection;
-        ei.started=System.nanoTime();
+        ei.started = System.nanoTime();
     }
 
     /**
@@ -79,7 +79,7 @@ public class ExecutionStatisticsBuilder {
      * Invoked on ETL completion.
      */
     public void etlComplete() {
-        if (executionStatistics==null) {
+        if (executionStatistics == null) {
             throw new IllegalStateException("etlStarted not called");
         }
 
@@ -99,7 +99,7 @@ public class ExecutionStatisticsBuilder {
             ended.workingTime = 0;
         }
         final Connection con = ended.connection;
-        ended.connection=null; //clear the connection to avoid leaks
+        ended.connection = null; //clear the connection to avoid leaks
         long conStatements = con.getExecutedStatementsCount();
         long elStatements = conStatements - ended.statementsOnStart;
         if (ok) {
@@ -110,17 +110,16 @@ public class ExecutionStatisticsBuilder {
 
         if (elStatements > 0) {
             ended.statements += elStatements;
-            executionStatistics.statements+=elStatements;
+            executionStatistics.statements += elStatements;
         }
-
 
         //Exclude this element time from parent elements
         //Also find the parent elements with the same connection and decrement their number of statements
-        for (int i=executionStack.size()-1;i>=0;i--) {
+        for (int i = executionStack.size() - 1; i >= 0; i--) {
             final ExecutionStatistics.ElementInfo parent = executionStack.get(i);
             parent.workingTime -= ti;
-            if (parent.connection==con) { //if the same objects
-                parent.statementsOnStart+=elStatements;
+            if (parent.connection == con) { //if the same objects
+                parent.statementsOnStart += elStatements;
             }
         }
 
@@ -131,7 +130,7 @@ public class ExecutionStatisticsBuilder {
     }
 
     private ExecutionStatistics.ElementInfo getInfo(final Location loc) {
-        if (executionStatistics==null) {
+        if (executionStatistics == null) {
             throw new IllegalStateException("etlStarted must be invoked prior to calling this method");
         }
         ExecutionStatistics.ElementInfo ei = executionStatistics.elements.get(loc.getXPath());
@@ -147,5 +146,18 @@ public class ExecutionStatisticsBuilder {
 
     public ExecutionStatistics getStatistics() {
         return executionStatistics;
+    }
+
+    /**
+     * A non-synchronized faster replacement for {@link java.util.Stack}.
+     */
+    static final class ElementsStack extends ArrayList<ExecutionStatistics.ElementInfo> {
+        public ExecutionStatistics.ElementInfo pop() {
+            return remove(size() - 1);
+        }
+
+        public void push(ExecutionStatistics.ElementInfo element) {
+            add(element);
+        }
     }
 }
