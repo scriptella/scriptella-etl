@@ -1,6 +1,10 @@
 <body>
-Sybase Driver Adapter for Scriptella.
-<p><b>Note: </b>The driver tries to load one after another jdbc3,jdbc2 and jdbc Sybase drivers.
+Scriptella Driver Adapter for Sybase ASE and ASA.
+<p><b>Note: </b>The driver tries to load any of the known JDBC drivers in the following order:
+<ul>
+    <li>jdbc3,jdbc2 or jdbc driver from Sybase.
+    <li><a href="http://jtds.sourceforge.net">JTDS</a> driver</li>
+</ul>
 <h2>General information</h2>
 <table>
     <tr>
@@ -11,7 +15,9 @@ Sybase Driver Adapter for Scriptella.
     </tr>
     <tr>
         <td><b>Runtime dependencies:</b></td>
-        <td><code><a href="http://www.sybase.com/products/informationmanagement/softwaredeveloperkit/jconnect">jconn3.jar</a></code></td>
+        <td><code><a href="http://www.sybase.com/products/informationmanagement/softwaredeveloperkit/jconnect">jconn3.jar</a></code>
+            or <code><a href="http://sourceforge.net/project/showfiles.php?group_id=33291">jtds-VERSION.jar</a></code>.
+        </td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>

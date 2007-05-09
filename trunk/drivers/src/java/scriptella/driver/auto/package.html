@@ -1,0 +1,44 @@
+<body>
+Autodiscovery Driver for Scriptella.
+<p>Automatically discovers a driver based on the specified url.
+<p><em>Note:</em>
+    Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella,
+    in other cases driver's name has to be specified manually.</p>
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.auto.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Driver alias name:</b></td><td><code>auto</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>Specific to an underlying driver</td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td>Depends on an underlying driver.</td>
+    </tr>
+</table>
+<h2>Example</h2>
+<code><pre>
+    &lt;!-- connection to a SQL Server database via JTDS driver-->
+    &lt;connection driver="auto" url="jdbc:jtds:sqlserver://localhost:1433/northwind"/&gt;
+
+    &lt;!-- connection to a JNDI bound datasource -->
+    &lt;connection driver="auto" url="jndi:ds/appDataSource"/&gt;
+
+    &lt;!-- connection to a Spring managed datasource -->
+    &lt;connection driver="auto" url="spring:myDataSource"/&gt;
+
+    &lt;!-- connection to Mail driver-->
+    &lt;connection driver="auto" url="mailto:user@host?subject=Hello"&gt;
+        mail.smtp.host=mail.host.name
+        mail.user=user
+        mail.password=password
+    &lt;/connection>
+
+
+</pre></code>
+
+</body>

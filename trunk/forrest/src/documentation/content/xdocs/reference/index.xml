@@ -575,16 +575,34 @@
 				<li>Simplified naming. No need to specify a full driver's class
                 name, alias may be used, e.g. driver="hslqdb", "oracle" etc.</li>
 				<li>Scriptella adapters are preconfigured for optimal performance, syntax parsing rules
-                and other execution options, e.g. BLOB handling for oracle. In most cases
+                and other execution options, e.g. BLOB handling for Oracle. In most cases
                 you can specify a generic JDBC property, but using adapters simplifies
                 switching between drivers and even a target platform e.g. Java/.Net</li>
-			</ul>
-			<p>See <a href="drivers.html#jdbcbridge">JDBC Bridge Drivers Matrix</a> for the complete list of supported adapters.</p>
+                <li>Different JDBC drivers can be used to access popular databases such as Microsoft SQL Server or Sybase ASE/ASA.
+                    Each driver has an individual class name. Example list of driver names for Sybase ASA/ASE: com.sybase.jdbc3.jdbc.SybDriver,
+                    com.sybase.jdbc2.jdbc.SybDriver, com.sybase.jdbc.jdbc.SybDriver, net.sourceforge.jtds.jdbc.Driver. With
+                    Scriptella you simply specify "jdbc" as a name of the driver and an available driver is loaded from classpath.
+                </li>
+            </ul>
+            <p>See <a href="drivers.html#jdbcbridge">JDBC Bridge Drivers Matrix</a> for the complete list of supported adapters.</p>
 			<note>
                 Scriptella driver's package short name is an alias for the driver, e.g. h2 is an alias
                 for scriptella.driver.h2.Driver
             </note>
-		</section>
+            <section>
+                <title>Autodiscovery of JDBC drivers</title>
+                <p>Scriptella provides auto-discovery feature based on the connection URL. Just specify jdbc as driver name and
+                the driver will be recognized based on the specified URL.Example:</p>
+                <source><![CDATA[
+                   <connection driver="jdbc" url="jdbc:sybase:Tds:host:2048/database"/>
+                ]]></source>
+                <p>The "jdbc" driver will load the "sybase" driver, because the URL belongs to Sybase.</p>
+                <note>Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella, in other
+                cases driver's name has to be specified manually. See <a
+                href="../docs/api/scriptella/driver/auto/package-summary.html">JDBC driver JavaDoc</a>
+                    for autodiscovery implementation details.</note>
+            </section>
+        </section>
 		<section>
 			<title>Non-relational Datasources Interoperability</title>
 			<p>See <a href="drivers.html#nonjdbc">Non-JDBC Drivers Matrix</a> for the complete list of drivers.</p>

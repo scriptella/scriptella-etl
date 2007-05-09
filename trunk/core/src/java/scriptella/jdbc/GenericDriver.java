@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Adapter for JDBC drivers.
+ * Generic adapter for JDBC drivers.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -60,18 +60,19 @@ public class GenericDriver extends AbstractScriptellaDriver {
     protected void loadDrivers(String... drivers) {
         if (drivers.length > 0) {
             Throwable throwable = null;
+            final boolean debug = LOG.isLoggable(Level.FINE);
             for (String name : drivers) {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Trying to load driver class " + name);
-                }
                 try {
                     Class.forName(name);
+                    if (debug) {
+                        LOG.fine("Found driver class " + name);
+                    }
                     break;
                 } catch (Throwable t) {
                     if (throwable == null) {
                         throwable = t;
                     } else {
-                        if (LOG.isLoggable(Level.FINE)) {
+                        if (debug) {
                             LOG.log(Level.FINE, "Failed to load driver class " + name, t);
                         }
                     }
