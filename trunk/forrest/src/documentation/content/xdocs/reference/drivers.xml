@@ -141,7 +141,15 @@
 					<th>Scriptella Driver Name</th>
 					<th>Notes</th>
 				</tr>
-				<tr>
+                <tr>
+                    <td>
+                        <anchor id="auto"/>
+                        <a href="../docs/api/scriptella/driver/auto/package-summary.html">Autodiscovery</a>
+                    </td>
+                    <td>scriptella.driver.auto.Driver</td>
+                    <td>Automatically discovers a necessary driver based on the specified url.</td>
+                </tr>
+                <tr>
 					<td>
 						<anchor id="csv"/>
 						<a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a>
