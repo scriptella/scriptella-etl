@@ -23,7 +23,6 @@ import scriptella.spi.QueryCallback;
 import scriptella.util.ColumnsMap;
 import scriptella.util.ExceptionUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,51 +35,48 @@ import java.util.regex.Pattern;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class CsvQuery implements ParametersCallback, Closeable {
-    private CSVReader reader;
+public class CsvQuery implements ParametersCallback {
     private final boolean headers;
     private final boolean trim;
     private ColumnsMap columnsMap;
     private String[] row;
     private Pattern[][] patterns;
     private Matcher[][] matchers;
-    private PropertiesSubstitutor substitutor = new PropertiesSubstitutor();
+    private PropertiesSubstitutor substitutor;
 
     /**
      * Creates a query for CSVReader.
      *
-     * @param reader  CSV reader.
-     * @param headers true if first line contains headers.
-     * @param trim    true if if extra whitespaces in the query should be trimmed.
+     * @param queryReader query CSVReader.
+     * @param substitutor properties substitutor to use. The parameters for the substitutor must be set by a caller.
+     * @param headers     true if first line of input CSV file contains headers.
+     * @param trim        true if if extra whitespaces should be trimmed.
      */
-    public CsvQuery(CSVReader reader, boolean headers, boolean trim) {
-        if (reader == null) {
-            throw new IllegalArgumentException("CSV reader cannot be null");
-        }
-        this.reader = reader;
+    public CsvQuery(CSVReader queryReader, PropertiesSubstitutor substitutor, boolean headers, boolean trim) {
         this.headers = headers;
         this.trim = trim;
+        this.substitutor = substitutor;
+        compileQueries(queryReader);
+        closeSilently(queryReader);
     }
 
     /**
-     * Executes a query.
+     * Executes a query over a specified text content.
      *
-     * @param queryReader        query content reader. Closed after this method completes.
-     * @param parametersCallback parameters to use.
-     * @param queryCallback      callback to use for result set iteration.
-     * @param counter            statements counter.
+     * @param reader        CSV content reader.
+     * @param queryCallback callback to use for result set iteration.
+     * @param counter       statements counter.
      * @throws IOException if IO error occurs.
      */
-    public void execute(CSVReader queryReader, ParametersCallback parametersCallback, QueryCallback queryCallback, AbstractConnection.StatementCounter counter) throws IOException {
+    public void execute(CSVReader reader, QueryCallback queryCallback, AbstractConnection.StatementCounter counter) throws IOException {
         try {
-            substitutor.setParameters(parametersCallback);
-            compileQueries(queryReader);
-
             columnsMap = new ColumnsMap();
             if (headers) {
                 String[] row = reader.readNext();
-                for (int i = 0; i < row.length; i++) {
-                    columnsMap.registerColumn(row[i].trim(), i + 1);
+                if (row != null) {
+                    for (int i = 0; i < row.length; i++) {
+                        columnsMap.registerColumn(row[i].trim(), i + 1);
+                    }
                 }
             }
             //For each row
@@ -91,15 +87,12 @@ public class CsvQuery implements ParametersCallback, Closeable {
                 }
             }
         } finally { //clean up
-            try {
-                queryReader.close();
-            } catch (Exception e) {
-                ExceptionUtils.ignoreThrowable(e);
-            }
+            closeSilently(reader);
         }
         if (patterns != null) {
             counter.statements += patterns.length;
         }
+        columnsMap = null;
     }
 
     /**
@@ -204,6 +197,7 @@ public class CsvQuery implements ParametersCallback, Closeable {
 
     /**
      * Trims array of strings if {@link #trim} flag is true.
+     *
      * @param s array of strings.
      * @return the same array instance.
      */
@@ -219,22 +213,27 @@ public class CsvQuery implements ParametersCallback, Closeable {
     }
 
     public Object getParameter(final String name) {
-        if (reader == null) {
+        if (columnsMap == null) {
             throw new IllegalStateException("CSV Resultset is closed");
         }
         Integer col = columnsMap.find(name);
         if (col != null && col > 0 && col <= row.length) { //If col is not null and in range
             return row[col - 1];
-        } else { //otherwise call parent
+        } else { //otherwise call parent context.
             return substitutor.getParameters().getParameter(name);
         }
     }
 
-    public void close() throws IOException {
-        if (reader != null) {
+    /**
+     * Helper method to close CSV reader.
+     *
+     * @param reader CSV reader to close.
+     */
+    static void closeSilently(CSVReader reader) {
+        try {
             reader.close();
-            reader = null;
-            columnsMap = null;
+        } catch (Exception e) {
+            ExceptionUtils.ignoreThrowable(e);
         }
     }
 }

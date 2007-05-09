@@ -15,6 +15,7 @@
  */
 package scriptella.driver.text;
 
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
@@ -93,7 +94,8 @@ public class TextConnection extends AbstractTextConnection {
         }
 
         try {
-            new TextQueryExecutor(q, trim, parametersCallback).execute(in, queryCallback, counter);
+            new TextQueryExecutor(q, new PropertiesSubstitutor(parametersCallback), trim, skipLines).
+                    execute(in, queryCallback, counter);
         } finally {
             IOUtils.closeSilently(q);
             IOUtils.closeSilently(in);

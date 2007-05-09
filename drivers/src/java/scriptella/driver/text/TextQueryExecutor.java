@@ -73,20 +73,17 @@ import java.util.regex.Pattern;
  */
 class TextQueryExecutor implements ParametersCallback {
     private static final Logger LOG = Logger.getLogger(TextQueryExecutor.class.getName());
-    private final ParametersCallback params;
     private final PropertiesSubstitutor ps;
     private Pattern[] query;
     private Matcher result;
     private boolean trim;
+    private int skipLines;
     private static final String COLUMN_PREFIX = "column";
 
-    public TextQueryExecutor(final Reader queryReader, final boolean trim, final ParametersCallback parentParametersCallback) {
-        if (queryReader == null) {
-            throw new IllegalArgumentException("Query cannot be null");
-        }
+    public TextQueryExecutor(final Reader queryReader, final PropertiesSubstitutor substitutor, final boolean trim, final int skipLines) {
         this.trim = trim;
-        this.params = parentParametersCallback;
-        ps = new PropertiesSubstitutor(params);
+        this.skipLines = skipLines;
+        ps = substitutor;
         //Compiles patterns loaded from specified reader.
         //Patterns are read line-by-line.
         BufferedReader r = IOUtils.asBuffered(queryReader);
@@ -127,6 +124,10 @@ class TextQueryExecutor implements ParametersCallback {
         int qCount = query.length;
         Matcher[] matchers = new Matcher[qCount];
         LineIterator it = new LineIterator(reader, ps, trim);
+        //Skip a specified number of lines
+        for (int i = 0; i < skipLines && it.hasNext(); i++) {
+            it.next();
+        }
         while (it.hasNext()) {
             String line = it.next();
             for (int i = 0; i < qCount; i++) {
@@ -172,6 +173,6 @@ class TextQueryExecutor implements ParametersCallback {
                 ExceptionUtils.ignoreThrowable(e);
             }
         }
-        return params.getParameter(name);
+        return ps.getParameters().getParameter(name);
     }
 }
