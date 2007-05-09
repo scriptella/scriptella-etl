@@ -181,13 +181,15 @@ public class CsvConnectionTest extends AbstractTestCase {
         ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
         CsvConnection con = new CsvConnection(cp);
-        testCsvInput = "Column 1,Column 2\n11,12\n21,22\n31,32";
+        testCsvInput = "-skipped---,--\n-skipped---,--\nc1,c2\n11,12";
         rows=0;
         con.executeQuery(new StringResource(""), MockParametersCallbacks.NULL, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
-                assertEquals("31", parameters.getParameter("1"));
-                assertEquals("32", parameters.getParameter("2"));
+                assertEquals("11", parameters.getParameter("1"));
+                assertEquals("11", parameters.getParameter("c1"));
+                assertEquals("12", parameters.getParameter("2"));
+                assertEquals("12", parameters.getParameter("c2"));
             }
         });
         assertEquals(1, rows);

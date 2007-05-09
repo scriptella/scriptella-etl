@@ -58,7 +58,7 @@ Text driver supports Regular expressions syntax to query text files.
 The file is read line-by-line from the location specified by the URL connection property and each line is matched
 against the regex pattern.
 <p>
-If the <b>whole line</b> matches the pattern this match produces a virtual row in a result set.
+If a line or a part of it matches the pattern this match produces a virtual row in a result set.
 The column names in a virtual result set correspond to matched regex group names.
 For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
     result set row contains two columns(groups): 0-foobar, 1-bar. These columns
@@ -74,24 +74,27 @@ Specify each regular expression on a separate line to match them using OR condit
     <li>Empty query selects all lines from the input file.</li>
     <li>The <code>0</code>(zero) column name in the produced result set contains the matched line.</li>
     <li>Leading and trailing whitespaces in query element and input file lines are trimmed by default.</li>
+    <li>Use ^ and $ boundary matchers to match the <b>whole line</b>.</li>
 </ul>
 </p>
 <br><u>Example:</u>
 <code>
     <pre>
 &lt;query&gt;
-  ERROR: (.*)
+  ^ERROR: (.*)
   WARNING: (.*Failed.*)
+  ([\d]+) errors?
 &lt;/query&gt;
     </pre>
 </code>
-This query consists of 2 regular expressions:
+This query consists of 3 regular expressions:
 <ol>
     <li>selects lines starting with <code>ERROR:</code> prefix</li>
     <li>selects <code>WARNING</code> lines having <code>Failed</code> substring</li>
+    <li>selects lines containg a number of errors, e.g. "Found 5 errors".</li>
 </ol>
-The query selects any line satisfying one of these 2 regular expressions.
-Input file has the following content:
+The query selects any line satisfying one of these 3 regular expressions.
+Suppose input file has the following content:
 <code>
 <pre>
 Log file started...
@@ -99,6 +102,7 @@ INFO: INIT
 WARNING: CPU is slow
 WARNING: Failed to increase heap size
 ERROR: Process interrupted
+Operation completed with 1 error.
 </pre>
 </code>
 As the result of query execution the following set of rows is produced:
@@ -115,6 +119,11 @@ As the result of query execution the following set of rows is produced:
         <td>ERROR: Process interrupted</td>
         <td>Process interrupted</td>
     </tr>
+    <tr>
+        <td>1 error</td>
+        <td>1</td>
+    </tr>
+
 </table>
 <h2>Script Syntax</h2>
 The &lt;script&gt; element content is read line-by-line, for each line
