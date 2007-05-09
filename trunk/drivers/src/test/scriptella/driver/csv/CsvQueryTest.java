@@ -17,6 +17,7 @@ package scriptella.driver.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
 import scriptella.AbstractTestCase;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
@@ -33,15 +34,17 @@ import java.io.StringReader;
  */
 public class CsvQueryTest extends AbstractTestCase {
     private int rows;
+
     public void test() throws IOException {
         //Test query with columns number exceeding the input data columns number
         String data = "1,2,3\n11,2,3,4\n1";
         String query = ".*1.*,2,3,4";
-        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), false, false);
-        rows=0;
+        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, false);
+        rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3,4 matches the pattern
-        q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.UNSUPPORTED, new QueryCallback() {
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
                 assertEquals("11", parameters.getParameter("1"));
@@ -56,15 +59,17 @@ public class CsvQueryTest extends AbstractTestCase {
 
     /**
      * Tests if query correctly works with parameters.
+     *
      * @throws IOException
      */
     public void testParametersLookup() throws IOException {
         String data = "a,b,c\n11,22,33";
         String query = "11,22,33";
-        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), true, true);
-        rows=0;
+        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), true, true);
+        rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.SIMPLE, new QueryCallback() {
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
                 //now lookup columns by name and index
@@ -86,17 +91,13 @@ public class CsvQueryTest extends AbstractTestCase {
      * Tests if invalid queries are recognized.
      */
     public void testInvalidQuery() throws IOException {
-        String data = "a,b,c";
         String query = "\\"; //bad query
-        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(data)), true, true);
         try {
-            q.execute(new CSVReader(new StringReader(query)), MockParametersCallbacks.UNSUPPORTED, null, null);
+            new CsvQuery(new CSVReader(new StringReader(query)),
+                    new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), true, true);
             fail("Bad query syntax should be recognized");
-        } catch (CsvProviderException e) {
+        } catch (Exception e) {
             //OK
         }
-
-
     }
-
 }

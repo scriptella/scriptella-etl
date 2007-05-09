@@ -43,13 +43,15 @@ public class CsvConnectionTest extends AbstractTestCase {
     private int rows;
 
     private ByteArrayOutputStream out;
+    private String testCsvInput;
 
     protected void setUp() throws Exception {
         super.setUp();
+        testCsvInput = "c1;c2;c3\nc4;'c''5';c6\u0394";
         testURLHandler = new TestURLHandler() {
             public InputStream getInputStream(final URL u) {
                 try {
-                    return new ByteArrayInputStream("c1;c2;c3\nc4;'c''5';c6\u0394".getBytes("UTF8"));
+                    return new ByteArrayInputStream(testCsvInput.getBytes("UTF8"));
                 } catch (UnsupportedEncodingException e) {
                     throw new IllegalStateException(e.getMessage(), e);
                 }
@@ -130,7 +132,7 @@ public class CsvConnectionTest extends AbstractTestCase {
     /**
      * Tests CSV processing with trim mode switched off.
      */
-    public void testNoTrim() throws UnsupportedEncodingException {
+    public void testNoTrim() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         props.put(CsvConnection.TRIM, "no");
@@ -155,7 +157,7 @@ public class CsvConnectionTest extends AbstractTestCase {
 
     }
 
-    public void testAutoFlush() throws UnsupportedEncodingException {
+    public void testAutoFlush() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         props.put(CsvConnection.FLUSH, "true");
@@ -168,5 +170,38 @@ public class CsvConnectionTest extends AbstractTestCase {
         assertNotNull(out);
         assertEquals(str+"\n", new String(out.toByteArray()));
     }
+
+    /**
+     * Tests if skip_lines is working.
+     */
+    public void testSkipLines() {
+        //Create a configuration with non default values
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(CsvConnection.SKIP_LINES, "2");
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+
+        CsvConnection con = new CsvConnection(cp);
+        testCsvInput = "Column 1,Column 2\n11,12\n21,22\n31,32";
+        rows=0;
+        con.executeQuery(new StringResource(""), MockParametersCallbacks.NULL, new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                rows++;
+                assertEquals("31", parameters.getParameter("1"));
+                assertEquals("32", parameters.getParameter("2"));
+            }
+        });
+        assertEquals(1, rows);
+        //Now test if the number of lines to skip exceeds the file size
+        testCsvInput = "v1,v2\nv3,v4";
+        rows=0;
+        con.executeQuery(new StringResource(""), MockParametersCallbacks.NULL, new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                rows++;
+            }
+        });
+        assertEquals(0, rows);
+    }
+
+
 
 }

@@ -38,6 +38,8 @@ public abstract class AbstractTextConnection extends AbstractConnection {
     protected final boolean flush;
     protected final URL url; //if null - use console
     protected final String eol;
+    protected final int skipLines;
+
     /**
      * Name of the <code>encoding</code> connection property.
      * Specifies charset encoding in text files.
@@ -63,6 +65,14 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      */
     public static final String FLUSH = "flush";
 
+    /**
+     * Name of the <code>skip_lines</code> connection property.
+     * The number of lines to skip before start reading.
+     * Default value is 0 (no lines are skipped).
+     * <p>Only valid for &lt;query&gt; elements.
+     */
+    public static final String SKIP_LINES = "skip_lines";
+
 
     /**
      * For testing only.
@@ -73,6 +83,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         flush = false;
         url = null;
         eol = "\n";
+        skipLines = 0;
     }
 
     /**
@@ -88,13 +99,14 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         encoding = parameters.getCharsetProperty(ENCODING);
         trim = parameters.getBooleanProperty(TRIM, true);
         //When printing to console - flushing is enabled
-        flush = url==null || parameters.getBooleanProperty(FLUSH, false);
+        flush = url == null || parameters.getBooleanProperty(FLUSH, false);
         String eolStr = parameters.getStringProperty(TextConnection.EOL);
         if (eolStr != null && eolStr.length() > 0) {
             eol = eolStr;
         } else {
             eol = "\n"; //Default value
         }
+        skipLines = parameters.getIntegerProperty(SKIP_LINES, 0);
     }
 
     public String getEncoding() {
@@ -126,7 +138,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      * @throws IOException if IO error occured.
      */
     protected Writer newOutputWriter() throws IOException {
-        return url == null ? ConsoleAdapters.getConsoleWriter(encoding):
+        return url == null ? ConsoleAdapters.getConsoleWriter(encoding) :
                 IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
     }
 

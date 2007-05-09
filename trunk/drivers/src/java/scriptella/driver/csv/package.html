@@ -52,8 +52,14 @@ The driver to write and query CSV files.
     <tr>
         <td>trim</td>
         <td>Value of <code>true</code> specifies that the leading and trailing
-     whitespaces in CSV fields should be omitted..
+     whitespaces in CSV fields should be omitted.
         <td>No, the default value is <code>true</code>.</td>
+    </tr>
+    <tr>
+        <td>skip_lines</td>
+        <td>The number of lines to skip before start reading. Please note that if <code>headers=true</code>, 
+            the actual number of skipped lines is <code>skipped_lines+1</code>
+        <td>No, the default value is <code>0</code> (no lines are skipped).</td>
     </tr>
 </table>
 <h2>Query Syntax</h2>

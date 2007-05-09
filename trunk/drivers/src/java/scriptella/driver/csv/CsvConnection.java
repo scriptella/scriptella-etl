@@ -25,7 +25,6 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
-import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
 import java.io.IOException;
@@ -61,7 +60,7 @@ public class CsvConnection extends AbstractTextConnection {
     public static final String QUOTE = "quote";
 
     /**
-     * Name of the <code>suppressHeaders</code> connection property.
+     * Name of the <code>headers</code> connection property.
      * true means the first line contains headers. Default value is true.
      * <p>Only valid for &lt;query&gt; elements.
      */
@@ -70,7 +69,6 @@ public class CsvConnection extends AbstractTextConnection {
     private final char separator;
     private final char quote;
     private final boolean headers;
-
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
@@ -144,18 +142,17 @@ public class CsvConnection extends AbstractTextConnection {
         if (out != null) {
             throw new CsvProviderException("Cannot query and update a CSV file simultaneously.");
         }
+        CSVReader queryReader;
         try {
-            CSVReader in = new CSVReader(newInputReader(), separator, quote);
-            CsvQuery q = new CsvQuery(in, headers, trim);
-            try {
-                q.execute(new CSVReader(queryContent.open()), parametersCallback, queryCallback, counter);
-            } catch (IOException e) {
-                throw new CsvProviderException("Cannot read query " + queryContent, e);
-            } finally {
-                IOUtils.closeSilently(q);
-            }
+            queryReader = new CSVReader(queryContent.open());
         } catch (IOException e) {
-            throw new CsvProviderException("Unable to open URL " + url + " for input", e);
+            throw new CsvProviderException("Failed to read query content", e);
+        }
+        CsvQuery q = new CsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback), headers, trim);
+        try {
+            q.execute(new CSVReader(newInputReader(), separator, quote, skipLines), queryCallback, counter);
+        } catch (IOException e) {
+            throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
         }
     }
 
