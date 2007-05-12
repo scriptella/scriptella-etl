@@ -41,7 +41,7 @@ public class JexlConnection extends AbstractConnection {
     private Map<Resource, Script> cache = new IdentityHashMap<Resource, Script>();
 
     /**
-     * Instantiates a new connection to Janino Script Evaluator.
+     * Instantiates a new connection to JEXL.
      *
      * @param parameters connection parameters.
      */
