@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @see scriptella.expression.JexlExpression
  */
-public class IfInterceptor extends ElementInterceptor {
+public final class IfInterceptor extends ElementInterceptor {
     private static final Logger LOG = Logger.getLogger(IfInterceptor.class.getName());
     private static final Set<CharSequence> trueStrs = new LinkedHashSet<CharSequence>();
 

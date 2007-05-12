@@ -25,7 +25,7 @@ import scriptella.spi.Connection;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ConnectionInterceptor extends ElementInterceptor {
+public final class ConnectionInterceptor extends ElementInterceptor {
     private ConnectionInterceptor(ExecutableElement next, String conId) {
         super(next, new ConnectionDecorator(conId));
     }

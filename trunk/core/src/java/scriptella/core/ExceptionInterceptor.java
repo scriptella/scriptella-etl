@@ -25,7 +25,7 @@ import scriptella.configuration.Location;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ExceptionInterceptor extends ElementInterceptor {
+public final class ExceptionInterceptor extends ElementInterceptor {
     private Location location;
 
     public ExceptionInterceptor(ExecutableElement next, Location location) {

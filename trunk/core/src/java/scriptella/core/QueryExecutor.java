@@ -36,7 +36,8 @@ import java.util.Map;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class QueryExecutor extends ContentExecutor<QueryEl> {
+public final class QueryExecutor extends ContentExecutor<QueryEl> {
+    private static final Object NULL = new Object(); //NULL object flag
     private ExecutableElement[] nestedElements;
 
     private QueryExecutor(QueryEl queryEl) {
@@ -67,21 +68,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         if (debug) {
             log.fine("Executing query " + getLocation());
         }
-        connection.executeQuery(resource, ctx,
-                new QueryCallback() {
-                    public void processRow(final ParametersCallback params) {
-                        EtlCancelledException.checkEtlCancelled();
-                        ctxDecorator.rownum++;
-                        ctxDecorator.setParams(params);
-                        if (debug) {
-                            log.fine("Processing row #" + ctxDecorator.rownum + " for query " + getLocation());
-                        }
-
-                        for (ExecutableElement exec : nestedElements) {
-                            exec.execute(ctxDecorator);
-                        }
-                    }
-                });
+        connection.executeQuery(resource, ctx, ctxDecorator);
         if (debug) {
             if (ctxDecorator.rownum == 0) {
                 log.fine("Query " + getLocation() + " returned no results.");
@@ -104,8 +91,7 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
         return q;
     }
 
-    private static final class QueryCtxDecorator extends DynamicContextDecorator {
-        private static final Object NULL = new Object(); //NULL object flag
+    private final class QueryCtxDecorator extends DynamicContextDecorator implements QueryCallback {
         private ParametersCallback params;
         private int rownum; //current row number
         private Map<String, Object> cachedParams;
@@ -115,11 +101,22 @@ public class QueryExecutor extends ContentExecutor<QueryEl> {
             super(context);
         }
 
-        void setParams(final ParametersCallback params) {
-            this.params = params;
+
+        public void processRow(final ParametersCallback parameters) {
+            EtlCancelledException.checkEtlCancelled();
+            rownum++;
+            params = parameters;
             if (cachedParams != null) {
                 cachedParams.clear();
             }
+            if (debug) {
+                log.fine("Processing row #" + rownum + " for query " + getLocation());
+            }
+
+            for (ExecutableElement exec : nestedElements) {
+                exec.execute(this);
+            }
+
         }
 
         @Override
