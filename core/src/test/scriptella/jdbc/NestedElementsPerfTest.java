@@ -28,6 +28,7 @@ import scriptella.execution.EtlExecutorException;
 public class NestedElementsPerfTest extends AbstractTestCase {
     /**
      * History:
+     * 12.05.2007 - Duron 1.7Mhz - 1350 ms
      * 19.01.2007 - Duron 1.7Mhz - 1500 ms
      * @throws EtlExecutorException if ETL fails
      */
