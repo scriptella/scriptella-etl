@@ -25,6 +25,8 @@ import java.io.StringReader;
  * Represents String as a resource.
  * <p>This implementation is intended to represent
  * small text blocks.
+ * <p>This resource is immutable and can be cached based
+ * on object identity.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -35,6 +37,7 @@ public class StringResource implements Resource {
 
     /**
      * Creates a resource based on String content.
+     *
      * @param string resource content.
      */
     public StringResource(String string) {
@@ -43,7 +46,8 @@ public class StringResource implements Resource {
 
     /**
      * Creates a resource based on String content.
-     * @param string resource content.
+     *
+     * @param string      resource content.
      * @param description resource description.
      */
     public StringResource(String string, String description) {
@@ -64,6 +68,6 @@ public class StringResource implements Resource {
     }
 
     public String toString() {
-        return description==null?"Text block":description;
+        return description == null ? "Text block" : description;
     }
 }
