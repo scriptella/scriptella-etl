@@ -28,7 +28,7 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
-    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Janino", "2.45");
+    static final DialectIdentifier DIALECT_IDENTIFIER = new DialectIdentifier("Janino", "2.56");
 
 
     public Driver() {
