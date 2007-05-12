@@ -25,7 +25,7 @@ import scriptella.execution.ExecutionStatisticsBuilder;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class StatisticInterceptor extends ElementInterceptor {
+public final class StatisticInterceptor extends ElementInterceptor {
     private Location location;
 
     public StatisticInterceptor(ExecutableElement next, Location location) {

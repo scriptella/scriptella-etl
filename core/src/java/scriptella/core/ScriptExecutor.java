@@ -33,7 +33,7 @@ import java.util.logging.Level;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptExecutor extends ContentExecutor<ScriptEl> {
+public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
     public ScriptExecutor(ScriptEl scriptEl) {
         super(scriptEl);
     }
