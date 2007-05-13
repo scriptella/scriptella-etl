@@ -78,13 +78,13 @@
         );
         INSERT INTO Metainf VALUES (1);
         <!-- Conditional schema creation scripts-->
-        <dialect name=".*hsql.*">
+        <dialect name="hsql">
             <include href="hsqldb-schema.sql"/>
         </dialect>
-        <dialect name=".*oracle.*">
+        <dialect name="oracle">
             <include href="oracle-schema.sql"/>
         </dialect>
-        <dialect name=".*mysql.*">
+        <dialect name="mysql">
             <include href="mysql-schema.sql"/>
         </dialect>
         <!-- Fill the table with data -->

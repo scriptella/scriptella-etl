@@ -115,13 +115,13 @@ EtlExecutor.newExecutor(
             -- In this example dialects are used to
             -- include different DDLs for data types:
             -- Example: oracle-schema.sql for Oracle
-            <dialect name=".*hsql.*"> <!-- Regular expressions supported-->
+            <dialect name="hsql"> <!-- Regular expressions syntax supported-->
                 <include href="hsqldb-schema.sql"/>
             </dialect>
-            <dialect name=".*oracle.*">
+            <dialect name="oracle">
                 <include href="oracle-schema.sql"/>
             </dialect>
-            <dialect name=".*mysql.*">
+            <dialect name="mysql">
                 <include href="mysql-schema.sql"/>
             </dialect>
             -- SQL92 inserts - no need to use dialects
