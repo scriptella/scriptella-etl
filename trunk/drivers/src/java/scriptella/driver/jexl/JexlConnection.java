@@ -15,7 +15,6 @@
  */
 package scriptella.driver.jexl;
 
-import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.Script;
 import org.apache.commons.jexl.ScriptFactory;
 import scriptella.spi.AbstractConnection;
@@ -50,27 +49,14 @@ public class JexlConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
-        Script script = compile(scriptContent);
-        try {
-            JexlContext ctx = new JexlContextMap(parametersCallback);
-            script.execute(ctx);
-        } catch (Exception e) {
-            throw new JexlProviderException("Failed to execute JEXL script", e);
-        }
+        run(scriptContent, new JexlContextMap(parametersCallback));
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
-        Script query = compile(queryContent);
-        try {
-            JexlContextMap ctx = new JexlContextMap(parametersCallback);
-            ctx.put("query", new Query(queryCallback, ctx));
-            query.execute(ctx);
-        } catch (Exception e) {
-            throw new JexlProviderException("Failed to execute JEXL script", e);
-        }
+        run(queryContent, new JexlContextMap(parametersCallback, queryCallback));
     }
 
-    private Script compile(Resource resource) {
+    private void run(Resource resource, JexlContextMap ctx) {
         Script script = cache.get(resource);
         if (script == null) {
             String s;
@@ -86,7 +72,11 @@ public class JexlConnection extends AbstractConnection {
                 throw new JexlProviderException("Failed to compile JEXL script", e);
             }
         }
-        return script;
+        try {
+            script.execute(ctx);
+        } catch (Exception e) {
+            throw new JexlProviderException("Failed to execute JEXL script", e);
+        }
     }
 
 
@@ -94,6 +84,7 @@ public class JexlConnection extends AbstractConnection {
      * Closes the connection and releases all related resources.
      */
     public void close() throws ProviderException {
+        cache = null;
     }
 
 }
