@@ -1,7 +1,7 @@
 <body>
 <h1>Scriptella bridge for the JSR 223: Scripting for the Java™ Platform.</h1>
 Allows usage of different scripting languages in ETL &lt;query&gt; and &lt;script&gt; elements.
-<p>The driver relies on javax.script package from JDK 6.</p>
+<p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from JDK 6.</p>
 <h2>General information</h2>
 <table>
     <tr>
@@ -20,13 +20,13 @@ Allows usage of different scripting languages in ETL &lt;query&gt; and &lt;scrip
     </tr>
     <tr>
         <td>language</td>
-        <td>Language syntax used in script and queries.</td>
-        <td>No, the default charset language is <code>JavaScript</code>.</td>
+        <td>Language used in scripts and queries.</td>
+        <td>No, the default language is <code>JavaScript</code>.</td>
     </tr>
 </table>
 
 <h2>Query and Script Syntax</h2>
-This driver does not impose any limitations on a language syntax. See <a href="https://scripting.dev.java.net">Scripting.</a>
+This driver does not impose any limitations on a language syntax. See <a href="https://scripting.dev.java.net">JSR-223 script engines</a>
 project for more details on supported languages.
 <p>
     Scripts and queries can reference variables from parent elements. Declared variables are
@@ -50,15 +50,15 @@ See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a>
 The following query executes a child script 10 times. As the result of execution 10 records
 are inserted into a database table.
 <code><pre>
-&lt;connection id="script" driver="jexl"/&gt;
+&lt;connection id="script" driver="script"/&gt;
 &lt;connection id="out" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB"/&gt;
 
-&lt;query connection-id="jexl"&gt;
-    <![CDATA[
+&lt;query connection-id="script"&gt;
+    &lt;![CDATA[
     for (var i=0;i<10;i++) {
         login='login'+i;
-        query.next();
-    }]]>
+        query.next(); &lt;!-- Executes a child script element--> 
+    }]]&gt;
     &lt;script connection-id="out"&gt;
         INSERT INTO Table(ID, Login) VALUES (?i, ?login);
     &lt;/script&gt;

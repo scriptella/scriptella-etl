@@ -90,7 +90,9 @@
                     <strong>
                         <a href="docs/api/scriptella/spi/package-summary.html">Service Provider Interface (SPI)</a>
                     </strong>
-                    for interoperability with non-JDBC DataSources.
+                    for interoperability with non-JDBC DataSources and scripting languages.
+                    Out of the box <a href="reference/drivers.html#script">support for JSR 223</a>
+                    <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">(Scripting for the Java™ Platform)</a> compatible languages. 
                 </li>
                 <li>Built-In
                     <a href="reference/drivers.html#nonjdbc">CSV, TEXT, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
