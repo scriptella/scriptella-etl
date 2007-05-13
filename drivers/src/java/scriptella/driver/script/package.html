@@ -1,0 +1,68 @@
+<body>
+<h1>Scriptella bridge for the JSR 223: Scripting for the Java™ Platform.</h1>
+Allows usage of different scripting languages in ETL &lt;query&gt; and &lt;script&gt; elements.
+<p>The driver relies on javax.script package from JDK 6.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.script.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td>Java SE 6 is required. Additional dependencies are specific to a scripting language.</td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>language</td>
+        <td>Language syntax used in script and queries.</td>
+        <td>No, the default charset language is <code>JavaScript</code>.</td>
+    </tr>
+</table>
+
+<h2>Query and Script Syntax</h2>
+This driver does not impose any limitations on a language syntax. See <a href="https://scripting.dev.java.net">Scripting.</a>
+project for more details on supported languages.
+<p>
+    Scripts and queries can reference variables from parent elements. Declared variables are
+    exposed to nested elements.
+</p>
+<p>Implicit variable <code>query</code> is available in &lt;query&gt; elements. This variable
+should be used to produce a result set:</p>
+<code>
+<pre>
+    &lt;query&gt;<![CDATA[
+        var v1='This variable is visible in a child script';
+        for (var i=0;i<10;i++) {
+            query.next(); // Triggers execution of a child script.
+        }]]>
+        &lt;script&gt;......&lt;/script&gt;
+    &lt;/query&gt;
+</pre>
+See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
+</code>
+<h2>Examples</h2>
+The following query executes a child script 10 times. As the result of execution 10 records
+are inserted into a database table.
+<code><pre>
+&lt;connection id="script" driver="jexl"/&gt;
+&lt;connection id="out" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB"/&gt;
+
+&lt;query connection-id="jexl"&gt;
+    <![CDATA[
+    for (var i=0;i<10;i++) {
+        login='login'+i;
+        query.next();
+    }]]>
+    &lt;script connection-id="out"&gt;
+        INSERT INTO Table(ID, Login) VALUES (?i, ?login);
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre></code>
+</body>
