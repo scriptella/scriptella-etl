@@ -25,6 +25,12 @@ import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.Collections;
 
 /**
@@ -55,8 +61,6 @@ public class ScriptConnectionTest extends AbstractTestCase {
         } catch (ScriptProviderException e) {
             //OK
         }
-
-
     }
 
     static ScriptConnection newConnection() {
@@ -91,6 +95,32 @@ public class ScriptConnectionTest extends AbstractTestCase {
         };
         newConnection().executeQuery(r, MockParametersCallbacks.fromMap(Collections.singletonMap("a0", 5)), callback);
 
+    }
+
+    /**
+     * Tests if readers/writers are working
+     */
+    public void testStreamHandling() {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        testURLHandler = new TestURLHandler() {
+            public InputStream getInputStream(final URL u) throws IOException {
+                return new ByteArrayInputStream("Hello".getBytes());
+            }
+
+            public OutputStream getOutputStream(final URL u) throws IOException {
+                return os;
+            }
+
+            public int getContentLength(final URL u) {
+                return 0;
+            }
+        };
+        Connection c = new Driver().connect(
+                new MockConnectionParameters(Collections.singletonMap(ScriptConnection.ENCODING, "UTF-8"), "tst:/file"));
+
+        c.executeScript(new StringResource("print('Hello '+name)"),
+                MockParametersCallbacks.fromMap(Collections.singletonMap("name", "world")));
+        assertEquals("Hello world", os.toString());
     }
 
 }
