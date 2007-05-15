@@ -121,4 +121,19 @@ public class LineIteratorTest extends AbstractTestCase {
             assertEquals(ioe2, e);
         }
     }
+
+    /**
+     * Tests if skip works
+     */
+    public void testSkip() {
+        LineIterator lit = new LineIterator(new StringReader("a\nb\nc\nd"));
+        lit.skip(0);
+        assertEquals("a", lit.next());
+        assertEquals(2, lit.skip(2));
+        assertEquals("d", lit.next());
+        assertEquals(0, lit.skip(1)); //move outside
+        assertFalse(lit.hasNext());
+        lit.skip(-3); //nagatives are ingored
+        assertFalse(lit.hasNext());
+    }
 }

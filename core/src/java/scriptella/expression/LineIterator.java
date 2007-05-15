@@ -121,6 +121,22 @@ public class LineIterator implements Iterator<String>, Closeable {
         return res;
     }
 
+
+    /**
+     * Skips N lines.
+     * @param n number of lines to skip.
+     * @return the actual number of lines skipped.
+     */
+    public int skip(int n) {
+        for (int i = 0; i < n; i++) {
+            if (!hasNext()) {
+                return i;
+            }
+            next();
+        }
+        return n;
+    }
+
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("remove not supported by " + getClass().getName());
     }
