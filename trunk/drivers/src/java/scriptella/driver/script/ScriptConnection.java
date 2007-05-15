@@ -23,15 +23,21 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
+import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -42,7 +48,6 @@ import java.util.logging.Logger;
  * Scriptella connection adapter for the JSR 223: Scripting for the Java™ Platform.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  * <p/>
- * TODO: enable reading and writing to file
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -52,7 +57,19 @@ public class ScriptConnection extends AbstractConnection {
     private Map<Resource, CompiledScript> cache;
     private ScriptEngine engine;
     private Compilable compiler;
+    private String encoding;
+    private URL url;
+    private Writer out;
+    /**
+     * Name of the <code>language</code> connection property.
+     */
     static final String LANGUAGE = "language";
+
+    /**
+     * Name of the <code>encoding</code> connection property.
+     * Specifies charset encoding of a character stream specified by an url connection parameter.
+     */
+    static final String ENCODING = "encoding";
 
 
     /**
@@ -80,8 +97,18 @@ public class ScriptConnection extends AbstractConnection {
         } else {
             LOG.info("Engine " + engine.getFactory().getEngineName() + " does not support compilation. Running in interpreted mode.");
         }
+        if (!StringUtils.isEmpty(parameters.getUrl())) { //if url is specified
+            url = parameters.getResolvedUrl();
+            //setup reader and writer for it
+            ScriptContext ctx = engine.getContext();
+            ctx.setReader(new LazyReader());
+            //JS engine bug - we have to wrap with PrintWriter, because otherwise print function won't work.
+            ctx.setWriter(new PrintWriter(new LazyWriter()));
+        }
+        encoding = parameters.getCharsetProperty(ENCODING);
         ScriptEngineFactory f = engine.getFactory();
         setDialectIdentifier(new DialectIdentifier(f.getLanguageName(), f.getLanguageVersion()));
+
     }
 
     /**
@@ -125,14 +152,14 @@ public class ScriptConnection extends AbstractConnection {
                 try {
                     cache.put(resource, script = compiler.compile(resource.open()));
                 } catch (ScriptException e) {
-                    throw new ScriptProviderException("Failed to execute script", e);
+                    throw new ScriptProviderException("Failed to compile script", resource, e);
                 }
             }
             script.eval(parametersCallback);
         } catch (IOException e) {
             throw new ScriptProviderException("Failed to open script for reading", e);
         } catch (ScriptException e) {
-            throw new ScriptProviderException("Failed to execute script", e);
+            throw new ScriptProviderException("Failed to execute script", resource, e);
         }
 
     }
@@ -143,6 +170,52 @@ public class ScriptConnection extends AbstractConnection {
      */
     public void close() throws ProviderException {
         cache = null;
+    }
+
+    /**
+     * Lazily initialized reader.
+     */
+    final class LazyReader extends Reader {
+        private Reader r;
+
+        public int read(char cbuf[], int off, int len) throws IOException {
+            if (r == null) {
+                r = IOUtils.getReader(url.openStream(), encoding);
+            }
+            return r.read(cbuf, off, len);
+        }
+
+        public void close() throws IOException {
+            if (r != null) {
+                r.close();
+            }
+        }
+    }
+
+    /**
+     * Lazily initialized writer which appends chars to an URL stream.
+     */
+    final class LazyWriter extends Writer {
+
+        public void write(char cbuf[], int off, int len) throws IOException {
+            if (out == null) {
+                out = IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
+            }
+            out.write(cbuf, off, len);
+        }
+
+        public void flush() throws IOException {
+            if (out != null) {
+                out.flush();
+            }
+        }
+
+        public void close() throws IOException {
+            if (out != null) {
+                out.close();
+            }
+
+        }
     }
 
 }
