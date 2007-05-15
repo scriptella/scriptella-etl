@@ -17,11 +17,11 @@ package scriptella.driver.janino;
 
 import org.codehaus.janino.Scanner;
 import org.codehaus.janino.ScriptEvaluator;
+import scriptella.expression.LineIterator;
 import scriptella.spi.Resource;
 import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.IdentityHashMap;
@@ -58,7 +58,7 @@ final class CodeCompiler {
             evaluator.setExtendedType(type);
             evaluator.setStaticMethod(false);
             evaluator.setMethodName("execute");
-            evaluator.setClassName(type.getName()+"_Generated");
+            evaluator.setClassName(type.getName() + "_Generated");
 
             Reader r = null;
             try {
@@ -96,19 +96,17 @@ final class CodeCompiler {
     }
 
     static String getLine(Resource resource, int line) {
-        BufferedReader r = null;
+        int lines = line-1;
+        LineIterator it = null;
         try {
-            r = new BufferedReader(resource.open());
-            for (int i = 0; i < line - 1; i++) {
-                if (r.readLine() == null) {
-                    return null;
-                }
+            it = new LineIterator(resource.open());
+            if (it.skip(lines) == lines && it.hasNext()) {
+                return it.next();
             }
-            return r.readLine();
         } catch (IOException e) {
             ExceptionUtils.ignoreThrowable(e);
         } finally {
-            IOUtils.closeSilently(r);
+            IOUtils.closeSilently(it);
         }
         return null;
 
