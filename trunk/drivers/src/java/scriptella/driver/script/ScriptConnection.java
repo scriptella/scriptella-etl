@@ -80,7 +80,7 @@ public class ScriptConnection extends AbstractConnection {
     public ScriptConnection(ConnectionParameters parameters) {
         super(parameters);
         String lang = parameters.getStringProperty(LANGUAGE);
-        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager(ScriptConnection.class.getClassLoader());
         if (StringUtils.isEmpty(lang)) { //JavaScript is used by default
             LOG.fine("Script language was not specified. JavaScript is default.");
             lang = "js";
