@@ -1,14 +1,20 @@
 <body>
 <h1>Scriptella bridge for the JSR 223: Scripting for the Java™ Platform.</h1>
-Allows usage of different scripting languages in ETL &lt;query&gt; and &lt;script&gt; elements.
-<p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from JDK 6.</p>
+Allows usage of <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a> compatible scripting languages in
+ETL &lt;query&gt; and &lt;script&gt; elements.
+<p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from Java SE 6.
+The default language expected by the driver is JavaScript which is bundled with JRE.</p>
 <h2>General information</h2>
 <table>
     <tr>
         <td><b>Driver class:</b></td><td><code>scriptella.driver.script.Driver</code></td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td>Java SE 6 is required. Additional dependencies are specific to a scripting language.</td>
+        <td><b>URL:</b></td><td>URL of the file to read from and send output to. URIs are resolved relative to a script file.
+    If url is not specified console (<code>System.in/out</code>) is used.</td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><b>Java SE 6</b> is required. Additional dependencies are specific to a scripting language.</td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -34,39 +40,57 @@ Allows usage of different scripting languages in ETL &lt;query&gt; and &lt;scrip
 This driver does not impose any limitations on a language syntax. See <a href="https://scripting.dev.java.net">JSR-223 script engines</a>
 project for more details on supported languages.
 <p>
-    Scripts and queries can reference variables from parent elements. Declared variables are
+    Scripts and queries can reference variables from ancestor elements. Declared variables are
     exposed to nested elements.
 </p>
 <p>Implicit variable <code>query</code> is available in &lt;query&gt; elements. This variable
 should be used to produce a result set:</p>
 <code>
 <pre>
-    &lt;query&gt;<![CDATA[
-        var v1='This variable is visible in a child script';
-        for (var i=0;i<10;i++) {
+    &lt;query&gt;&lt;![CDATA[
+        var v1 = 'This variable is visible in a child script';
+        for (var i = 0; i < 10; i++) {
             query.next(); // Triggers execution of a child script.
-        }]]>
-        &lt;script&gt;......&lt;/script&gt;
+        }]]&gt;
+        &lt;script&gt;
+            ......
+            v2 = v1 + '!';
+            ......
+        &lt;/script&gt;
     &lt;/query&gt;
 </pre>
 See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
 </code>
+<a name="examples"/>
 <h2>Examples</h2>
 The following query executes a child script 10 times. As the result of execution 10 records
-are inserted into a database table.
+are inserted into a database table. Additionally a log file log.txt is produced.
 <code><pre>
 &lt;connection id="script" driver="script"/&gt;
 &lt;connection id="out" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB"/&gt;
+&lt;connection id="log" driver="script" url="log.txt"/&gt;
 
 &lt;query connection-id="script"&gt;
     &lt;![CDATA[
-    for (var i=0;i<10;i++) {
-        login='login'+i;
-        query.next(); &lt;!-- Executes a child script element--> 
+    for (var i = 0; i < 10; i++) {
+        login = 'login' + i;
+        //You can instantiate Java objects and invoke static methods
+        var now = new java.sql.Timestamp(java.lang.System.currentTimeMillis());
+        query.next(); //Executes a child script element
     }]]&gt;
+
+    &lt;!-- Inserts a parameterized row into a database --&gt;
     &lt;script connection-id="out"&gt;
-        INSERT INTO Table(ID, Login) VALUES (?i, ?login);
+        INSERT INTO Table(ID, Login, Login_Time) VALUES (?i, ?login, ?now);
     &lt;/script&gt;
+    
+    &lt;!-- Logs the message using MessageFormat class and parent context variables --&gt;
+    &lt;script connection-id="log">
+        // create Java String array of 2 elements
+        var a = java.lang.reflect.Array.newInstance(java.lang.Object, 2)
+        a[0] = now;a[1] = i;
+        println(format.format(a));
+    &gt;/script>
 &lt;/query&gt;
 
 </pre></code>

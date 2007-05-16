@@ -23,7 +23,7 @@
 		<section id="jdbcbridge">
 			<title>JDBC Bridge Drivers</title>
 			<p>Scriptella providers a set of built-in drivers for popular databases, see also
-			<a href="../docs/api/scriptella/jdbc/package-summary.html">JDBC Bridge Javadoc</a> for common properties and behaviour.</p>
+			<a href="../docs/api/scriptella/jdbc/package-summary.html#package_description">JDBC Bridge Javadoc</a> for common properties and behaviour.</p>
 			<note>Although usage of JDBC adapters is recommended you may directly use any JDBC compliant driver.</note>
 			<table>
 				<tr>
@@ -35,7 +35,7 @@
                 <tr>
                     <td>
                         <anchor id="db2"/>
-                        <a href="../docs/api/scriptella/driver/db2/package-summary.html">DB2 Database</a>
+                        <a href="../docs/api/scriptella/driver/db2/package-summary.html#package_description">DB2 Database</a>
                     </td>
                     <td>scriptella.driver.<strong>db2</strong>.Driver</td>
                     <td>com.ibm.db2.jcc.DB2Driver</td>
@@ -44,7 +44,7 @@
                 <tr>
                     <td>
                         <anchor id="h2"/>
-                        <a href="../docs/api/scriptella/driver/h2/package-summary.html">H2 Database</a>
+                        <a href="../docs/api/scriptella/driver/h2/package-summary.html#package_description">H2 Database</a>
                     </td>
                     <td>scriptella.driver.<strong>h2</strong>.Driver</td>
                     <td>org.h2.Driver</td>
@@ -53,7 +53,7 @@
 				<tr>
 					<td>
                         <anchor id="hsqldb"/>
-                        <a href="../docs/api/scriptella/driver/hsqldb/package-summary.html">HSQLDB</a>
+                        <a href="../docs/api/scriptella/driver/hsqldb/package-summary.html#package_description">HSQLDB</a>
 					</td>
 					<td>scriptella.driver.<strong>hsqldb</strong>.Driver</td>
 					<td>org.hsqldb.jdbcDriver</td>
@@ -62,7 +62,7 @@
 				<tr>
 					<td>
 						<anchor id="jndi"/>
-						<a href="../docs/api/scriptella/driver/jndi/package-summary.html">JNDI</a>
+						<a href="../docs/api/scriptella/driver/jndi/package-summary.html#package_description">JNDI</a>
 					</td>
 					<td>scriptella.driver.<strong>jndi</strong>.Driver</td>
 					<td>Any JDBC driver</td>
@@ -72,7 +72,7 @@
                 <tr>
                     <td>
                         <anchor id="mssql"/>
-                        <a href="../docs/api/scriptella/driver/mssql/package-summary.html">Microsoft SQL Server Database</a>
+                        <a href="../docs/api/scriptella/driver/mssql/package-summary.html#package_description">Microsoft SQL Server Database</a>
                     </td>
                     <td>scriptella.driver.<strong>mssql</strong>.Driver</td>
                     <td>com.microsoft.sqlserver.jdbc.SQLServerDriver</td>
@@ -82,7 +82,7 @@
                 <tr>
                     <td>
                         <anchor id="mysql"/>
-                        <a href="../docs/api/scriptella/driver/mysql/package-summary.html">MySQL Database</a>
+                        <a href="../docs/api/scriptella/driver/mysql/package-summary.html#package_description">MySQL Database</a>
                     </td>
                     <td>scriptella.driver.<strong>mysql</strong>.Driver</td>
                     <td>com.mysql.jdbc.Driver</td>
@@ -91,7 +91,7 @@
                 <tr>
 					<td>
 						<anchor id="oracle"/>
-						<a href="../docs/api/scriptella/driver/oracle/package-summary.html">Oracle Database</a>
+						<a href="../docs/api/scriptella/driver/oracle/package-summary.html#package_description">Oracle Database</a>
 					</td>
 					<td>scriptella.driver.<strong>oracle</strong>.Driver</td>
 					<td>oracle.jdbc.driver.OracleDriver</td>
@@ -104,7 +104,7 @@
                 <tr>
 					<td>
 						<anchor id="postgresql"/>
-						<a href="../docs/api/scriptella/driver/postgresql/package-summary.html">PostgreSQL Database</a>
+						<a href="../docs/api/scriptella/driver/postgresql/package-summary.html#package_description">PostgreSQL Database</a>
 					</td>
 					<td>scriptella.driver.<strong>postgresql</strong>.Driver</td>
 					<td>org.postgresql.Driver</td>
@@ -113,7 +113,7 @@
 				<tr>
 					<td>
 						<anchor id="spring"/>
-						<a href="../docs/api/scriptella/driver/spring/package-summary.html">Spring Framework</a>
+						<a href="../docs/api/scriptella/driver/spring/package-summary.html#package_description">Spring Framework</a>
 					</td>
 					<td>scriptella.driver.<strong>spring</strong>.Driver</td>
 					<td>Any JDBC driver</td>
@@ -125,7 +125,7 @@
 				<tr>
 					<td>
                         <anchor id="sybase"/>
-                        <a href="../docs/api/scriptella/driver/sybase/package-summary.html">Sybase Database</a>
+                        <a href="../docs/api/scriptella/driver/sybase/package-summary.html#package_description">Sybase Database</a>
 					</td>
 					<td>scriptella.driver.<strong>sybase</strong>.Driver</td>
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
@@ -144,7 +144,7 @@
                 <tr>
                     <td>
                         <anchor id="auto"/>
-                        <a href="../docs/api/scriptella/driver/auto/package-summary.html">Autodiscovery</a>
+                        <a href="../docs/api/scriptella/driver/auto/package-summary.html#package_description">Autodiscovery</a>
                     </td>
                     <td>scriptella.driver.<strong>auto</strong>.Driver</td>
                     <td>Automatically discovers a necessary driver based on the specified url.</td>
@@ -152,7 +152,7 @@
                 <tr>
 					<td>
 						<anchor id="csv"/>
-						<a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a>
+						<a href="../docs/api/scriptella/driver/csv/package-summary.html#package_description">CSV</a>
 					</td>
 					<td>scriptella.driver.<strong>csv</strong>.Driver</td>
 					<td>The driver to write and query CSV files.</td>
@@ -160,7 +160,7 @@
 				<tr>
 					<td>
 						<anchor id="janino"/>
-						<a href="../docs/api/scriptella/driver/janino/package-summary.html">Janino</a>
+						<a href="../docs/api/scriptella/driver/janino/package-summary.html#package_description">Janino</a>
 					</td>
 					<td>scriptella.driver.<strong>janino</strong>.Driver</td>
 					<td>This driver allows embedding of Java code into &lt;query&gt; and &lt;script&gt; elements.</td>
@@ -168,7 +168,7 @@
 				<tr>
 					<td>
 						<anchor id="jexl"/>
-						<a href="../docs/api/scriptella/driver/jexl/package-summary.html">JEXL</a>
+						<a href="../docs/api/scriptella/driver/jexl/package-summary.html#package_description">JEXL</a>
 					</td>
 					<td>scriptella.driver.<strong>jexl</strong>.Driver</td>
 					<td>Allows usage of JEXL scripts in &lt;query&gt; and &lt;script&gt; elements.</td>
@@ -176,7 +176,7 @@
                 <tr>
 					<td>
 						<anchor id="ldap"/>
-						<a href="../docs/api/scriptella/driver/ldap/package-summary.html">LDAP</a>
+						<a href="../docs/api/scriptella/driver/ldap/package-summary.html#package_description">LDAP</a>
 					</td>
 					<td>scriptella.driver.<strong>ldap</strong>.Driver</td>
 					<td>This driver allows executing LDIF scripts and search filter queries.</td>
@@ -184,7 +184,7 @@
                 <tr>
                     <td>
                         <anchor id="lucene"/>
-                        <a href="../docs/api/scriptella/driver/lucene/package-summary.html">Lucene</a>
+                        <a href="../docs/api/scriptella/driver/lucene/package-summary.html#package_description">Lucene</a>
                     </td>
                     <td>scriptella.driver.<strong>lucene</strong>.Driver</td>
                     <td>This driver allows search queries through lucene indexed data.</td>
@@ -192,7 +192,7 @@
                 <tr>
                     <td>
                         <anchor id="mail"/>
-                        <a href="../docs/api/scriptella/driver/mail/package-summary.html">Mail</a>
+                        <a href="../docs/api/scriptella/driver/mail/package-summary.html#package_description">Mail</a>
                     </td>
                     <td>scriptella.driver.<strong>mail</strong>.Driver</td>
                     <td>Allows sending E-Mails via SMTP.</td>
@@ -200,16 +200,17 @@
                 <tr>
                     <td>
                         <anchor id="script"/>
-                        <a href="../docs/api/scriptella/driver/script/package-summary.html">javax.script bridge</a>
+                        <a href="../docs/api/scriptella/driver/script/package-summary.html#package_description">javax.script bridge</a>
                     </td>
                     <td>scriptella.driver.<strong>script</strong>.Driver</td>
                     <td>Provides support for <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a> compatible scripting languages like JavaScript, JRuby, Grovy etc. See
-                    <a href="http://scripting.dev.java.net">JSR-223 script engines</a> project.</td>
+                    <a href="http://scripting.dev.java.net">JSR-223 script engines</a> project for the list of supported languages.
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         <anchor id="text"/>
-                        <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>
+                        <a href="../docs/api/scriptella/driver/text/package-summary.html#package_description">Text</a>
                     </td>
                     <td>scriptella.driver.<strong>text</strong>.Driver</td>
                     <td>The driver for working with text data. It supports regular expressions syntax for quering
@@ -218,7 +219,7 @@
                 <tr>
 					<td>
 						<anchor id="velocity"/>
-						<a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>
+						<a href="../docs/api/scriptella/driver/velocity/package-summary.html#package_description">Velocity</a>
 					</td>
 					<td>scriptella.driver.<strong>velocity</strong>.Driver</td>
 					<td>This driver allows to integrate velocity templates into script files.</td>
@@ -226,7 +227,7 @@
                 <tr>
 					<td>
 						<anchor id="xpath"/>
-						<a href="../docs/api/scriptella/driver/xpath/package-summary.html">XPath</a>
+						<a href="../docs/api/scriptella/driver/xpath/package-summary.html#package_description">XPath</a>
 					</td>
 					<td>scriptella.driver.<strong>xpath</strong>.Driver</td>
 					<td>This driver allows querying XML files with XPath expressions.</td>
