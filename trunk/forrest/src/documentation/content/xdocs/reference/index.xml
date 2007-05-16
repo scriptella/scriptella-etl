@@ -653,7 +653,7 @@
 				<p>Other Java compilers or interpreters can also be plugged in via custom Scriptella Drivers.</p>
 			</section>
             <section>
-                <title>Interoperability with Scripting Languages</title>
+                <title>Interaction with Scripting Languages</title>
                 <p>Java SE 6 includes <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223: Scripting for the Java™
                     Platform</a> API. This is a framework by which Java Applications can "host" script engines.
                     Sun's implementation of Java SE 6 includes an example script engine based on
