@@ -24,7 +24,7 @@
 			<title>JDBC Bridge Drivers</title>
 			<p>Scriptella providers a set of built-in drivers for popular databases, see also
 			<a href="../docs/api/scriptella/jdbc/package-summary.html#package_description">JDBC Bridge Javadoc</a> for common properties and behaviour.</p>
-			<note>Although usage of JDBC adapters is recommended you may directly use any JDBC compliant driver.</note>
+			<note>Although usage of JDBC adapters is recommended you are free to use any JDBC compliant driver.</note>
 			<table>
 				<tr>
 					<th>Adapter Name</th>
