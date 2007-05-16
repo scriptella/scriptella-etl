@@ -45,10 +45,12 @@ public class Driver extends AbstractScriptellaDriver {
 
     private static final Map<String, String> MAPPINGS = new HashMap<String, String>();
 
+    private static final String AUTO_URL_PROPERTIES = "scriptella/driver/auto/url.properties";
+
     static {
         //Merge all autodiscovery.properties found. Similar to JAR SPI mechanism.
         try {
-            List<URL> resources = Collections.list(Driver.class.getClassLoader().getResources("scriptella/driver/auto/url.properties"));
+            List<URL> resources = Collections.list(Driver.class.getClassLoader().getResources(AUTO_URL_PROPERTIES));
 
             LOG.fine("Loading autodiscovery properties from " + resources);
             for (URL resource : resources) {
