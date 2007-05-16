@@ -593,9 +593,7 @@
                 <title>Autodiscovery of JDBC drivers</title>
                 <p>Scriptella provides auto-discovery feature based on the connection URL. Just specify jdbc as driver name and
                 the driver will be recognized based on the specified URL.Example:</p>
-                <source><![CDATA[
-                   <connection driver="jdbc" url="jdbc:sybase:Tds:host:2048/database"/>
-                ]]></source>
+                <source><![CDATA[<connection driver="jdbc" url="jdbc:sybase:Tds:host:2048/database"/>]]></source>
                 <p>The "jdbc" driver will load the "sybase" driver, because the URL belongs to Sybase.</p>
                 <note>Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella, in other
                 cases driver's name has to be specified manually. See <a

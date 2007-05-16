@@ -36,6 +36,38 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
+        <release version="0.9" date="2007-05-17">
+            <action context="code" type="add" dev="ejboy" fixes-bug="3672">
+                Auto-discovery for JDBC drivers
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5007">
+                Support for JSR 223 (Scripting for the Java Platform)
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5037">
+                Add ?{textfile 'filename/url' } to upload CLOBs from text files.
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="5252">
+                Simplified dialect names matching
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5253">
+                Database migration template
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="5473">
+                Support for bind variables/expressions in a href attribute of include element
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="5600">
+                skip_lines connection parameter for CSV and Text driver
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="5260">
+                SpringDriverTest failed in coverage mode
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="5390">
+                Fix for LDAP when using search.scope and search.basedn parameters
+            </action>
+            <action context="build" type="update" dev="ejboy">
+                Since this release JDK 6 is required to build Scriptella
+            </action>
+        </release>
         <release version="0.8" date="2007-03-28">
             <action context="build" type="update" dev="ejboy" fixes-bug="5036">
                 Remove unused commons-logging classes from scriptella.jar
