@@ -652,7 +652,20 @@
 				</ul>
 				<p>Other Java compilers or interpreters can also be plugged in via custom Scriptella Drivers.</p>
 			</section>
-			<section>
+            <section>
+                <title>Interoperability with Scripting Languages</title>
+                <p>Java SE 6 includes <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223: Scripting for the Java™
+                    Platform</a> API. This is a framework by which Java Applications can "host" script engines.
+                    Sun's implementation of Java SE 6 includes an example script engine based on
+                    <a href="http://www.mozilla.org/rhino/">Mozilla Rhino:JavaScript for Java</a>.
+                </p>
+                <p>Scriptella supports JSR 223 compatible scripting languages via <a href="drivers.html#script">javax.script Bridge</a>
+                    driver.</p>
+                <note>
+                    Java SE 6 or higher is required to work with JSR-223 scripts. 
+                </note>
+            </section>
+            <section>
 				<title>Producing Reports with Velocity</title>
 				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on
 				proven open source solutions instead of reinventing the wheel. The built-in <a href="drivers.html#velocity">Velocity Driver</a>
