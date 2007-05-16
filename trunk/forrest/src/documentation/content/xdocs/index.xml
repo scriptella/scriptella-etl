@@ -106,22 +106,20 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 0.8 Released (March 28, 2007)</title>
-                <p>We are pleased to announce the availability of Scriptella 0.8.
-                    New and Notable Features and Bug Fixes:</p>
+                <title>Scriptella 0.9 Released (May 17, 2007)</title>
+                <p>We are pleased to announce the availability of Scriptella 0.9.
+                    This release introduced integration with JSR 223 (Scripting for the Java Platform)
+                    and drivers autodiscovery.
+                    Other notable features and bug fixes:</p>
                 <ul>
-                    <li>Working with dates in ${ ... } JEXL expressions</li>
-                    <li>Runnable and Callable façade for EtlExecutor.</li>
-                    <li>Mail provider.</li>
-                    <li>NULL not handled for CLOBs and BLOBs.</li>
-                    <li>Fix Spring context propagation.</li>
-                    <li>Send output to the console if no output file URL was specified for Velocity and Text driver.</li>
-                    <li>Automatically convert windows DRIVE:/ paths to file:/ URL</li>
-                    <li>Upgraded to Janino 2.5.6</li>
-                    <li>Removed unused commons-logging classes from scriptella.jar</li>
+                    <li>New syntax extension: ?{textfile 'filename/url' } to upload CLOBs from text files.</li>
+                    <li>Simplified dialect names matching</li>
+                    <li>Database migration template. etl-template Ant task.</li>
+                    <li>Support for bind variables/expressions in a href attribute of include element</li>
+                    <li>Since this release JDK 6 is required to build Scriptella</li>
                 </ul>
-                <p>Thank you for contributions and ideas!<br/>
-                Make ETL easier - <a href="download.html">Download Scriptella Now!</a></p>
+                <p>We hope you will enjoy the new features. See <a href="changes.html">change log</a> for additional details.<br/>
+                <a href="tutorial.html">Make ETL easier</a> - <a href="download.html">Download Scriptella Now!</a></p>
             </section>
         </section>
         </body>
