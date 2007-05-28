@@ -171,7 +171,7 @@ class Lobs {
         protected abstract void flushToDisk() throws IOException;
 
         /**
-         * Invoked when on initialization phase complete.
+         * Invoked when initialization phase complete.
          * <p>Subclasses should close unused and opened resources.
          */
         protected abstract void onInitComplete();
@@ -180,7 +180,7 @@ class Lobs {
          * Performs a LOB initialization in following steps:
          * <ul>
          * <li>Reads content into memory until the size exceeds {@link #LOB_MAX_MEM}.
-         * <li>{@link #flushToDisk() Flushes} memory conent to disk.
+         * <li>{@link #flushToDisk() Flushes} memory content to disk.
          * <li>Copy the left bytes to disk.
          * </ul>
          */
