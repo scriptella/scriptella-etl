@@ -67,6 +67,7 @@ public class GenericDriver extends AbstractScriptellaDriver {
                     if (debug) {
                         LOG.fine("Found driver class " + name);
                     }
+                    throwable = null;
                     break;
                 } catch (Throwable t) {
                     if (throwable == null) {
