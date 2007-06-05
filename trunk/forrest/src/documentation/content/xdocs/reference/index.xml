@@ -499,7 +499,7 @@
         driver,class,user,password
     must be set before calling "DataMigrator" etl-template
     -->
-    &lt;etl-template name="DataMigrator"/>]]>
+    <etl-template name="DataMigrator"/>]]>
                     </source>
                 </section>
             </section>
