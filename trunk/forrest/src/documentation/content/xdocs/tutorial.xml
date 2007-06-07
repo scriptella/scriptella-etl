@@ -9,9 +9,10 @@
 			<title>Installation</title>
 			<ul>
 				<li><a href="download.html">Download</a> Scriptella binary distribution.</li>
-                <li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to system path variable.</li>
-                <li>Check if JRE has been installed correctly by running java -version.
-                <p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p></li>
+                <li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to a system <code>PATH</code> variable.
+                <p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and
+                    <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p></li>
+                <li>Check if JRE has been installed correctly by running java -version.</li>
                 <li><em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
                     or directly specify classpath attribute in script connection elements.</li>
 			</ul>
