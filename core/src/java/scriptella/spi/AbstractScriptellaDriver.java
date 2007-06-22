@@ -28,4 +28,25 @@ public abstract class AbstractScriptellaDriver implements ScriptellaDriver {
         return getClass().getPackage().getName();
     }
 
+    /**
+     * Helper method which returns an actual version of Scriptella used at runtime.
+     *
+     * @return project version, e.g. 1.0, or null if package info is absent.
+     */
+    public static String getScriptellaVersion() {
+        Package p = AbstractScriptellaDriver.class.getPackage();
+        return p == null ? null : p.getImplementationVersion();
+    }
+
+    /**
+     * Helper method which returns an actual product title of Scriptella used at runtime.
+     *
+     * @return project title, e.g. Scriptella ETL, or null if package info is absent.
+     */
+    public static String getScriptellaTitle() {
+        Package p = AbstractScriptellaDriver.class.getPackage();
+        return p == null ? null : p.getSpecificationTitle();
+    }
+
+
 }
