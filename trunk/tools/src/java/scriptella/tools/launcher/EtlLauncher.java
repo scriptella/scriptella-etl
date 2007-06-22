@@ -24,6 +24,7 @@ import scriptella.execution.JmxEtlManager;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
+import scriptella.spi.AbstractScriptellaDriver;
 import scriptella.tools.template.TemplateManager;
 import scriptella.util.CollectionUtils;
 import scriptella.util.IOUtils;
@@ -197,9 +198,10 @@ public class EtlLauncher {
     }
 
     protected void printVersion() {
-        Package p = getClass().getPackage();
-        if (p != null && p.getSpecificationTitle() != null && p.getImplementationVersion() != null) {
-            out.println(p.getSpecificationTitle() + " Version " + p.getImplementationVersion());
+        String v = AbstractScriptellaDriver.getScriptellaVersion();
+        String p = AbstractScriptellaDriver.getScriptellaTitle();
+        if (p != null && v != null) {
+            out.println(p + " Version " + v);
         } else {
             out.println("Scriptella version information unavailable");
         }
