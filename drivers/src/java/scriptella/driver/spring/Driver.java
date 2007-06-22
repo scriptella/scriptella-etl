@@ -34,6 +34,17 @@ import java.util.Properties;
  * @version 1.0
  */
 public class Driver extends GenericDriver {
+
+    public Driver() {
+        try {
+            Class.forName("org.springframework.beans.factory.BeanFactory");
+        } catch (ClassNotFoundException e) {
+            throw new SpringProviderException("Spring not found on classpath. " +
+                    "This driver can be used only in a Spring-managed environment, " +
+                    "use EtlExecutorBean to run the ETL file.");
+        }
+    }
+
     @Override
     protected java.sql.Connection getConnection(String url, Properties props) throws SQLException {
         if (url == null) {
@@ -51,8 +62,6 @@ public class Driver extends GenericDriver {
         }
 
     }
-
-
 
 
 }
