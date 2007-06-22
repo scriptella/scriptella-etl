@@ -139,11 +139,11 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
 
     @Override
     public ExecutionStatistics execute(final ProgressIndicator indicator) throws EtlExecutorException {
-        setContextBeanFactory(beanFactory);
+        setContextBeanFactory(beanFactory); //Associates current beanfactory with the thread
         try {
             return super.execute(indicator);
         } finally {
-            setContextBeanFactory(null);
+            setContextBeanFactory(null); //Clears the association to avoid memory leaks
         }
     }
 
