@@ -43,6 +43,7 @@ public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
     public static final String KEEPFORMAT_KEY = "keepformat";
+    public static final String AUTOCOMMIT_KEY = "autocommit";
     public static final String TRANSACTION_ISOLATION_KEY = "transaction.isolation";
     public static final String TRANSACTION_ISOLATION_READ_UNCOMMITTED = "READ_UNCOMMITTED";
     public static final String TRANSACTION_ISOLATION_READ_COMMITTED = "READ_COMMITTED";
@@ -51,6 +52,7 @@ public class JdbcConnection extends AbstractConnection {
     private Connection con;
     private static final Logger LOG = Logger.getLogger(JdbcConnection.class.getName());
     private boolean transactable;
+    private boolean autocommit;
     private ParametersParser parametersParser;
     int statementCacheSize;
     protected String separator = ";";
@@ -82,7 +84,7 @@ public class JdbcConnection extends AbstractConnection {
         }
         if (transactable) { //only effective for transactable connections
             try {
-                con.setAutoCommit(false);
+                con.setAutoCommit(autocommit);
             } catch (Exception e) {
                 throw new JdbcException("Unable to set autocommit=false for " + toString(), e);
             }
@@ -124,6 +126,7 @@ public class JdbcConnection extends AbstractConnection {
             }
 
         }
+        autocommit = parameters.getBooleanProperty(AUTOCOMMIT_KEY);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }

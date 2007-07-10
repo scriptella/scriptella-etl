@@ -54,6 +54,9 @@ public class ConnectionParameters {
 
     /**
      * Creates connection parameters based on &lt;connection&gt; element..
+     *
+     * @param conf    connection declaration element.
+     * @param context driver context.
      */
     public ConnectionParameters(ConnectionEl conf, DriverContext context) {
         this.properties = conf.getProperties();
@@ -90,6 +93,7 @@ public class ConnectionParameters {
      * Returns string value of the property.
      *
      * @param name property name.
+     * @return property value.
      */
     public String getStringProperty(String name) {
         Object v = properties.get(name);
@@ -99,6 +103,11 @@ public class ConnectionParameters {
     /**
      * Returns the value of integer property.
      *
+     * @param name         name of the property.
+     * @param defaultValue default value if property is absent.
+     * @return property value.
+     * @throws scriptella.configuration.ConfigurationException
+     *          if parsing failed.
      * @see #getNumberProperty(String,Number)
      */
     public Integer getIntegerProperty(String name, int defaultValue) throws ConfigurationException {
@@ -117,6 +126,8 @@ public class ConnectionParameters {
      * @param name         property name.
      * @param defaultValue default value to use when property omitted.
      * @return numeric property value.
+     * @throws scriptella.configuration.ConfigurationException
+     *          if parsing failed.
      * @see Long#decode(String)
      */
     public Number getNumberProperty(String name, Number defaultValue) throws ConfigurationException {
@@ -142,6 +153,12 @@ public class ConnectionParameters {
 
 
     /**
+     * Parses property value as boolean flag. Default value is <code>false</code>.
+     *
+     * @param name property name.
+     * @return boolean property value.
+     * @throws scriptella.configuration.ConfigurationException
+     *          if property has unrecognized value.
      * @see #getBooleanProperty(String,boolean)
      */
     public boolean getBooleanProperty(String name) throws ConfigurationException {
@@ -149,7 +166,7 @@ public class ConnectionParameters {
     }
 
     /**
-     * Parses property value as boolean flag.
+     * Parses property value as a boolean flag.
      *
      * @param name         property name.
      * @param defaultValue default value to use if connection has no such property.
@@ -298,6 +315,7 @@ public class ConnectionParameters {
      * Returns the url property resolved relative to a script location.
      *
      * @throws ConfigurationException if connection URL is malformed or null.
+     * @return resolved URL.
      */
     public URL getResolvedUrl() throws ConfigurationException {
         if (url == null) {
