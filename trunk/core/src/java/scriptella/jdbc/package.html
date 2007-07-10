@@ -54,6 +54,16 @@ Scriptella JDBC Bridge.
             <code>REPEATABLE_READ</code> and <code>SERIALIZABLE</code>.
         <td>No, the default value is driver specific.</td>
     </tr>
+    <tr>
+        <td>autocommit</td>
+        <td>True if connection is in auto-commit mode. If a connection is in auto-commit mode, then all its SQL statements will be executed and committed
+                as individual transactions.
+            <p><em>Note:</em> In general avoid setting autocommit to true, because in this case an ETL process cannot be rolled back correctly.
+                Use this parameter only for operations (bulk inserts etc.) where performance is critical.</p>
+        </td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+
 
 
 </table>
