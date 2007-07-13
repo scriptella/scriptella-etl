@@ -66,9 +66,17 @@ public class  CsvConnection extends AbstractTextConnection {
      */
     public static final String HEADERS = "headers";
 
+    /**
+     * Name of the <code>null_string</code> connection property.
+     * If set, specifies value of a string token to be parsed as Java <code>null</code> literal.
+     */
+    public static final String NULL_STRING = "null_string";
+
+
     private final char separator;
     private final char quote;
     private final boolean headers;
+    private final String nullString;
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
@@ -88,6 +96,7 @@ public class  CsvConnection extends AbstractTextConnection {
         }
 
         headers = parameters.getBooleanProperty(HEADERS, true);
+        nullString = parameters.getStringProperty(NULL_STRING);
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
@@ -148,7 +157,7 @@ public class  CsvConnection extends AbstractTextConnection {
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
-        CsvQuery q = new CsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback), headers, trim);
+        CsvQuery q = new CsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback), nullString, headers, trim);
         try {
             q.execute(new CSVReader(newInputReader(), separator, quote, skipLines), queryCallback, counter);
         } catch (IOException e) {

@@ -40,7 +40,7 @@ public class CsvQueryTest extends AbstractTestCase {
         String data = "1,2,3\n11,2,3,4\n1";
         String query = ".*1.*,2,3,4";
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, false);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, false);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3,4 matches the pattern
@@ -66,7 +66,7 @@ public class CsvQueryTest extends AbstractTestCase {
         String data = "a,b,c\n11,22,33";
         String query = "11,22,33";
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), true, true);
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), null, true, true);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
@@ -94,10 +94,50 @@ public class CsvQueryTest extends AbstractTestCase {
         String query = "\\"; //bad query
         try {
             new CsvQuery(new CSVReader(new StringReader(query)),
-                    new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), true, true);
+                    new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, true, true);
             fail("Bad query syntax should be recognized");
         } catch (Exception e) {
             //OK
         }
+    }
+
+    /**
+     * Tests parsing of null strings. See Bug #5760 Impossible to import NULL with CSV driver
+     * @throws java.io.IOException if IO error occurs
+     */
+    public void testNullString() throws IOException {
+        String data = "1,NULL,c\n11,,33";
+        CsvQuery q = new CsvQuery(new CSVReader(new StringReader("")),
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), "NULL", false, true);
+        rows = 0;
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                if (rows == 0) {
+                    assertNull(parameters.getParameter("2"));
+                } else { //rows==1
+                    assertEquals("", parameters.getParameter("2"));
+                }
+                rows++;
+            }
+        }, cnt);
+        assertEquals(2, rows);
+
+        //Now check if empty string is treated as null
+        q = new CsvQuery(new CSVReader(new StringReader("")),
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), "", false, true);
+        rows = 0;
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                if (rows == 0) {
+                    assertEquals("NULL", parameters.getParameter("2"));
+                } else { //rows==1
+                    assertNull(parameters.getParameter("2"));
+                }
+                rows++;
+            }
+        }, cnt);
+        assertEquals(2, rows);
+
     }
 }

@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 public class CsvQuery implements ParametersCallback {
     private final boolean headers;
     private final boolean trim;
+    private final String nullString;
     private ColumnsMap columnsMap;
     private String[] row;
     private Pattern[][] patterns;
@@ -51,10 +52,12 @@ public class CsvQuery implements ParametersCallback {
      * @param substitutor properties substitutor to use. The parameters for the substitutor must be set by a caller.
      * @param headers     true if first line of input CSV file contains headers.
      * @param trim        true if if extra whitespaces should be trimmed.
+     * @param nullString  string to treat as NULL.
      */
-    public CsvQuery(CSVReader queryReader, PropertiesSubstitutor substitutor, boolean headers, boolean trim) {
+    public CsvQuery(CSVReader queryReader, PropertiesSubstitutor substitutor, String nullString, boolean headers, boolean trim) {
         this.headers = headers;
         this.trim = trim;
+        this.nullString = nullString;
         this.substitutor = substitutor;
         compileQueries(queryReader);
         closeSilently(queryReader);
@@ -218,7 +221,8 @@ public class CsvQuery implements ParametersCallback {
         }
         Integer col = columnsMap.find(name);
         if (col != null && col > 0 && col <= row.length) { //If col is not null and in range
-            return row[col - 1];
+            final String s = row[col - 1];
+            return nullString != null && nullString.equals(s) ? null : s;
         } else { //otherwise call parent context.
             return substitutor.getParameters().getParameter(name);
         }

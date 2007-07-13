@@ -61,6 +61,11 @@ The driver to write and query CSV files.
             the actual number of skipped lines is <code>skipped_lines+1</code>
         <td>No, the default value is <code>0</code> (no lines are skipped).</td>
     </tr>
+    <tr>
+        <td>null_string</td>
+        <td>Specifies value of a string token to be parsed as Java <code>null</code> literal.</td>
+        <td>No, by default strings are preserved, i.e. empty CSV field is parsed as empty string.</td>
+    </tr>
 </table>
 <h2>Query Syntax</h2>
 The driver utilizes query by example approach for CSV content filtering.
