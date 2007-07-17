@@ -241,7 +241,7 @@
                     <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.<br/>
                     $property and ${property} return the same value, but the first one is faster, because JEXL expression engine
                     is not used to evaluate the expression.</li>
-				<li>?Propery_Name or ?{expression} are used <em>only in SQL queries and scripts</em> to set prepared statement parameters.
+				<li>?Property_Name or ?{expression} are used <em>only in SQL queries and scripts</em> to set prepared statement parameters.
                 ? prefixed expressions are not substituted inside quotes, comments and outside of query/script elements.</li>
 			</ul>
 			<p>The properties syntax described above is allowed in the following places:</p>
