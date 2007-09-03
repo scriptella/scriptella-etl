@@ -225,7 +225,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
 
         final ProgressCallback progress = ctx.getProgressCallback();
         progress.step(1, "Initializing properties");
-        ctx.setProperties(configuration.getProperties());
+        ctx.setProperties(configuration.getParameters());
         ctx.setProgressCallback(progress.fork(9, 100));
         ctx.session = new Session(configuration, ctx);
         ctx.getProgressCallback().complete();
@@ -266,7 +266,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
      * Helper method to create a new ScriptExecutor for specified script URL.
      *
      * @param scriptFileUrl      URL of script file.
-     * @param externalProperties see {@link ConfigurationFactory#setExternalProperties(java.util.Map)}
+     * @param externalProperties see {@link ConfigurationFactory#setExternalParameters(java.util.Map)}
      * @return configured instance of script executor.
      * @see ConfigurationFactory
      */
@@ -275,7 +275,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(scriptFileUrl);
         if (externalProperties != null) {
-            cf.setExternalProperties(externalProperties);
+            cf.setExternalParameters(externalProperties);
         }
         return new EtlExecutor(cf.createConfiguration());
     }

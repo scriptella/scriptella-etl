@@ -15,22 +15,28 @@
  */
 package scriptella.configuration;
 
+import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.support.MapParametersCallback;
+import scriptella.util.IOUtils;
 import scriptella.util.PropertiesMap;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
 
 /**
- * TODO: Add documentation
+ * Represents XML elements which store properties.
+ * <p>Examples: <code>&lt;properties&gt;</code>
+ * and <code>&lt;connection&gt;</code>
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class PropertiesEl extends XmlConfigurableBase {
-    Map<String, ?> map = Collections.emptyMap();
+    Map<String, ?> map;
 
     public PropertiesEl() {
     }
@@ -40,6 +46,7 @@ public class PropertiesEl extends XmlConfigurableBase {
     }
 
     public void configure(final XmlElement element) {
+        map = Collections.emptyMap();
         if (element == null) {
             return; //Properties is not a mandatory element
         }
@@ -50,28 +57,42 @@ public class PropertiesEl extends XmlConfigurableBase {
             InputStream is = null;
 
             try {
-                is = new ReaderInputStream(content.open());
+                //TODO use unicode conversion similar to native2ascii
+                //expand global properties
+                is = new ByteArrayInputStream(element.expandProperties(IOUtils.toString(content.open())).getBytes());
                 p.load(is);
+                //Now let's expand local properties
+                PropertiesSubstitutor ps = new PropertiesSubstitutor(p);
+                for (Map.Entry<String, Object> entry : p.entrySet()) {
+                    Object v = entry.getValue();
+                    if (v instanceof String) {
+                        entry.setValue(ps.substitute((String) v));
+                    }
+                }
                 map = p;
             } catch (Exception e) {
                 throw new ConfigurationException("Unable to load properties", e,
                         element);
             } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                    }
-                }
+                IOUtils.closeSilently(is);
             }
         }
     }
 
+    /**
+     * Returns properties stored in this element as a map.
+     * @return map of properties.
+     */
     public Map<String, ?> getMap() {
         return map;
     }
 
-    public void setMap(Map<String, ?> map) {
-        this.map = new PropertiesMap(map);
+    /**
+     * Returns this properties as a parameters callback.
+     * @return this properties as a parameters callback.
+     */
+    public ParametersCallback asParametersCallback() {
+        return new MapParametersCallback(map);
     }
+
 }

@@ -69,7 +69,7 @@ public class PropertiesTest extends AbstractTestCase {
     private EtlExecutor prepareExecutor(Map<String,String> props) {
         ConfigurationFactory cf = new ConfigurationFactory();
         cf.setResourceURL(getClass().getResource(getClass().getSimpleName()+".xml"));
-        cf.setExternalProperties(props);
+        cf.setExternalParameters(props);
         return new EtlExecutor(cf.createConfiguration()) {
             //overrides prepare method to get ctx and params for connection
             @Override

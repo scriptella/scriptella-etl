@@ -118,7 +118,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
     @Override
     protected ConfigurationFactory newConfigurationFactory() {
         ConfigurationFactory cf = super.newConfigurationFactory();
-        cf.setExternalProperties(externalProperties);
+        cf.setExternalParameters(externalProperties);
         return cf;
     }
 

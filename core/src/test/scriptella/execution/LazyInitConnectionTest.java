@@ -32,7 +32,7 @@ public class LazyInitConnectionTest extends AbstractTestCase {
 
     protected ConfigurationFactory newConfigurationFactory() {
         ConfigurationFactory cf = super.newConfigurationFactory();
-        cf.setExternalProperties(props);
+        cf.setExternalParameters(props);
         return cf;
     }
 

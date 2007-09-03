@@ -15,7 +15,8 @@
  */
 package scriptella.spi;
 
-import scriptella.expression.MapParametersCallback;
+import scriptella.spi.support.MapParametersCallback;
+import scriptella.spi.support.NullParametersCallback;
 
 import java.util.Map;
 
@@ -39,11 +40,7 @@ public class MockParametersCallbacks {
     };
 
 
-    public static final ParametersCallback NULL = new ParametersCallback() {
-        public Object getParameter(final String name) {
-            return null;
-        }
-    };
+    public static final ParametersCallback NULL = NullParametersCallback.INSTANCE;
 
     public static final ParametersCallback UNSUPPORTED = new ParametersCallback() {
         public Object getParameter(final String name) {

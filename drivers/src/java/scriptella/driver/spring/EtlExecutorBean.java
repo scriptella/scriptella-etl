@@ -111,7 +111,7 @@ public class EtlExecutorBean extends EtlExecutor implements InitializingBean, Be
             } else { //Initialize configuration
                 ConfigurationFactory cf = new ConfigurationFactory();
                 cf.setResourceURL(configLocation);
-                cf.setExternalProperties(properties);
+                cf.setExternalParameters(properties);
                 setConfiguration(cf.createConfiguration());
             }
         }

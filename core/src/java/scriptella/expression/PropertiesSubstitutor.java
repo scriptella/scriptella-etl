@@ -16,6 +16,7 @@
 package scriptella.expression;
 
 import scriptella.spi.ParametersCallback;
+import scriptella.spi.support.MapParametersCallback;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;
