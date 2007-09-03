@@ -256,7 +256,7 @@ public class EtlLauncher {
                     file.getPath(), e);
         }
 
-        factory.setExternalProperties(properties);
+        factory.setExternalParameters(properties);
         final ConfigurationEl c = factory.createConfiguration();
 
         exec.setConfiguration(c);

@@ -13,36 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.configuration;
+package scriptella.spi.support;
 
-import scriptella.core.SystemException;
-
+import scriptella.spi.ParametersCallback;
 
 /**
- * Thrown if configuration error is found.
+ * Null-object constant for {@link ParametersCallback}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ConfigurationException extends SystemException {
-    private transient XmlElement element;
+public class NullParametersCallback implements ParametersCallback {
+    public static final ParametersCallback INSTANCE = new NullParametersCallback();
 
-    public ConfigurationException(String message) {
-        super(message);
+    /**
+     * Singleton.
+     */
+    private NullParametersCallback() {
     }
 
-    public ConfigurationException(String message, XmlElement element) {
-        super(message);
-        this.element = element;
-    }
 
-    public ConfigurationException(String message, Throwable cause) {
-        super(message, cause);
+    /**
+     * Always return null.
+     *
+     * @param name parameter name.
+     * @return null.
+     */
+    public Object getParameter(final String name) {
+        return null;
     }
-
-    public ConfigurationException(String message, Throwable cause, XmlElement element) {
-        super(message, cause);
-        this.element = element;
-    }
-
 }

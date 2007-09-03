@@ -54,7 +54,7 @@ public final class StringUtils {
      * @return <code>o.toString()</code> or <code>&quot;&quot;</code> if <code>o==null</code>.
      */
     public static String nullsafeToString(final Object o) {
-        return o==null?"":o.toString();
+        return o == null ? "" : o.toString();
     }
 
     /**

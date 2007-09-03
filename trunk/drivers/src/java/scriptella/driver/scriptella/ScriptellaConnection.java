@@ -15,6 +15,7 @@
  */
 package scriptella.driver.scriptella;
 
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
@@ -27,6 +28,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
+import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,14 +65,22 @@ public class ScriptellaConnection extends AbstractConnection {
         } catch (IOException e) {
             throw new ScriptellaProviderException("Unable to open script", e);
         }
+        ConfigurationFactory cf = new ConfigurationFactory();
         while (it.hasNext()) {
             String uri = it.next();
+            if (StringUtils.isEmpty(uri)) { //skipping empty lines as they are resolved to a main ETL file
+                continue;
+            }
             URL u;
             try {
                 u = ctx.resolve(uri);
             } catch (MalformedURLException e) {
                 throw new ScriptellaProviderException("Malformed URI " + uri, e);
             }
+            //For now we support recursive calls. Uncomment the following line to disable recursive calls.
+//            if (ctx.getScriptFileURL().equals(u)) {
+//                throw new ScriptellaProviderException("Recursive calls not supported");
+//            }
             if (isReadonly()) {
                 LOG.info("Readonly Mode - Skipping ETL file " + u);
             } else {
@@ -78,7 +88,9 @@ public class ScriptellaConnection extends AbstractConnection {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Executing Scriptella ETL file " + u);
                     }
-                    ExecutionStatistics st = EtlExecutor.newExecutor(u).execute();
+                    cf.setResourceURL(u);
+                    cf.setExternalParameters(parametersCallback);
+                    ExecutionStatistics st = new EtlExecutor(cf.createConfiguration()).execute();
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Completed ETL file execution.\n" + st);
                     }

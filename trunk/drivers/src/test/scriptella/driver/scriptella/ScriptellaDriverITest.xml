@@ -1,12 +1,11 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
 <etl>
     <properties>
-        file1=10
-        file2=10
+        f1=file1.xml
     </properties>
     <connection driver="scriptella"/>
     <script>
-        $file1
-        $file2
+        $f1
+        file1.xml
     </script>
 </etl>

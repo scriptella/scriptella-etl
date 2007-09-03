@@ -20,13 +20,16 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
-import scriptella.core.ThreadSafe;
+import scriptella.expression.PropertiesSubstitutor;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.support.HierarchicalParametersCallback;
+import scriptella.spi.support.MapParametersCallback;
+import scriptella.spi.support.NullParametersCallback;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -42,7 +45,7 @@ public class ConfigurationFactory {
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "etl.dtd";
     private URL resourceURL;
-    private Map<String, ?> externalProperties;
+    private ParametersCallback externalParameters;
 
     static {
         setValidating(true);
@@ -70,16 +73,6 @@ public class ConfigurationFactory {
     }
 
     /**
-     * A getter for external Properties.
-     *
-     * @return external properties set by {@link #setExternalProperties}.
-     */
-    @ThreadSafe
-    public Map<String, ?> getExternalProperties() {
-        return externalProperties;
-    }
-
-    /**
      * Sets additional properties.
      * <p>External properties takes precedence over properties specified
      * in ETL &lt;properties&gt; element.
@@ -87,14 +80,21 @@ public class ConfigurationFactory {
      *
      * @param externalProperties external properties. Nulls allowed.
      */
-    @ThreadSafe
-    public void setExternalProperties(final Map<String, ?> externalProperties) {
-        if (externalProperties == null) {
-            this.externalProperties = null;
-        } else {
-            this.externalProperties = new LinkedHashMap<String, Object>(externalProperties);
-        }
+    public void setExternalParameters(final Map<String, ?> externalProperties) {
+        setExternalParameters(externalProperties == null ? null : new MapParametersCallback(externalProperties));
     }
+
+    /**
+     * Sets additional parameters.
+     * <p>These parameters take precedence over properties specified in the &lt;properties&gt; section of an ETL file.
+     * <p>Intended for integration with other systems like ant.
+     *
+     * @param externalParameters external parameters.
+     */
+    public void setExternalParameters(final ParametersCallback externalParameters) {
+        this.externalParameters = externalParameters;
+    }
+
 
     /**
      * Parses XML file and creates a configuration based on a specified parameters.
@@ -112,15 +112,16 @@ public class ConfigurationFactory {
 
             final InputSource inputSource = new InputSource(resourceURL.toString());
             final Document document = db.parse(inputSource);
-            PropertiesMerger merger = externalProperties == null ?
-                    new PropertiesMerger() : new PropertiesMerger(externalProperties);
+            HierarchicalParametersCallback params = new HierarchicalParametersCallback(
+                    externalParameters == null ? NullParametersCallback.INSTANCE : externalParameters, null);
+            PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
 
             return new ConfigurationEl(new XmlElement(
-                    document.getDocumentElement(), resourceURL, merger.getSubstitutor()), merger);
+                    document.getDocumentElement(), resourceURL, ps), params);
         } catch (IOException e) {
-            throw new ConfigurationException("Unable to load document: " + e.getMessage(), e);
+            throw new ConfigurationException("Unable to load document: " + e, e);
         } catch (Exception e) {
-            throw new ConfigurationException("Unable to parse document: " + e.getMessage(), e);
+            throw new ConfigurationException("Unable to parse document: " + e, e);
         }
     }
 

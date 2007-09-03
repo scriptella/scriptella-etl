@@ -40,7 +40,7 @@ public class JexlDriverITest extends AbstractTestCase {
 
     protected ConfigurationFactory newConfigurationFactory() {
         ConfigurationFactory cf = new ConfigurationFactory();
-        cf.setExternalProperties(Collections.singletonMap("callback", this));
+        cf.setExternalParameters(Collections.singletonMap("callback", this));
         return cf;
     }
 

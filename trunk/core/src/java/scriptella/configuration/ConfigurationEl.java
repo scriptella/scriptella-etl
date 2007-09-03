@@ -16,11 +16,11 @@
 package scriptella.configuration;
 
 import scriptella.spi.ParametersCallback;
+import scriptella.spi.support.HierarchicalParametersCallback;
 
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -33,11 +33,11 @@ import java.util.Set;
 public class ConfigurationEl extends XmlConfigurableBase {
     private List<ConnectionEl> connections;
     private List<ScriptingElement> scriptingElements;
-    private PropertiesMerger propertiesMerger;
+    private HierarchicalParametersCallback parametersCallback;
     private URL documentUrl;
 
-    public ConfigurationEl(XmlElement element, PropertiesMerger merger) {
-        propertiesMerger = merger;
+    public ConfigurationEl(XmlElement element, HierarchicalParametersCallback parametersCallback) {
+        this.parametersCallback = parametersCallback;
         configure(element);
     }
 
@@ -60,8 +60,8 @@ public class ConfigurationEl extends XmlConfigurableBase {
     /**
      * Returns this configuration properties merged with external ones specified in a factory. 
      */
-    public ParametersCallback getProperties() {
-        return propertiesMerger;
+    public ParametersCallback getParameters() {
+        return parametersCallback;
     }
 
     public URL getDocumentUrl() {
@@ -75,9 +75,9 @@ public class ConfigurationEl extends XmlConfigurableBase {
     public void configure(final XmlElement element) {
         documentUrl = element.getDocumentUrl();
 
-        Map<String,?> xmlProps = new PropertiesEl(element.getChild("properties")).getMap();
+        ParametersCallback xmlProps = new PropertiesEl(element.getChild("properties")).asParametersCallback();
         //Now merge external and local xml properties
-        propertiesMerger.addProperties(xmlProps);
+        parametersCallback.setParentCallback(xmlProps);
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
@@ -128,7 +128,7 @@ public class ConfigurationEl extends XmlConfigurableBase {
 
     public String toString() {
         return "ConfigurationEl{" + "connections=" + connections +
-                ", scriptingElements=" + scriptingElements + ", properties=" + propertiesMerger +
+                ", scriptingElements=" + scriptingElements + ", properties=" + parametersCallback +
                 ", documentUrl=" + documentUrl + "}";
     }
 }

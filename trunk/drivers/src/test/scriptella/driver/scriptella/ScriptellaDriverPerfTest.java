@@ -16,20 +16,39 @@
 package scriptella.driver.scriptella;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutorException;
 
+import java.util.Collections;
+
 /**
- * Integration test for {@link scriptella.driver.scriptella.Driver}.
+ * Performance test for {@link scriptella.driver.scriptella.Driver}.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class ScriptellaDriverITest extends AbstractTestCase {
-    public static String global = "";
+public class ScriptellaDriverPerfTest extends AbstractTestCase {
+    public int count;
 
+    /**
+     * History:
+     * 02.09.2007 - Celeron 1.7Mhz - 985 ms
+     */
     public void test() throws EtlExecutorException {
         newEtlExecutor().execute();
-        assertEquals("file1.xml_visible\nfile1.xml_visible\n", global);
+        assertEquals(150, count);
+    }
+
+
+    public void executed() {
+        count++;
+    }
+
+    @Override
+    protected ConfigurationFactory newConfigurationFactory() {
+        ConfigurationFactory f = super.newConfigurationFactory();
+        f.setExternalParameters(Collections.singletonMap("test", this));
+        return f;
     }
 
 }
