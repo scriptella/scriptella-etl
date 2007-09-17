@@ -103,6 +103,7 @@ public abstract class XmlConfigurableBase implements XmlConfigurable {
 
     protected Method findSetter(final String property)
             throws NoSuchMethodException {
+        //TODO Add methods cache
         return getClass()
                 .getMethod("set" +
                         Character.toUpperCase(property.charAt(0)) + property.substring(1),

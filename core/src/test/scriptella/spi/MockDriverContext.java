@@ -40,4 +40,9 @@ public class MockDriverContext implements DriverContext {
     }
 
     public static final DriverContext INSTANCE = new MockDriverContext();
+
+
+    public Object getParameter(final String name) {
+        return null;
+    }
 }

@@ -32,7 +32,7 @@ import java.net.URL;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public interface DriverContext {
+public interface DriverContext extends ParametersCallback {
     public URL getScriptFileURL();
 
 

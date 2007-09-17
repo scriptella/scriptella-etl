@@ -29,7 +29,7 @@ public class ScriptellaDriverITest extends AbstractTestCase {
 
     public void test() throws EtlExecutorException {
         newEtlExecutor().execute();
-        assertEquals("file1.xml_visible\nfile1.xml_visible\n", global);
+        assertEquals("file2_file1.xml_visible\nfile1.xml_visible\nfile2_", global);
     }
 
 }

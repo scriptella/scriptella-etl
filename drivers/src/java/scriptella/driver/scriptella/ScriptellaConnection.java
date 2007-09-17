@@ -45,7 +45,9 @@ import java.util.logging.Logger;
  */
 public class ScriptellaConnection extends AbstractConnection {
     private static final Logger LOG = Logger.getLogger(ScriptellaConnection.class.getName());
+    private ConfigurationFactory configurationFactory = new ConfigurationFactory();
     private DriverContext ctx;
+
 
 
     /**
@@ -56,6 +58,10 @@ public class ScriptellaConnection extends AbstractConnection {
     public ScriptellaConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
         ctx = parameters.getContext();
+        //If url attribute specified - execute this file
+        if (!StringUtils.isEmpty(parameters.getUrl())) {
+            execute(parameters.getResolvedUrl(), ctx);
+        }
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
@@ -65,38 +71,40 @@ public class ScriptellaConnection extends AbstractConnection {
         } catch (IOException e) {
             throw new ScriptellaProviderException("Unable to open script", e);
         }
-        ConfigurationFactory cf = new ConfigurationFactory();
+
         while (it.hasNext()) {
             String uri = it.next();
             if (StringUtils.isEmpty(uri)) { //skipping empty lines as they are resolved to a main ETL file
                 continue;
             }
-            URL u;
             try {
-                u = ctx.resolve(uri);
+                execute(ctx.resolve(uri), parametersCallback);
             } catch (MalformedURLException e) {
                 throw new ScriptellaProviderException("Malformed URI " + uri, e);
             }
-            //For now we support recursive calls. Uncomment the following line to disable recursive calls.
-//            if (ctx.getScriptFileURL().equals(u)) {
-//                throw new ScriptellaProviderException("Recursive calls not supported");
-//            }
-            if (isReadonly()) {
-                LOG.info("Readonly Mode - Skipping ETL file " + u);
-            } else {
-                try {
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("Executing Scriptella ETL file " + u);
-                    }
-                    cf.setResourceURL(u);
-                    cf.setExternalParameters(parametersCallback);
-                    ExecutionStatistics st = new EtlExecutor(cf.createConfiguration()).execute();
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("Completed ETL file execution.\n" + st);
-                    }
-                } catch (EtlExecutorException e) {
-                    throw new ScriptellaProviderException("Failed to execute script " + u + " : " + e.getMessage(), e);
+        }
+    }
+
+    private void execute(URL u, ParametersCallback callback) {
+        //For now we support recursive calls. Uncomment the following line to disable recursive calls.
+//        if (ctx.getScriptFileURL().equals(u)) {
+//            throw new ScriptellaProviderException("Recursive calls not supported");
+//        }
+        if (isReadonly()) {
+            LOG.info("Readonly Mode - Skipping ETL file " + u);
+        } else {
+            try {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Executing Scriptella ETL file " + u);
                 }
+                configurationFactory.setResourceURL(u);
+                configurationFactory.setExternalParameters(callback);
+                ExecutionStatistics st = new EtlExecutor(configurationFactory.createConfiguration()).execute();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Completed ETL file execution.\n" + st);
+                }
+            } catch (EtlExecutorException e) {
+                throw new ScriptellaProviderException("Failed to execute script " + u + " : " + e.getMessage(), e);
             }
         }
     }
