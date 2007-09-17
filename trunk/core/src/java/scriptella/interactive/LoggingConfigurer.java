@@ -30,16 +30,22 @@ public class LoggingConfigurer {
 
     /**
      * Configures logging messages to use specified handler
+     * @param handler to use.
      */
     public static void configure(Handler handler) {
-        final Logger l = Logger.getLogger("scriptella");
+        final Logger l = getScriptellaLogger();
         l.setLevel(handler.getLevel());
         l.setUseParentHandlers(false);
         l.addHandler(handler);
     }
 
     public static void remove(Handler handler) {
-        final Logger l = Logger.getLogger("scriptella");
-        l.removeHandler(handler);
+        getScriptellaLogger().removeHandler(handler);
     }
+
+    private static Logger getScriptellaLogger() {
+        return Logger.getLogger("scriptella");
+    }
+
+
 }
