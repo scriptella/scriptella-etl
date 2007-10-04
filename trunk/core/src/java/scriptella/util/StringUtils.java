@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public final class StringUtils {
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     private StringUtils() {//singleton
     }
 
@@ -50,6 +52,7 @@ public final class StringUtils {
 
     /**
      * Returns Null safe string representation of specified object.
+     *
      * @param o object to convert to String.
      * @return <code>o.toString()</code> or <code>&quot;&quot;</code> if <code>o==null</code>.
      */
@@ -123,7 +126,7 @@ public final class StringUtils {
      * <p>All EOL char sequences are replaced with a single system line.separator,
      * and all other whitespace sequences are replaced with a single space.
      *
-     * @param string string to format. Nulls are allowed.
+     * @param string    string to format. Nulls are allowed.
      * @param maxLength maximum number of characters to show or negative if the string cannot be trimmed.
      * @return formatted string.
      */
@@ -132,14 +135,11 @@ public final class StringUtils {
             return "";
         }
         String res = string.trim();
-        String sep = System.getProperty("line.separator");
-        if (sep == null) {
-            sep = "\n";
-        }
+        String sep = LINE_SEPARATOR == null ? "\n" : LINE_SEPARATOR;
         res = EOLS.matcher(res).replaceAll(sep);
         res = WHITESPACES.matcher(res).replaceAll(" ");
-        if (maxLength>0 && res.length()>maxLength) {
-            res=res.substring(0, maxLength)+" ...";
+        if (maxLength > 0 && res.length() > maxLength) {
+            res = res.substring(0, maxLength) + " ...";
         }
         return res;
     }
