@@ -159,6 +159,7 @@
 
    <exclude pattern="**/"/>
    <exclude pattern="**/api/**"/>
+   <exclude pattern="**/dtd/**"/>
 
 
 <!--

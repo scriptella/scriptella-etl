@@ -34,8 +34,8 @@ See http://forrest.apache.org/docs/linking.html for more info
         <index label="Reference Documentation" href="reference/index.html" description="Scriptella Reference Documentation"/>
         <index label="Drivers Matrix" href="reference/drivers.html"/>
         <!-- Temprorary solution to avoid broken links. See forrest FAQ for solution on apidocs links-->
-        <api label="API Docs" href="docs/api/"/>
-        <dtd label="DTD Reference" href="docs/dtd/"/>
+        <api label="API Docs" href="docs/api/index.html"/>
+        <dtd label="DTD Reference" href="docs/dtd/index.html"/>
         <howtos label="How-Tos" tab="howto">
             <ant label="Migrate from Ant SQL Task" href="howto/migrate-from-ant.html"/>
             <ant label="Automated Database Initialization" href="howto/initialize-database.html"/>
