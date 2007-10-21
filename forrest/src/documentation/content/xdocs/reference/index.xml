@@ -19,7 +19,17 @@
 			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
 			<p>The following diagram is an overview of the Scriptella execution model:</p>
 			<figure src="../images/reference/intro.png" alt="Architecture Overview"/>
-			<section>
+            <p>
+                A typical ETL process collects data from one or many datasources and loads it into other
+                datasources optionally performing necessary transformations. To accomplish these tasks Scriptella
+                provides 3 basic elements:
+            </p>
+            <ul>
+                <li><strong>Connection</strong>. Represents a connection to a datasource like a database, directory service, XML file etc.</li>
+                <li><strong>Script</strong>. Contains code to execute, i.e. SQL, JavaScript, JEXL or another DSL (Domain Specific Language).</li>
+                <li><strong>Query</strong>. Contains DSL code to query a datasource. Queries can contain nested queries and scripts.</li>
+            </ul>
+            <section>
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
 				<ul>
