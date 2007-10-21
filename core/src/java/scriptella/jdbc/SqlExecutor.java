@@ -132,6 +132,12 @@ class SqlExecutor extends SqlParserBase implements Closeable {
                 updatedRows = sw.update();
             }
             logExecutedStatement(sql, params, updatedRows);
+            if (connection.autocommitSize > 0 && (counter.statements % connection.autocommitSize == 0)) {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Committing transaction after " + connection.autocommitSize + " statements");
+                }
+                connection.commit();
+            }
         } catch (SQLException e) {
             throw new JdbcException("Unable to execute statement", e, sql, params);
         } catch (JdbcException e) {

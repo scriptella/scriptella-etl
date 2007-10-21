@@ -57,14 +57,28 @@ Scriptella JDBC Bridge.
     <tr>
         <td>autocommit</td>
         <td>True if connection is in auto-commit mode. If a connection is in auto-commit mode, then all its SQL statements will be executed and committed
-                as individual transactions.
+                as individual transactions.See also autocommit.size.
             <p><em>Note:</em> In general avoid setting autocommit to true, because in this case an ETL process cannot be rolled back correctly.
-                Use this parameter only for operations (bulk inserts etc.) where performance is critical.</p>
+                Use this parameter only for performance critical operations (bulk inserts etc.).</p>
         </td>
         <td>No, the default value is <code>false</code>.</td>
     </tr>
+        <tr>
+        <td>autocommit.size</td>
+        <td>If positive, specifies the number of statements to execute before producing implicit commit,
+            i.e. controls how much data is committed in its batches.
+            <p><em>Notes:</em>
+                <ul>
+                <li>In general avoid using autocommit.size, because in this case an ETL process cannot be rolled back correctly.
+                Use this parameter only for performance critical operations (bulk inserts etc.).</li>
+                <li>If the <code>autocommit</code> is <code>true</code>,
+                    then setting <code>autocommit.size</code> has no effect</li>
+                </ul>
 
-
+            </p>
+        </td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
 
 </table>
 <h2>Properties Substitution</h2>

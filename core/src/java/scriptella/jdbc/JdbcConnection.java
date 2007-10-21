@@ -44,6 +44,7 @@ public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
     public static final String KEEPFORMAT_KEY = "keepformat";
     public static final String AUTOCOMMIT_KEY = "autocommit";
+    public static final String AUTOCOMMIT_SIZE_KEY = "autocommit.size";
     public static final String TRANSACTION_ISOLATION_KEY = "transaction.isolation";
     public static final String TRANSACTION_ISOLATION_READ_UNCOMMITTED = "READ_UNCOMMITTED";
     public static final String TRANSACTION_ISOLATION_READ_COMMITTED = "READ_COMMITTED";
@@ -58,6 +59,7 @@ public class JdbcConnection extends AbstractConnection {
     protected String separator = ";";
     protected boolean separatorSingleLine;
     protected boolean keepformat;
+    protected int autocommitSize;
     private Integer txIsolation;
     private final Map<Resource, SqlExecutor> resourcesMap = new IdentityHashMap<Resource, SqlExecutor>();
 
@@ -93,6 +95,7 @@ public class JdbcConnection extends AbstractConnection {
 
     /**
      * Called in constructor
+     * @param parameters connection parameters.
      */
     protected void init(ConnectionParameters parameters) {
 
@@ -127,6 +130,7 @@ public class JdbcConnection extends AbstractConnection {
 
         }
         autocommit = parameters.getBooleanProperty(AUTOCOMMIT_KEY);
+        autocommitSize = parameters.getIntegerProperty(AUTOCOMMIT_SIZE_KEY, 0);
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
