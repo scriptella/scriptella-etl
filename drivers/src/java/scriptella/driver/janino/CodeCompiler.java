@@ -15,8 +15,8 @@
  */
 package scriptella.driver.janino;
 
-import org.codehaus.janino.Scanner;
 import org.codehaus.janino.ScriptEvaluator;
+import org.codehaus.janino.util.LocatedException;
 import scriptella.expression.LineIterator;
 import scriptella.spi.Resource;
 import scriptella.util.ExceptionUtils;
@@ -85,8 +85,8 @@ final class CodeCompiler {
      */
     private static JaninoProviderException guestErrorStatement(JaninoProviderException pe, Resource r) {
         Throwable cause = pe.getCause();
-        if (cause instanceof Scanner.LocatedException) {
-            Scanner.LocatedException le = (Scanner.LocatedException) cause;
+        if (cause instanceof LocatedException) {
+            LocatedException le = (LocatedException) cause;
             if (le.getLocation() != null) {
                 String line = getLine(r, le.getLocation().getLineNumber());
                 pe.setErrorStatement(line);
