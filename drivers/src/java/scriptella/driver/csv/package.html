@@ -70,7 +70,7 @@ The driver to write and query CSV files.
 <h2>Query Syntax</h2>
 The driver utilizes query by example approach for CSV content filtering.
 If you want to read the whole CSV simply use empty query element, otherwise
-specify a set of lines containing comma-separated case insensitive regular expressions.
+specify a set of lines containing <em>comma-separated</em> case insensitive regular expressions.
 <br><u>Example:</u>
 <code>
     <pre>
@@ -83,7 +83,7 @@ contains "food" substring.
 <p>The columns of the matched row can be referenced by name in nested queries/scripts. It
 is also possible to reference columns by an index, i.e.  $1, $2, ...</p>
 <h2>Script Syntax</h2>
-The script syntax is simple, just specify a comma-separated set of columns.
+The script syntax is simple, just specify a <em>comma-separated</em> set of columns.
 <br><u>Example:</u>
 <code>
     <pre>
@@ -94,6 +94,11 @@ id,priority,summary,status
     </pre>
 </code>
 This script writes 2 lines to the output file.
+<p><u>IMPORTANT:</u>
+Always use commas as a column separator inside both &lt;script&gt; and &lt;query&gt; elements no
+matter what <code>separator</code> is used in files being parsed or produced.
+This decision allows switching between different formats like tab or semicolumn while keeping
+scripts and queries unchanged.</p>
 <h2>Properties substitution</h2>
 In CSV script and query elements use ${property} syntax for properties/variables substition.
 <h2>Examples</h2>

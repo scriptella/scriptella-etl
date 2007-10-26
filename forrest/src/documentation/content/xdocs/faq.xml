@@ -28,6 +28,38 @@
                 <p>See <a href="reference/index.html#BIND_VARIABLES">Reference Manual</a> for additional details.</p>
             </answer>
         </faq>
+        <faq id="SET_VARIABLE">
+            <question>How to share a mutable variable between script/query elements of an ETL file?</question>
+            <answer><p>In general such practice in not recommended because often it's a sign of a bad design.
+            It's like using GOTOs or global variables in programming languages.
+                But in several cases using a global variable may help to achieve required goal. We propose 2 approaches:</p>
+            <ol>
+                <li>Use System.setProperty and System.getProperty to share variable between scripts. This is definitely a
+                hack, but very easy to implement in JavaScript for example</li>
+                <li>Another approach is similar to the technqiue utilized in anonymous inner classes to
+                modify a single-element array declared as a final variable.</li>
+            </ol>
+             <p>The following example demonstrates both approaches:</p>
+            <source><![CDATA[
+<etl>
+    <connection driver="script"/>
+    <script> java.lang.System.setProperty('globalVar', 'Message from sript 1') </script>
+    <script> java.lang.System.out.println('globalVar='+java.lang.System.getProperty('globalVar')) </script>
+
+    <query>
+        var globalVar = []; //Declare global variable
+        query.next(); //Executes child scripts
+        <script> //Updates global variable
+           globalVar[0] = 1;
+        </script>
+        <script> //Outputs updated value of global variable
+             java.lang.System.out.println('globalVar[0]='+globalVar[0]);
+        </script>
+    </query>
+</etl>
+         ]]></source>
+            </answer>
+        </faq>
 
         <faq id="COLUMN_SPACES">
             <question>How to escape spaces in field names?</question>
