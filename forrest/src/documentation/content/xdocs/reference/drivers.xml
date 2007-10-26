@@ -209,6 +209,16 @@
                 </tr>
                 <tr>
                     <td>
+                        <anchor id="scriptella"/>
+                        <a href="../docs/api/scriptella/driver/scriptella/package-summary.html#package_description">Scriptella driver</a>
+                    </td>
+                    <td>scriptella.driver.<strong>scriptella</strong>.Driver</td>
+                    <td>Driver for running Scriptella ETL files. Similar to Ant's &lt;ant&gt; task, i.e. it is suitable for
+                        splitting large ETL files into sub-projects.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="text"/>
                         <a href="../docs/api/scriptella/driver/text/package-summary.html#package_description">Text</a>
                     </td>
