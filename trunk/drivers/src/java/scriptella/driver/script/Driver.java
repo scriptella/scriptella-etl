@@ -28,6 +28,15 @@ import scriptella.spi.ConnectionParameters;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
+
+    public Driver() {
+        try { //Check if javax.script is available
+            Class.forName("javax.script.ScriptEngine");
+        } catch (ClassNotFoundException e) {
+            throw new ScriptProviderException("Java SE 6 or higher is required for this driver to operate.", e);
+        }
+    }
+
     public Connection connect(ConnectionParameters connectionParameters) {
         return new ScriptConnection(connectionParameters);
     }

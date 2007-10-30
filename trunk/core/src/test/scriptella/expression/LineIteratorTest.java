@@ -136,4 +136,12 @@ public class LineIteratorTest extends AbstractTestCase {
         lit.skip(-3); //nagatives are ingored
         assertFalse(lit.hasNext());
     }
+
+    public void testLineAt() {
+        LineIterator it = new LineIterator(new StringReader(
+                " L1\nL2 \r\nL3 "
+        ));
+        assertEquals("L2 ", it.getLineAt(1));
+        assertEquals(null, it.getLineAt(1));
+    }
 }

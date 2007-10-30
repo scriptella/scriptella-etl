@@ -16,6 +16,7 @@
 package scriptella.driver.script;
 
 import scriptella.configuration.ConfigurationException;
+import scriptella.expression.LineIterator;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
@@ -23,6 +24,7 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
+import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
@@ -138,8 +140,6 @@ public class ScriptConnection extends AbstractConnection {
      *
      * @param resource           resource to compile.
      * @param parametersCallback parameters callback.
-     * @throws ScriptException if script failed.
-     * @throws IOException     if I/O error occurs while opening script.
      */
     private void run(Resource resource, BindingsParametersCallback parametersCallback) {
         try {
@@ -152,16 +152,29 @@ public class ScriptConnection extends AbstractConnection {
                 try {
                     cache.put(resource, script = compiler.compile(resource.open()));
                 } catch (ScriptException e) {
-                    throw new ScriptProviderException("Failed to compile script", resource, e);
+                    throw new ScriptProviderException("Failed to compile script", e, getErrorStatement(resource, e));
                 }
             }
             script.eval(parametersCallback);
         } catch (IOException e) {
             throw new ScriptProviderException("Failed to open script for reading", e);
         } catch (ScriptException e) {
-            throw new ScriptProviderException("Failed to execute script", resource, e);
+            throw new ScriptProviderException("Failed to execute script", e, getErrorStatement(resource, e));
         }
 
+    }
+
+    static String getErrorStatement(Resource resource, ScriptException exception) {
+        LineIterator it = null;
+        try {
+            it = new LineIterator(resource.open());
+            return it.getLineAt(exception.getLineNumber() - 1);
+        } catch (IOException e) {
+            ExceptionUtils.ignoreThrowable(e);
+        } finally {
+            IOUtils.closeSilently(it);
+        }
+        return null;
     }
 
 

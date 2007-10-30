@@ -15,14 +15,7 @@
  */
 package scriptella.driver.script;
 
-import scriptella.expression.LineIterator;
 import scriptella.spi.ProviderException;
-import scriptella.spi.Resource;
-import scriptella.util.ExceptionUtils;
-import scriptella.util.IOUtils;
-
-import javax.script.ScriptException;
-import java.io.IOException;
 
 /**
  * Thrown to indicate an error in scripting engine.
@@ -35,20 +28,9 @@ public class ScriptProviderException extends ProviderException {
         super(message, cause);
     }
 
-    public ScriptProviderException(String message, Resource resource, ScriptException exception) {
-        super(message, exception);
-        int lines = exception.getLineNumber() - 1;
-        LineIterator it = null;
-        try {
-            it = new LineIterator(resource.open());
-            if (it.skip(lines) == lines && it.hasNext()) {
-                setErrorStatement(it.next());
-            }
-        } catch (IOException e) {
-            ExceptionUtils.ignoreThrowable(e);
-        } finally {
-            IOUtils.closeSilently(it);
-        }
+    public ScriptProviderException(String message, Throwable cause, String errorStatement) {
+        super(message, cause);
+        setErrorStatement(errorStatement);
     }
 
 
