@@ -25,6 +25,7 @@ import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;
 
+import javax.script.ScriptException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -121,6 +122,12 @@ public class ScriptConnectionTest extends AbstractTestCase {
         c.executeScript(new StringResource("print('Hello '+name)"),
                 MockParametersCallbacks.fromMap(Collections.singletonMap("name", "world")));
         assertEquals("Hello world", os.toString());
+    }
+
+    public void testGetErrorStatement() {
+        String st = ScriptConnection.getErrorStatement(
+                new StringResource("a\nbb\ncc"), new ScriptException("test", "test", 2));
+        assertEquals("bb", st);
     }
 
 }

@@ -96,20 +96,16 @@ final class CodeCompiler {
     }
 
     static String getLine(Resource resource, int line) {
-        int lines = line-1;
         LineIterator it = null;
         try {
             it = new LineIterator(resource.open());
-            if (it.skip(lines) == lines && it.hasNext()) {
-                return it.next();
-            }
+            return it.getLineAt(line - 1);
         } catch (IOException e) {
             ExceptionUtils.ignoreThrowable(e);
         } finally {
             IOUtils.closeSilently(it);
         }
         return null;
-
     }
 
 

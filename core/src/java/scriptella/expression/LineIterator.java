@@ -137,6 +137,17 @@ public class LineIterator implements Iterator<String>, Closeable {
         return n;
     }
 
+    /**
+     * Returns specified line or null if EOF occured.
+     * 
+     * @param n line number relative to the current line in the input. n>=0
+     * @return line n.
+     */
+    public String getLineAt(int n) {
+        skip(n);
+        return hasNext() ? next() : null;
+    }
+
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("remove not supported by " + getClass().getName());
     }
