@@ -38,7 +38,7 @@
     <fileset id="src.zip.fileset" dir="${basedir}"
              includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**"
              excludes="samples/lib/**"/>
-    <property name="src.zip.includes" value=""></property>
+    <property name="src.zip.includes" value=""/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
     <tstamp/>
 
