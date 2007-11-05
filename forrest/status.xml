@@ -36,6 +36,33 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
+        <release version="1.0 beta" date="2007-11-17">
+            <action context="code" type="add" dev="ejboy" fixes-bug="6086">
+                Driver for running external Scriptella ETL files
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="6256">
+                Add "autocommit.size" JDBC connection parameter.
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="5845">
+                "autocommit" connection parameter
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="5760">
+                Impossible to import NULL with CSV driver
+            </action>
+            <action context="code" type="fix" dev="volk" fixes-bug="5698">
+                JdbcException throwing during driver loading
+            </action>
+			<action context="code" type="update" dev="ejboy" fixes-bug="6294">
+                Upgrade to Velocity 1.5
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="6293">
+                [Compatibility] Upgrade to Janino 2.5.11
+            </action>
+            <action context="code" type="update" dev="ejboy">
+                Several minor bugs were fixed, cosmetic fixes for code, site and documentation.
+            </action>
+
+        </release>
         <release version="0.9" date="2007-05-17">
             <action context="code" type="add" dev="ejboy" fixes-bug="3672">
                 Auto-discovery for JDBC drivers
