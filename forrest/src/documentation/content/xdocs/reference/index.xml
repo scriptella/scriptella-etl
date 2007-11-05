@@ -3,7 +3,7 @@
 <document>
 	<header>
 		<title>Scriptella ETL Reference Documentation</title>
-		<version>0.9</version>
+		<version>1.0 BETA</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
@@ -24,11 +24,19 @@
                 datasources optionally performing necessary transformations. To accomplish these tasks Scriptella
                 provides 3 basic elements:
             </p>
-            <ul>
+            <ul>             
                 <li><strong>Connection</strong>. Represents a connection to a datasource like a database, directory service, XML file etc.</li>
-                <li><strong>Script</strong>. Contains code to execute, i.e. SQL, JavaScript, JEXL or another DSL (Domain Specific Language).</li>
-                <li><strong>Query</strong>. Contains DSL code to query a datasource. Queries can contain nested queries and scripts.</li>
+                <li><strong>Script</strong>. Contains code to execute, i.e. SQL, JavaScript, JEXL or even a DSL (Domain Specific Language).</li>
+                <li><strong>Query</strong>. Contains code written in DSL to query a datasource. Queries can contain nested queries and scripts.</li>
             </ul>
+            <p>
+            One of the primary Scriptella features is ability to link queries and scripts written
+            in different languages while sharing the same variables (e.g. database columns, XML or LDAP attributes or RegEx groups).
+            To use this power you have to understand how queries work in Scriptella. For the sake of simplicity queries
+            can be considered as <code>"for each"</code> statements which loop through the set of rows (JDBC ResultSet,
+            LDAP entries, XML DOM elements etc.) and execute nested elements passing attributes/columns of each row as
+            variables.</p>
+            <figure src="../images/reference/example1.png" alt="ETL File Example"/>
             <section>
 				<title>When to use</title>
 				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
