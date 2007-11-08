@@ -36,7 +36,7 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
-        <release version="1.0 beta" date="2007-11-17">
+        <release version="1.0 beta" date="2007-11-08">
             <action context="code" type="add" dev="ejboy" fixes-bug="6086">
                 Driver for running external Scriptella ETL files
             </action>
