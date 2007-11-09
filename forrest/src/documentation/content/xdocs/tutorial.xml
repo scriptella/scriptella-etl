@@ -54,7 +54,8 @@ EtlExecutor.newExecutor(
             <p>For a quick start type <code>scriptella -t</code> to create a template etl.xml file.</p>
             <section>
 				<title>Copy table to another database</title>
-				<p>Assume Database #1 contains Table Product with id, category and name columns. The following script
+                <figure src="./images/table_copy.png" alt="Migration of table records"/>
+                <p>Assume Database #1 contains Table Product with id, category and name columns. The following script
                 copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
 				<p>etl.xml:</p>
 				<source><![CDATA[
@@ -76,7 +77,8 @@ EtlExecutor.newExecutor(
 			</section>
 			<section>
 				<title>Working with BLOBs</title>
-				<p>The following sample initializes table of music tracks. Each track has a DATA field containing
+                <figure src="./images/blob_insert.png" alt="Inserting BLOB content from URL"/>
+                <p>The following sample initializes table of music tracks. Each track has a DATA field containing
  a file loaded from an external location. File song1.mp3 is stored in the same directory as etl.xml and song2.mp3
  is loaded through the web.</p>
 				<p>etl.xml:</p>
