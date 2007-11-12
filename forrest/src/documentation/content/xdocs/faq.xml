@@ -123,6 +123,26 @@
                 <p>This idea is similar to <a href="http://www.javaddicts.net/blog/index.php/2005/06/13/executing-oracle-plsql-from-ant/">Ant solution</a>.</p>
             </answer>
         </faq>
+        <faq id="COMMIT">
+            <question>How to control committment and transactions?</question>
+            <answer><p>The following connection parameters are supported by the JDBC bridge:</p>
+                <ul>
+                    <li><code>transaction.isolation</code> - Transaction isolation level name</li>
+                    <li><code>autocommit</code> - Enables/disables auto-commit mode.</li>
+                    <li><code>autocommit.size</code> - Enables/disables auto-commit mode.</li>
+                </ul>
+                <note>
+                     In general avoid using <code>autocommit.size</code>, because in this case an ETL process cannot be rolled back correctly. Use this parameter only for performance critical operations (bulk inserts etc.).<br/>
+                     If the <code>autocommit</code> is true, then setting <code>autocommit.size</code> has no effect.
+                </note>
+                <p><strong>Example:</strong></p>
+                <source><![CDATA[
+<connection driver="auto" url="jdbc:hsqldb:mem:test">
+    autocommit.size=4 <!-- Automatically commit after every 4th statement -->
+    transaction.isolation=SERIALIZABLE <!-- Sets TX level to Serializable -->
+</connection>]]></source>
+            </answer>
+        </faq>
     </faqsection>
     <!-- More faqs or parts here -->
 </faqs>
