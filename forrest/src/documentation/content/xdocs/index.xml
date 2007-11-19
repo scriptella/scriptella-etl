@@ -20,9 +20,9 @@
         <section id="usage">
             <title>Typical use</title>
             <ul>
-                <li>Database migration.</li>
-                <li>Database creation/update scripts.</li>
-                <li>Cross-database ETL operations, import/export.</li>
+                <li>Executing scripts written in SQL, JavaScript, JEXL, Velocity and <a href="reference/drivers.html">many more</a>.</li>
+                <li>Database migration. Interoperability with LDAP, JDBC, XML and other datasources.</li>
+                <li>Cross-database ETL operations, import/export from/to CSV, text and XML and other formats.</li>
                 <li>Alternative for Ant &lt;sql&gt; task.</li>
                 <li>Automated database schema upgrade.</li>
             </ul>
