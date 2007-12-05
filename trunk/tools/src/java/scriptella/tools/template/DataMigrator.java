@@ -321,7 +321,7 @@ public class DataMigrator extends TemplateManager {
                 try {
                     metaData = connection.getMetaData();
                 } catch (SQLException e) {
-                    throw new JdbcException("Unable to get database metadata");
+                    throw new JdbcException("Unable to get database metadata", e);
                 }
             }
             return metaData;
