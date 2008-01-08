@@ -62,7 +62,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
             columnsCount = m.getColumnCount();
             jdbcTypes = new int[columnsCount];
             for (int i = 1; i <= columnsCount; i++) {
-                columnsMap.registerColumn(m.getColumnName(i), i);
+                columnsMap.registerColumn(m.getColumnLabel(i), i);
                 jdbcTypes[i-1]=m.getColumnType(i); //Store column types for converter
             }
         } catch (SQLException e) {
