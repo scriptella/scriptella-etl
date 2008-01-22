@@ -31,8 +31,7 @@ import java.util.Set;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JexlExpression extends Expression {
-    private JexlContextAdapter adapter = new JexlContextAdapter();
+public final class JexlExpression extends Expression {
     private org.apache.commons.jexl.Expression expression;
 
     protected JexlExpression(String expression) throws ParseException {
@@ -41,54 +40,44 @@ public class JexlExpression extends Expression {
         try {
             this.expression = ExpressionFactory.createExpression(expression);
         } catch (Exception e) {
-            throw new ParseException(e.getMessage(),e);
+            throw new ParseException(e.getMessage(), e);
         } catch (TokenMgrError e) {
-            throw new ParseException(e.getMessage(),e);
+            throw new ParseException(e.getMessage(), e);
         }
     }
 
     public Object evaluate(final ParametersCallback callback)
             throws EvaluationException {
+        JexlContextAdapter a = new JexlContextAdapter(callback);
         try {
-            adapter.setContext(callback);
-
-            return expression.evaluate(adapter);
+            return expression.evaluate(a);
         } catch (Exception e) {
             throw new EvaluationException(e);
-        } finally {
-            adapter.unsetContext();
         }
+
     }
 
     /**
      * Adapter for JexlContext to allow working with {@link ParametersCallback}.
+     * <p>Also implements Map to represent ParametersCallback.
      */
-    private static class JexlContextAdapter implements JexlContext {
-        private ParametersCallbackMap map = new ParametersCallbackMap();
+    private static class JexlContextAdapter implements JexlContext, Map {
+        private ParametersCallback callback;
+
+        private JexlContextAdapter(ParametersCallback callback) {
+            this.callback = callback;
+        }
 
         public void setVars(final Map map) {
         }
 
         public Map getVars() {
-            return map;
+            return this;
         }
 
-        public void setContext(final ParametersCallback parametersCallback) {
-            map.callback = parametersCallback;
-        }
-
-        public void unsetContext() {
-            map.callback = null;
-        }
-    }
-
-    /**
-     * Represents {@link ParametersCallback} as a Map.
-     * <p>Only {@link #get(Object)} method is supported. Invocations of other methods result in
-     * {@link UnsupportedOperationException} thrown.
-     */
-    private static final class ParametersCallbackMap implements Map {
-        private ParametersCallback callback;
+        //-- Implementation of java.util.Map interface
+        //   Only {@link #get(Object)} method is supported. Invocations of other methods result in
+        //   {@link UnsupportedOperationException} thrown.
 
         public int size() {
             throw new UnsupportedOperationException();
@@ -141,5 +130,7 @@ public class JexlExpression extends Expression {
         public Set<Entry<String, Object>> entrySet() {
             throw new UnsupportedOperationException();
         }
+
     }
+
 }
