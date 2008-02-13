@@ -155,6 +155,7 @@ public class AllJDBCDriversTest extends AbstractTestCase {
                     checkData(row[5]);
                     checkBData(row[6]);
                     checkCData(row[7]);
+                    assertNull(row[8]);
                 }
             }
         }

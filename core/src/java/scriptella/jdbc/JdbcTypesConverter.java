@@ -55,14 +55,14 @@ class JdbcTypesConverter implements Closeable {
      * object as an Object in the Java programming language.
      *
      * @param rs
-     * @param index column index.
+     * @param index    column index.
      * @param jdbcType column {@link java.sql.Types JDBC type}
      * @return
      * @throws SQLException
      * @see ResultSet#getObject(int)
      */
     public Object getObject(final ResultSet rs, final int index, final int jdbcType) throws SQLException {
-        switch(jdbcType) {
+        switch (jdbcType) {
             case Types.DATE: //For date/timestamp use getTimestamp to keep hh,mm,ss if possible
             case Types.TIMESTAMP:
                 return rs.getTimestamp(index);
@@ -74,13 +74,13 @@ class JdbcTypesConverter implements Closeable {
                 return rs.getClob(index);
             case Types.LONGVARBINARY:
                 InputStream is = rs.getBinaryStream(index);
-                return is==null?null:toBlob(is);
+                return is == null ? null : toBlob(is);
             case Types.LONGVARCHAR:
                 Reader reader = rs.getCharacterStream(index);
-                return reader==null?null:toClob(reader);
+                return reader == null ? null : toClob(reader);
         }
         Object res = rs.getObject(index);
-        if (res==null) {
+        if (res == null) {
             return null;
         }
         return res;
@@ -92,8 +92,8 @@ class JdbcTypesConverter implements Closeable {
      * <p>Depending on the value type the concrete subclass of JdbcTypesConverter is chosen.
      *
      * @param preparedStatement prepared statement to set object.
-     * @param index he first parameter is 1, the second is 2, ...
-     * @param value the object containing the input parameter value
+     * @param index             he first parameter is 1, the second is 2, ...
+     * @param value             the object containing the input parameter value
      * @throws SQLException
      */
     public void setObject(final PreparedStatement preparedStatement, final int index, final Object value) throws SQLException {
@@ -102,7 +102,7 @@ class JdbcTypesConverter implements Closeable {
             setBlob(preparedStatement, index, toBlob((InputStream) value));
         } else if (value instanceof Reader) {
             setClob(preparedStatement, index, toClob((Reader) value));
-        //For BLOBs/CLOBs use JDBC 1.0 methods for compatibility
+            //For BLOBs/CLOBs use JDBC 1.0 methods for compatibility
         } else if (value instanceof Blob) {
             setBlob(preparedStatement, index, (Blob) value);
         } else if (value instanceof Clob) {
@@ -110,9 +110,17 @@ class JdbcTypesConverter implements Closeable {
         } else if (value instanceof Date) {
             setDateObject(preparedStatement, index, (Date) value);
         } else if (value instanceof Calendar) {
-            preparedStatement.setTimestamp(index, new Timestamp(((Calendar)value).getTimeInMillis()), (Calendar) value);
+            preparedStatement.setTimestamp(index, new Timestamp(((Calendar) value).getTimeInMillis()), (Calendar) value);
         } else {
-            preparedStatement.setObject(index, value);
+            try {
+                preparedStatement.setObject(index, value);
+            } catch (SQLException e) {
+                if (value == null) { //Some drivers require type of NULL parameter.
+                    preparedStatement.setNull(index, Types.VARCHAR);
+                } else {
+                    throw e;
+                }
+            }
         }
     }
 
@@ -156,8 +164,8 @@ class JdbcTypesConverter implements Closeable {
     }
 
     protected void registerResource(Closeable resource) {
-        if (resources==null) {
-            resources=new ArrayList<Closeable>();
+        if (resources == null) {
+            resources = new ArrayList<Closeable>();
         }
         resources.add(resource);
     }
