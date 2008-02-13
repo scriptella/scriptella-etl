@@ -13,7 +13,8 @@
             Ti $DATETIME,
             Data $BINARY,
             BData $LONGVARBINARY,
-            CData $LONGVARCHAR
+            CData $LONGVARCHAR,
+            Nullable $INT
         );
         <onerror codes="955,42101" retry="true">
             DROP TABLE Test
