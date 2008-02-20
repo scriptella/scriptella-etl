@@ -28,7 +28,7 @@ import java.util.Set;
 
 
 /**
- * TODO: Add documentation
+ * Integration tests for dialect handling.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -40,8 +40,7 @@ public class DialectsTest extends DBTestCase {
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test");
-        final Set expected = new HashSet(Arrays.asList(
-                new Integer[]{1, 3, 4, 5, 6, 7, 9}));
+        final Set expected = new HashSet<Integer>(Arrays.asList(1, 3, 4, 5, 6, 7, 9, 11));
         final Set actual = new HashSet<Integer>();
 
         s.execute(con,
@@ -59,7 +58,7 @@ public class DialectsTest extends DBTestCase {
         se.execute();
 
         QueryHelper s = new QueryHelper("select * from test2");
-        final Set expected = new HashSet(Arrays.asList(new Integer[]{1, 2}));
+        final Set expected = new HashSet<Integer>(Arrays.asList(1, 2));
         final Set actual = new HashSet<Integer>();
 
         s.execute(con,

@@ -141,19 +141,25 @@ The dialect element defines a vendor specific script. Scripting elements may con
 This element may contain plain text or includes.
 <u>Example:</u>
 %
-<dialect name=".*oracle.*" version=".*10.*">
-//Statements executed only for Oracle 10 and higher
+<dialect name="oracle" version="10\.">
+//Statements executed only for Oracle 10.x
 </dialect>
+<dialect name="oracle" exclude="true">
+//Statements executed for any datasource except Oracle
+</dialect>
+
 %
 -->
 <!ELEMENT dialect (#PCDATA | include)*>
 <!--
  @attr name case insensitive regular expression to match vendor name, e.g. .*oracle.*
  @attr version case insensitive regular expression to match vendor version, e.g. 1\.0
+ @attr exclude optional attribute to invert the name/version matching.  
 -->
 <!ATTLIST dialect
 name CDATA #IMPLIED
 version CDATA #IMPLIED
+exclude (true | false) "false"
 >
 
 <!--

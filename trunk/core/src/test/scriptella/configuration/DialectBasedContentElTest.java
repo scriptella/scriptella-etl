@@ -79,6 +79,7 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         assertTrue(d.matches(DialectIdentifier.NULL_DIALECT));
         d.setName(Pattern.compile("dl"));
         assertFalse(d.matches(DialectIdentifier.NULL_DIALECT));
+
     }
 
     /**
@@ -92,6 +93,24 @@ public class DialectBasedContentElTest extends AbstractTestCase {
         assertFalse(d.matches(new DialectIdentifier("string", "2.1.0")));
         assertTrue(d.matches(new DialectIdentifier("string", "1.0")));
     }
+
+    public void testExclude() {
+        DialectBasedContentEl.Dialect d = new DialectBasedContentEl.Dialect();
+        d.setName(Pattern.compile("oracle"));
+        d.setExclude(true);
+        //Substring only oracle database of any version should be excluded
+        assertFalse(d.matches(new DialectIdentifier("oracle", "1.0")));
+        assertFalse(d.matches(new DialectIdentifier("oracle", "2.0")));
+        assertFalse(d.matches(new DialectIdentifier("oracle", null)));
+        assertTrue(d.matches(new DialectIdentifier("sybase", null)));
+        d.setVersion(Pattern.compile("1.0"));
+        //Substring only oracle 1.0 database of any version should be excluded
+        assertFalse(d.matches(new DialectIdentifier("oracle", "1.0")));
+        assertTrue(d.matches(new DialectIdentifier("oracle", "2.0")));
+        assertTrue(d.matches(new DialectIdentifier("sybase", null)));
+        assertTrue(d.matches(new DialectIdentifier("sybase", "1.1")));
+    }
+
 
     /**
      * Tests when no content was matched.
