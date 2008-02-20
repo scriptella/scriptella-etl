@@ -122,6 +122,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
     static class Dialect extends XmlConfigurableBase {
         private Pattern name;
         private Pattern version;
+        private boolean exclude;
         private ContentEl contentEl;
 
         public Pattern getName() {
@@ -140,6 +141,15 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
             this.version = version;
         }
 
+
+        public boolean isExclude() {
+            return exclude;
+        }
+
+        public void setExclude(boolean exclude) {
+            this.exclude = exclude;
+        }
+
         public ContentEl getContentEl() {
             return contentEl;
         }
@@ -147,6 +157,7 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
         public void configure(final XmlElement element) {
             setPatternProperty(element, "name");
             setPatternProperty(element, "version");
+            exclude=element.getBooleanAttribute("exclude", false);
             contentEl = new ContentEl(element);
             setLocation(element);
         }
@@ -171,15 +182,15 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
             String idName = StringUtils.nullsafeToString(id.getName());
             String idVersion = StringUtils.nullsafeToString(id.getVersion());
             //Substring matching is used for names. Versions are matched entirely
-            return ((name == null) ||
+            boolean matches = ((name == null) ||
                     name.matcher(idName).find()) && ((version == null) ||
                     version.matcher(idVersion).matches());
-
+            return exclude?!matches:matches;
         }
 
         public String toString() {
             return "Dialect{" + "name=" + name + ", version=" +
-                    version + ", contentEl=" + contentEl + "}";
+                    version + ", exclude="+exclude+", contentEl=" + contentEl + "}";
         }
     }
 

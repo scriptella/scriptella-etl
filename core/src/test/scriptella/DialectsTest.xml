@@ -43,6 +43,15 @@
         insert into test(id, value) values (9,'333');
 
     </script>
+    <script>
+        <dialect name="hsql" exclude="true"><!-- skipped -->
+            insert into test(id, value) values (10,'333');
+        </dialect>
+        <dialect name="oracle" exclude="true"> <!-- executes-->
+            insert into test(id, value) values (11,'333');
+        </dialect>
+
+    </script>
 
 
 </etl>
