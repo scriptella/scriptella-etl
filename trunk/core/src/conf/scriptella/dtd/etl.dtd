@@ -142,10 +142,10 @@ This element may contain plain text or includes.
 <u>Example:</u>
 %
 <dialect name="oracle" version="10\.">
-//Statements executed only for Oracle 10.x
+    //Statements executed only for Oracle 10.x
 </dialect>
 <dialect name="oracle" exclude="true">
-//Statements executed for any datasource except Oracle
+    //Statements executed for any datasource except Oracle
 </dialect>
 
 %
@@ -154,7 +154,9 @@ This element may contain plain text or includes.
 <!--
  @attr name case insensitive regular expression to match vendor name, e.g. .*oracle.*
  @attr version case insensitive regular expression to match vendor version, e.g. 1\.0
- @attr exclude optional attribute to invert the name/version matching.  
+ @attr exclude optional attribute to invert the name/version matching.
+       Use exclude="true" to skip content for dialects with specified name and version.
+
 -->
 <!ATTLIST dialect
 name CDATA #IMPLIED
