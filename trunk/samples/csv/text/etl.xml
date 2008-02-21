@@ -21,9 +21,10 @@
         <script connection-id="out" if="rownum>1">$1,$2,$3,$4</script>
     </query>
     <query connection-id="in">
-        <!--Select bugs with status open or reopened.
-        Unfortunately I don't know how to specify negation,e.g. !closed-->
-        ([\s\w]*),([\s\w]*),([\s\w]*),(open|reopened)
+        <!--Select bugs with status without word 'closed' .-->
+        <![CDATA[
+        ([\s\w]*),([\s\w]*),(.*),((.(?!closed)(?<!closed))*)
+        ]]>
         <script connection-id="outFiltered">$1;$2;${column3.replaceAll('"', '""')};$4</script>
         <!-- column3.replaceAll is used to escape quote characters -->
     </query>
