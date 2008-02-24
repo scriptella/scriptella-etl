@@ -68,12 +68,12 @@ public class OnErrorHandler {
             //iterates through elements
             for (OnErrorEl onErrorEl : onerrorElements) {
                 Pattern type = onErrorEl.getType();
-                if (type != null && !type.matcher(t.getClass().getName()).matches()) {
+                if (type != null && !type.matcher(t.getClass().getName()).find()) {
                     continue;
                 }
                 Pattern msg = onErrorEl.getMessage();
                 //if onerror has message, but exception hasn't or different message - skip this case
-                if (msg != null && (t.getMessage() == null || !msg.matcher(t.getMessage()).matches())) {
+                if (msg != null && (t.getMessage() == null || !msg.matcher(t.getMessage()).find())) {
                     continue;
                 }
                 Set<String> codes = onErrorEl.getCodes();

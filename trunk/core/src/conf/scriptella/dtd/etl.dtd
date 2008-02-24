@@ -169,19 +169,19 @@ The onerror element defines fallback script to execute if error occurs.
 This element may contain plain text or includes.
 <p><u>Example:</u>
 %
-<onerror type=".*SQLException">
+<onerror type="SQLException">
     DROP TABLE MYTABLE
 </onerror>
 %
 Note: Attributes are applied using AND condition, so if you specified
-%<onerror type=".*ProviderException" codes="100,200">%
-so only Provider Exceptions having 100 and/or 200 error code are handled. 
+%<onerror type="ProviderException" codes="100,200">%
+so only exceptions with class name *.ProviderException having 100 and/or 200 error code are handled.
 -->
 <!ELEMENT onerror (#PCDATA | include | dialect)*>
 <!--
- @attr type Regular expression pattern to match exception type
+ @attr type Regular expression pattern to match exception type. Partial matching is allowed.
  @attr codes Comma-separated list of vendor codes/sql states. Triggered if any of these codes matches one of the codes reported by driver.
- @attr message Regular expression pattern to match exception message
+ @attr message Regular expression pattern to match exception message. Partial matching is allowed.
  @attr retry true if statement which caused a problem should be retried after this handler completes.
 -->
 <!ATTLIST onerror
