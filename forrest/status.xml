@@ -36,6 +36,25 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
+        Use column label in addition to column name for JDBC metadata
+        <release version="1.0 RC" date="not yet released">
+            <action context="code" type="update" dev="ejboy" fixes-bug="5627">
+                Simplified onerror regex matching for message and type attributes
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="6713">
+                Use column label in addition to column name for JDBC metadata
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="6773">
+                NullpointerException in JEXL expressions if running in multiple threads
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="6913">
+                Inserting NULL values into a DB2 database
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="6924">
+                Add "exclude=true/false" attribute for dialect tag.
+            </action>
+        </release>
+
         <release version="1.0 beta" date="2007-11-08">
             <action context="code" type="add" dev="ejboy" fixes-bug="6086">
                 Driver for running external Scriptella ETL files
