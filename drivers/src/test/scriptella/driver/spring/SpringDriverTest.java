@@ -23,6 +23,7 @@ import scriptella.execution.EtlExecutorException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -40,7 +41,11 @@ public class SpringDriverTest extends AbstractTestCase {
         EtlExecutor exec = (EtlExecutor) bf.getBean("executor");
         exec.execute();
         con.createStatement().executeQuery("select * from SpringTable"); //A table should be created
+        //Test batched executor
+        ResultSet rs = con.createStatement().executeQuery("select * from Batch order by id");//A table should be created
+        assertTrue(rs.next());
+        assertEquals(1, rs.getInt(1));
+        assertFalse(rs.next());
         con.createStatement().execute("SHUTDOWN");
-
     }
 }

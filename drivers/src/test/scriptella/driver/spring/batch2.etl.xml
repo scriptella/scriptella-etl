@@ -1,0 +1,8 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="spring" url="datasource" />
+    <script>
+        INSERT INTO $tableName VALUES (1);
+    </script>
+
+</etl>
