@@ -101,6 +101,11 @@ This decision allows switching between different formats like tab or semicolumn 
 scripts and queries unchanged.</p>
 <h2>Properties substitution</h2>
 In CSV script and query elements use ${property} syntax for properties/variables substition.
+<p><u>NOTE:</u></p>
+By default NULL variables are not substituted, because Scriptella substitution engine cannot
+distinguish null value from undeclared variable which is not always desired.
+<p>Use <code>${etl.text.ifNull(variable)}</code> or 
+    <code>${etl.text.ifNull(variable, '')}</code> to output NULL as empty string.</p>
 <h2>Examples</h2>
 <code><pre>
 &lt;connection id="in" driver="csv" url="data.csv" classpath="lib/opencsv.jar"&gt;

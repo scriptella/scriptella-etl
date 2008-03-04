@@ -33,6 +33,7 @@ public class EtlVariable {
     public static final String NAME = "etl";
 
     private final DateUtils date = new DateUtils();
+    private final TextUtils text = new TextUtils();
 
     /**
      * Returns the global <code>etl</code> variable.
@@ -46,6 +47,11 @@ public class EtlVariable {
     public DateUtils getDate() {
         return date;
     }
+
+    public TextUtils getText() {
+        return text;
+    }
+
 
     /**
      * Utility class for ETL file expressions.
@@ -100,6 +106,7 @@ public class EtlVariable {
 
         /**
          * A synonym for {@link #now(String)}.
+         *
          * @param formatPattern format pattern.
          * @return formatted date.
          */
@@ -107,5 +114,47 @@ public class EtlVariable {
             return now(formatPattern);
         }
     }
+
+    /**
+     * Utility class for ETL file expressions.
+     * <p>Provides text operations.
+     */
+    public static class TextUtils {
+
+        /**
+         * Substitute an object when a null value is encountered.
+         * @param object object to check.
+         * @param replacement replacement object.
+         * @return object or replacement if object==null
+         */
+        public Object ifNull(Object object, Object replacement) {
+            return object == null ? replacement : object;
+        }
+
+        /**
+         * Substitute an object with empty string when a null value is encountered.
+         * @param object object to check.
+         * @return object or empty string if object==null.
+         */
+        public Object ifNull(Object object) {
+            return object == null ? "" : object;
+        }
+
+        /**
+         * If expr1 = expr2 is true, return NULL else return expr1.
+         * @param expr1 first expression
+         * @param expr2 second expression
+         * @return true if expr1 = expr2, otherwise null.
+         */
+        public Object nullIf(Object expr1, Object expr2) {
+            if (expr1==null) {
+                return null;
+            } else {
+                return expr1.equals(expr2)?null:expr1;
+            }
+        }
+
+    }
+
 
 }
