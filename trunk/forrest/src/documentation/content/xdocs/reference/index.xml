@@ -276,6 +276,11 @@
                     - formats the current date using the specified pattern. See <a href="../docs/api/scriptella/expression/EtlVariable.DateUtils.html">JavaDoc</a>
                     for more details.
                 </li>
+                <li>etl.text - Methods for working with text. <br/>Example: <code>${etl.text.ifNull(a)}</code>
+                    - returns empty string if a=null. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
+                    for more details.
+                </li>
+
             </ul>
             <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
                 use <code>get(name)</code> to get variable's value.

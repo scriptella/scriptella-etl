@@ -20,6 +20,7 @@ import scriptella.spi.MockParametersCallbacks;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,5 +55,23 @@ public class EtlVariableTest extends AbstractTestCase {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.fromMap(m));
         String s = ps.substitute("${etl.date.today('" + format + "')}");
         assertEquals(new SimpleDateFormat(format).format(new Date()), s);
+    }
+
+    public void testText() {
+        Object o = Expression.compile("etl.text.ifNull(a)").evaluate(MockParametersCallbacks.NULL);
+        assertEquals("", o);
+        o = Expression.compile("etl.text.ifNull(a,1)").evaluate(MockParametersCallbacks.NULL);
+        assertEquals(1, o);
+        o = Expression.compile("etl.text.ifNull(a,1)").evaluate(MockParametersCallbacks.fromMap(
+                Collections.singletonMap("a", 2)));
+        assertEquals(2, o);
+        o = Expression.compile("etl.text.nullIf(a,1)").evaluate(MockParametersCallbacks.fromMap(
+                Collections.singletonMap("a", 1)));
+        assertNull(o);
+        o = Expression.compile("etl.text.nullIf(a,1)").evaluate(MockParametersCallbacks.NULL);
+        assertNull(o);
+        o = Expression.compile("etl.text.nullIf(a,1)").evaluate(MockParametersCallbacks.fromMap(
+                Collections.singletonMap("a", 2)));
+        assertEquals(2, o);
     }
 }
