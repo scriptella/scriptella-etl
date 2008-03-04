@@ -150,7 +150,8 @@
         <faq id="NULLS">
             <question>How to ouput null value as empty string in a CSV/Text file.</question>
             <answer><p>Suppose we have 3 variables - a='valueA';b=null and c='valueC'.</p>
-                <p>Here is a CSV script which outputs them in a single line:</p>
+                <p>Here is a <a href="docs/api/scriptella/driver/csv/package-summary.html#package_description">CSV</a>
+                    script which outputs them in a single line:</p>
                 <source>
                     $a,$b,$c
                 </source>
