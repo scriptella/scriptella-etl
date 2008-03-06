@@ -22,8 +22,15 @@ width="88" height="31" border="0" alt="Powered by Scriptella ETL"></a>]]></td></
                 <li><a href="http://jroller.com/page/ejboy">Author's Blog</a></li>
                 <li><a href="http://www.ohloh.net/projects/4526"><img src="http://www.ohloh.net/projects/4526/badge.gif" alt="Metrics by Ohloh"/></a> - Scriptella ETL metrics by Ohloh</li>
                 <li><a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples at DZone Snippets</a></li>
+                <li>A nice and short <a href="http://www.pcal.net/blog/2007/07/scriptella-etl.html">introduction</a> of Scriptella ETL</li>
                 <li>Vote for Scriptella on <a href="http://javapowertools.wikidot.com/cooltools">Java Power Tools</a></li>
-                
+                <li>Scriptella is a member of <a href="http://www.datamigrationpro.com">DataMigrationPro.com</a> global professional community.</li>
+            </ul>
+        </section>
+        <section>
+            <title>Companies and products that use Scriptella</title>
+            <ul>
+                <li><a href="http://www.cfosoft.com">CFOsoft</a> uses Scriptella for their <a href="http://www.cfosoft.com/technology_opensource.php">Laguna BI platform</a>.</li>
             </ul>
         </section>
     </body>
