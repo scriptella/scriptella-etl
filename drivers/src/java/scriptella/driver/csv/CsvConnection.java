@@ -15,9 +15,9 @@
  */
 package scriptella.driver.csv;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 import scriptella.core.EtlCancelledException;
+import scriptella.driver.csv.opencsv.CSVReader;
+import scriptella.driver.csv.opencsv.CSVWriter;
 import scriptella.driver.text.AbstractTextConnection;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ConnectionParameters;

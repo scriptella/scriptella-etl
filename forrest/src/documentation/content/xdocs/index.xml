@@ -106,19 +106,20 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.0 BETA Released (November 8, 2007)</title>
-                <p>We are pleased to announce the availability of Scriptella 1.0 BETA.
-                    This release introduced support for external ETL files.
+                <title>Scriptella 1.0 RC Released (Date)</title>
+                <p>We are pleased to announce the availability of Scriptella 1.0 RC.
+                    This release fixes several minor bugs found in BETA version.
                     Other notable features and bug fixes:</p>
                 <ul>
-                    <li>"autocommit.size" and "autocommit" JDBC connection parameters</li>
-                    <li>Impossible to import NULL with CSV driver</li>
-                    <li>JdbcException throwing during driver loading</li>
-                    <li>Upgrade to Velocity 1.5</li>
-                    <li>[Compatibility] Upgrade to Janino 2.5.11</li>
+                    <li>etl.text utility methods to format strings</li>
+                    <li>Execute multiple ETL files in Spring</li>
+                    <li>Add "exclude=true/false" attribute for dialect tag.</li>
+                    <li>NullpointerException in JEXL expressions if running in multiple threads</li>
+                    <li>Inserting NULL values into a DB2 database</li>
+                    <li>Simplified onerror regex matching for message and type attributes</li>
                 </ul>
-                <p>We hope that this release is stable enough and won't introduce critical bugs so we can roll out
-                    Scriptella 1.0 soon. See <a href="changes.html">change log</a> for additional details.<br/>
+                <p>If no serious problems are found in this release Scriptella 1.0 GA will be released soon.
+                    See <a href="changes.html">change log</a> for additional details.<br/>
                 <a href="tutorial.html">Make ETL easier</a> - <a href="download.html">Download Scriptella Now!</a></p>
             </section>
         </section>

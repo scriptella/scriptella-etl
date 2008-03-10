@@ -3,7 +3,6 @@
         <pathelement location="${basedir}/../core/build/tmp/classes"/>
         <pathelement location="${basedir}/../lib/velocity-dep.jar"/>
         <pathelement location="${basedir}/../lib/janino.jar"/>
-        <pathelement location="${basedir}/../lib/opencsv.jar"/>
         <pathelement location="${basedir}/../lib/spring.jar"/>
         <pathelement location="${basedir}/../lib/lucene-core.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>

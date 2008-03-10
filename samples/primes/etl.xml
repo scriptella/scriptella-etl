@@ -33,7 +33,7 @@
     <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:mix" user="sa" classpath="../lib/hsqldb.jar"/>
 
     <!--Set up CSV driver-->
-    <connection id="csv" driver="csv" url="report.csv" classpath="../lib/opencsv.jar">
+    <connection id="csv" driver="csv" url="report.csv">
         #If necessary use empty quote char to suppress quotes
         quote=
         #Use Excel compatible separator for output

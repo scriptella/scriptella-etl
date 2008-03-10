@@ -12,7 +12,7 @@ The driver to write and query CSV files.
     If url has no value the output is read from/printed to the console (System.out).</code></td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td><code><a href="http://prdownloads.sourceforge.net/opencsv">opencsv-1.6+.jar</a></code></td>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -108,10 +108,10 @@ distinguish null value from undeclared variable which is not always desired.
     <code>${etl.text.ifNull(variable, '')}</code> to output NULL as empty string.</p>
 <h2>Examples</h2>
 <code><pre>
-&lt;connection id="in" driver="csv" url="data.csv" classpath="lib/opencsv.jar"&gt;
+&lt;connection id="in" driver="csv" url="data.csv"&gt;
 
 &lt;/connection&gt;
-&lt;connection id="out" driver="csv" url="report.csv" classpath="lib/opencsv.jar"&gt;
+&lt;connection id="out" driver="csv" url="report.csv"&gt;
     #Use empty quote to turn off quoting
     quote=
     separator=;

@@ -15,8 +15,8 @@
  */
 package scriptella.driver.csv;
 
-import au.com.bytecode.opencsv.CSVReader;
 import scriptella.AbstractTestCase;
+import scriptella.driver.csv.opencsv.CSVReader;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.MockParametersCallbacks;

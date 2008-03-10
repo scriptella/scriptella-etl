@@ -38,6 +38,12 @@
         <!--</release>-->
         Use column label in addition to column name for JDBC metadata
         <release version="1.0 RC" date="not yet released">
+            <action context="code" type="add" dev="ejboy" fixes-bug="7048">
+                etl.text utility methods to format strings
+            </action>
+            <action context="code" type="add" dev="ejboy" fixes-bug="7003">
+                Execute multiple ETL files in Spring
+            </action>
             <action context="code" type="update" dev="ejboy" fixes-bug="5627">
                 Simplified onerror regex matching for message and type attributes
             </action>
