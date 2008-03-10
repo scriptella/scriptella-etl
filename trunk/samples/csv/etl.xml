@@ -3,14 +3,14 @@
     <description>
         Quieries CSV data from from file and store the results in a DB and other CSV file.
     </description>
-    <connection id="in" driver="csv" url="bugs-in.csv" classpath="../lib/opencsv.jar"/>
+    <connection id="in" driver="csv" url="bugs-in.csv"/>
     <!--Filtered output to another file -->
-    <connection id="out" driver="csv" url="bugs-out.csv" classpath="../lib/opencsv.jar">
+    <connection id="out" driver="csv" url="bugs-out.csv">
         #Use empty quote to turn off quoting
         quote=
     </connection>
     <!--Connection to output a filtered list of bugs as an Excel CSV file -->
-    <connection id="outFiltered" driver="csv" url="bugs-out-filtered.csv" classpath="../lib/opencsv.jar">
+    <connection id="outFiltered" driver="csv" url="bugs-out-filtered.csv">
         separator=;
     </connection>
     <!--In memory just for example-->

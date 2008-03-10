@@ -654,7 +654,6 @@
 				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
                     feature can be used to work
                     with CSV files.</p>
-				<p>Additionally <a href="http://opencsv.sourceforge.net">opencsv</a> library can be used in Janino scripts.</p>
 			</section>
             <section>
                 <title>Working with XML data</title>
@@ -718,7 +717,7 @@
 				</tr>
 				<tr>
 					<td>CSV</td>
-					<td>Example of working with CSV data using HSQLDB CSV tables feature, opencsv library or Scriptella built-in Text driver.</td>
+					<td>Example of working with CSV data using HSQLDB CSV tables feature, Scriptella built-in CSV or Text driver.</td>
 				</tr>
 				<tr>
 					<td>DB Upgrade</td>
