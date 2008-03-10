@@ -5,13 +5,13 @@
     </description>
     <connection id="script" driver="jexl"/>
     <!--Filtered output to another file -->
-    <connection id="out" driver="csv" url="output.csv" classpath="../lib/opencsv.jar"/>
+    <connection id="out" driver="csv" url="tmp/output.csv"/>
     <query connection-id="script">
         i=0;
         while (i lt 100000) {
             query.next();
             <script connection-id="out">
-                i,${'Test value for CSV file '+i}                    
+                $i,${'Test value for CSV file '+i}                    
             </script>
             i=i+1;
         }

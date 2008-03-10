@@ -17,10 +17,16 @@
 <project name="Scriptella Benchmark" default="execute">
     <!-- Registers scriptella ant task.
     Update classpath attribute if necessary-->
-    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
 
     <target name="execute" description="runs the ETL">
         <!--Use debug="true" to see more execution details-->
+        <delete dir="tmp" failonerror="no"/>
+        <mkdir dir="tmp"/>
         <etl file="createcsv.etl.xml"/>
+        <etl file="importcsv.etl.xml"/>
+        <etl file="exportcsv.etl.xml"/>
+
     </target>
+
 </project>
