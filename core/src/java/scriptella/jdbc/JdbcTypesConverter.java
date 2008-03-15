@@ -48,6 +48,8 @@ import java.util.List;
  * @version 1.0
  */
 class JdbcTypesConverter implements Closeable {
+    //Closable resources are registered here to be disposed when
+    //they go out of scope, e.g. next query row, or after executing an SQL statement
     private List<Closeable> resources;
 
     /**
@@ -141,11 +143,15 @@ class JdbcTypesConverter implements Closeable {
     }
 
     protected void setBlob(final PreparedStatement ps, final int index, final Blob blob) throws SQLException {
-        ps.setBinaryStream(index, blob.getBinaryStream(), (int) blob.length());
+        InputStream stream = blob.getBinaryStream();
+        ps.setBinaryStream(index, stream, (int) blob.length());
+        registerResource(stream);
     }
 
     protected void setClob(final PreparedStatement ps, final int index, final Clob clob) throws SQLException {
-        ps.setCharacterStream(index, clob.getCharacterStream(), (int) clob.length());
+        Reader reader = clob.getCharacterStream();
+        ps.setCharacterStream(index, reader, (int) clob.length());
+        registerResource(reader);
     }
 
     /**
