@@ -77,6 +77,7 @@ public class ResultSetAdapter implements ParametersCallback, Closeable {
      */
     public boolean next() {
         try {
+            converter.close();
             return resultSet.next();
         } catch (SQLException e) {
             throw new JdbcException("Unable to move cursor to the next row", e);
