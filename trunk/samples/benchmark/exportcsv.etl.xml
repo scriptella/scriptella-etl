@@ -9,7 +9,7 @@
     <query connection-id="in">
         SELECT * FROM Test
         <script connection-id="out">
-            ?1,?2
+            $1,$2
         </script>
     </query>
 
