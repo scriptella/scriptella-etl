@@ -15,6 +15,8 @@
  */
 package scriptella.driver.csv.opencsv;
 
+import scriptella.util.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -108,7 +110,7 @@ public class CSVReader {
      */
     public CSVReader(Reader reader, char separator, char quotechar, int line) {
         //Kupolov: check if reader already buffered
-        this.br = reader instanceof BufferedReader?(BufferedReader)reader:new BufferedReader(reader);
+        this.br = IOUtils.asBuffered(reader);
         this.separator = separator;
         this.quotechar = quotechar;
         this.skipLines = line;

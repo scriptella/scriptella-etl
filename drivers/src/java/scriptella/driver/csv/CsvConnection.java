@@ -28,7 +28,6 @@ import scriptella.spi.Resource;
 import scriptella.util.StringUtils;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -45,7 +44,6 @@ public class  CsvConnection extends AbstractTextConnection {
     private static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
     private Writer writer;
-
 
     /**
      * Name of the <code>separator</code> connection property.
@@ -71,7 +69,6 @@ public class  CsvConnection extends AbstractTextConnection {
      * If set, specifies value of a string token to be parsed as Java <code>null</code> literal.
      */
     public static final String NULL_STRING = "null_string";
-
 
     private final char separator;
     private final char quote;
@@ -100,23 +97,24 @@ public class  CsvConnection extends AbstractTextConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
+        final CSVReader r;
         try {
-            executeScript(scriptContent.open(), parametersCallback);
-            if (flush && writer != null) {
-                writer.flush();
-            }
+            r = getScriptingElementReader(scriptContent);
         } catch (IOException e) {
-            throw new CsvProviderException("Cannot read script.", e);
+            throw new CsvProviderException("Cannot open CSV script content.", e);
+        }
+        try {
+            executeScript(r, parametersCallback);
+        } catch (IOException e) {
+            throw new CsvProviderException("Cannot output CSV script.", e);
         }
     }
 
 
-    void executeScript(Reader reader, ParametersCallback parametersCallback) throws IOException {
-
-        CSVReader r = new CSVReader(reader);//Parsing rules of script in XML is always standard
+    void executeScript(CSVReader reader, ParametersCallback parametersCallback) throws IOException {
         CSVWriter out = getOut();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
-        for (String[] row; (row = r.readNext()) != null;) {
+        for (String[] row; (row = reader.readNext()) != null;) {
             EtlCancelledException.checkEtlCancelled();
             for (int i = 0; i < row.length; i++) {
                 String field = row[i];
@@ -145,6 +143,9 @@ public class  CsvConnection extends AbstractTextConnection {
                 }
             }
         }
+        if (flush) {
+            writer.flush();
+        }
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
@@ -153,7 +154,7 @@ public class  CsvConnection extends AbstractTextConnection {
         }
         CSVReader queryReader;
         try {
-            queryReader = new CSVReader(queryContent.open());
+            queryReader = getScriptingElementReader(queryContent);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
@@ -163,6 +164,10 @@ public class  CsvConnection extends AbstractTextConnection {
         } catch (IOException e) {
             throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
         }
+    }
+
+    private CSVReader getScriptingElementReader(Resource content) throws IOException {
+        return new CSVReader(content.open());
     }
 
     /**
