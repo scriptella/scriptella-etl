@@ -16,6 +16,7 @@
 package scriptella.driver.jndi;
 
 import scriptella.jdbc.GenericDriver;
+import scriptella.util.StringUtils;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -42,10 +43,7 @@ public class Driver extends GenericDriver {
         }
         try {
             InitialContext ctx = new InitialContext(props);
-            if (url.startsWith("jndi:")) { //Remove jndi: URL prefix used for autodiscovery
-                url = url.substring(5);
-            }
-            DataSource ds = (DataSource) ctx.lookup(url);
+            DataSource ds = (DataSource) ctx.lookup(StringUtils.removePrefix(url, "jndi:"));
             return ds.getConnection();
         } catch (NamingException e) {
             throw new JndiProviderException("A problem occured while trying to lookup a datasource with name " + url, e);

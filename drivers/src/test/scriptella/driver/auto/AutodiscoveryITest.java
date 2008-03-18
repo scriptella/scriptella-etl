@@ -35,10 +35,10 @@ public class AutodiscoveryITest extends DBTestCase {
                 getConnection("autotest"), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
-                assertEquals(1, parameters.getParameter("1"));
+                assertEquals(rows, parameters.getParameter("1"));
             }
         });
-        assertEquals(1, rows);
+        assertEquals(2, rows);
 
     }
 

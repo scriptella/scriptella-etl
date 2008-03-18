@@ -68,4 +68,11 @@ public class StringUtilsTest extends AbstractTestCase {
         String test = "    \u0000 test\r\n  line2\r  line3 ";
         assertEquals("test"+sep+" line2"+sep+" line3", StringUtils.consoleFormat(test));
     }
+
+    public void testRemovePrefix() {
+        assertEquals("test", StringUtils.removePrefix("test", null));
+        assertEquals(null, StringUtils.removePrefix(null, null));
+        assertEquals(null, StringUtils.removePrefix(null,"test"));
+        assertEquals("test", StringUtils.removePrefix("url:test","url:"));
+    }
 }

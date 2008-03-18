@@ -60,8 +60,8 @@ EtlExecutor.newExecutor(
 				<p>etl.xml:</p>
 				<source><![CDATA[
     <etl>
-        <connection id="db1" driver="jdbc.Driver.Class.Name" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
-        <connection id="db2" driver="jdbc.Driver.Class2.Name" url="jdbc:database2:sample" user="sa" password=""/>
+        <connection id="db1" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
+        <connection id="db2" url="jdbc:database2:sample" user="sa" password=""/>
         <query connection-id="db1">
             <!-- Select product from software category in db1-->
             SELECT * FROM Product WHERE category='software';
@@ -84,7 +84,7 @@ EtlExecutor.newExecutor(
 				<p>etl.xml:</p>
 				<source><![CDATA[
     <etl>
-        <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
+        <connection url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
         <script>
             CREATE TABLE Track (
               ID INT,
@@ -112,7 +112,7 @@ EtlExecutor.newExecutor(
         <properties><!-- Load external properties -->
             <include href="etl.properties"/>
         </properties>
-        <connection driver="$driver" url="$url" user="$user"
+        <connection url="$url" user="$user"
             password="$password" classpath="$classpath"/>
         <script>
             -- In this example dialects are used to

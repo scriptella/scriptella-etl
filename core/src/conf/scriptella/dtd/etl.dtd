@@ -78,7 +78,7 @@ This element may contain properties as plain text with includes.
 <!--
  @attr id connection identifier. Connection is referenced by id in scripts and queries.
        For single connection ETL files this attribute is optional.
- @attr driver driver class name.
+ @attr driver driver class name. Default driver name is "auto" which try to determine a driver using an url attribute.
  @attr url connection url.
  @attr user database login
  @attr password database password
@@ -92,7 +92,7 @@ This element may contain properties as plain text with includes.
 -->
 <!ATTLIST connection
 id ID #IMPLIED
-driver CDATA #REQUIRED
+driver CDATA "auto"
 url CDATA #IMPLIED
 user CDATA #IMPLIED
 password CDATA #IMPLIED
