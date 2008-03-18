@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -44,6 +45,7 @@ public final class IOUtils {
     private IOUtils() {
     }
 
+    private static final int DEFAULT_BUFFER_SIZE_FOR_STRINGS = 1024;
     /**
      * Default value of maximum stream size for arrays conversion
      */
@@ -207,6 +209,10 @@ public final class IOUtils {
     public static BufferedReader asBuffered(Reader reader) {
         if (reader==null) {
             throw new IllegalArgumentException("Reader cannot be null");
+        }
+        //Performance optimization. If content is in memory - use smaller buffer
+        if (reader instanceof StringReader) {
+            return new BufferedReader(reader, DEFAULT_BUFFER_SIZE_FOR_STRINGS);
         }
         return (reader instanceof BufferedReader?(BufferedReader)reader:new BufferedReader(reader));
     }
