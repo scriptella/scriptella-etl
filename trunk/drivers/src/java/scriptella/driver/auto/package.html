@@ -1,9 +1,14 @@
 <body>
 Autodiscovery Driver for Scriptella.
 <p>Automatically discovers a driver based on the specified url.
+This driver is used by default if "driver" connection attribute was not specified.
+
 <p><em>Note:</em>
     Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella,
-    in other cases driver's name has to be specified manually.</p>
+    in other cases driver's name has to be specified manually.
+    If you get error messages like <em>Unable to automatically discover driver for url</em>, that means the specified
+    URL cannot be recognized and you have to explictly specify "driver" connection attribute.
+</p>
 
 <h2>General information</h2>
 <table>
@@ -26,13 +31,13 @@ Autodiscovery Driver for Scriptella.
     &lt;connection driver="auto" url="jdbc:jtds:sqlserver://localhost:1433/northwind"/&gt;
 
     &lt;!-- connection to a JNDI bound datasource -->
-    &lt;connection driver="auto" url="jndi:ds/appDataSource"/&gt;
+    &lt;connection url="jndi:ds/appDataSource"/&gt;
 
     &lt;!-- connection to a Spring managed datasource -->
-    &lt;connection driver="auto" url="spring:myDataSource"/&gt;
+    &lt;connection url="spring:myDataSource"/&gt;
 
     &lt;!-- connection to Mail driver-->
-    &lt;connection driver="auto" url="mailto:user@host?subject=Hello"&gt;
+    &lt;connection url="mailto:user@host?subject=Hello"&gt;
         mail.smtp.host=mail.host.name
         mail.user=user
         mail.password=password

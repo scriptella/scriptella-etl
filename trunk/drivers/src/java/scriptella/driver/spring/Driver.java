@@ -17,6 +17,7 @@ package scriptella.driver.spring;
 
 import org.springframework.beans.factory.BeanFactory;
 import scriptella.jdbc.GenericDriver;
+import scriptella.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -52,10 +53,7 @@ public class Driver extends GenericDriver {
         }
         try {
             BeanFactory beanFactory = EtlExecutorBean.getContextBeanFactory();
-            if (url.startsWith("spring:")) { //Remove spring:: URL prefix used for autodiscovery
-                url = url.substring(7);
-            }
-            DataSource ds = (DataSource) beanFactory.getBean(url);
+            DataSource ds = (DataSource) beanFactory.getBean(StringUtils.removePrefix(url, "spring:"));
             return ds.getConnection();
         } catch (Exception e) {
             throw new SpringProviderException("A problem occured while trying to lookup a datasource with name " + url, e);

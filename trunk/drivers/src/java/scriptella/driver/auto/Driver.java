@@ -79,7 +79,8 @@ public class Driver extends AbstractScriptellaDriver {
         if (u.startsWith("jdbc:")) { //If driver url not recognized - try JDBC 4.0 Auto-loading feature
             return getConnection(GenericDriver.class.getName(), connectionParameters);
         }
-        throw new ConfigurationException("Unable to automatically discover driver for url " + connectionParameters.getUrl());
+        throw new ConfigurationException("Unable to automatically discover driver for url " +
+                connectionParameters.getUrl()+". Please explicitly specify a \"driver\" connection attribute.");
     }
 
     /**

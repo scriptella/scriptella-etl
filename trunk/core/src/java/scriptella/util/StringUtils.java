@@ -144,5 +144,18 @@ public final class StringUtils {
         return res;
     }
 
+    /**
+     * Removes a prefix from a string.
+     * @param string original string. May be null.
+     * @param prefix prefix to to check and remove. May be null.
+     * @return string without a prefix, or unchanged string.
+     */
+    public static String removePrefix(String string, String prefix) {
+        if (prefix != null && string != null && string.startsWith(prefix)) {
+            return string.substring(prefix.length());
+        }
+        return string;
+    }
+
 
 }
