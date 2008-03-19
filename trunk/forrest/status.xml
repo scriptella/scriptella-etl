@@ -38,11 +38,23 @@
         <!--</release>-->
         Use column label in addition to column name for JDBC metadata
         <release version="1.0 RC" date="not yet released">
+            <action context="code" type="update" dev="ejboy" fixes-bug="7160">
+                Make driver attribute optional with default value of "auto"
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="7098">
+                Replace opencsv with a built-in implementation
+            </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="7048">
                 etl.text utility methods to format strings
             </action>
             <action context="code" type="add" dev="ejboy" fixes-bug="7003">
                 Execute multiple ETL files in Spring
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="6132">
+                Error working whith blobs
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="5658">
+                scriptella.execution.EtlExecutorException: Java heap space -java.lang.OutOfMemoryError:
             </action>
             <action context="code" type="update" dev="ejboy" fixes-bug="5627">
                 Simplified onerror regex matching for message and type attributes
