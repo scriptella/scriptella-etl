@@ -6,14 +6,13 @@
         The source data is obtained from LDAP.
     </description>
     <!--Connection to the LDAP-->
-    <connection id="in" driver="ldap"
-                url="ldap://localhost:389/dc=scriptella"
+    <connection id="in" url="ldap://localhost:389/dc=scriptella"
                 user="cn=root,dc=scriptella" password="secret">
         <!--Define connection properties-->
         search.scope=subtree
     </connection>
     <!--Connection to the target database -->
-    <connection id="out" driver="hsqldb" url="jdbc:hsqldb:file:outdb"
+    <connection id="out" url="jdbc:hsqldb:file:outdb"
                 user="sa" password="" classpath="../lib/hsqldb.jar"/>
     <script connection-id="out">
         <!--Creates empty database and drops exisiting tables if DB already exisis -->

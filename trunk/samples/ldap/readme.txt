@@ -68,6 +68,10 @@ uniqueMember: uid=fbloggs,ou=people,dc=scriptella
 You may check for required data presence in LDAP by running:
 ldapsearch -b "dc=scriptella" "(objectclass=*)"
 
+Use ldapadd -x -D "cn=root,dc=scriptella" -W -f init.ldif
+to add init.ldif file.
+
+
 Execute ldap2db.etl.xml script to migrate data from LDAP to HSQLDB database named "outdb".
 
 Migration of database data to LDAP.
