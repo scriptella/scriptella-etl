@@ -6,11 +6,10 @@
         - Do not use extra whitespaces in LDIF entries, because LDIF is whitespace sensitive format
     </description>
     <!--Connection to the in memory database-->
-    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb"
+    <connection id="in" url="jdbc:hsqldb:mem:indb"
                 user="sa" password="" classpath="../lib/hsqldb.jar"/>
     <!--Connection to the LDAP-->
-    <connection id="out" driver="ldap"
-                url="ldap://localhost:389"
+    <connection id="out" url="ldap://localhost:389"
                 user="cn=root,dc=scriptella" password="secret">
         readonly=true
     </connection>

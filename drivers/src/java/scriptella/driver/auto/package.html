@@ -1,14 +1,20 @@
 <body>
 Autodiscovery Driver for Scriptella.
 <p>Automatically discovers a driver based on the specified url.
-This driver is used by default if "driver" connection attribute was not specified.
-
+This driver is used by default if no "driver" connection attribute was specified.
 <p><em>Note:</em>
     Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella,
     in other cases driver's name has to be specified manually.
     If you get error messages like <em>Unable to automatically discover driver for url</em>, that means the specified
     URL cannot be recognized and you have to explictly specify "driver" connection attribute.
 </p>
+<p>Supported URL schemes:</p>
+<ul>
+    <li><b>jdbc:</b> managed by JDBC drivers, e.g. jdbc:oracle:, jdbc:mysql etc.</li>
+    <li><b>spring:</b> and <b>jndi:</b> for Spring and JNDI managed datasources.</li>
+    <li><b>mailto:</b> managed by Mail driver.</li>
+    <li><b>ldap:</b> managed by LDAP driver</li>
+</ul>
 
 <h2>General information</h2>
 <table>
