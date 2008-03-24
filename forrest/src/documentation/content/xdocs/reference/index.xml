@@ -101,7 +101,7 @@
         </section>
 		<section>
 			<title>Scripts Syntax</title>
-			<note>For details about all XML elements consult a <a href="../docs/dtd/">Scriptella DTD Documentation</a>
+			<note>For details about all XML elements consult a <a href="../docs/dtd/index.html">Scriptella DTD Documentation</a>
 			</note>
 			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
 			<source><![CDATA[
