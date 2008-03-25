@@ -43,6 +43,15 @@
                 </tr>
                 <tr>
                     <td>
+                        <anchor id="derby"/>
+                        <a href="../docs/api/scriptella/driver/derby/package-summary.html#package_description">Derby Database</a>
+                    </td>
+                    <td>scriptella.driver.<strong>derby</strong>.Driver</td>
+                    <td>org.apache.derby.jdbc.ClientDriver; org.apache.derby.jdbc.EmbeddedDriver</td>
+                    <td/>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="h2"/>
                         <a href="../docs/api/scriptella/driver/h2/package-summary.html#package_description">H2 Database</a>
                     </td>
