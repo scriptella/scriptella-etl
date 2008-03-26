@@ -34,6 +34,15 @@
 				</tr>
                 <tr>
                     <td>
+                        <anchor id="as400"/>
+                        <a href="../docs/api/scriptella/driver/as400/package-summary.html#package_description">IBM AS/400 Database</a>
+                    </td>
+                    <td>scriptella.driver.<strong>as400</strong>.Driver</td>
+                    <td>com.ibm.as400.access.AS400JDBCDriver</td>
+                    <td/>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="db2"/>
                         <a href="../docs/api/scriptella/driver/db2/package-summary.html#package_description">DB2 Database</a>
                     </td>
