@@ -115,7 +115,7 @@
     <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678">
         driver.property=value
     </connection>
-    <connection id="con2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" password=""/>
+    <connection id="con2" url="jdbc:hsqldb:file:db" user="sa" password=""/>
     <script connection-id="out">
 	    <include href="dbschema.sql"/>
     </script>
@@ -139,7 +139,7 @@
 				<title>&lt;connection&gt;</title>
 				<p>Elements of this type define connections to different datasources to work with.
                     A set of required attributes depends on driver. For example JDBC drivers require
-                    driver, url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
+                    url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
 				<p>
 					<strong>id</strong> attribute is required if you declare more than one connections inside your script.
                     The value of this attribute is used to reference the connection in scripts and queries.</p>
@@ -150,7 +150,13 @@
                     Alternatively you can add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
                     Boot classpath libraries take precedence over libraries specified in connection classpath attribute.
                 </p>
-				<p>
+                <p>
+                    <strong>driver</strong> optional attribute specifies driver class name or an alias.
+                    The default value is "auto",
+       in this case a target driver is guessed from an url attribute if possible. See <a href="drivers.html">Drivers matrix</a>
+                    for the list of driver aliases included into Scriptella distribution.
+                </p>
+                <p>
 					<strong>lazy-init</strong>
                     optional attribute specifies connection initialization strategy.
                     <code>true</code>
@@ -167,7 +173,7 @@
 					<li>Other connections create database users or produce files required for this connection
                         to be initialized properly.</li>
 				</ul>
-				<p>Use element's content to set connection properties. Several drivers also recognize
+				<p>Use element's content to set connection properties. Several drivers also accept
                     connection properties in a URL string, e.g. <code>jdbc:url:db;param=value</code>
 				</p>
 				<p>
