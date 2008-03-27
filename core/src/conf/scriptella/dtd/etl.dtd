@@ -78,7 +78,7 @@ This element may contain properties as plain text with includes.
 <!--
  @attr id connection identifier. Connection is referenced by id in scripts and queries.
        For single connection ETL files this attribute is optional.
- @attr driver driver class name. The default value is "auto",
+ @attr driver driver class name or alias. The default value is "auto",
        in this case a target driver is guessed from an url attribute.
  @attr url connection url.
  @attr user database login
