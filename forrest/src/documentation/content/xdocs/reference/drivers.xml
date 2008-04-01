@@ -156,7 +156,7 @@
                     </td>
                     <td>scriptella.driver.<strong>xls</strong>.Driver</td>
                     <td>net.pcal.sqlsheet.XlsDriver</td>
-                    <td/>
+                    <td>This driver allows you to interact with Microsoft Excel spreadsheets using SQL statements.</td>
                 </tr>
             </table>
 		</section>
