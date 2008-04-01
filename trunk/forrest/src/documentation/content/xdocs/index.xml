@@ -95,7 +95,7 @@
                     <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">(Scripting for the Java™ Platform)</a> compatible languages. 
                 </li>
                 <li>Built-In
-                    <a href="reference/drivers.html#nonjdbc">CSV, TEXT, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
+                    <a href="reference/drivers.html#nonjdbc">CSV, Excel, Text, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
                     providers. Integration with Java EE, <a href="reference/drivers.html#spring">Spring Framework</a>,
                     <a href="reference/index.html#jmx">JMX</a>
                     , <a href="reference/drivers.html#jndi">JNDI</a> and <a href="reference/drivers.html#mail">JavaMail</a> 
@@ -106,20 +106,23 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.0 RC Released (Date)</title>
-                <p>We are pleased to announce the availability of Scriptella 1.0 RC.
-                    This release fixes several minor bugs found in BETA version.
-                    Other notable features and bug fixes:</p>
+                <title>Scriptella 1.0 RC Released (April 2, 2008)</title>
+                <p>We are pleased to announce the availability of Scriptella 1.0 Release Candidate.
+                    This release introduces support for new features and
+                    fixes several bugs found in BETA version.
+                    Notable features and bug fixes:</p>
                 <ul>
+                    <li>Make driver attribute optional with default value of "auto"</li>
                     <li>etl.text utility methods to format strings</li>
                     <li>Execute multiple ETL files in Spring</li>
                     <li>Add "exclude=true/false" attribute for dialect tag.</li>
                     <li>NullpointerException in JEXL expressions if running in multiple threads</li>
                     <li>Inserting NULL values into a DB2 database</li>
                     <li>Simplified onerror regex matching for message and type attributes</li>
+                    <li>New drivers: IBM AS/400 and SqlSheet JDBC Excel driver.</li>
+                    <li>Improved CSV driver. opencsv library was replaced with a built-in implementation.</li>
                 </ul>
-                <p>If no serious problems are found in this release Scriptella 1.0 GA will be released soon.
-                    See <a href="changes.html">change log</a> for additional details.<br/>
+                <p>See <a href="changes.html">change log</a> for additional details.<br/>
                 <a href="tutorial.html">Make ETL easier</a> - <a href="download.html">Download Scriptella Now!</a></p>
             </section>
         </section>

@@ -108,6 +108,15 @@
                 </tr>
                 <tr>
 					<td>
+						<anchor id="odbc"/>
+						<a href="../docs/api/scriptella/driver/odbc/package-summary.html#package_description">Oracle Database</a>
+					</td>
+					<td>scriptella.driver.<strong>odbc</strong>.Driver</td>
+					<td>sun.jdbc.odbc.JdbcOdbcDriver</td>
+					<td>JDBC-ODBC Bridge driver. The bridge implements JDBC for any database with ODBC driver.</td>
+				</tr>
+                <tr>
+					<td>
 						<anchor id="oracle"/>
 						<a href="../docs/api/scriptella/driver/oracle/package-summary.html#package_description">Oracle Database</a>
 					</td>

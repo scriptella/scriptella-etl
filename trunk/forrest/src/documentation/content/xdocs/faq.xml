@@ -12,6 +12,15 @@
 			<answer><p>An up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
 			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</p></answer>
         </faq>
+        <faq id="ODBC">
+            <question>Does Scriptella support Microsoft Access?</question>
+            <answer><p>Microsoft Access and other databases with ODBC interface are supported via ODBC-JDBC bridge driver which comes with Sun's JRE.
+                Download <a href="download.html">ODBC example</a> for more details. Connection declaration example:</p>
+                <source><![CDATA[
+                <connection url="jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=Northwind.mdb"/>
+                ]]></source>
+                </answer>
+        </faq>
         <faq id="BIND_VARIABLES">
             <question>What is the difference between $variable / ${expression} and ?variable / ?{expression} syntax.</question>
 			<answer><p>Binding variables syntax varies between drivers. JDBC drivers use the following rules
