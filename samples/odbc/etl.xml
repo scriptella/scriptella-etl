@@ -21,8 +21,7 @@
     </description>
     <!-- ODBC Connection to Northwind Microsoft Access Database.
      Use the same driver name and URL syntax for other ODBC sources.-->
-    <connection id="odbc" driver="sun.jdbc.odbc.JdbcOdbcDriver"
-                url="jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=Northwind.mdb"/>
+    <connection id="odbc" url="jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=Northwind.mdb"/>
     <!-- Java code -->
     <connection id="java" driver="janino" classpath="../lib/janino.jar"/>
     <!-- HTML report outputted by Text driver to categories.html -->

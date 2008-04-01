@@ -1,0 +1,29 @@
+<body>
+<h1>The JDBC-ODBC Bridge Adapter for Scriptella.</h1>
+The JDBC-ODBC Bridge is a JDBC driver that implements JDBC operations by translating them into ODBC operations. To ODBC it appears as a normal application program. The Bridge implements JDBC for any database for which an ODBC driver is available. The Bridge is implemented as the sun.jdbc.odbc Java package and contains a native library used to access ODBC.
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.odbc.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>Same as for Sun's JDBC-ODBC Bridge.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection url="jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=Northwind.mdb"/&gt;
+</pre></code>
+</body>

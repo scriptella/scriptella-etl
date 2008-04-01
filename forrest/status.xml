@@ -38,6 +38,15 @@
         <!--</release>-->
         Use column label in addition to column name for JDBC metadata
         <release version="1.0 RC" date="not yet released">
+            <action context="code" type="add" dev="volk" fixes-bug="7252">
+        		odbc alias for JDBC-ODBC bridge driver
+            </action>
+            <action context="code" type="add" dev="volk" fixes-bug="7234">
+        		Support for SQLSheet JDBC driver to work with Excel files.
+            </action>
+            <action context="code" type="add" dev="volk" fixes-bug="7227">
+                IBM AS/400 Driver
+            </action>
             <action context="code" type="update" dev="ejboy" fixes-bug="7160">
                 Make driver attribute optional with default value of "auto"
             </action>
