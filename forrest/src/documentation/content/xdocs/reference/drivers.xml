@@ -149,6 +149,15 @@
 					<td>com.sybase.jdbc3.jdbc.SybDriver</td>
                     <td/>
 				</tr>
+                <tr>
+                    <td>
+                        <anchor id="xls"/>
+                        <a href="../docs/api/scriptella/driver/xls/package-summary.html#package_description">JDBC Driver for Excel Spreadsheets</a>
+                    </td>
+                    <td>scriptella.driver.<strong>xls</strong>.Driver</td>
+                    <td>net.pcal.sqlsheet.XlsDriver</td>
+                    <td/>
+                </tr>
             </table>
 		</section>
 		<section id="nonjdbc">
