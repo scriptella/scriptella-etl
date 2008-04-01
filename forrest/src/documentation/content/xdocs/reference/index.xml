@@ -143,7 +143,10 @@
 				<p>
 					<strong>id</strong> attribute is required if you declare more than one connections inside your script.
                     The value of this attribute is used to reference the connection in scripts and queries.</p>
-				<p>
+                <p>
+                    <strong>url</strong> attribute specifies connection URL. URL format is driver specific, e.g. <code>jdbc:</code> for JDBC drivers.
+                Other drivers like CSV or text accept absolute URLs or file locations relative to an ETL file.</p>
+                <p>
 					<strong>classpath</strong> optional attribute is used to specify additional classpath to load driver libraries.
                     .Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides.
                     Absolute URLs are also supported, e.g. ftp://server/jconnect.jar;http://server2/classes12.zip
@@ -655,13 +658,13 @@
                 </p>
 			</section>
 			<section>
-				<title>Working with CSV data</title>
+				<title>Working with CSV and text data</title>
 				<p>The <a href="drivers.html#csv">built-in CSV driver</a> allows to easily query and generate CSV files.</p>
 				<p>The <a href="drivers.html#text">built-in Text driver</a> provides a generic way to handle text data.</p>
 				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
                     feature can be used to work
                     with CSV files.</p>
-			</section>
+            </section>
             <section>
                 <title>Working with XML data</title>
                 <p>The <a href="drivers.html#xpath">built-in XPath driver</a> allows querying XML files with XPath expressions.</p>
@@ -709,7 +712,21 @@
 				JDBC, JEXL or Janino drivers provide more powerful and easy-to-use solutions for dynamic queries.
 				</note>
 			</section>
-		</section>
+            <section>
+                <title>URL schemes supported by Scriptella</title>
+                <p>Scriptella allows specifying URLs to externally located resources. The following protocols are supported:</p>
+                <ul>
+                    <li>http, ftp, file, jar and other protocols supported by JRE</li>
+                </ul>
+                <p>Examples:</p>
+                <source><![CDATA[
+                <connection driver="xpath" url="http://snippets.dzone.com/rss/tag/scriptella"/>
+                <connection driver="csv" url="http://finance.google.com/finance/historical?q=JAVA&output=csv"/>
+                <connection driver="text" url="ftp://ftphostname/report.txt"/>
+                ]]>
+                </source>
+            </section>
+        </section>
 		<section>
 			<title>Examples</title>
 			<p>Download Scriptella examples from <a href="../download.html">Downloads</a> page.
@@ -758,7 +775,12 @@
 					<td>Fills the database with prime numbers and produces HTML/CSV reports.
                     This example demonstrates a combined usage of Velocity, JEXL, CSV Driver and SQL.</td>
 				</tr>
-			</table>
+                <tr>
+                    <td>XML</td>
+                    <td>This example shows how to work with XML data using XPath expressions.</td>
+
+                </tr>
+            </table>
 		</section>
 		<section>
 			<title>Best Practices</title>
