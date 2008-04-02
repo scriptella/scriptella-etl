@@ -24,6 +24,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
@@ -103,7 +104,9 @@ public class LuceneQuery implements ParametersCallback, Closeable {
                     QueryParser parser = new QueryParser(field, analyzer);
                     parser.setLowercaseExpandedTerms(useLowercaseExpandedTerms);
                     try {
-                        iterate(searcher.search(parser.parse(queryContent)));
+                        Query query = parser.parse(queryContent);
+                        Hits hits = searcher.search(query);
+                        iterate(hits);
                     } catch (IOException e) {
                         throw new LuceneProviderException("Failed to search query.", e);
                     }
