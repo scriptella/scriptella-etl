@@ -6,11 +6,11 @@
 	</header>
 	<body>
         <section>
-			<title>Stable Version: 1.0 BETA (November 8, 2007)</title>
+			<title>Stable Version: 1.0 Release Candidate (April 2, 2008)</title>
             <table>
-                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0beta.zip?doc_id=41117">scriptella-1.0beta.zip</a></td></tr>
-                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0beta-src.zip?doc_id=41118">scriptella-1.0beta-src.zip</a></td></tr>
-                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.0beta.zip?doc_id=41119">scriptella-examples-1.0beta.zip</a></td></tr>
+                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0rc.zip?doc_id=46936">scriptella-1.0rc.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0rc-src.zip?doc_id=46937">scriptella-1.0rc-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.0rc.zip?doc_id=46938">scriptella-examples-1.0rc.zip</a></td></tr>
             </table>
 		</section>
         <section>

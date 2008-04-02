@@ -38,7 +38,7 @@
         <!--</release>-->
         Use column label in addition to column name for JDBC metadata
         <release version="1.0 RC" date="not yet released">
-            <action context="code" type="add" dev="volk" fixes-bug="7252">
+            <action context="code" type="add" dev="ejboy" fixes-bug="7252">
         		odbc alias for JDBC-ODBC bridge driver
             </action>
             <action context="code" type="add" dev="volk" fixes-bug="7234">
