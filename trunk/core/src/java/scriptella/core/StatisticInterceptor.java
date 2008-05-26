@@ -36,8 +36,8 @@ public final class StatisticInterceptor extends ElementInterceptor {
     public void execute(final DynamicContext ctx) {
         boolean ok = false;
         final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
+        statisticsBuilder.elementStarted(location, ctx.getConnection());
         try {
-            statisticsBuilder.elementStarted(location, ctx.getConnection());
             executeNext(ctx);
             ok = true;
         } finally {
