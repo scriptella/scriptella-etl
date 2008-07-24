@@ -41,6 +41,11 @@
         separator=;
     </connection>
 
+    <!--Set up XLS driver-->
+    <connection id="xls" url="jdbc:xls:file:report.xls" classpath="../lib/sqlsheet-0.1.0.jar; ../lib/poi.jar; ../lib/jsqlparser.jar">
+    </connection>
+
+
     <!--Create a database schema. Single table for prime numbers. -->
     <script connection-id="db">
         CREATE TABLE Primes (
@@ -73,6 +78,14 @@
             INSERT INTO Primes VALUES(?i);
         </script>
     </query>
+    <!-- Create Excel sheet T1 -->
+    <script connection-id="xls">
+        CREATE TABLE T1(
+		COL1 INT,
+		COL2 INT
+	);
+    </script>
+
     <!-- Now we generate a report header.-->
     <script connection-id="velocity">#parse ("header.vm")</script>
     <!--Write CSV file header.
@@ -96,6 +109,10 @@
         <!--Producing a CSV file-->
         <script connection-id="csv">
             ${rownum},${number}
+        </script>
+        <!--Producing an Excel file-->
+        <script connection-id="xls">
+            INSERT INTO T1 (COL1,COL2) VALUES(${rownum},${number});
         </script>
     </query>
     <!--And finally produce a report footer -->
