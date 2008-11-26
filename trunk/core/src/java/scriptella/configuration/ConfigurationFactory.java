@@ -29,6 +29,7 @@ import scriptella.spi.support.NullParametersCallback;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ public class ConfigurationFactory {
     private static final Logger LOG = Logger.getLogger(ConfigurationFactory.class.getName());
     private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "etl.dtd";
+    private static final String RES_PATH = "/scriptella/dtd/" + DTD_NAME;
     private URL resourceURL;
     private ParametersCallback externalParameters;
 
@@ -129,8 +131,12 @@ public class ConfigurationFactory {
     private static final EntityResolver ETL_ENTITY_RESOLVER = new EntityResolver() {
         public InputSource resolveEntity(final String publicId, final String systemId) {
             if (systemId != null && systemId.trim().endsWith(DTD_NAME)) {
-                return new InputSource(ConfigurationFactory.class.getResourceAsStream(
-                        "/scriptella/dtd/" + DTD_NAME));
+                InputStream stream = ConfigurationFactory.class.getResourceAsStream(RES_PATH);
+                if (stream == null) { //This may happen only in IDE if *.dtd are not copied during compile
+                    throw new IllegalStateException("Scriptella required DTD resource " + RES_PATH +
+                            " not found on classpath. Please check scriptella.jar and its content.");
+                }
+                return new InputSource(stream);
             }
             return null;
         }
