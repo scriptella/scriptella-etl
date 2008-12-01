@@ -26,9 +26,8 @@ import scriptella.spi.ParametersCallback;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public
 @ThreadSafe
-class DynamicContext implements ParametersCallback {
+public class DynamicContext implements ParametersCallback {
     protected EtlContext globalContext;
 
     protected DynamicContext() {
