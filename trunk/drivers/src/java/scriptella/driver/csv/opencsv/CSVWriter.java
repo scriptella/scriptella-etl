@@ -17,6 +17,7 @@ package scriptella.driver.csv.opencsv;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.io.Closeable;
 
 /**
  * A very simple CSV writer released under a commercial-friendly license.
@@ -25,7 +26,7 @@ import java.io.Writer;
  * @author Fyodor Kupolov
  *
  */
-public class CSVWriter {
+public class CSVWriter implements Closeable {
 
     private Writer writer;
 

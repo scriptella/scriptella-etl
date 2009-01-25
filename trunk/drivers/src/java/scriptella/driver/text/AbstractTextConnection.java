@@ -101,11 +101,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         //When printing to console - flushing is enabled
         flush = url == null || parameters.getBooleanProperty(FLUSH, false);
         String eolStr = parameters.getStringProperty(TextConnection.EOL);
-        if (eolStr != null && eolStr.length() > 0) {
-            eol = eolStr;
-        } else {
-            eol = "\n"; //Default value
-        }
+        eol = eolStr != null ? eolStr : "\n";//Default value
         skipLines = parameters.getIntegerProperty(SKIP_LINES, 0);
     }
 

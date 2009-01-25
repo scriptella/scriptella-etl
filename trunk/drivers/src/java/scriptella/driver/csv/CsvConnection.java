@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class  CsvConnection extends AbstractTextConnection {
-    private static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
+    protected static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
     private Writer writer;
 
@@ -70,10 +70,10 @@ public class  CsvConnection extends AbstractTextConnection {
      */
     public static final String NULL_STRING = "null_string";
 
-    private final char separator;
-    private final char quote;
-    private final boolean headers;
-    private final String nullString;
+    protected final char separator;
+    protected final char quote;
+    protected final boolean headers;
+    protected final String nullString;
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
@@ -152,14 +152,14 @@ public class  CsvConnection extends AbstractTextConnection {
         if (out != null) {
             throw new CsvProviderException("Cannot query and update a CSV file simultaneously.");
         }
-        CSVReader queryReader;
+        final CSVReader queryReader;
         try {
             queryReader = getScriptingElementReader(queryContent);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
-        CsvQuery q = new CsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback), nullString, headers, trim);
         try {
+            final CsvQuery q = newCsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback));
             q.execute(new CSVReader(newInputReader(), separator, quote, skipLines), queryCallback, counter);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
@@ -183,6 +183,17 @@ public class  CsvConnection extends AbstractTextConnection {
             }
         }
         return out;
+    }
+
+    /**
+     * Template factory method to instantiate query handlers.
+     *
+     * @param csvReader CSV reader to use for parsing.
+     * @param ps        properties substitutor.
+     * @return constructed query for a specified input and parameters.
+     */
+    protected CsvQuery newCsvQuery(CSVReader csvReader, PropertiesSubstitutor ps) {
+        return new CsvQuery(csvReader, ps, nullString, headers, trim);
     }
 
 

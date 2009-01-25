@@ -26,6 +26,7 @@ import scriptella.util.ExceptionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,10 +37,11 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class CsvQuery implements ParametersCallback {
-    private final boolean headers;
-    private final boolean trim;
-    private final String nullString;
-    private ColumnsMap columnsMap;
+    protected static final Logger LOG = Logger.getLogger(CsvQuery.class.getName());
+    protected final boolean headers;
+    protected final boolean trim;
+    protected final String nullString;
+    private ColumnsMap columnsMap; //column_name->column_number mapping
     private String[] row;
     private Pattern[][] patterns;
     private Matcher[][] matchers;
@@ -73,20 +75,11 @@ public class CsvQuery implements ParametersCallback {
      */
     public void execute(CSVReader reader, QueryCallback queryCallback, AbstractConnection.StatementCounter counter) throws IOException {
         try {
-            columnsMap = new ColumnsMap();
-            if (headers) {
-                String[] row = reader.readNext();
-                if (row != null) {
-                    for (int i = 0; i < row.length; i++) {
-                        columnsMap.registerColumn(row[i].trim(), i + 1);
-                    }
-                }
-            }
-            //For each row
-
-            while ((row = trim(reader.readNext())) != null) {
-                if (rowMatches()) {
-                    queryCallback.processRow(this);
+            columnsMap = parseHeader(reader);
+            String[] r;
+            while ((r = trim(reader.readNext())) != null) {
+                if (rowMatches(r)) {
+                    processRow(queryCallback, r);
                 }
             }
         } finally { //clean up
@@ -96,17 +89,32 @@ public class CsvQuery implements ParametersCallback {
             counter.statements += patterns.length;
         }
         columnsMap = null;
+        row = null;
+    }
+
+    protected ColumnsMap parseHeader(CSVReader reader) throws IOException {
+        final ColumnsMap columnsMap = new ColumnsMap();
+        if (headers) {
+            String[] row = reader.readNext();
+            if (row != null) {
+                for (int i = 0; i < row.length; i++) {
+                    columnsMap.registerColumn(row[i].trim(), i + 1);
+                }
+            }
+        }
+        return columnsMap;
     }
 
     /**
      * Checks if current CSV row matches any of the specified patterns.
      *
+     * @param r row to check
      * @return true if row matches one of queries.
      */
-    boolean rowMatches() {
+    protected boolean rowMatches(final String[] r) {
         //Checking border conditions
         Pattern[][] ptrs = patterns;
-        int columnsCount = row.length;
+        int columnsCount = r.length;
         if (ptrs == null) {
             return true;
         } else if (columnsCount == 0) {
@@ -125,7 +133,7 @@ public class CsvQuery implements ParametersCallback {
                 Pattern columnPtr = rowPatterns[j];
                 if (columnPtr != null) {
                     Matcher m = rowMatchers[j];
-                    String col = row[j]; //Current column value
+                    String col = r[j]; //Current column value
                     if (m == null) { //create new matcher
                         m = columnPtr.matcher(col);
                         rowMatchers[j] = m;
@@ -145,6 +153,18 @@ public class CsvQuery implements ParametersCallback {
         return false; //no matches
 
 
+    }
+
+    /**
+     * Processes the current row.
+     * <p>This template method may be used for customizations by sublasses.
+     *
+     * @param queryCallback query callback to use.
+     * @param r             row to pass as current parameters callback.
+     */
+    protected void processRow(QueryCallback queryCallback, String[] r) {
+        this.row = r;
+        queryCallback.processRow(this);
     }
 
     /**
@@ -221,11 +241,27 @@ public class CsvQuery implements ParametersCallback {
         }
         Integer col = columnsMap.find(name);
         if (col != null && col > 0 && col <= row.length) { //If col is not null and in range
-            final String s = row[col - 1];
-            return nullString != null && nullString.equals(s) ? null : s;
+            return getCurrentRowValueAt(col, name);
         } else { //otherwise call parent context.
             return substitutor.getParameters().getParameter(name);
         }
+    }
+
+    /**
+     * Returns the value of a specified column.
+     * <p>This method may be overriden to perform conversion etc
+     * <br>2 parameters are passed for performance reasons, so that subclasses may decide wich one to use.
+      * @param columnIndex column index
+     * @param columnName column name.
+     * @return value of the specified column of the current row.
+     */
+    protected Object getCurrentRowValueAt(int columnIndex, String columnName) {
+        final String s = row[columnIndex - 1];
+        return nullString != null && nullString.equals(s) ? null : s;
+    }
+
+    protected ColumnsMap getColumnsMap() {
+        return columnsMap;
     }
 
     /**
