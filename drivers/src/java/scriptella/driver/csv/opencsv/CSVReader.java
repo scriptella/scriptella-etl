@@ -18,6 +18,7 @@ package scriptella.driver.csv.opencsv;
 import scriptella.util.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.List;
  * @author Fyodor Kupolov (Performance optimizations)
  *
  */
-public class CSVReader {
+public class CSVReader implements Closeable {
 
     private BufferedReader br;
 
