@@ -111,6 +111,15 @@ public class EtlLauncher {
     }
 
     /**
+     *
+     * @param suppressStatistics true if statistics must be suppressed.
+     * @see scriptella.execution.EtlExecutor#setSuppressStatistics(boolean)
+     */
+    public void setNoStat(boolean suppressStatistics) {
+        exec.setSuppressStatistics(suppressStatistics);
+    }
+
+    /**
      * Launches ETL script using command line arguments.
      *
      * @param args command line arguments.
@@ -149,6 +158,10 @@ public class EtlLauncher {
                 }
                 if (arg.startsWith("-t")) {
                     return template(arguments);
+                }
+                if (arg.startsWith("-nostat")) {
+                    setNoStat(true);
+                    continue;
                 }
                 if (arg.startsWith("-")) {
                     err.println("Unrecognized option " + arg);
@@ -262,7 +275,9 @@ public class EtlLauncher {
         exec.setConfiguration(c);
         ExecutionStatistics st = exec.execute(indicator);
         if (LOG.isLoggable(Level.INFO)) {
-            LOG.info("Execution statistics:\n" + st.toString());
+            if (!exec.isSuppressStatistics()) {
+                LOG.info("Execution statistics:\n" + st.toString());
+            }
             LOG.info("Successfully executed ETL file " + file);
         }
     }

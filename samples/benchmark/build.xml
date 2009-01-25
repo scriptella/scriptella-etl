@@ -18,14 +18,15 @@
     <!-- Registers scriptella ant task.
     Update classpath attribute if necessary-->
     <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
+    <property name="suppress_statistics" value="true"/> <!-- For better performance -->
 
     <target name="execute" description="runs the ETL">
         <!--Use debug="true" to see more execution details-->
         <delete dir="tmp" failonerror="no"/>
         <mkdir dir="tmp"/>
-        <etl file="createcsv.etl.xml"/>
-        <etl file="importcsv.etl.xml"/>
-        <etl file="exportcsv.etl.xml"/>
+        <etl file="createcsv.etl.xml" nostat="${suppress_statistics}"/>
+        <etl file="importcsv.etl.xml" nostat="${suppress_statistics}"/>
+        <etl file="exportcsv.etl.xml" nostat="${suppress_statistics}"/>
 
     </target>
 

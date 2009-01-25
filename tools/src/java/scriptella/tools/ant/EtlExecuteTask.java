@@ -39,6 +39,7 @@ public class EtlExecuteTask extends EtlTaskBase {
     private final EtlLauncher launcher = new EtlLauncher();
     private String maxmemory;
     private boolean fork;
+    private boolean nostat;
 
     public boolean isFork() {
         return fork;
@@ -46,6 +47,14 @@ public class EtlExecuteTask extends EtlTaskBase {
 
     public void setFork(final boolean fork) {
         this.fork = fork;
+    }
+
+    public boolean isNostat() {
+        return nostat;
+    }
+
+    public void setNostat(boolean nostat) {
+        this.nostat = nostat;
     }
 
     /**
@@ -102,6 +111,7 @@ public class EtlExecuteTask extends EtlTaskBase {
     private void execute(final List<File> files) {
         launcher.setProgressIndicator(new ConsoleProgressIndicator());
         launcher.setProperties(getProperties());
+        launcher.setNoStat(nostat);
 
         setupLogging();
         for (File file : files) {
@@ -128,6 +138,10 @@ public class EtlExecuteTask extends EtlTaskBase {
         j.setClassname(EtlLauncher.class.getName());
 
         StringBuilder line = new StringBuilder();
+
+        if (nostat) {
+            line.append("-nostat ");
+        }
 
         for (File file : files) {
             line.append(file.getPath()).append(' ');
