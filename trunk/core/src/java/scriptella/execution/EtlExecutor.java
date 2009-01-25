@@ -71,6 +71,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     private static final Logger LOG = Logger.getLogger(EtlExecutor.class.getName());
     private ConfigurationEl configuration;
     private boolean jmxEnabled;
+    private boolean suppressStatistics;
 
     /**
      * Creates ETL executor.
@@ -129,6 +130,23 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
      */
     public void setJmxEnabled(boolean jmxEnabled) {
         this.jmxEnabled = jmxEnabled;
+    }
+
+    /**
+     * Getter for {@link #setSuppressStatistics(boolean) suppressStatistics} property.
+     * @return true if statistics collection is disabled. Default value is false.
+     */
+    public boolean isSuppressStatistics() {
+        return suppressStatistics;
+    }
+
+    /**
+     * Enables or disables collecting of statistics. Default value is false, which means statistics is collected.
+     * <p>Setting this option to <code>true</code> may improve performance in some cases.
+     * @param suppressStatistics true if statistics collection should be disabled.
+     */
+    public void setSuppressStatistics(boolean suppressStatistics) {
+        this.suppressStatistics = suppressStatistics;
     }
 
     /**
@@ -218,7 +236,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
      * @return prepared scripts context.
      */
     protected EtlContext prepare(final ProgressIndicator indicator) {
-        EtlContext ctx = new EtlContext();
+        EtlContext ctx = new EtlContext(!suppressStatistics);
         ctx.getStatisticsBuilder().etlStarted();
         ctx.setBaseURL(configuration.getDocumentUrl());
         ctx.setProgressCallback(new ProgressCallback(100, indicator));

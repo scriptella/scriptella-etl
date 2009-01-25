@@ -15,6 +15,8 @@
  */
 package scriptella.util;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -62,5 +64,19 @@ public class ColumnsMap {
         return index;
     }
 
+    /**
+     * Converts this mapping to index->name column map.
+     * @return index->name column map.
+     */
+    public Map<Integer, String> asIndexNameMap() {
+        if (map==null) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, String> m = new HashMap<Integer, String>();
 
+        for (Map.Entry<String, Integer> e : map.entrySet()) {
+            m.put(e.getValue(), e.getKey());
+        }
+        return m;
+    }
 }

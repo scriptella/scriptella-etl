@@ -18,6 +18,7 @@ package scriptella.jdbc;
 import scriptella.AbstractTestCase;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
+import scriptella.execution.ExecutionStatistics;
 
 /**
  * Tests for nested elements handling.
@@ -28,13 +29,30 @@ import scriptella.execution.EtlExecutorException;
 public class NestedElementsPerfTest extends AbstractTestCase {
     /**
      * History:
+     * 24.11.2008 - Lenovo T61 2GHz - 840 ms
      * 12.05.2007 - Duron 1.7Mhz - 1350 ms
      * 19.01.2007 - Duron 1.7Mhz - 1500 ms
      * @throws EtlExecutorException if ETL fails
      */
     public void test() throws EtlExecutorException {
         EtlExecutor exec = newEtlExecutor();
-        exec.execute();
+        ExecutionStatistics executionStatistics = exec.execute();
+        System.out.println("executionStatistics = " + executionStatistics);
     }
+
+    /**
+     * History:
+     * 24.11.2008 - Lenovo T61 2GHz - 630 ms
+     * @throws EtlExecutorException if ETL fails
+     */
+    public void testNoStat() throws EtlExecutorException {
+        EtlExecutor exec = newEtlExecutor();
+        exec.setSuppressStatistics(true);
+        ExecutionStatistics es = exec.execute();
+        System.out.println("es = " + es);
+
+
+    }
+
 
 }

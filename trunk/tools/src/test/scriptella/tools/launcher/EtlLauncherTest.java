@@ -16,6 +16,7 @@
 package scriptella.tools.launcher;
 
 import scriptella.DBTestCase;
+import scriptella.execution.EtlExecutorException;
 import scriptella.tools.template.TemplateManagerTest;
 import scriptella.util.IOUtils;
 
@@ -120,6 +121,31 @@ public class EtlLauncherTest extends DBTestCase {
         TemplateManagerTest.TestTemplate.created=false;
         etl.launch(new String[] {"-t", "TemplateManagerTest$TestTemplate"});
         assertTrue(TemplateManagerTest.TestTemplate.created);
+    }
+
+
+    public void testNoStat() {
+
+        final boolean[] nostat = {false};
+        final boolean[] executed = {false};
+        EtlLauncher l = new EtlLauncher() {
+            public void setNoStat(boolean suppressStatistics) {
+                nostat[0] = suppressStatistics;
+            }
+
+
+            protected boolean isFile(File file) {
+                return true;
+            }
+
+            public void execute(File file) throws EtlExecutorException {
+                executed[0] = true;
+
+            }
+        };
+        l.launch(new String[] {"-d", "-nostat"});
+        assertTrue("-nostat does not work", nostat[0]);
+        assertTrue("script was not executed", executed[0]);
     }
 
 

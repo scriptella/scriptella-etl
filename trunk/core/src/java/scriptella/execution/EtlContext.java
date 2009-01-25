@@ -39,8 +39,16 @@ public class EtlContext implements ParametersCallback, DriverContext {
     private ProgressCallback progressCallback;
     private ParametersCallback properties;
     private URL baseURL;
-    private ExecutionStatisticsBuilder statisticsBuilder = new ExecutionStatisticsBuilder();
+    private ExecutionStatisticsBuilder statisticsBuilder;
     Session session; //Connections related stuff is here
+
+    public EtlContext() {
+        this(true);
+    }
+
+    public EtlContext(boolean collectStatistics) {
+        statisticsBuilder = collectStatistics?new ExecutionStatisticsBuilder(): new SilentExecutionStatisticsBuilder();
+    }
 
     public Object getParameter(final String name) {
         return properties.getParameter(name);
@@ -78,6 +86,10 @@ public class EtlContext implements ParametersCallback, DriverContext {
 
     public ExecutionStatisticsBuilder getStatisticsBuilder() {
         return statisticsBuilder;
+    }
+
+    void setStatisticsBuilder(ExecutionStatisticsBuilder statisticsBuilder) {
+        this.statisticsBuilder = statisticsBuilder;
     }
 
     public Session getSession() {
