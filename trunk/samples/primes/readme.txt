@@ -8,8 +8,6 @@ Velocity is used to produce HTML report based on a SQL query.
 
 CSV Driver produces CSV file with prime numbers.
 
-XLS Driver produces Excel file with prime numbers.
-
 Script configuration is specified in etl.properties file.
 
 Usage
