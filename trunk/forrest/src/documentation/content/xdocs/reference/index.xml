@@ -443,9 +443,11 @@
 							<td>If true, print debugging information.</td>
 							<td>No, default value is false.</td>
 						</tr>
-                        <td>nostat</td>
-                        <td>If true turns off statistics collecting.</td>
-                        <td>No, default value is false.</td>
+                        <tr>
+                            <td>nostat</td>
+                            <td>If true turns off statistics collecting.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
                         <tr>
 							<td>quiet</td>
 							<td>If true, be extra quiet.</td>
