@@ -15,6 +15,8 @@
  */
 package scriptella.core;
 
+import scriptella.util.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +26,10 @@ import java.net.URLClassLoader;
 /**
  * A classloader for drivers specified by connection element.
  * <p>This class loader is used only if classpath connection attribute is not empty.
- * @see #loadClass(String) delegation model description.
  *
  * @author Fyodor Kupolov
  * @version 1.0
+ * @see #loadClass(String) delegation model description.
  */
 class DriverClassLoader extends URLClassLoader {
     public DriverClassLoader(URL[] urls) {
@@ -43,6 +45,7 @@ class DriverClassLoader extends URLClassLoader {
      * This solution is used to overcome limitations of cross-loaders interaction and to simplify built-in drivers development.
      * <li>In other cases the semantics is the same as in {@link URLClassLoader}.
      * </ul>
+     *
      * @param name class name.
      * @return the loaded class
      * @throws ClassNotFoundException If the class was not found
@@ -60,26 +63,28 @@ class DriverClassLoader extends URLClassLoader {
 
     /**
      * Defines a package for a class name.
+     *
      * @param className class name to define a package.
      * @see #definePackage(String, java.util.jar.Manifest, java.net.URL)
      */
     private void definePackage(String className) {
-        if (className==null) {
+        if (className == null) {
             return;
         }
         int ind = className.lastIndexOf('.');
-        if (ind<0) {
+        if (ind < 0) {
             return;
         }
         String pName = className.substring(0, ind);
-        if (getPackage(pName)==null) {
-            definePackage(pName, null ,null, null ,null, null, null, null);
+        if (getPackage(pName) == null) {
+            definePackage(pName, null, null, null, null, null, null, null);
         }
     }
 
     /**
      * Loads a class content using a parent class loader.
      * <p>Please note that we load class bytes even if it has already been loaded by the parent class loader.
+     *
      * @param name class name.
      * @return class file content.
      */
@@ -95,11 +100,12 @@ class DriverClassLoader extends URLClassLoader {
             for (int c; (c = is.read(b)) >= 0;) {
                 baos.write(b, 0, c);
             }
+            return baos.toByteArray();
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeSilently(is);
         }
-        return baos.toByteArray();
-
     }
 
 

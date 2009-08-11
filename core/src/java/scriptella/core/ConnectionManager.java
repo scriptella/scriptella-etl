@@ -25,6 +25,8 @@ import scriptella.util.UrlPathTokenizer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,9 +53,13 @@ public class ConnectionManager {
             //Parse it and create a new classloader
             UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getScriptFileURL());
             try {
-                URL[] urls = tok.split(c.getClasspath());
+                final URL[] urls = tok.split(c.getClasspath());
                 if (urls.length > 0) {
-                    cl = new DriverClassLoader(urls);
+                    cl = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                        public ClassLoader run() {
+                            return new DriverClassLoader(urls);
+                        }
+                    });
                 }
             } catch (MalformedURLException e) {
                 throw new ConfigurationException("Unable to parse classpath parameter for " + c, e);

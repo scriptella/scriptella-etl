@@ -61,18 +61,18 @@ public class HsqlConnection extends JdbcConnection {
     void shutdown() {
         assert shutdownOnExit;
         Connection con = getNativeConnection();
-        assert con != null; //we are going to close, so con!=null
+        Statement st = null;
         try {
-            if (con.isClosed()) {
+            if (con == null || con.isClosed()) {
                 LOG.info("Unable to correctly shutdown in-process HSQLDB. Connection has already already been closed");
                 return;
             }
-            Statement st = con.createStatement();
+            st = con.createStatement();
             st.execute("SHUTDOWN");
-            JdbcUtils.closeSilent(st);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB", e);
         } finally {
+            JdbcUtils.closeSilent(st);
             JdbcUtils.closeSilent(con);
         }
     }
@@ -103,7 +103,6 @@ public class HsqlConnection extends JdbcConnection {
         }
         return !url.startsWith("jdbc:hsqldb:hsqls");
     }
-
 
 
 }
