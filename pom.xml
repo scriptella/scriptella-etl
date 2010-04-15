@@ -74,6 +74,12 @@
                 <artifactId>scriptella-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.javaforge.scriptella</groupId>
+                <artifactId>scriptella-core</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>junit</groupId>
