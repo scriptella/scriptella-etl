@@ -34,6 +34,12 @@
             <artifactId>scriptella-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.javaforge.scriptella</groupId>
+            <artifactId>scriptella-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-jexl</groupId>
             <artifactId>commons-jexl</artifactId>
         </dependency>
