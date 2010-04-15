@@ -54,7 +54,7 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://javaforge.com/svn/scriptella/trunk/</connection>
+        <connection>scm:svn:http://anonymous:anon@javaforge.com/svn/scriptella/trunk/</connection>
         <developerConnection>scm:svn:http://javaforge.com/svn/scriptella/trunk/</developerConnection>
         <url>http://www.javaforge.com/proj/sources/sccBrowse.do?proj_id=781&amp;dirname=trunk/</url>
     </scm>
