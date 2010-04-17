@@ -18,10 +18,14 @@
         Build file for Scriptella Project.
         Use build.properties/custom.build.properties to customize its behaviour.
     </description>
-    <property file="custom.build.properties"/>
+
+	<property file="custom.build.properties"/>
     <property file="build.properties"/>
-    <property file="version.properties"/>
-    <property name="build.dir" value="${basedir}/build"/>
+
+	<xmlproperty file="pom.xml" prefix="pom.xml" />
+    <property name="version" value="${pom.xml.project.version}"/>
+
+	<property name="build.dir" value="${basedir}/build"/>
     <property name="lib.dir" value="${basedir}/lib"/>
     <property name="core" value="${basedir}/core"/>
     <property name="tools" value="${basedir}/tools"/>
@@ -35,7 +39,7 @@
     <property name="zip.name" value="${product.name}.zip"/>
     <property name="srcide.zip.name" value="scriptella-src-ide.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
-    <fileset id="src.zip.fileset" dir="${basedir}"
+	<fileset id="src.zip.fileset" dir="${basedir}"
              includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**"
              excludes="samples/lib/**"/>
     <property name="src.zip.includes" value=""/>
@@ -74,7 +78,7 @@
             <fileset dir="${core}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" excludes="META-INF/*"/>
-            <fileset file="${basedir}/version.properties"/>
+            <fileset file="${basedir}/pom.xml"/>
             <zipfileset src="${lib.dir}/commons-jexl.jar" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-logging.jar"
                         excludes="META-INF/* **/NoOpLog* **/SimpleLog* **/LogSource*"/>
@@ -83,7 +87,7 @@
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
             </manifest>
         </jar>
-        <!-- Update samples libs --> 
+        <!-- Update samples libs -->
         <copy todir="${basedir}/samples/lib">
             <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>

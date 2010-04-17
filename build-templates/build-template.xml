@@ -31,7 +31,9 @@
     <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
     <property name="root.dir" value="${basedir}/.."/>
     <tstamp/>
-    <property file="${root.dir}/version.properties"/>
+
+	<xmlproperty file="${root.dir}/pom.xml" prefix="pom.xml" />
+    <property name="version" value="${pom.xml.project.version}"/>
 
     <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>
