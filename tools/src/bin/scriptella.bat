@@ -1,5 +1,5 @@
 @echo off
-rem Copyright 2006-2009 The Scriptella Project Team.
+rem Copyright 2006-2007 The Scriptella Project Team.
 rem
 rem Licensed under the Apache License, Version 2.0 (the "License");
 rem you may not use this file except in compliance with the License.

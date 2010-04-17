@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,18 +61,18 @@ public class HsqlConnection extends JdbcConnection {
     void shutdown() {
         assert shutdownOnExit;
         Connection con = getNativeConnection();
-        Statement st = null;
+        assert con != null; //we are going to close, so con!=null
         try {
-            if (con == null || con.isClosed()) {
+            if (con.isClosed()) {
                 LOG.info("Unable to correctly shutdown in-process HSQLDB. Connection has already already been closed");
                 return;
             }
-            st = con.createStatement();
+            Statement st = con.createStatement();
             st.execute("SHUTDOWN");
+            JdbcUtils.closeSilent(st);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Problem occured while trying to shutdown in-process HSQLDB", e);
         } finally {
-            JdbcUtils.closeSilent(st);
             JdbcUtils.closeSilent(con);
         }
     }
@@ -103,6 +103,7 @@ public class HsqlConnection extends JdbcConnection {
         }
         return !url.startsWith("jdbc:hsqldb:hsqls");
     }
+
 
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import scriptella.execution.EtlExecutorException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,10 +56,10 @@ public class H2ScriptTest extends AbstractTestCase {
             actual.add(n);
             byte[] expBlob = new byte[4];
             Arrays.fill(expBlob, n.byteValue());
-            Blob blob = (Blob) rs.getObject(2);
-            byte[] actualBlob = blob.getBytes(0, 4);
-
-            assertEquals(4, blob.length()); //no bytes are left
+            ByteArrayInputStream bais = (ByteArrayInputStream) rs.getObject(2);
+            byte[] actualBlob = new byte[4];
+            bais.read(actualBlob);
+            assertTrue(bais.read()<0); //no bytes are left
 
             assertTrue(Arrays.equals(expBlob, actualBlob));
 
