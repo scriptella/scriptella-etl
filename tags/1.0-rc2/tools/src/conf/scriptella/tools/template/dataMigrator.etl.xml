@@ -1,0 +1,14 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>Scriptella ETL Data Migration Template.</description>
+    <properties>
+        <include href="$etl.properties"/> <!--Load from external properties file-->
+    </properties>
+    
+    <!-- Source database (from) connection declaration -->
+    <connection id="from" driver="$from.driver" url="$from.url" user="$from.user" password="$from.password" classpath="$from.classpath"/>
+
+    <!-- Destination database (to) connection declaration -->
+    <connection id="to" driver="$to.driver" url="$to.url" user="$to.user" password="$to.password" classpath="$to.classpath"/>
+$queries
+</etl>

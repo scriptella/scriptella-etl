@@ -1,0 +1,34 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Simply creates a table with data in one db and copy it to another database.
+    </description>
+    <connection id="c1" driver="auto" url="${url1}" user="${user1}" password="${password1}"/>
+    <connection id="c2" driver="auto" url="${url2}" user="${user2}" password="${password2}"/>
+    <connection id="c3" driver="janino"/>
+    <script connection-id="c1">
+        --Removed any data from table
+        DELETE FROM Test;
+        --Insert the test record
+        INSERT INTO Test VALUES (1, 3.14, 'String', 1, {ts '2006-07-21 19:43:00'}, '01010101', ?blob, ?clob, null);
+    </script>
+    <script connection-id="c2">
+        DELETE FROM Test;<!--Clearing the previous data-->
+    </script>
+    <query connection-id="c1">
+        SELECT * FROM Test
+        <script connection-id="c2">
+            INSERT INTO Test VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);
+        </script>
+    </query>
+    <!-- Just copy data to c3 for checking-->
+    <query connection-id="c2">
+        SELECT * FROM Test
+        <script connection-id="c3">
+            scriptella.driver.alljdbc.AllJDBCDriversTest.addRow(new Object[] {
+                get("1"),get("2"),get("3"),get("4"),get("5"),get("6"),get("7"),get("8"),get("9") });
+        </script>
+    </query>
+
+
+</etl>

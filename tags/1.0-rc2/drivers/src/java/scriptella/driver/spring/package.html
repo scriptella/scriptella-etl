@@ -1,0 +1,83 @@
+<body>
+Spring Framework Integration Driver for Scriptella.
+<p>This driver allows working in <a href="http://www.springframework.org">The Spring Framework</a> environment
+and provides an ability to locate Spring-managed data sources.</p>
+<p>This driver acts as a proxy and relies on <a href="../../jdbc/package-summary.html">JDBC Bridge</a>.</p>
+
+<p><u>Important:</u></p>
+The driver requires <a href="EtlExecutorBean.html">EtlExecutorBean</a>
+to operate, see examples below.
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.spring.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>Name of the DataSource bean specified in the bean factory/application context</td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code><a href="http://www.springframework.org">Spring Framework</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+</table>
+<h2>ETL Executor Configuration</h2>
+EtlExecutorBean is intended to be configured from Spring XML configuration files.
+See <a href="EtlExecutorBean.html">EtlExecutorBean Javadoc</a> for details on
+how to configure the executor in Spring.
+<h2>Example</h2>
+This example creates a table Spring_Table using a connection from Spring Datasource.
+<p><b>Spring Application Context</b></p>
+Spring application context declares a datasource and an executor. Additional
+properties and dependencies like progress indicator may also be injected.
+<code><pre>
+&lt;beans&gt;
+    &lt;bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;
+        &lt;property name="driverClassName"&gt;&lt;value&gt;org.hsqldb.jdbcDriver&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="url"&gt;&lt;value&gt;jdbc:hsqldb:mem:spring&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="username"&gt;&lt;value&gt;sa&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="password"&gt;&lt;value&gt;&lt;/value&gt;&lt;/property&gt;
+    &lt;/bean>
+    &lt;bean id="progress" class="scriptella.interactive.ConsoleProgressIndicator"/&gt;
+    &lt;bean id="executor" class="<b>scriptella.driver.spring.EtlExecutorBean</b>">
+        &lt;property name="configLocation">&lt;value>etl.xml&lt;/value>&lt;/property>
+        &lt;property name="progressIndicator">&lt;ref local="progress"/>&lt;/property>
+        &lt;property name="properties">&lt;map>
+            &lt;entry key="tableName">&lt;value>Spring_Table&lt;/value>&lt;/entry>
+            &lt;/map>
+        &lt;/property>
+    &lt;/bean>
+&lt;/beans>
+</pre></code>
+<b>ETL file etl.xml</b>
+<code><pre>
+&lt;etl>
+    &lt;connection driver="spring" url="datasource"/>
+    &lt;script>
+        CREATE TABLE ${tableName} (
+            ID INT
+        )
+    &lt;/script>
+&lt;/etl>
+</pre></code>
+The usage of <code>executor</code> is straightforward:
+<code><pre>
+EtlExecutor exec = (EtlExecutor) beanFactory.getBean("executor");
+exec.execute();
+</pre></code>
+Additionally you can use <code>java.util.concurrent.Callable</code> or <code>java.lang.Runnable</code>
+invocation interface to avoid unnecessary dependency on Scriptella in application code:
+<code><pre>
+Callable exec = (Callable) beanFactory.getBean("executor");
+exec.call();
+</pre></code>
+<h2>Batched execution of ETL files</h2>
+<code><a href="BatchEtlExecutorBean.html">BatchEtlExecutorBean</a></code> provides an API
+to execute ETL files in a batch.
+</body>

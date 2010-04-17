@@ -1,0 +1,20 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Quieries XML with XPath expression and store the results in a CSV file.
+        Buil-in xpath driver is used for input.
+        Buil-in text driver is used for output.
+    </description>
+    <connection id="in" driver="xpath" url="cd_catalog.xml"/>
+
+    <!--Connection to output a list as Excel CSV file -->
+    <connection id="out" driver="text" url="cd_catalog-out.csv"/>
+
+    <script connection-id="out">Title;Artist;Country;Company;Price;Year</script>
+    <query connection-id="in">
+        <!--XPath which all CD elements in a catalog-->
+        /CATALOG/CD
+        <!--Outputs all matched elements-->
+        <script connection-id="out" if="rownum>1">$TITLE;$ARTIST;$COUNTRY;$COMPANY;$PRICE;$YEAR</script>
+    </query>
+</etl>

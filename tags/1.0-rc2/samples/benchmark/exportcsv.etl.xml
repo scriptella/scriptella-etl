@@ -1,0 +1,17 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Quieries CSV data from from file and store the results in a DB and other CSV file.
+    </description>
+    <connection id="in" driver="auto" url="jdbc:hsqldb:file:tmp/db"/>
+    <!--Filtered output to another file -->
+    <connection id="out" driver="csv" url="tmp/output2.csv"/>
+    <query connection-id="in">
+        SELECT * FROM Test
+        <script connection-id="out">
+            $1,$2
+        </script>
+    </query>
+
+
+</etl>

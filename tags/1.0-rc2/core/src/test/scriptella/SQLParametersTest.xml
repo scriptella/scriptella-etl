@@ -1,0 +1,22 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<!--
+This suite tests properties substitution.
+-->
+<etl>
+    <properties><!-- Registers global property-->
+        global=globalValue
+        global2=global2Value
+        tableName=Test
+        insert=INSERT INTO
+    </properties>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlparamstst" user="sa" password=""/>
+    <script>
+        CREATE TABLE $tableName (
+        ID INT,
+        TEXT VARCHAR(100)
+        );
+        $insert Test(id, text) values (1, ?global);<!-- Must be substituted-->
+        ${insert} Test(id, text) values (2, ?global2+'Three${global}');<!-- ? in literals is skipped, $ is processed-->
+    </script>
+
+</etl>

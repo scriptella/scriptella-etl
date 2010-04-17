@@ -1,0 +1,134 @@
+<body>
+<h1>CSV Driver for Scriptella.</h1>
+The driver to write and query CSV files.
+<p><b>Note: </b>The driver doesn't use SQL syntax
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.csv.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>CSV file URL. URIs are resolved relative to a script file directory.
+    If url has no value the output is read from/printed to the console (System.out).</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>encoding</td>
+        <td>Specifies charset encoding of CSV files.</td>
+        <td>No, the system default encoding is used.</td>
+    </tr>
+    <tr>
+        <td>separator</td>
+        <td>The delimiter to use for separating entries when reading from or writing to files.</td>
+        <td>No, the default value is <code>,</code>.</td>
+    </tr>
+    <tr>
+        <td>quote</td>
+        <td>The character to use for quoted elements when reading from or writing to files.
+            Use empty string to suppress quoting.</td>
+        <td>No, the default value is <code>&quot;</code>.</td>
+    </tr>
+    <tr>
+        <td>headers</td>
+        <td>Value of true means the first line contains headers.
+            <p>Only valid for &lt;query&gt; elements.</td>
+        <td>No, the default value is <code>true</code>(first line contains column names).</td>
+    </tr>
+    <tr>
+        <td>eol</td>
+        <td>End-Of-Line suffix.<p>Only valid for &lt;script&gt; elements.</td>
+        <td>No, the default value is <code>\n</code>.</td>
+    </tr>
+    <tr>
+        <td>trim</td>
+        <td>Value of <code>true</code> specifies that the leading and trailing
+     whitespaces in CSV fields should be omitted.
+        <td>No, the default value is <code>true</code>.</td>
+    </tr>
+    <tr>
+        <td>skip_lines</td>
+        <td>The number of lines to skip before start reading. Please note that if <code>headers=true</code>, 
+            the actual number of skipped lines is <code>skipped_lines+1</code>
+        <td>No, the default value is <code>0</code> (no lines are skipped).</td>
+    </tr>
+    <tr>
+        <td>null_string</td>
+        <td>Specifies value of a string token to be parsed as Java <code>null</code> literal.</td>
+        <td>No, by default strings are preserved, i.e. empty CSV field is parsed as empty string.</td>
+    </tr>
+</table>
+<h2>Query Syntax</h2>
+The driver utilizes query by example approach for CSV content filtering.
+If you want to read the whole CSV simply use empty query element, otherwise
+specify a set of lines containing <em>comma-separated</em> case insensitive regular expressions.
+<br><u>Example:</u>
+<code>
+    <pre>
+,food
+,^Beverages$
+    </pre>
+</code>
+This query selects rows where the second column equals "Beverages" or
+contains "food" substring.
+<p>The columns of the matched row can be referenced by name in nested queries/scripts. It
+is also possible to reference columns by an index, i.e.  $1, $2, ...</p>
+<h2>Script Syntax</h2>
+The script syntax is simple, just specify a <em>comma-separated</em> set of columns.
+<br><u>Example:</u>
+<code>
+    <pre>
+&lt;script&gt;
+id,priority,summary,status
+1,Critical,NullPointerException in Main class,Open
+&lt;/script&gt;
+    </pre>
+</code>
+This script writes 2 lines to the output file.
+<p><u>IMPORTANT:</u>
+Always use commas as a column separator inside both &lt;script&gt; and &lt;query&gt; elements no
+matter what <code>separator</code> is used in files being parsed or produced.
+This decision allows switching between different formats like tab or semicolumn while keeping
+scripts and queries unchanged.</p>
+<h2>Properties substitution</h2>
+In CSV script and query elements use ${property} syntax for properties/variables substition.
+<p><u>NOTE:</u></p>
+By default NULL variables are not substituted, because Scriptella substitution engine cannot
+distinguish null value from undeclared variable which is not always desired.
+<p>Use <code>${etl.text.ifNull(variable)}</code> or 
+    <code>${etl.text.ifNull(variable, '')}</code> to output NULL as empty string.</p>
+<h2>Examples</h2>
+<code><pre>
+&lt;connection id="in" driver="csv" url="data.csv"&gt;
+
+&lt;/connection&gt;
+&lt;connection id="out" driver="csv" url="report.csv"&gt;
+    #Use empty quote to turn off quoting
+    quote=
+    separator=;
+&lt;/connection&gt;
+
+&lt;script connection-id="out"&gt;
+    ID,Priority,Summary,Status
+&lt;/script&gt;
+
+&lt;query connection-id="in"&gt;
+    &lt;!--Empty query means select all--&gt;
+    &lt;script connection-id="out"&gt;
+        $rownum,$priority,$summary,$status
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre></code>
+Copies rows from data.csv file to report.csv, additionally the ID column is added.
+The result file will be semicolon separated.
+</body>

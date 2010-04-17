@@ -1,0 +1,25 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<!--
+This suite tests support of numbered parameters,e.g. ?1,?2 additionally to column names
+-->
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlparamstst2" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT,
+        _33 INT <!-- Column name-->
+        );
+        insert into Test values (1,-1);
+        insert into Test values (2,-1);
+        insert into Test values (3,-1);
+    </script>
+    <query>
+        ${'select * from Test'}
+        <script>
+            insert into Test values (10*${1}, ${_33})<!--Iterates through row 1,2,3 and inserts rows 10,20,30.
+                                                ?_33-means column name -->
+        </script>
+    </query>
+
+
+</etl>

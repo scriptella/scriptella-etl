@@ -1,0 +1,35 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Test script for rownum pseudo-column functionality.
+    </description>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytestrownum" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT
+        );
+        insert into Test values (1);
+        insert into Test values (2);
+        insert into Test values (3);
+    </script>
+    <script>
+        CREATE TABLE Result (
+        ID INT
+        );
+    </script>
+
+    <query id="query1">
+        select * from test
+        <query id="query2">
+            select * from test where id=?rownum <!--query1 row number-->
+            <script if="rownum==1"> <!--always true-->
+                insert into result values (?ID);
+            </script>
+        </query>
+        <script><!--Insert 11,12,13-->
+            insert into result values (?rownum+10);
+        </script>
+    </query>
+
+
+</etl>

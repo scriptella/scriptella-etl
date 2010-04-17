@@ -1,0 +1,54 @@
+<body>
+Lucene Driver for Scriptella.
+<p>This driver allows to search through Lucene v.2.x compatible indexed data.</p>
+<p>Lucene scripting elements are implicit subclasses of <a href="LuceneQuery.html">Query</a> base classe.</p>
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.lucene.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code><a href="http://www.apache.org/dyn/closer.cgi/lucene/java/">lucene-core.jar</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>fields</td>
+        <td>List of comma-separated fields to be searched</td>
+        <td>No, the Lucene default field 'contents' is used.</td>
+    </tr>
+    <tr>
+        <td>useMultiFieldQueryParser</td>
+        <td>whether <a href="http://lucene.apache.org/java/docs/api/org/apache/lucene/queryParser/MultiFieldQueryParser.html">MultiFieldQueryParser</a> or
+            <a href="http://lucene.apache.org/java/docs/api/org/apache/lucene/queryParser.QueryParser">QueryParser</a> to be used</td>
+        <td>No, default value is <code>false</code>.</td>
+    </tr>
+    <tr>
+        <td>useLowercaseExpandedTerms</td>
+        <td>whether terms of wildcard, prefix, fuzzy and range queries are to be automatically lower-cased or not</td>
+        <td>No, default value is <code>true</code>.</td>
+    </tr>
+
+</table>
+<p>Note: if MultiFieldQueryParser is used instead of QueryParser then all the query's terms must appear,
+but it doesn't matter in what fields they appear.</p>
+
+<h2>Example</h2>
+<code><pre>
+    &lt;connection id="search" driver="lucene" url="file://PATH_TO_YOUR_LUCENE_INDEX"&gt;
+        fields=default_field
+    &lt;/connection&gt;
+    &lt;connection id="out" driver="text" url="tst://testfile"/&gt;
+    &lt;query id="search"&gt;
+        title:script luc*e
+        &lt;script connection-id="out"&gt;$rownum+'. '+$title+' : '+$default_field&lt;/script&gt;
+    &lt;/query&gt;
+</pre></code>
+</body>
