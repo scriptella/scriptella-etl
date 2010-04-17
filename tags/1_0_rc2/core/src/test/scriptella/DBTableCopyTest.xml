@@ -1,0 +1,27 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:test" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT,
+        VALUE VARCHAR(255),
+        VALUE2 VARCHAR(255)
+        );
+        CREATE TABLE Test2 (
+        ID INT,
+        VALUE VARCHAR(255),
+        VALUE2 VARCHAR(255)
+        );
+        insert into test(id, value) values (1,'222');
+        insert into test(id, value) values (2,'333');
+        insert into test(id, value, value2) values (3,'444','value');
+    </script>
+
+    <query>
+        select * from Test
+        <script>
+            insert into test2(id, value, value2) values (?{id},?{value}, ?{value2});
+        </script>
+    </query>
+
+</etl>

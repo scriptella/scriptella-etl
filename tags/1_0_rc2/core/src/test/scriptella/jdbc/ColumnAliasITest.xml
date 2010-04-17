@@ -1,0 +1,10 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:aliastest" user="sa" password=""/>
+    <script>
+        CREATE TABLE TST (
+            ID INT
+        )
+        INSERT INTO TST VALUES (2);
+    </script>
+</etl>

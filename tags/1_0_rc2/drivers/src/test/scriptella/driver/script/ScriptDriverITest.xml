@@ -1,0 +1,18 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        n=10
+    </properties>
+    <connection driver="script">
+        language=JavaScript
+    </connection>
+    <query><![CDATA[
+        for (var i=0;i<n;i++) {
+            k=i;
+            query.next();
+        }]]>
+        <script>
+            callback.notify(k);
+        </script>
+    </query>
+</etl>

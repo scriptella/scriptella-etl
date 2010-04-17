@@ -1,0 +1,56 @@
+<body>
+<h1>JEXL Driver for Scriptella.</h1>
+Allows usage of JEXL scripts in ETL &lt;query&gt; and &lt;script&gt; elements.
+<p>The driver uses commons-jexl library which is a part of Scriptella Core.
+    JEXL scripts are interpreted at runtime and generally work slower than compiled scripts (e.g. Janino),
+nevertheless JEXL scripts are easier to write and maintain especially for non-Java developers.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.jexl.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+    </tr>
+</table>
+<h2>Query and Script Syntax</h2>
+<a href="http://jakarta.apache.org/commons/jexl/reference/syntax.html">Standard JEXL scripts syntax</a> is used inside
+ETL elements.
+<p>
+    Bind variables from parent elements are accessible as simple variables. Assignment operator
+    v="value" makes variable <code>v</code> available for nested ETL elements.
+</p>
+<p>Implicit variable <code>query</code> is available in &lt;query&gt; elements. This variable
+should be used to produce a result set:</p>
+<code>
+<pre>
+    &lt;query&gt;
+        i=0; while(i lt 10) {
+            i=i+1;
+            query.next(); // Causes child script to be executed
+        }
+        &lt;script&gt;......&lt;/script&gt;
+    &lt;/query&gt;
+</pre>
+See <a href="../script/ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
+</code>
+<h2>Examples</h2>
+<code><pre>
+&lt;connection id="jexl" driver="jexl"/&gt;
+&lt;connection id="out" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB"/&gt;
+
+&lt;query connection-id="jexl"&gt;
+    i=0;while (i lt 10) {
+        i=i+1;
+        login='login'+i;
+        query.next();
+    }
+    &lt;script connection-id="out"&gt;
+        INSERT INTO Table(ID, Login) VALUES (?i, ?login);
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre></code>
+The query executes a child script 10 times. As the result of execution 10 records
+are inserted in a database table.
+</body>

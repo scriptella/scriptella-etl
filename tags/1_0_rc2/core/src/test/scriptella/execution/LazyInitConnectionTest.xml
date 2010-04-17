@@ -1,0 +1,6 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="----" lazy-init="${lazy}"/><!--This DTD violation is ok for testing--> 
+    <script if="false">Always fails
+    </script>
+</etl>

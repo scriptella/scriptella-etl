@@ -1,0 +1,42 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        property=!
+    </properties>
+    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytestdb1" user="sa" password=""/>
+    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytestdb2" user="sa" password=""/>
+    <script connection-id="c1">
+        CREATE TABLE Test (
+        ID INT
+        );
+        insert into Test values (1);
+        insert into Test values (3);
+    </script>
+    <script connection-id="c2">
+        CREATE TABLE Test (
+        ID INT,
+        TEXT VARCHAR(100)
+        );
+        CREATE TABLE Result (
+        ID INT,
+        TEXT VARCHAR(100),
+        TEXT2 VARCHAR(100)
+        );
+
+        insert into Test(id, text) values (1, 'One');
+        insert into Test(id, text) values (2, 'Two');
+        insert into Test(id, text) values (3, 'Three');
+    </script>
+
+    <query connection-id="c1">
+        <query connection-id="c2">
+            select * from test where id=?{id}
+            <script connection-id="c2">
+                insert into result(id, text, text2) values (?id,?text,?property+'tst');
+            </script>
+        </query>
+        select * from test
+    </query>
+
+
+</etl>

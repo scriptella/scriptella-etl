@@ -1,0 +1,8 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jmx" user="sa" password=""/>
+    <script>
+        commit;
+        shutdown;
+    </script>
+</etl>

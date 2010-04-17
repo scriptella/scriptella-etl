@@ -1,0 +1,10 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <!-- Invoked from ScriptellaDriverITest -->
+    <connection driver="script"/>
+    <script>
+        with(JavaImporter(Packages.scriptella.driver.scriptella)) {
+            ScriptellaDriverITest.global+='file2_';
+        }
+    </script>
+</etl>

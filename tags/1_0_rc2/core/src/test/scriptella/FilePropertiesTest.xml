@@ -1,0 +1,21 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:fileproptst" user="sa" password=""/>
+    <script>
+        create table t (
+        id int,
+        c binary
+        );
+        insert into t(id, c) values(1,?{file 'tst://file'});
+        insert into t(id, c) values(2,?{file 'tst://file'});
+        insert into t(id, c) values(3,?{file 'tst://file'})
+    </script>
+    <script><!-- uploading a text file -->
+        create table txt (
+        id int,
+        c longvarchar
+        );
+        insert into txt(id, c) values(1,?{textfile 'tst://file'});
+    </script>
+
+</etl>

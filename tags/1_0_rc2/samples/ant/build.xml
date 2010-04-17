@@ -1,0 +1,53 @@
+<!--
+ Copyright 2006-2007 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<project name="ant samples" default="main">
+    <description>
+        Shows how-to call Scriptella from Ant.
+    </description>
+    <!-- Registers scriptella ant tasks. -->
+    <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar"/>
+    <target name="main">
+        <property name="antproperty" value="Ant Property"/>
+        <!--Executes etl.xml -->
+        <etl/>
+        <!-- You may reassign classpath just before executing a script-->
+        <taskdef resource="antscriptella.properties">
+            <classpath>
+                <pathelement location="../lib/scriptella.jar"/>
+                <!-- The following classpath elements are optional.
+                Use connection classpath attribute to specify driver's classpath in a script file -->
+                <pathelement location="../lib/hsqldb.jar"/>
+            </classpath>
+        </taskdef>
+        <etl debug="true">
+            <fileset file="etl.xml"/>
+        </etl>
+        <!--Do not pass Ant properties-->
+        <etl inheritAll="false"/>
+    </target>
+
+    <target name="template" description="Produces data migration template based on an HSQLDB database">
+        <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
+        <etl/> <!-- Initialize the database -->
+        <!--
+        Now call the template please note that driver,class,user,password properties must be set
+        before calling this task
+        -->
+        <property file="etl.properties"/>
+        <etl-template name="DataMigrator"/>
+    </target>
+
+</project>
