@@ -78,11 +78,10 @@
             <fileset dir="${core}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" excludes="META-INF/*"/>
-            <fileset file="${basedir}/pom.xml"/>
             <zipfileset src="${lib.dir}/commons-jexl.jar" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-logging.jar"
                         excludes="META-INF/* **/NoOpLog* **/SimpleLog* **/LogSource*"/>
-            <zipfileset dir="${basedir}" includes="LICENSE NOTICE" prefix="META-INF"/>
+            <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
             </manifest>
