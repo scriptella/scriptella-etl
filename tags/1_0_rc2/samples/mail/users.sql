@@ -1,3 +1,0 @@
--- Email notifications will be sent to the following list
--- INSERT INTO User VALUES ('_user1@nosuchhost.com', 'User 1');
--- INSERT INTO User VALUES ('_user2@nosuchhost.com', 'User 2');
