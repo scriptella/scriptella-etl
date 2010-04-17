@@ -3,7 +3,7 @@
 <document>
 	<header>
 		<title>Scriptella ETL Drivers Matrix</title>
-		<version>1.0</version>
+		<version>1.0 RC</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
         </authors>

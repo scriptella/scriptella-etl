@@ -3,7 +3,7 @@
 <document>
 	<header>
 		<title>Scriptella ETL Reference Documentation</title>
-		<version>1.0</version>
+		<version>1.0 RC</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
@@ -443,11 +443,9 @@
 							<td>If true, print debugging information.</td>
 							<td>No, default value is false.</td>
 						</tr>
-                        <tr>
-                            <td>nostat</td>
-                            <td>If true turns off statistics collecting.</td>
-                            <td>No, default value is false.</td>
-                        </tr>
+                        <td>nostat</td>
+                        <td>If true turns off statistics collecting.</td>
+                        <td>No, default value is false.</td>
                         <tr>
 							<td>quiet</td>
 							<td>If true, be extra quiet.</td>

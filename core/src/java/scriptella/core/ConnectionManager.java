@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import scriptella.util.UrlPathTokenizer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -53,13 +51,9 @@ public class ConnectionManager {
             //Parse it and create a new classloader
             UrlPathTokenizer tok = new UrlPathTokenizer(ctx.getScriptFileURL());
             try {
-                final URL[] urls = tok.split(c.getClasspath());
+                URL[] urls = tok.split(c.getClasspath());
                 if (urls.length > 0) {
-                    cl = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-                        public ClassLoader run() {
-                            return new DriverClassLoader(urls);
-                        }
-                    });
+                    cl = new DriverClassLoader(urls);
                 }
             } catch (MalformedURLException e) {
                 throw new ConfigurationException("Unable to parse classpath parameter for " + c, e);

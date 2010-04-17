@@ -1,5 +1,5 @@
 <!--
- Copyright 2006-2009 The Scriptella Project Team.
+ Copyright 2006-2007 The Scriptella Project Team.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -31,9 +31,7 @@
     <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
     <property name="root.dir" value="${basedir}/.."/>
     <tstamp/>
-
-	<xmlproperty file="${root.dir}/pom.xml" prefix="pom.xml" />
-    <property name="version" value="${pom.xml.project.version}"/>
+    <property file="${root.dir}/version.properties"/>
 
     <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>

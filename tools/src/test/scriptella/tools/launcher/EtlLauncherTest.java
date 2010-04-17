@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2007 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public class EtlLauncherTest extends DBTestCase {
 
     public void testFile() {
         EtlLauncher launcher  = new EtlLauncher();
-        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[] {"src/test/scriptella/tools/launcher/EtlLauncherTest"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[] {"tools/src/test/scriptella/tools/launcher/EtlLauncherTest"}));
     }
 
     /**
@@ -88,7 +88,7 @@ public class EtlLauncherTest extends DBTestCase {
      */
     public void testJmx() throws FileNotFoundException, MalformedURLException, MalformedObjectNameException {
         final EtlLauncher launcher  = new EtlLauncher();
-        final String fileName = "src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
+        final String fileName = "tools/src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
         URL u = IOUtils.toUrl(launcher.resolveFile(null, fileName));
         final ObjectName mbeanName = new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(u.toString()));
         final MBeanServer srv = ManagementFactory.getPlatformMBeanServer();
