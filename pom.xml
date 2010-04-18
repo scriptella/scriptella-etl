@@ -45,6 +45,12 @@
             <name>Fyodor Kupolov</name>
             <timezone>+2</timezone>
         </developer>
+        <developer>
+            <id>hboutemy</id>
+            <name>Hervé Boutemy</name>
+            <email>hboutemy@apache.org</email>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <modules>
