@@ -43,7 +43,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
         for (ExecutionStatistics.ElementInfo info : elements) {
-            assertTrue("Negative working time: "+info.getWorkingTime(), info.getWorkingTime()>=0);
+            assertTrue("Negative working time: " + info.getWorkingTime(), info.getWorkingTime() >= 0);
             if ("/etl/script[1]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
@@ -150,7 +150,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         long time = 288727350; //3d 8h 12m 7s 350ms
         StringBuilder sb = new StringBuilder();
         ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
-        assertEquals(" 3 days 8 hours 12 minutes 7"+sep+"35 seconds", sb.toString());
+        assertEquals(" 3 days 8 hours 12 minutes 7" + sep + "35 seconds", sb.toString());
         time = 3605001; //1h 5s 1ms
         sb = new StringBuilder();
         ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
@@ -158,7 +158,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         time = 800; //800ms
         sb = new StringBuilder();
         ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
-        assertEquals(" 0,8 second", sb.toString());
+        assertEquals(" 0" + sep + "8 second", sb.toString());
         time = 1000; //1000ms
         sb = new StringBuilder();
         ExecutionStatistics.appendTotalTimeDuration(time, sb, f);
