@@ -63,7 +63,11 @@ public class GenericDriver extends AbstractScriptellaDriver {
             final boolean debug = LOG.isLoggable(Level.FINE);
             for (String name : drivers) {
                 try {
-                    Class.forName(name);
+                    try {
+                        Class.forName(name);
+                    } catch (ClassNotFoundException e) {
+                        Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+                    }
                     if (debug) {
                         LOG.fine("Found driver class " + name);
                     }
