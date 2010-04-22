@@ -47,7 +47,7 @@ public class EtlLauncherTest extends DBTestCase {
         EtlLauncher etlLauncher = new EtlLauncher() {
             @Override
             protected boolean isFile(File file) {
-                return file.getName().indexOf("_nofile_")<0;
+                return file.getName().indexOf("_nofile_") < 0;
             }
 
             @Override
@@ -73,22 +73,23 @@ public class EtlLauncherTest extends DBTestCase {
                 return false;
             }
         };
-        assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND, etlLauncher.launch(new String[] {}));
+        assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND, etlLauncher.launch(new String[]{}));
 
 
     }
 
     public void testFile() {
-        EtlLauncher launcher  = new EtlLauncher();
-        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[] {"src/test/scriptella/tools/launcher/EtlLauncherTest"}));
+        EtlLauncher launcher = new EtlLauncher();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{
+                getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherTest"}));
     }
 
     /**
      * Tests if JMX monitoring is enabled during execution.
      */
     public void testJmx() throws FileNotFoundException, MalformedURLException, MalformedObjectNameException {
-        final EtlLauncher launcher  = new EtlLauncher();
-        final String fileName = "src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
+        final EtlLauncher launcher = new EtlLauncher();
+        final String fileName = getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherTestJmx";
         URL u = IOUtils.toUrl(launcher.resolveFile(null, fileName));
         final ObjectName mbeanName = new ObjectName("scriptella:type=etl,url=" + ObjectName.quote(u.toString()));
         final MBeanServer srv = ManagementFactory.getPlatformMBeanServer();
@@ -103,13 +104,13 @@ public class EtlLauncherTest extends DBTestCase {
                     fail(e.getMessage());
                 }
                 //Check if cancellation is working
-                srv.invoke(mbeanName, "cancel",null, null);
+                srv.invoke(mbeanName, "cancel", null, null);
                 return "";
             }
         };
         launcher.setProperties(Collections.singletonMap("callback", r));
 
-        assertEquals(EtlLauncher.ErrorCode.FAILED, launcher.launch(new String[] {fileName}));
+        assertEquals(EtlLauncher.ErrorCode.FAILED, launcher.launch(new String[]{fileName}));
         assertFalse(srv.isRegistered(mbeanName));
     }
 
@@ -118,8 +119,8 @@ public class EtlLauncherTest extends DBTestCase {
      */
     public void testTemplate() {
         EtlLauncher etl = new EtlLauncher();
-        TemplateManagerTest.TestTemplate.created=false;
-        etl.launch(new String[] {"-t", "TemplateManagerTest$TestTemplate"});
+        TemplateManagerTest.TestTemplate.created = false;
+        etl.launch(new String[]{"-t", "TemplateManagerTest$TestTemplate"});
         assertTrue(TemplateManagerTest.TestTemplate.created);
     }
 
@@ -143,10 +144,21 @@ public class EtlLauncherTest extends DBTestCase {
 
             }
         };
-        l.launch(new String[] {"-d", "-nostat"});
+        l.launch(new String[]{"-d", "-nostat"});
         assertTrue("-nostat does not work", nostat[0]);
         assertTrue("script was not executed", executed[0]);
     }
 
+    /**
+     * Fix for running inside different environments Maven/Ant or IDE when current directory is different.
+     *
+     * @return absolute path to basedir directory if basedir property is specified, otherwise empty string
+     */
+    private String getBasedir() {
+        //If running inside Maven the basedir property is set,
+        // otherwise assume we run inside IDE/Maven with current directory set to root project
+        String basedir = System.getProperty("basedir");
+        return basedir != null ? new File(basedir).getAbsolutePath() + '/' : "tools/";
+    }
 
 }
