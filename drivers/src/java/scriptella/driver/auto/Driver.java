@@ -26,11 +26,7 @@ import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -63,14 +59,15 @@ public class Driver extends AbstractScriptellaDriver {
         }
     }
 
-    public Connection connect(final ConnectionParameters connectionParameters) throws ConfigurationException{
+    public Connection connect(final ConnectionParameters connectionParameters) throws ConfigurationException {
         String u = connectionParameters.getUrl();
         if (StringUtils.isEmpty(u)) {
             throw new ConfigurationException("url connection parameter is required");
         }
+        u = u.toLowerCase(); //Ignore case when matching URIs
         //Finding an url in the mappings
         for (Map.Entry<String, String> entry : MAPPINGS.entrySet()) {
-            String pattern = entry.getKey();
+            String pattern = entry.getKey().toLowerCase();
             String driver = entry.getValue();
             if (u.startsWith(pattern)) {
                 return getConnection(driver, connectionParameters);
@@ -80,7 +77,7 @@ public class Driver extends AbstractScriptellaDriver {
             return getConnection(GenericDriver.class.getName(), connectionParameters);
         }
         throw new ConfigurationException("Unable to automatically discover driver for url " +
-                connectionParameters.getUrl()+". Please explicitly specify a \"driver\" connection attribute.");
+                connectionParameters.getUrl() + ". Please explicitly specify a \"driver\" connection attribute.");
     }
 
     /**
@@ -93,7 +90,7 @@ public class Driver extends AbstractScriptellaDriver {
     protected Connection getConnection(String driver, ConnectionParameters connectionParameters) {
         try {
             Connection c = DriverFactory.getDriver(driver, getClass().getClassLoader()).connect(connectionParameters);
-            LOG.info("Using "+driver+" driver for url "+connectionParameters.getUrl());
+            LOG.info("Using " + driver + " driver for url " + connectionParameters.getUrl());
             return c;
         } catch (ClassNotFoundException e) {
             throw new ConfigurationException("Unable to initialize driver " + driver, e);

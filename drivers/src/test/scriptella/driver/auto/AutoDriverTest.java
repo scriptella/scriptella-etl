@@ -24,30 +24,32 @@ import scriptella.spi.MockConnectionParameters;
 
 /**
  * Tests for {@link scriptella.driver.auto.Driver}.
+ *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class AutoDriverTest extends AbstractTestCase {
     private String expectedDriver;
+
     public void test() {
         Driver d = new Driver() {
             @Override
             protected Connection getConnection(String driver, ConnectionParameters connectionParameters) {
                 assertEquals(expectedDriver, driver);
-                expectedDriver=null;
+                expectedDriver = null;
                 return null;
             }
         };
 
         //Check several drivers which should be automatically discovered
-        expectedDriver="h2";
+        expectedDriver = "h2";
         d.connect(new MockConnectionParameters(null, "jdbc:h2:....."));
         assertNull(expectedDriver);
-        expectedDriver="jndi";
+        expectedDriver = "jndi";
         d.connect(new MockConnectionParameters(null, "jndi:DataSource"));
         assertNull(expectedDriver);
         //Now check JDBC 4.0 auto-loading for unsupported JDBC driver
-        expectedDriver= GenericDriver.class.getName(); //
+        expectedDriver = GenericDriver.class.getName(); //
         d.connect(new MockConnectionParameters(null, "jdbc:nosuchdb:object"));
         //Now check unsupported drivers
         try {
@@ -64,6 +66,11 @@ public class AutoDriverTest extends AbstractTestCase {
         } catch (ConfigurationException e) {
             //OK
         }
+
+        //Test case insensitive matching
+        expectedDriver = "odbc";
+        d.connect(new MockConnectionParameters(null, "jdbc:ODbC:...."));
+        assertNull(expectedDriver);
 
     }
 }
