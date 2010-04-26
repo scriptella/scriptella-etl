@@ -52,6 +52,18 @@
             <action context="code" type="fix" dev="ejboy">
                 Fixed ArrayIndexOutOfBounds thrown when lazy-initialization fails for connection
             </action>
+            <action context="code" type="fix" dev="volk" fixes-bug="7338">
+                Wrong alias for PostgreSQL for auto driver
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="10987">
+                db2 dirver is not automatically resolved
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="10660">
+                Cannot load class when scriptella is packaged in an EAR file in JBoss
+            </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="7390">
+                Cannot Write to HTTP URL
+            </action>
         </release>
         <release version="1.0 RC" date="2008-04-02">
             <action context="code" type="add" dev="ejboy" fixes-bug="7252">
