@@ -56,7 +56,7 @@
                 Wrong alias for PostgreSQL for auto driver
             </action>
             <action context="code" type="fix" dev="ejboy" fixes-bug="10987">
-                db2 dirver is not automatically resolved
+                db2 driver is not automatically resolved
             </action>
             <action context="code" type="fix" dev="ejboy" fixes-bug="10660">
                 Cannot load class when scriptella is packaged in an EAR file in JBoss
