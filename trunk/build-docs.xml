@@ -98,7 +98,7 @@
 </body>
 </html>
 ]]></replacetoken>
-                <replacevalue><![CDATA[</div>
+            <replacevalue><![CDATA[</div>
 <!-- Start of StatCounter Code -->
 <script type="text/javascript" language="javascript">
 var sc_project=2292342;
@@ -123,14 +123,17 @@ var sc_security="748ecb1a";
 <a href="http://www.addthis.com/bookmark.php" onclick="window.open('http://www.addthis.com/bookmark.php?pub=ejboy&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'addthis', 'scrollbars=yes,menubar=no,width=620,height=520,resizable=yes,toolbar=no,location=no,status=no'); return false;" title="Bookmark using any bookmark manager!" target="_blank"><img src="http://www.addthis.com/images/button1-bm.gif" width="125" height="16" border="0" alt="AddThis Social Bookmark Button" /></a>
 <!-- AddThis Bookmark Button END -->
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
-">
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<input type="hidden" name="cmd" value="_donations">
+<input type="hidden" name="business" value="scriptella@gmail.com">
+<input type="hidden" name="lc" value="US">
+<input type="hidden" name="item_name" value="Scriptella ETL">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
+<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
 </div>]]>
-</replacevalue>
+            </replacevalue>
         </replace>
     </target>
 
