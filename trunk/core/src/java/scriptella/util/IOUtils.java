@@ -15,6 +15,7 @@
  */
 package scriptella.util;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.regex.Pattern;
 
 /**
@@ -42,6 +44,7 @@ import java.util.regex.Pattern;
  */
 public final class IOUtils {
     //Singleton
+
     private IOUtils() {
     }
 
@@ -68,6 +71,7 @@ public final class IOUtils {
 
     /**
      * Silently closes a collection of objects.
+     *
      * @param closeables iterable closeables. Null value allowed.
      * @see #closeSilently(java.io.Closeable)
      */
@@ -173,7 +177,16 @@ public final class IOUtils {
         if ("file".equals(url.getProtocol())) {
             return new FileOutputStream(url.getFile());
         } else {
-            return url.openConnection().getOutputStream();
+            final URLConnection con = url.openConnection();
+            con.setDoOutput(true);
+            //Use a proxy to read input on close. Required for some servers.
+            return new BufferedOutputStream(con.getOutputStream()) {
+                @Override
+                public void close() throws IOException {
+                    super.close();
+                    IOUtils.closeSilently(con.getInputStream());
+                }
+            };
         }
 
     }
@@ -181,7 +194,6 @@ public final class IOUtils {
     /**
      * @return buffered reader for specified input stream.
      * @see #getReader(java.io.InputStream, String, boolean)
-     *
      */
     public static Reader getReader(final InputStream is, final String enc) throws UnsupportedEncodingException {
         return getReader(is, enc, true);
@@ -189,11 +201,12 @@ public final class IOUtils {
 
     /**
      * Returns reader for specified input stream and charset name.
-     * @param is source input stream.
-     * @param enc charset name, null means default.
+     *
+     * @param is       source input stream.
+     * @param enc      charset name, null means default.
      * @param buffered true if buffered reader should be used.
      * @return reader for inputstream.
-     * @throws UnsupportedEncodingException  If the named charset is not supported
+     * @throws UnsupportedEncodingException If the named charset is not supported
      */
     public static Reader getReader(final InputStream is, final String enc, final boolean buffered) throws UnsupportedEncodingException {
         Reader r = enc == null ? new InputStreamReader(is) : new InputStreamReader(is, enc);
@@ -203,38 +216,39 @@ public final class IOUtils {
     /**
      * Optionally makes a buffered reader from the specified one.
      * <p>If specified reader is buffered the object is returned unchanged.
+     *
      * @param reader reader to convert.
      * @return buffered reader.
      */
     public static BufferedReader asBuffered(Reader reader) {
-        if (reader==null) {
+        if (reader == null) {
             throw new IllegalArgumentException("Reader cannot be null");
         }
         //Performance optimization. If content is in memory - use smaller buffer
         if (reader instanceof StringReader) {
             return new BufferedReader(reader, DEFAULT_BUFFER_SIZE_FOR_STRINGS);
         }
-        return (reader instanceof BufferedReader?(BufferedReader)reader:new BufferedReader(reader));
+        return (reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader));
     }
 
     /**
      * Optionally makes a buffered writer from the specified one.
      * <p>If specified writer is buffered the object is returned unchanged.
+     *
      * @param writer writer to convert.
      * @return buffered writer.
      */
     public static BufferedWriter asBuffered(Writer writer) {
-        if (writer==null) {
+        if (writer == null) {
             throw new IllegalArgumentException("Writer cannot be null");
         }
-        return (writer instanceof BufferedWriter?(BufferedWriter)writer:new BufferedWriter(writer));
+        return (writer instanceof BufferedWriter ? (BufferedWriter) writer : new BufferedWriter(writer));
     }
 
 
     /**
      * @return buffered writer for specified output stream.
      * @see #getWriter(java.io.OutputStream, String, boolean)
-     *
      */
     public static Writer getWriter(final OutputStream os, final String enc) throws IOException {
         return getWriter(os, enc, true);
@@ -242,11 +256,12 @@ public final class IOUtils {
 
     /**
      * Returns writer for specified output stream and charset name.
-     * @param os source output stream.
-     * @param enc charset name, null means default.
+     *
+     * @param os       source output stream.
+     * @param enc      charset name, null means default.
      * @param buffered true if buffered reader should be used.
      * @return reader for inputstream.
-     * @throws UnsupportedEncodingException  If the named charset is not supported
+     * @throws UnsupportedEncodingException If the named charset is not supported
      */
     public static Writer getWriter(final OutputStream os, final String enc, final boolean buffered) throws IOException {
         Writer w = enc == null ? new OutputStreamWriter(os) : new OutputStreamWriter(os, enc);
@@ -255,10 +270,11 @@ public final class IOUtils {
 
     /**
      * A replacement for a deprecated File.toURL() method.
+     *
      * @param file file to convert to URL.
      * @return URL representing the file location.
      * @throws MalformedURLException If a protocol handler for the URL could not be found,
-     * or if some other error occurred while constructing the URL.
+     *                               or if some other error occurred while constructing the URL.
      */
     public static URL toUrl(File file) throws MalformedURLException {
         return file.toURI().toURL();
