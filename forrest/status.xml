@@ -64,6 +64,9 @@
             <action context="code" type="fix" dev="ejboy" fixes-bug="7390">
                 Cannot Write to HTTP URL
             </action>
+            <action context="code" type="fix" dev="ejboy" fixes-bug="8756">
+                Use null_string to expand $variable when it has null value. CSV, text driver
+            </action>
         </release>
         <release version="1.0 RC" date="2008-04-02">
             <action context="code" type="add" dev="ejboy" fixes-bug="7252">

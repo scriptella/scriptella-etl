@@ -41,41 +41,45 @@ import java.io.Writer;
  * </pre></code>
  * <b>Parameters:</b>
  * <table border=1>
- *   <tr>
- *     <th>rownum</th>
- *     <th>name</th>
- *     <th>surname</th>
- *     <th>email</th>
- *   </tr>
- *   <tr>
- *     <td>1</td>
- *     <td>John</td>
- *     <td>G</td>
- *     <td>  john@nosuchhost.com</td>
- *   </tr>
+ * <tr>
+ * <th>rownum</th>
+ * <th>name</th>
+ * <th>surname</th>
+ * <th>email</th>
+ * </tr>
+ * <tr>
+ * <td>1</td>
+ * <td>John</td>
+ * <td>G</td>
+ * <td>  john@nosuchhost.com</td>
+ * </tr>
  * </table>
  * <b>Result:</b>
  * <code><pre>
  * 1;John;G;john_at_nosuchhost.com
  * </pre></code>
- * @see PropertiesSubstitutor
  *
  * @author Fyodor Kupolov
  * @version 1.0
+ * @see PropertiesSubstitutor
  */
 public class TextScriptExecutor implements Closeable, Flushable {
     private BufferedWriter out;
     private boolean trim;
     private String eol;
-    private PropertiesSubstitutor ps=new PropertiesSubstitutor();
+    private PropertiesSubstitutor ps;
 
     /**
      * Creates an executor.
-     * @param out writer for output.
-     * @param trim true if each line in the output file should be trimmed
-     * @param eol EOL separator.
+     *
+     * @param out        writer for output.
+     * @param trim       true if each line in the output file should be trimmed
+     * @param eol        EOL separator.
+     * @param nullString null string.
      */
-    public TextScriptExecutor(Writer out, boolean trim, String eol) {
+    public TextScriptExecutor(Writer out, boolean trim, String eol, String nullString) {
+        ps = new PropertiesSubstitutor();
+        ps.setNullString(nullString);
         this.out = IOUtils.asBuffered(out);
         this.trim = trim;
         this.eol = eol;
@@ -83,8 +87,9 @@ public class TextScriptExecutor implements Closeable, Flushable {
 
     /**
      * Parses a script from read, expands properties and produces the output.
-     * @param reader script content.
-     * @param pc parameters for substitution.
+     *
+     * @param reader  script content.
+     * @param pc      parameters for substitution.
      * @param counter statements counter.
      */
     public void execute(Reader reader, ParametersCallback pc, AbstractConnection.StatementCounter counter) {
@@ -97,7 +102,7 @@ public class TextScriptExecutor implements Closeable, Flushable {
                     line = line.trim();
                 }
                 //If trimming is disabled (keeping format) or if line is not empty 
-                if (!trim || line.length()>0) {
+                if (!trim || line.length() > 0) {
                     try {
                         out.write(ps.substitute(line));
                         out.write(eol);
@@ -120,6 +125,6 @@ public class TextScriptExecutor implements Closeable, Flushable {
     public void close() throws IOException {
         IOUtils.closeSilently(out);
         out = null;
-        ps=null;
+        ps = null;
     }
 }

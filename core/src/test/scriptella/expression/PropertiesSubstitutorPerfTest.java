@@ -29,7 +29,8 @@ import java.util.Arrays;
 public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
     /**
      * History:
-     * 13.05.2007 - Duron 1700 Mhz JDK6 - 2700 ms 
+     * 27.04.2010 - Core Duo II 2.4GHz - 2200 ms
+     * 13.05.2007 - Duron 1700 Mhz JDK6 - 2700 ms
      * 09.03.2007 - Athlon 64 X2 2GHz - 1330 ms
      * 08.03.2007 - Athlon 64 X2 2GHz - 1850 ms
      * 05.09.2006 - Duron 1700 Mhz JDK5 - 4078 ms
@@ -37,14 +38,14 @@ public class PropertiesSubstitutorPerfTest extends AbstractTestCase {
     public void test() {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NAME);
 
-        char [] fillC = new char[1000];
-        Arrays.fill(fillC,'-');
+        char[] fillC = new char[1000];
+        Arrays.fill(fillC, '-');
         String fill = new String(fillC);
 
-        String line = "Text ${subst1} $subst2 "+fill+":$end //";
-        String exp = "Text subst1 subst2 "+fill+":end //";
+        String line = "Text ${subst1} $subst2 " + fill + ":$end //";
+        String exp = "Text subst1 subst2 " + fill + ":end //";
 
-        for (int i=0;i<100000;i++) {
+        for (int i = 0; i < 100000; i++) {
             String s = ps.substitute(line);
             assertEquals(exp, s);
         }

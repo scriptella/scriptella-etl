@@ -39,6 +39,8 @@ public abstract class AbstractTextConnection extends AbstractConnection {
     protected final URL url; //if null - use console
     protected final String eol;
     protected final int skipLines;
+    protected final String nullString;
+
 
     /**
      * Name of the <code>encoding</code> connection property.
@@ -73,6 +75,12 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      */
     public static final String SKIP_LINES = "skip_lines";
 
+    /**
+     * Name of the <code>null_string</code> connection property.
+     * If set, specifies value of a string token to be parsed as Java <code>null</code> literal.
+     */
+    public static final String NULL_STRING = "null_string";
+
 
     /**
      * For testing only.
@@ -84,6 +92,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         url = null;
         eol = "\n";
         skipLines = 0;
+        nullString = null;
     }
 
     /**
@@ -103,6 +112,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
         String eolStr = parameters.getStringProperty(TextConnection.EOL);
         eol = eolStr != null ? eolStr : "\n";//Default value
         skipLines = parameters.getIntegerProperty(SKIP_LINES, 0);
+        nullString = parameters.getStringProperty(NULL_STRING);
     }
 
     public String getEncoding() {

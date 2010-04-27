@@ -19,6 +19,7 @@ import scriptella.AbstractTestCase;
 import scriptella.spi.MockParametersCallbacks;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * Tests {@link PropertiesSubstitutor}
@@ -50,6 +51,22 @@ public class PropertiesSubstitutorTest extends AbstractTestCase {
         PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NULL);
         String exp = "$$ Text${subst1}${subst2}$subst3$subst4 End of test";
         String s = ps.substitute(exp);
+        assertEquals(exp, s);
+
+        //Now check if nullString is set
+        ps = new PropertiesSubstitutor(MockParametersCallbacks.NULL);
+        ps.setNullString("NULL");
+        assertEquals("NULL", ps.getNullString());
+        String expr = "$$ Test ${ex} ex ${ex1+ex2}....$test";
+        exp = "$$ Test NULL ex 0....NULL";
+        s = ps.substitute(expr);
+        assertEquals(exp, s);
+
+        ps = new PropertiesSubstitutor(Collections.singletonMap("a", "vA"));
+        ps.setNullString("NULL");
+        expr = "__$$$ __ vA_a_$$a $b/$c$";
+        exp = "__$$$ __ vA_a_$vA NULL/NULL$";
+        s = ps.substitute(expr);
         assertEquals(exp, s);
     }
 }

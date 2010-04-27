@@ -4,18 +4,23 @@ It allows querying a text file based on regular expressions, the text driver
 can also be used as a lightweight replacement for Velocity to produce
 simple output with properties substitution.
 <p>Text driver does depends on additional libraries and is generally faster than CSV or Velocity driver.</p>
+
 <p><b>Note: </b>The driver doesn't use SQL syntax
+
 <h2>General information</h2>
 <table>
     <tr>
-        <td><b>Driver class:</b></td><td><code>scriptella.driver.text.Driver</code></td>
+        <td><b>Driver class:</b></td>
+        <td><code>scriptella.driver.text.Driver</code></td>
     </tr>
     <tr>
-        <td><b>URL:</b></td><td><code>Text file URL. URIs are resolved relative to a script file directory.
-    If url has no value the output is read from/printed to the console (System.out).</code></td>
+        <td><b>URL:</b></td>
+        <td><code>Text file URL. URIs are resolved relative to a script file directory.
+            If url has no value the output is read from/printed to the console (System.out).</code></td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+        <td><b>Runtime dependencies:</b></td>
+        <td><code>None</code></td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -38,7 +43,7 @@ simple output with properties substitution.
     <tr>
         <td>trim</td>
         <td>Value of <code>true</code> specifies that the leading and trailing
-     whitespaces in text file lines should be omitted.
+            whitespaces in text file lines should be omitted.
         <td>No, the default value is <code>true</code>.</td>
     </tr>
     <tr>
@@ -52,22 +57,46 @@ simple output with properties substitution.
         <td>The number of lines to skip before start reading.
         <td>No, the default value is <code>0</code> (no lines are skipped).</td>
     </tr>
+    <tr>
+        <td>null_string</td>
+        <td>Specifies string token to represent Java <code>null</code> literal.
+            <p>
+                When querying a text file, regex group equal to null_string is returned as Java null.<br>
+                When outputting content, if null_string is specified, all the missing variables, or the vars with a null
+                value
+                are substituted with <code>null_string</code>.
+
+            <p>Specify an empty string (<code>null_string=</code>) to automatically convert between nulls in memory and
+                empty strings in files.
+                For example: Query regex: <code>\d*,\d*,\d*</code>, input line <code>1,,5</code> is parsed into a set of
+                3 variables with the following values <code>{"1", null, "5"}</code>
+                as opposed to the default behaviour <code>{"1","","5"}</code>.
+            </p>
+        </td>
+        <td>No, by default strings are preserved, i.e. empty strings are not converted to nulls and null variables
+            references are not expanded in the output, i.e. ${nullvalue}.
+        </td>
+    </tr>
 </table>
 <h2>Query Syntax</h2>
 Text driver supports Regular expressions syntax to query text files.
 The file is read line-by-line from the location specified by the URL connection property and each line is matched
 against the regex pattern.
 <p>
-If a line or a part of it matches the pattern this match produces a virtual row in a result set.
-The column names in a virtual result set correspond to matched regex group names.
-For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
+    If a line or a part of it matches the pattern this match produces a virtual row in a result set.
+    The column names in a virtual result set correspond to matched regex group names.
+    For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
     result set row contains two columns(groups): 0-foobar, 1-bar. These columns
     can be referenced in child script or query elements by a numeric name or by a string name <code>columnN</code>.
 </p>
+
 <p>It also possible to specify more than one regular expressions to match file content.
-Specify each regular expression on a separate line to match them using OR condition.
-<p>The Text driver uses <code>java.util.regex</code> implementation for pattern matching. See <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">java.util.Pattern</a>
+    Specify each regular expression on a separate line to match them using OR condition.
+
+<p>The Text driver uses <code>java.util.regex</code> implementation for pattern matching. See <a
+        href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">java.util.Pattern</a>
     for supported syntax Javadoc.</p>
+
 <p>Additional notes:
 <ul>
     <li>Regular expressions matching is case-insensitive</li>
@@ -130,11 +159,15 @@ The &lt;script&gt; element content is read line-by-line, for each line
 properties are expanded and the output is sent to the file specifed by a url connection attribute.
 <p>Additional notes:
 <ul>
-    <li>Lines in the outputted file are separated by a EOL string specified by <code>eol</code> connection property.</li>
+    <li>Lines in the outputted file are separated by a EOL string specified by <code>eol</code> connection property.
+    </li>
     <li>Leading and trailing whitespaces in the output file lines are trimmed by default.</li>
     <li>No escaping is performed when properties are expanded. Use String.replace or other escaping techniques to
-        achieve output similar to CSV etc.</li>
-    <li>If a script is executed multiple times (e.g. inside a parent query) the output is appended to the file content.</li>
+        achieve output similar to CSV etc.
+    </li>
+    <li>If a script is executed multiple times (e.g. inside a parent query) the output is appended to the file
+        content.
+    </li>
 </ul>
 </p>
 <br><u>Example:</u>
@@ -151,8 +184,20 @@ For id=1 and table=system this script produces the following output:
 Inserted a record with ID=1. Table=system
     </pre>
 </code>
+
 <h2>Properties substitution</h2>
 In text script and query elements ${property} or $property syntax is used for properties/variables substition.
+<p><u>NOTE:</u></p>
+By default NULL variables and expressions are preserved, use <code>null_string</code> connection property to specify
+a string token for nulls.
+For example setting null_string to empty string in the connection properties section will enable parsing
+empty strings as nulls:
+<pre><code>&lt;connection driver="csv" url="report.csv"&gt;
+    null_string=
+    &lt;/connection&gt;</code></pre>
+Scriptella properties substitution engine cannot distinguish null value from unused variable or some random usage of
+$var syntax,
+therefore we've chosen to preserve these blocks until user explicitly specify the value of null_string.
 <h2>Examples</h2>
 <code><pre>
 &lt;connection id="in" driver="text" url="data.csv"&gt;
@@ -170,7 +215,8 @@ In text script and query elements ${property} or $property syntax is used for pr
     &lt;/script&gt;
 &lt;/query&gt;
 
-</pre></code>
+</pre>
+</code>
 Copies rows from data.csv file to report.csv, additionally the ID column is added.
 The result file is semicolon separated.
 </body>

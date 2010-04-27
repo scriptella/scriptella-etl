@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class  CsvConnection extends AbstractTextConnection {
+public class CsvConnection extends AbstractTextConnection {
     protected static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
     private Writer writer;
@@ -64,16 +64,9 @@ public class  CsvConnection extends AbstractTextConnection {
      */
     public static final String HEADERS = "headers";
 
-    /**
-     * Name of the <code>null_string</code> connection property.
-     * If set, specifies value of a string token to be parsed as Java <code>null</code> literal.
-     */
-    public static final String NULL_STRING = "null_string";
-
     protected final char separator;
     protected final char quote;
     protected final boolean headers;
-    protected final String nullString;
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
@@ -93,7 +86,6 @@ public class  CsvConnection extends AbstractTextConnection {
         }
 
         headers = parameters.getBooleanProperty(HEADERS, true);
-        nullString = parameters.getStringProperty(NULL_STRING);
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
@@ -114,6 +106,7 @@ public class  CsvConnection extends AbstractTextConnection {
     void executeScript(CSVReader reader, ParametersCallback parametersCallback) throws IOException {
         CSVWriter out = getOut();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
+        ps.setNullString(nullString);
         for (String[] row; (row = reader.readNext()) != null;) {
             EtlCancelledException.checkEtlCancelled();
             for (int i = 0; i < row.length; i++) {
