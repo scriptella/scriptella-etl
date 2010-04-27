@@ -78,11 +78,14 @@ class TextQueryExecutor implements ParametersCallback {
     private Matcher result;
     private boolean trim;
     private int skipLines;
+    private String nullString;
     private static final String COLUMN_PREFIX = "column";
 
-    public TextQueryExecutor(final Reader queryReader, final PropertiesSubstitutor substitutor, final boolean trim, final int skipLines) {
+    public TextQueryExecutor(final Reader queryReader, final PropertiesSubstitutor substitutor,
+                             final boolean trim, final int skipLines, final String nullString) {
         this.trim = trim;
         this.skipLines = skipLines;
+        this.nullString = nullString;
         ps = substitutor;
         //Compiles patterns loaded from specified reader.
         //Patterns are read line-by-line.
@@ -117,10 +120,10 @@ class TextQueryExecutor implements ParametersCallback {
     /**
      * Executes a query and iterates the resultset using the callback.
      *
-     * @param qc callback to notify on each row.
+     * @param qc      callback to notify on each row.
      * @param counter statements counter.
      */
-    public void execute(Reader reader, final QueryCallback qc,  AbstractConnection.StatementCounter counter) {
+    public void execute(Reader reader, final QueryCallback qc, AbstractConnection.StatementCounter counter) {
         int qCount = query.length;
         Matcher[] matchers = new Matcher[qCount];
         LineIterator it = new LineIterator(reader, ps, trim);
@@ -147,7 +150,7 @@ class TextQueryExecutor implements ParametersCallback {
                 }
             }
         }
-        counter.statements+=qCount;
+        counter.statements += qCount;
     }
 
 
@@ -167,7 +170,8 @@ class TextQueryExecutor implements ParametersCallback {
             try {
                 int ind = Integer.parseInt(str);
                 if (ind >= 0 && ind <= result.groupCount()) {
-                    return result.group(ind);
+                    final String s = result.group(ind);
+                    return (nullString != null && nullString.equals(s)) ? null : s;
                 }
             } catch (NumberFormatException e) {
                 ExceptionUtils.ignoreThrowable(e);

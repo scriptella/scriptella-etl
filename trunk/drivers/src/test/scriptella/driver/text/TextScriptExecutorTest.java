@@ -39,8 +39,8 @@ public class TextScriptExecutorTest extends AbstractTestCase {
     public void test() throws IOException {
         String s = "  $rownum;$name;$surname;${email.trim().replaceAll('@','_at_')}\n";
         StringWriter out = new StringWriter();
-        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n");
-        Map<String,String> m = new HashMap<String, String>();
+        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n", null);
+        Map<String, String> m = new HashMap<String, String>();
         m.put("rownum", "1");
         m.put("name", "John");
         m.put("surname", "G");
@@ -63,5 +63,26 @@ public class TextScriptExecutorTest extends AbstractTestCase {
         assertEquals("1;John;G;john_at_nosuchhost.com", ar[0]);
         assertEquals("2;Jim;G;jim_at_nosuchhost.com", ar[1]);
     }
+
+    /**
+     * Tests general functionality.
+     */
+    public void testNullString() throws IOException {
+        String s = "$rownum;$name;$surname\n";
+        StringWriter out = new StringWriter();
+        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n", "Null");
+        Map<String, String> m = new HashMap<String, String>();
+        m.put("rownum", "1");
+        m.put("surname", "G");
+
+        ParametersCallback c = MockParametersCallbacks.fromMap(m);
+        AbstractConnection.StatementCounter counter = new AbstractConnection.StatementCounter();
+        ts.execute(new StringReader(s), c, counter);
+        assertEquals(1, counter.statements);
+        ts.close();
+        String res = out.toString();
+        assertEquals("1;Null;G\n", res);
+    }
+
 
 }

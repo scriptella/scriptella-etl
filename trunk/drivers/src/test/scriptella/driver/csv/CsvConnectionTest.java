@@ -18,6 +18,7 @@ package scriptella.driver.csv;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
+import scriptella.driver.text.AbstractTextConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
@@ -143,10 +144,10 @@ public class CsvConnectionTest extends AbstractTestCase {
         CsvConnection con = new CsvConnection(cp);
         con.executeQuery(new StringResource(" c4.*"), //extra leading whitespace
                 MockParametersCallbacks.SIMPLE, new QueryCallback() {
-            public void processRow(final ParametersCallback parameters) {
-                fail("Whitespace trimming should be suppressed.");
-            }
-        });
+                    public void processRow(final ParametersCallback parameters) {
+                        fail("Whitespace trimming should be suppressed.");
+                    }
+                });
         con.executeScript(new StringResource(" $a,$b , $c "),
                 MockParametersCallbacks.SIMPLE);
 
@@ -168,7 +169,24 @@ public class CsvConnectionTest extends AbstractTestCase {
         String str = "-test-";
         con.executeScript(new StringResource(str), MockParametersCallbacks.NULL);
         assertNotNull(out);
-        assertEquals(str+"\n", new String(out.toByteArray()));
+        assertEquals(str + "\n", new String(out.toByteArray()));
+    }
+
+    public void testNullString() {
+        //Create a configuration with non default values
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(AbstractTextConnection.NULL_STRING, "");
+        props.put(CsvConnection.QUOTE, "");
+        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+
+        CsvConnection con = new CsvConnection(cp);
+        String str = "$a,$b,$c";
+        props = new HashMap<String, String>();
+        props.put("a", "1");
+        props.put("c", "2");
+        con.executeScript(new StringResource(str), MockParametersCallbacks.fromMap(props));
+        con.close();
+        assertEquals("1,,2\n", new String(out.toByteArray()));
     }
 
     /**
@@ -182,7 +200,7 @@ public class CsvConnectionTest extends AbstractTestCase {
 
         CsvConnection con = new CsvConnection(cp);
         testCsvInput = "-skipped---,--\n-skipped---,--\nc1,c2\n11,12";
-        rows=0;
+        rows = 0;
         con.executeQuery(new StringResource(""), MockParametersCallbacks.NULL, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
@@ -195,7 +213,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         assertEquals(1, rows);
         //Now test if the number of lines to skip exceeds the file size
         testCsvInput = "v1,v2\nv3,v4";
-        rows=0;
+        rows = 0;
         con.executeQuery(new StringResource(""), MockParametersCallbacks.NULL, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
@@ -203,7 +221,6 @@ public class CsvConnectionTest extends AbstractTestCase {
         });
         assertEquals(0, rows);
     }
-
 
 
 }

@@ -63,6 +63,9 @@ public class PropertiesSubstitutor {
     final Matcher m1 = PROP_PTR.matcher("");
     final Matcher m2 = EXPR_PTR.matcher("");
 
+    private ParametersCallback parameters;
+    private String nullString;
+
     /**
      * Creates a properties substitutor.
      * <p>This constructor is used for performance critical places where multiple instantiation
@@ -91,8 +94,6 @@ public class PropertiesSubstitutor {
     public PropertiesSubstitutor(Map<String, ?> map) {
         this(new MapParametersCallback(map));
     }
-
-    private ParametersCallback parameters;
 
     /**
      * Substitutes properties/expressions in s and returns the result string.
@@ -206,18 +207,40 @@ public class PropertiesSubstitutor {
     }
 
     /**
+     * Returns string literal representing null value.
+     * <p>Used when converting objects {@link #toString(Object)}.
+     *
+     * @return string representing null value.
+     */
+    public String getNullString() {
+        return nullString;
+    }
+
+    /**
+     * Sets string literal representing null.
+     * <p>Used when converting objects {@link #toString(Object)}.
+     *
+     * @param nullString string literal representing null
+     */
+    public void setNullString(String nullString) {
+        this.nullString = nullString;
+    }
+
+    /**
      * Converts specified object to string.
+     * <p>{@link #getNullString()} represents null values.
      * <p>Subclasses may provide custom conversion strategy here.
      *
      * @param o object to convert to String.
      * @return string representation of object.
      */
     protected String toString(final Object o) {
-        return o == null ? null : o.toString();
+        return o == null ? nullString : o.toString();
     }
 
     /**
      * Tests if the given string contains properties/expressions.
+     *
      * @param string string to check.
      * @return true if a given string contains properties/expressions.
      */

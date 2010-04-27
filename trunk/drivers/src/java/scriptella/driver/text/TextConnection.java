@@ -68,7 +68,7 @@ public class TextConnection extends AbstractTextConnection {
     protected void initOut() {
         if (out == null) {
             try {
-                this.out = new TextScriptExecutor(newOutputWriter(), trim, eol);
+                this.out = new TextScriptExecutor(newOutputWriter(), trim, eol, nullString);
             } catch (IOException e) {
                 throw new TextProviderException("Unable to open file " + url + " for writing", e);
             }
@@ -94,7 +94,7 @@ public class TextConnection extends AbstractTextConnection {
         }
 
         try {
-            new TextQueryExecutor(q, new PropertiesSubstitutor(parametersCallback), trim, skipLines).
+            new TextQueryExecutor(q, new PropertiesSubstitutor(parametersCallback), trim, skipLines, nullString).
                     execute(in, queryCallback, counter);
         } finally {
             IOUtils.closeSilently(q);

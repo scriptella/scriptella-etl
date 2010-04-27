@@ -51,7 +51,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
                     throw new IllegalArgumentException(name);
                 }
             }
-        }), true, 0);
+        }), true, 0, null);
         final Set<String> expected = new HashSet<String>();
         expected.add("msg1");
         expected.add("msg3");
@@ -63,13 +63,13 @@ public class TextQueryExecutorTest extends AbstractTestCase {
             }
         }, cnt);
         assertEquals(1, cnt.statements);
-        assertTrue("The following elements were skipped "+expected, expected.isEmpty());
+        assertTrue("The following elements were skipped " + expected, expected.isEmpty());
     }
 
     public void testEmptyQuery() {
         StringReader in = new StringReader("line1\nline2");
         TextQueryExecutor tq = new TextQueryExecutor(new StringReader(""),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, 0);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, 0, null);
         final Set<String> expected = new HashSet<String>();
         expected.add("line1");
         expected.add("line2");
@@ -81,7 +81,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
             }
         }, cnt);
         assertEquals(1, cnt.statements);
-        assertTrue("The following elements were skipped "+expected, expected.isEmpty());
+        assertTrue("The following elements were skipped " + expected, expected.isEmpty());
     }
 
     /**
@@ -90,7 +90,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
     public void testQueryMultiline() {
         StringReader in = new StringReader("line1\nline2\nline3\nline4");
         TextQueryExecutor tq = new TextQueryExecutor(new StringReader("line2\nline4"),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, 0);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), false, 0, null);
         final Set<String> expected = new HashSet<String>();
         expected.add("line2");
         expected.add("line4");
@@ -102,7 +102,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
             }
         }, cnt);
         assertEquals(2, cnt.statements);
-        assertTrue("The following elements were skipped "+expected, expected.isEmpty());
+        assertTrue("The following elements were skipped " + expected, expected.isEmpty());
     }
 
 
@@ -113,9 +113,9 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         char[] b = new char[64000];
         Arrays.fill(b, 'a');
 
-        StringReader in = new StringReader(new String(b)+"match111111");
+        StringReader in = new StringReader(new String(b) + "match111111");
         TextQueryExecutor tq = new TextQueryExecutor(new StringReader(".*(match).*"),
-                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), true, 0);
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), true, 0, null);
         final Set<String> expected = new HashSet<String>();
         expected.add("match");
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
@@ -128,7 +128,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
             }
         }, cnt);
         assertEquals(1, cnt.statements);
-        assertTrue("The following elements were skipped "+expected, expected.isEmpty());
+        assertTrue("The following elements were skipped " + expected, expected.isEmpty());
     }
 
     private int lines; //tmp variable to store number of lines read
@@ -138,9 +138,9 @@ public class TextQueryExecutorTest extends AbstractTestCase {
      */
     public void testSkipLines() {
         TextQueryExecutor e = new TextQueryExecutor(new StringReader("([^\\t]*)\\t+([^\\t]*)"),
-                new PropertiesSubstitutor(MockParametersCallbacks.NULL), false, 2);
+                new PropertiesSubstitutor(MockParametersCallbacks.NULL), false, 2, null);
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
-        lines=0;
+        lines = 0;
         e.execute(new StringReader("11\t12\n21\t22\n31\t32"), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 lines++;
@@ -151,7 +151,7 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         }, cnt);
         assertEquals(1, lines);
         //Now test if number of lines to skip is larger than a file
-        cnt.statements=0;
+        cnt.statements = 0;
         e.execute(new StringReader(""), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
             }
@@ -159,4 +159,23 @@ public class TextQueryExecutorTest extends AbstractTestCase {
         assertEquals(1, cnt.statements);
 
     }
+
+    /**
+     * Tests if null_string parameter is working.
+     */
+    public void testNullString() {
+        TextQueryExecutor e = new TextQueryExecutor(new StringReader("([^\\t]*)\\t+([^\\t]*)"),
+                new PropertiesSubstitutor(MockParametersCallbacks.NULL), false, 0, "NULL");
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
+        e.execute(new StringReader("11\tNULL"), new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                lines++;
+                assertEquals("11", parameters.getParameter("1"));
+                assertEquals(null, parameters.getParameter("2"));
+                assertEquals("11\tNULL", parameters.getParameter("0"));
+            }
+        }, cnt);
+        assertEquals(1, lines);
+    }
+
 }
