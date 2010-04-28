@@ -19,13 +19,13 @@
         Use build.properties/custom.build.properties to customize its behaviour.
     </description>
 
-	<property file="custom.build.properties"/>
+    <property file="custom.build.properties"/>
     <property file="build.properties"/>
 
-	<xmlproperty file="pom.xml" prefix="pom.xml" />
+    <xmlproperty file="pom.xml" prefix="pom.xml"/>
     <property name="version" value="${pom.xml.project.version}"/>
 
-	<property name="build.dir" value="${basedir}/build"/>
+    <property name="build.dir" value="${basedir}/build"/>
     <property name="lib.dir" value="${basedir}/lib"/>
     <property name="core" value="${basedir}/core"/>
     <property name="tools" value="${basedir}/tools"/>
@@ -39,9 +39,10 @@
     <property name="zip.name" value="${product.name}.zip"/>
     <property name="srcide.zip.name" value="scriptella-src-ide.zip"/>
     <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
-	<fileset id="src.zip.fileset" dir="${basedir}"
-             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**"
-             excludes="samples/lib/**"/>
+    <fileset id="src.zip.fileset" dir="${basedir}"
+             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**
+                       *.xml **/pom.xml *.properties forrest/**"
+             excludes="samples/lib/** custom*.properties forrest/build/**"/>
     <property name="src.zip.includes" value=""/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
     <tstamp/>
@@ -71,7 +72,7 @@
         <delete file="${build.dir}/${jar.name}" failonerror="no"/>
         <copy todir="${tmp.dir}" file="${basedir}/build-templates/MANIFEST.MF" overwrite="true">
             <filterchain>
-                <expandproperties />
+                <expandproperties/>
             </filterchain>
         </copy>
         <jar destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF">
