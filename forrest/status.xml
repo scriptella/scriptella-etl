@@ -46,7 +46,7 @@
             <action context="code" type="update" dev="ejboy" fixes-bug="7074">
                 Upgrade dependencies: hsqldb 1.8.0.10, velocity 1.6.2, janino 2.5.15, h2 1.1.116
             </action>
-            <action context="code" type="add" dev="ejboy" fixes-bug="8895">
+            <action context="code" type="add" dev="ejboy" fixes-bug="8700">
                 nostat command line option to suppress statistics collecting.
             </action>
             <action context="code" type="fix" dev="ejboy">
