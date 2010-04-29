@@ -7,10 +7,7 @@
     <body>
         <section>
             <title>Community Support</title>
-            <p>For community support, check out the <a href="http://www.javaforge.com/proj/forum/browseForum.do?forum_id=3126">Discussion Forum</a>.</p>
-            <note>
-                You have to <a href="http://www.javaforge.com/registration.do">register</a> a JavaForge account to post forum messages and submit issues. 
-            </note>
+            <p>For community support, check out the <a href="http://groups.google.com/group/scriptella">Google Group</a>.</p>
         </section>
         <section>
             <title>Commercial Support</title>
@@ -29,7 +26,7 @@
             Typically our customers migrate from commercial vendors like BEA, IBM, Sybase or Oracle to
             open source solutions (e.g. JBoss, Tomcat, MySQL etc.)</p>
             <p>Just <a href="mailto:scriptella@gmail.com?Subject=Support Request">drop me a line</a>
-                if you are interested in high-quality outsorcing and consulting services for an affordable price.</p>
+                if you are interested in consulting services related to Scriptella.</p>
         </section>
         <section>
             <title>Issue Tracker</title>
