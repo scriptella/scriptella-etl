@@ -90,7 +90,7 @@
     </target>
 
     <target name="site_postprocess" description="Additional postprocessing for statistics and other HTML changes">
-        <!-- Google Analytics -->
+        <!-- StatCounter -->
         <replace dir="${basedir}/forrest/build/site">
             <include name="**/*.html"/>
             <exclude name="docs/** dtd/**"/>
@@ -112,7 +112,6 @@ var sc_security="748ecb1a";
 </body>
 </html>]]></replacevalue>
         </replace>
-
         <!-- Bookmarks + PayPal -->
         <replace dir="${basedir}/forrest/build/site">
             <include name="**/*.html"/>
@@ -122,13 +121,12 @@ var sc_security="748ecb1a";
 <!-- AddThis Bookmark Button BEGIN -->
 <a href="http://www.addthis.com/bookmark.php" onclick="window.open('http://www.addthis.com/bookmark.php?pub=ejboy&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title), 'addthis', 'scrollbars=yes,menubar=no,width=620,height=520,resizable=yes,toolbar=no,location=no,status=no'); return false;" title="Bookmark using any bookmark manager!" target="_blank"><img src="http://www.addthis.com/images/button1-bm.gif" width="125" height="16" border="0" alt="AddThis Social Bookmark Button" /></a>
 <!-- AddThis Bookmark Button END -->
+<br>
+<br>
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_donations">
-<input type="hidden" name="business" value="scriptella@gmail.com">
-<input type="hidden" name="lc" value="US">
-<input type="hidden" name="item_name" value="Scriptella ETL">
-<input type="hidden" name="currency_code" value="USD">
-<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHNwYJKoZIhvcNAQcEoIIHKDCCByQCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYA8HGHeu4fFzJa8+PNftXI6O+/dEOXlRx81F/6FTzKk6jr0gGsODKDpZ4URUh8eAw7nsW9pjlIUW+2E78JvXa4+bZvI/jx0pFAKT9q7/HWIKkgMx3QrXUr+JTWbTcamGn50X/KdbW+qa8r+lLemBHJ/KteaFxDzLJdjzq+GUnw7EzELMAkGBSsOAwIaBQAwgbQGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIv6efdy52+H2AgZB5c6HzDy4MneEGeLQapLpcHyPU7dn5y3IlvLIu/RyZ7FfgN7bkTQVisnKhyyGPICmEfkox/BIvOBwKczv8LwJZ/9WR8hmbntyGx7ed3TJqxJpyGo1lueFbXImpFFjoY1X7NDMavdzkHXEj4mRKlDVa6D2z76v4zsEtnGAsmKU6ghovZkeQlrDU87PnhHv4F4qgggOHMIIDgzCCAuygAwIBAgIBADANBgkqhkiG9w0BAQUFADCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20wHhcNMDQwMjEzMTAxMzE1WhcNMzUwMjEzMTAxMzE1WjCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMFHTt38RMxLXJyO2SmS+Ndl72T7oKJ4u4uw+6awntALWh03PewmIJuzbALScsTS4sZoS1fKciBGoh11gIfHzylvkdNe/hJl66/RGqrj5rFb08sAABNTzDTiqqNpJeBsYs/c2aiGozptX2RlnBktH+SUNpAajW724Nv2Wvhif6sFAgMBAAGjge4wgeswHQYDVR0OBBYEFJaffLvGbxe9WT9S1wob7BDWZJRrMIG7BgNVHSMEgbMwgbCAFJaffLvGbxe9WT9S1wob7BDWZJRroYGUpIGRMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbYIBADAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAIFfOlaagFrl71+jq6OKidbWFSE+Q4FqROvdgIONth+8kSK//Y/4ihuE4Ymvzn5ceE3S/iBSQQMjyvb+s2TWbQYDwcp129OPIbD9epdr4tJOUNiSojw7BHwYRiPh58S1xGlFgHFXwrEBb3dgNbMUa+u4qectsMAXpVHnD9wIyfmHMYIBmjCCAZYCAQEwgZQwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tAgEAMAkGBSsOAwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xMDA0MjkxOTQ1MjlaMCMGCSqGSIb3DQEJBDEWBBRoA7212QcytG8Ov07WpdbfgtU0jDANBgkqhkiG9w0BAQEFAASBgAeduqJc9Nh7ptEuBvUqV99rb45NH0sdWmlJIn4pDP1gl2v7BxAqjDrstoidZNO2iFU3b6UVYOXR/gf52eX5je5wzuoInE+Uen5iMKQOtVK4shKLPJ8PfjZh/4lup+BU49P9m3owCVoprHL8baj3roT9WY18FTOEP7/tZpPCp1Qz-----END PKCS7-----
+">
 <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
