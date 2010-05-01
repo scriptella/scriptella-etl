@@ -106,24 +106,33 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.0 RC Released (April 2, 2008)</title>
-                <p>We are pleased to announce the availability of Scriptella 1.0 Release Candidate.
-                    This release introduces support for new features and
-                    fixes several bugs found in BETA version.
-                    Notable features and bug fixes:</p>
+                <title>Scriptella 1.0 Released (!Date!, 2010)</title>
+                <p>We are pleased to announce the availability of Scriptella 1.0.
+                    This release fixes few minor bugs found in RCs:
+                </p>
                 <ul>
-                    <li>Make driver attribute optional with default value of "auto"</li>
-                    <li>etl.text utility methods to format strings</li>
-                    <li>Execute multiple ETL files in Spring</li>
-                    <li>Add "exclude=true/false" attribute for dialect tag.</li>
-                    <li>NullpointerException in JEXL expressions if running in multiple threads</li>
-                    <li>Inserting NULL values into a DB2 database</li>
-                    <li>Simplified onerror regex matching for message and type attributes</li>
-                    <li>New drivers: IBM AS/400 and SqlSheet JDBC Excel driver.</li>
-                    <li>Improved CSV driver. opencsv library was replaced with a built-in implementation.</li>
+                    <li>Fixed: ArrayIndexOutOfBounds thrown when lazy-initialization fails for connection</li>
+                    <li>Fixed: Cannot load class when scriptella is packaged in an EAR file in JBoss</li>
+                    <li>Fixed auto-discovery driver aliases for PostgreSQL/DB2</li>
+                    <li>Fixed: Cannot write to HTTP URL</li>
                 </ul>
-                <p>See <a href="changes.html">change log</a> for additional details.<br/>
-                <a href="tutorial.html">Make ETL easier</a> - <a href="download.html">Download Scriptella Now!</a></p>
+                <p>The following features are introduced:</p>
+                <ul>
+                    <li>Added CUBRID Database driver.</li>
+                    <li>Use null_string to expand $variable when it has null value. CSV, text driver</li>
+                    <li>nostat command line option to suppress statistics collecting</li>
+                </ul>
+                <p>See
+                    <a href="changes.html">change log</a>
+                    for additional details.
+                    <br/>
+                    <a href="tutorial.html">Make ETL easier</a>
+                    -
+                    <a href="download.html">Download Scriptella Now!</a>
+                </p>
+                <p>Work on 1.1 has begun, see
+                    <a href="http://www.javaforge.com/wiki/69768">Roadmap for 1.1</a>
+                </p>
             </section>
         </section>
         </body>
