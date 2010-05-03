@@ -1,0 +1,23 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:dynamicInclude" user="sa" password=""/>
+    <script>
+        CREATE TABLE Files (
+            Name VARCHAR(20)
+        );
+        CREATE TABLE Data (
+            ID INT
+        );
+        INSERT INTO Files VALUES ('DynamicIncludeITest1.sql');
+        INSERT INTO Files VALUES ('DynamicIncludeITestnosuchfile.sql');
+        INSERT INTO Files VALUES ('DynamicIncludeITest2.sql');
+    </script>
+    <query>
+        SELECT * FROM Files
+        <script><!-- Includes files read from the table -->
+            <include href="$name">
+                <fallback>INSERT INTO Data VALUES (-1)</fallback>
+            </include>
+        </script>
+    </query>
+</etl>

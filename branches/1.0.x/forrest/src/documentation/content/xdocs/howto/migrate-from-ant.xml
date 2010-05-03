@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2006-2009 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE howto PUBLIC "-//APACHE//DTD How-to V2.0//EN" "dtd/howto-v20.dtd">
+<howto>
+	<header>
+		<title>Migrating from Ant SQL Task to Scriptella ETL.</title>
+		<authors>
+			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+		</authors>
+		<notice>Work in progress</notice>
+		<abstract>This How-To describes the steps necessary to convert Ant-based DB creation scripts to Scriptella ETL files.</abstract>
+		<last-modified-content-date date="10.11.2006"/>
+	</header>
+	<audience title="Intended Audience">
+		<p>Developers/DBAs.</p>
+	</audience>
+	<purpose title="Purpose">
+		<p>This how-to is intended to simplify migration from Ant-based DB creation scripts to Scriptella ETL files. As the result you can get the following benefits:</p>
+		<ul>
+			<li>Possibility to upload binary files from any URL. Example: INSERT INTO Data_Table(ID, File) VALUES(1, ?{file 'pagefile.sys'})</li>
+			<li>Built-in support for non SQL datasources like CSV or LDAP Directories</li>
+			<li>Interoperability between several databases(or other datasources) in a single file. This means you can query one DB and insert the results into another one or export the result set to a CSV/HTML/... report file</li>
+			<li>Easy redistribution, you just have to put your ETL file, scriptella.jar (less than 500K) and required drivers to run your scripts in any environment with JRE installed.
+                Run your scripts from command-line, Ant or any other java environment.</li>
+			<li>User friendly GUI wizards to run your ETL files in interactive mode. <strong>Not supported yet</strong>.</li>
+		</ul>
+	</purpose>
+	<prerequisites title="Prerequisites">
+		<ul>
+			<li>Read the <a href="../tutorial.html">Tutorial</a>.</li>
+			<li><a href="../download.html">Download</a> Scriptella binary distribution.</li>
+		</ul>	
+	</prerequisites>
+	<steps title="Steps">
+		<section>
+			<title>The simplest case</title>
+			<p>Here is a simple example of Ant SQL task:</p>
+			<source><![CDATA[<sql driver="org.database.jdbcDriver" url="jdbc:database-url"
+    userid="sa"  password="pass" classpath="lib/driver.jar">
+	INSERT INTO Table VALUES (1,2,3,4);
+	INSERT INTO Table VALUES (2,3,4,5);
+</sql>]]>
+			</source>
+			<p>The Scriptella equivalent is the following:</p>
+			<source>
+			<![CDATA[
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.database.jdbcDriver" url="jdbc:database-url" 
+    user="sa" password="pass" classpath="lib/driver.jar"/>
+    <script>
+	INSERT INTO Table VALUES (1,2,3,4);
+	INSERT INTO Table VALUES (2,3,4,5);
+    </script>
+</etl>        			
+			]]>
+			</source>
+		</section>
+	</steps>
+</howto>

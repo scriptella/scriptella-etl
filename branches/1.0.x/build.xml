@@ -1,0 +1,167 @@
+<!--
+ Copyright 2006-2009 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<project name="scriptella" default="jar">
+    <description>
+        Build file for Scriptella Project.
+        Use build.properties/custom.build.properties to customize its behaviour.
+    </description>
+
+    <property file="custom.build.properties"/>
+    <property file="build.properties"/>
+
+    <xmlproperty file="pom.xml" prefix="pom.xml"/>
+    <property name="version" value="${pom.xml.project.version}"/>
+
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="core" value="${basedir}/core"/>
+    <property name="tools" value="${basedir}/tools"/>
+    <property name="drivers" value="${basedir}/drivers"/>
+    <property name="samples" value="${basedir}/samples"/>
+    <property name="tmp.dir" value="${build.dir}/tmp"/>
+    <property name="reports.dir" value="${build.dir}/reports"/>
+    <property name="tests.report.dir" value="${reports.dir}/junit"/>
+    <property name="jar.name" value="scriptella.jar"/>
+    <property name="product.name" value="scriptella-${version}"/>
+    <property name="zip.name" value="${product.name}.zip"/>
+    <property name="srcide.zip.name" value="scriptella-src-ide.zip"/>
+    <property name="src.zip.name" value="scriptella-${version}-src.zip"/>
+    <fileset id="src.zip.fileset" dir="${basedir}"
+             includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**
+                       *.xml **/pom.xml *.properties forrest/**"
+             excludes="samples/lib/** custom*.properties forrest/build/**"/>
+    <property name="src.zip.includes" value=""/>
+    <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
+    <tstamp/>
+
+    <target name="clean" unless="noclean">
+        <description>
+            Optional temp files cleanup.
+        </description>
+        <delete dir="${tmp.dir}" failonerror="no"/>
+        <ant dir="${core}" inheritall="false" target="clean"/>
+        <ant dir="${tools}" inheritall="false" target="clean"/>
+        <ant dir="${drivers}" inheritall="false" target="clean"/>
+    </target>
+
+    <target name="jar" depends="clean">
+        <description>
+            Produces main jar containing all required dependencies
+        </description>
+        <ant dir="${core}" inheritall="false"/>
+        <ant dir="${tools}" inheritall="false"/>
+        <ant dir="${drivers}" inheritall="false"/>
+        <copy todir="${build.dir}">
+            <fileset dir="${core}/build" includes="*.jar"/>
+            <fileset dir="${tools}/build" includes="*.jar"/>
+            <fileset dir="${drivers}/build" includes="*.jar"/>
+        </copy>
+        <delete file="${build.dir}/${jar.name}" failonerror="no"/>
+        <copy todir="${tmp.dir}" file="${basedir}/build-templates/MANIFEST.MF" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <jar destfile="${build.dir}/${jar.name}" manifest="${tmp.dir}/MANIFEST.MF">
+            <fileset dir="${core}/build/tmp/classes" excludes="META-INF/*"/>
+            <fileset dir="${tools}/build/tmp/classes" excludes="META-INF/*"/>
+            <fileset dir="${drivers}/build/tmp/classes" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-jexl.jar" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-logging.jar"
+                        excludes="META-INF/* **/NoOpLog* **/SimpleLog* **/LogSource*"/>
+            <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
+            </manifest>
+        </jar>
+        <!-- Update samples libs -->
+        <copy todir="${basedir}/samples/lib">
+            <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
+            <fileset file="${build.dir}/${jar.name}"/>
+        </copy>
+    </target>
+
+    <target name="zip" depends="jar">
+        <description>Prepares binary distribution</description>
+        <ant antfile="build-docs.xml" target="codereports"/>
+        <delete file="${build.dir}/${zip.name}" failonerror="false"/>
+        <delete file="${tmp.dir}/${srcide.zip.name}" failonerror="false"/>
+        <zip destfile="${tmp.dir}/${srcide.zip.name}">
+            <fileset dir="${core}/src/java" includes="**/*.java"/>
+            <fileset dir="${drivers}/src/java" includes="**/*.java"/>
+            <fileset dir="${tools}/src/java" includes="**/*.java"/>
+        </zip>
+        <zip destfile="${build.dir}/${zip.name}">
+            <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt" prefix="${product.name}/lib"/>
+            <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
+            <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
+            <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
+            <zipfileset dir="${basedir}" includes="README LICENSE NOTICE" prefix="${product.name}"/>
+            <zipfileset file="${tmp.dir}/${srcide.zip.name}" prefix="${product.name}"/>
+        </zip>
+    </target>
+
+    <target name="examples" depends="jar">
+        <description>Prepares examples distribution</description>
+        <delete file="${build.dir}/${examples.zip.name}" failonerror="false"/>
+        <zip destfile="${build.dir}/${examples.zip.name}">
+            <fileset dir="${basedir}/samples"/>
+        </zip>
+    </target>
+
+    <target name="srczip">
+        <description>Prepares src distribution</description>
+        <delete file="${build.dir}/${src.zip.name}" failonerror="false"/>
+        <zip destfile="${build.dir}/${src.zip.name}">
+            <fileset refid="src.zip.fileset"/>
+        </zip>
+    </target>
+
+    <target name="dist" depends="zip, srczip, examples">
+        <description>Prepares binary and src distribution</description>
+    </target>
+
+    <target name="test">
+        <description>
+            Runs unit tests and produces reports in ${tests.report.dir}.
+            The tests are runned per module to control dependencies between modules.
+        </description>
+
+        <ant dir="${core}" antfile="${core}/build.xml" target="test" inheritall="false"/>
+        <ant dir="${drivers}" antfile="${drivers}/build.xml" target="test" inheritall="false"/>
+        <ant dir="${tools}" antfile="${tools}/build.xml" target="test" inheritall="false"/>
+        <delete dir="${tests.report.dir}" failonerror="no"/>
+        <mkdir dir="${tests.report.dir}"/>
+        <junitreport todir="${tests.report.dir}">
+            <fileset dir="${core}/build/tmp/junit-xml" includes="TEST-*.xml"/>
+            <fileset dir="${drivers}/build/tmp/junit-xml" includes="TEST-*.xml"/>
+            <fileset dir="${tools}/build/tmp/junit-xml" includes="TEST-*.xml"/>
+            <report todir="${tests.report.dir}"/>
+        </junitreport>
+        <fail if="unit.tests.failed" message="JUnit test failed see ${tests.report.dir}"/>
+
+    </target>
+
+    <target name="coverage">
+        <description>
+            Runs junit and produce reports including code coverage.
+            Requires cobertura.dir to be specified in build.properties
+        </description>
+        <ant antfile="${basedir}/coverage.xml" inheritall="false"/>
+    </target>
+
+
+</project>

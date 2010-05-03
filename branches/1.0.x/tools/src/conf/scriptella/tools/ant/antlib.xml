@@ -1,0 +1,5 @@
+<antlib>
+    <taskdef name="etl" classname="scriptella.tools.ant.EtlExecuteTask" uri="org.scriptella">
+
+    </taskdef>
+</antlib>

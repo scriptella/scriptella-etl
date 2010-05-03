@@ -1,0 +1,8 @@
+## This is a HTML report header
+<html>
+<head>
+    <title>$report_title</title>
+</head>
+<body>
+    <h1>Prime numbers in 2 .. $max_prime interval.</h1>
+    <table border=1>

@@ -1,0 +1,127 @@
+<body>
+Scriptella JDBC Bridge.
+<p>As specified in Service Provider API all JDBC drivers are registered
+    via this bridge. This procedure is transparent to end user,
+    he only have to specify jdbc driver class name or an alias.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>JDBC driver class name</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>JDBC driver URL, e.g. <code>jdbc:mydb:...</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>Set of libraries required by the JDBC driver.</code></td>
+    </tr>
+</table>
+<h2>JDBC Bridge Properties</h2>
+<p>JDBC bridge makes the following configuration properties available in configuration element:</p>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>statement.cache</td>
+        <td>Size of prepared statements cache or 0 to disable statement caching.</td>
+        <td>No, the default value is 64.</td>
+    </tr>
+    <tr>
+        <td>statement.separator</td>
+        <td>SQL statements separator string. Similar to Ant delimiter property.</td>
+        <td>No, the default value is <code>;</code> (semicolon).</td>
+    </tr>
+    <tr>
+        <td>statement.separator.singleline</td>
+        <td>True if the delimiter should only be recognized on a line by itself. Leading and trailing whitespaces are
+        ignored when searching for a separator in <code>statement.separator.singleline=true</code> mode.
+            Similar to Ant delimitertype property.</td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+    <tr>
+        <td>keepformat</td>
+        <td>True if the original SQL formatting should be preserved.
+        <p>This property is similar to Ant keepformat property except that Oracle-style hints (?*+ hint */) are always preserved in Scriptella.</p></td>
+        <td>No, the default value is <code>false</code>, i.e. extra whitespaces and comments removed.</td>
+    </tr>
+    <tr>
+        <td>transaction.isolation</td>
+        <td>Transaction isolation level name or an integer value according to <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/sql/Connection">java.sql.Connection</a>
+            javadoc.
+            The valid level names are: <code>READ_UNCOMMITTED</code>, <code>READ_COMMITTED</code>,
+            <code>REPEATABLE_READ</code> and <code>SERIALIZABLE</code>.
+        <td>No, the default value is driver specific.</td>
+    </tr>
+    <tr>
+        <td>autocommit</td>
+        <td>True if connection is in auto-commit mode. If a connection is in auto-commit mode, then all its SQL statements will be executed and committed
+                as individual transactions.See also autocommit.size.
+            <p><em>Note:</em> In general avoid setting autocommit to true, because in this case an ETL process cannot be rolled back correctly.
+                Use this parameter only for performance critical operations (bulk inserts etc.).</p>
+        </td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+        <tr>
+        <td>autocommit.size</td>
+        <td>If positive, specifies the number of statements to execute before producing implicit commit,
+            i.e. controls how much data is committed in its batches.
+            <p><em>Notes:</em>
+                <ul>
+                <li>In general avoid using autocommit.size, because in this case an ETL process cannot be rolled back correctly.
+                Use this parameter only for performance critical operations (bulk inserts etc.).</li>
+                <li>If the <code>autocommit</code> is <code>true</code>,
+                    then setting <code>autocommit.size</code> has no effect</li>
+                </ul>
+
+            </p>
+        </td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+
+</table>
+<h2>Properties Substitution</h2>
+The bridge supports standard ${} variables expansion and
+allows to set prepared statement parameters via ?{} syntax.
+<p>Example:
+<pre><code>
+var=_name
+id=11
+--------------------------------------
+select * FROM table${var} where id=?id
+-- is transformed to a JDBC prepared statement---
+select * FROM table_name where id=?
+-- where parameter id=11
+</code></pre>
+<p><u>Notes:</u>
+<ul>
+    <li>$ prefixed expressions are substituted in all parts except comments.</li>
+    <li>? prefixed expressions are not substituted inside quotes and comments.</li>
+    <br>Example:
+    <code>
+    <pre>--only ${prop} and ?surname are handled
+     SELECT * FROM "Table" WHERE NAME="?John${prop}" and SURNAME=?surname;
+    </pre></code>
+
+</ul>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="hsqldb.jar"&gt;
+        #Disable cache - just for example
+        statement.cache=0
+        #Set SQL statements separator
+        statement.separator=;
+    &lt;/connection>
+
+    &lt;connection id="out" driver="h2" url="jdbc:h2:file:out" user="sa"/&gt;
+    &lt;query connection-id="in"&gt;
+        SELECT * from Bug
+        &lt;script connection-id="out"&gt;
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        &lt;/script&gt;
+    &lt;/query&gt;
+</pre></code>
+
+</body>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+    <header>
+        <title>Scriptella ETL Project Support</title>
+    </header>
+    <body>
+        <section>
+            <title>Community Support</title>
+            <p>For community support, check out the <a href="http://groups.google.com/group/scriptella">Google Group</a>.</p>
+        </section>
+        <section>
+            <title>Commercial Support</title>
+            <p>We believe in open source and we build our solutions using a stack of carefully selected open source projects.
+            These projects include, but are not limited to:</p>
+            <ul>
+                <li><a href="http://www.springframework.org">Spring Framework</a>, <a href="http://www.opensymphony.com/quartz">Quartz Scheduler</a>, <a
+                        href="http://www.hibernate.org">Hibernate</a>, <a href="http://jboss.org">JBoss</a></li>
+                <li><a href="https://dwr.dev.java.net">DWR</a>, <a href="http://wicket.sourceforge.net">Wicket</a>, <a
+                        href="http://prototypejs.org/">Prototype</a>, <a href="http://openrico.org">Rico</a>, <a
+                        href="http://script.aculo.us/">script.aculo.us</a>, <a href="http://dojotoolkit.org">Dojo</a></li>
+                <li><a href="http://ant.apache.org">Ant</a>, <a href="http://junit.org">JUnit</a> and
+                    of course <strong>Scriptella</strong></li>
+            </ul>
+            <p>We also have a strong experience in migration between databases and application servers.
+            Typically our customers migrate from commercial vendors like BEA, IBM, Sybase or Oracle to
+            open source solutions (e.g. JBoss, Tomcat, MySQL etc.)</p>
+            <p>Just <a href="mailto:scriptella@gmail.com?Subject=Support Request">drop me a line</a>
+                if you are interested in consulting services related to Scriptella.</p>
+        </section>
+        <section>
+            <title>Issue Tracker</title>
+            <p>If you think that you've found a bug or want to propose a feature to implement?
+                Use JavaForge project <a href="http://www.javaforge.com/proj/tracker.do?proj_id=781">Issue Tracker</a>.</p>
+        </section>
+    </body>
+</document>
