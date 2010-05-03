@@ -118,19 +118,18 @@
                 </ul>
                 <p>The following features are introduced:</p>
                 <ul>
-                    <li>Added CUBRID Database driver.</li>
+                    <li>Added <a href="http://www.cubrid.org/apps_and_tools">CUBRID Database driver</a>.</li>
                     <li>Use null_string to expand $variable when it has null value. CSV, text driver</li>
                     <li>nostat command line option to suppress statistics collecting</li>
                 </ul>
+                <p>Kudos to Hervé for providing Maven POM files. Work on Maven integration is in progress. See <a
+                        href="http://www.javaforge.com/issue/10631">TSK-10631</a> for more details</p>
                 <p>See
-                    <a href="changes.html">change log</a>
-                    for additional details.
+                    <a href="changes.html">change log</a>  for additional details.
                     <br/>
-                    <a href="tutorial.html">Make ETL easier</a>
-                    -
-                    <a href="download.html">Download Scriptella Now!</a>
+                    <a href="tutorial.html">Make ETL easier</a> -<a href="download.html">Download Scriptella Now!</a>
                 </p>
-                <p>Work on 1.1 has begun, see
+                <p>Work on 1.1 has started, see
                     <a href="http://www.javaforge.com/wiki/69768">Roadmap for 1.1</a>
                 </p>
             </section>
