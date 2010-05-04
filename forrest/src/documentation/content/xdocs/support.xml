@@ -7,8 +7,9 @@
     <body>
         <section>
             <title>Community Support</title>
-            <p>For community support, check out the <a href="http://groups.google.com/group/scriptella">Google Group</a>.</p>
+            <p>For community support, check out <a href="http://groups.google.com/group/scriptella">Scriptella ETL Google Group</a>.</p>
         </section>
+        <!-- No commercial support for now
         <section>
             <title>Commercial Support</title>
             <p>We believe in open source and we build our solutions using a stack of carefully selected open source projects.
@@ -28,6 +29,7 @@
             <p>Just <a href="mailto:scriptella@gmail.com?Subject=Support Request">drop me a line</a>
                 if you are interested in consulting services related to Scriptella.</p>
         </section>
+        -->
         <section>
             <title>Issue Tracker</title>
             <p>If you think that you've found a bug or want to propose a feature to implement?
