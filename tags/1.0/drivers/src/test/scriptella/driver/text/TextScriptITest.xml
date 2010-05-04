@@ -1,0 +1,17 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="in" driver="text" url="tst://testfile">
+        encoding=UTF8
+    </connection>
+    <connection id="out" driver="text" url="tst://testfile2">
+        eol=\r
+        trim=false
+    </connection>
+
+    <query connection-id="in">
+        \D*(\d+)\D*
+        <script connection-id="out">n$1</script>
+    </query>
+    <script connection-id="in">Test Trim
+    </script>
+</etl>

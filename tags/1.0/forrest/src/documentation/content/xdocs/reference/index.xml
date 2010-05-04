@@ -1,0 +1,864 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+	<header>
+		<title>Scriptella ETL Reference Documentation</title>
+		<version>1.0</version>
+		<authors>
+			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+		</authors>
+		<notice>Work in progress</notice>
+		<abstract class="pageBreakAfter">
+			<img src="../images/site-logo.png" alt=""/>
+		</abstract>
+	</header>
+	<body>
+		<section>
+			<title>Introduction</title>
+			<p>Scriptella is a Java-based ETL and scripts execution tool. The primary scripting language is a plain old SQL executed by the JDBC bridge.
+			At the same time other non-JDBC providers could be easily added allowing to mix SQL scripts with other scripting languages.</p>
+			<p>The following diagram is an overview of the Scriptella execution model:</p>
+			<figure src="../images/reference/intro.png" alt="Architecture Overview"/>
+            <p>
+                A typical ETL process collects data from one or many datasources and loads it into other
+                datasources optionally performing necessary transformations. To accomplish these tasks Scriptella
+                provides 3 basic elements:
+            </p>
+            <ul>             
+                <li><strong>Connection</strong>. Represents a connection to a datasource like a database, directory service, XML file etc.</li>
+                <li><strong>Script</strong>. Contains code to execute, i.e. SQL, JavaScript, JEXL or even a DSL (Domain Specific Language).</li>
+                <li><strong>Query</strong>. Contains code written in DSL to query a datasource. Queries can contain nested queries and scripts.</li>
+            </ul>
+            <p>
+            One of the primary Scriptella features is ability to link queries and scripts written
+            in different languages while sharing the same variables (e.g. database columns, XML or LDAP attributes or RegEx groups).
+            To use this power you have to understand how queries work in Scriptella. For the sake of simplicity queries
+            can be considered as <code>"for each"</code> statements which loop through the set of rows (JDBC ResultSet,
+            LDAP entries, XML DOM elements etc.) and execute nested elements passing attributes/columns of each row as
+            variables.</p>
+            <figure src="../images/reference/example1.png" alt="ETL File Example"/>
+            <section>
+				<title>When to use</title>
+				<p>There is no silver bullet and you have to pick a right tool aligned with your goals. Here is a list of scenarios when Scriptella may be a very helpful tool:</p>
+				<ul>
+					<li>Storing database SQL scripts. Scriptella allows to easily execue SQL scripts without dependencies on database vendor SQL tools. Moreover you can reference BLOB content, e.g. files, and use other JDBC features in your scripts.</li>
+					<li>Working with several datasources. For example gathering statistics from the one database and store it inside the other one</li>
+					<li>If you prefer to write <source>SELECT * FROM Account WHERE login=?name</source> instead of using a "Smart Query Designer GUI"</li>
+					<li>Test data generation. You don't have to store huge random generated test files - produce
+                    test data during script execution.</li>
+                    <li>Migrations. Scriptella supports multiple migrations styles
+                        including Ruby-on-Rails-like schema evolution and data migration.</li>
+                </ul>
+				<p>Of course there are situations when you'd probably try to find a better tool:</p>
+				<ul>
+					<li>Database replication,i.e. one-to-one copy of the database content. There are plenty of tools doing this job easier.</li>
+                </ul>
+			</section>
+		</section>
+		<section>
+			<title>System Requirements</title>
+			<p>Scriptella requires JDK or JRE version 5.0 or later to operate.</p>
+			<p>The memory requirements are dependant on your script content and referenced connection providers. For example if in-process database connections are used inside a script we recommend to use at least 512Mb of RAM.</p>
+		</section>
+		<section>
+			<title>Installation</title>
+			<anchor id="INSTALLATION"/>
+			<ul>
+				<li>
+					<a href="../download.html">Download</a> Scriptella binary distribution.</li>
+                <li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to a system <code>PATH</code> variable.
+                <p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and
+                    <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p></li>
+				<li>Check if JRE has been installed correctly by running java -version. Alternatively JAVA_HOME may be used to specify JDK location.</li>
+				<li>
+					<em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+                    or directly specify classpath attribute in script connection elements.</li>
+			</ul>
+			<p>The binary distribution of Scriptella has the following directory layout:</p>
+			<source>
++-+
+  +--- bin - launch scripts
+  |
+  +--- docs - documentation
+  |      +--- api - API Documentation (in Javadoc format)
+  |      |
+  |      +--- dtd - Scriptella DTD file and documentation in DTDDoc format.
+  +--- lib - scriptella boot class path libraries loaded by launch scripts.
+            </source>
+			<p>Among other libraries the Scriptella distribution contains the following jars:</p>
+			<ul>
+				<li>
+					<code>scriptella-core.jar</code> - Scriptella core classes required to operate</li>
+				<li>
+					<code>scriptella-drivers.jar</code> - Built in drivers and adapters for different datasources</li>
+				<li>
+					<code>scriptella-tools.jar</code> - Misc tools, Ant and command line launchers</li>
+				<li>
+					<code>scriptella.jar</code> - All-In-One jar containing all dependencies except the driver specific. You have to load additional driver dependencies in a connection classpath attrubute or by putting the jars into lib folder.</li>
+			</ul>
+            <p>For convenience the Java source files are stored inside <code>scriptella-src-ide.zip</code> file. This file can be used
+            inside IDE to attach sources for scriptella.jar</p>
+        </section>
+		<section>
+			<title>Scripts Syntax</title>
+			<note>For details about all XML elements consult a <a href="../docs/dtd/index.html">Scriptella DTD Documentation</a>
+			</note>
+			<p>The following XML stanza briefly covers main Scriptella XML elements:</p>
+			<source><![CDATA[
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description></description>
+    <properties>
+        <include href="script.properties"/>
+        driver=org.jdcDriver
+    </properties>
+    <connection id="con1" driver="$driver" url="${url}" user="$user" password="12345678">
+        driver.property=value
+    </connection>
+    <connection id="con2" url="jdbc:hsqldb:file:db" user="sa" password=""/>
+    <script connection-id="out">
+	    <include href="dbschema.sql"/>
+    </script>
+    <query connection-id="in">
+        SELECT * from Bug
+        <script connection-id="out">
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        </script>
+    </query>
+</etl>]]></source>
+			<p>&lt;etl&gt; is a root element of all Scriptella files.</p>
+			<section>
+				<title>&lt;properties&gt;</title>
+				<p>In this element define properties to be substituted in other script elements. This concept is similar to
+                Ant.</p>
+				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
+				<note>The values of properties defined in this element are overridden by system properties or other
+                external properties depending on execution environment, e.g. Ant properties.</note>
+			</section>
+			<section>
+				<title>&lt;connection&gt;</title>
+				<p>Elements of this type define connections to different datasources to work with.
+                    A set of required attributes depends on driver. For example JDBC drivers require
+                    url, user and password attributes. Additionally you may specify catalog/schema attributes.</p>
+				<p>
+					<strong>id</strong> attribute is required if you declare more than one connections inside your script.
+                    The value of this attribute is used to reference the connection in scripts and queries.</p>
+                <p>
+                    <strong>url</strong> attribute specifies connection URL. URL format is driver specific, e.g. <code>jdbc:</code> for JDBC drivers.
+                Other drivers like CSV or text accept absolute URLs or file locations relative to an ETL file.</p>
+                <p>
+					<strong>classpath</strong> optional attribute is used to specify additional classpath to load driver libraries.
+                    .Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides.
+                    Absolute URLs are also supported, e.g. ftp://server/jconnect.jar;http://server2/classes12.zip
+                    Alternatively you can add drivers jars to scriptella boot classpath (SCRIPTELLA_DIR/lib directory or in Ant taskdef classpath).
+                    Boot classpath libraries take precedence over libraries specified in connection classpath attribute.
+                </p>
+                <p>
+                    <strong>driver</strong> optional attribute specifies driver class name or an alias.
+                    The default value is "auto",
+       in this case a target driver is guessed from an url attribute if possible. See <a href="drivers.html">Drivers matrix</a>
+                    for the list of driver aliases included into Scriptella distribution.
+                </p>
+                <p>
+					<strong>lazy-init</strong>
+                    optional attribute specifies connection initialization strategy.
+                    <code>true</code>
+                    if connection initialization should be deferred until it is actually used.
+                    The default value of
+                    <code>false</code>
+                    means that connection is initialized on ETL startup.
+                    Lazy connection initialization may be useful in the following cases:
+                </p>
+				<ul>
+					<li>A script or a query operating with this connection has conditional <strong>if</strong>
+                        attribute, in this case greedy initialization may be redundant
+                    </li>
+					<li>Other connections create database users or produce files required for this connection
+                        to be initialized properly.</li>
+				</ul>
+				<p>Use element's content to set connection properties. Several drivers also accept
+                    connection properties in a URL string, e.g. <code>jdbc:url:db;param=value</code>
+				</p>
+				<p>
+					<strong>Example</strong>
+				</p>
+				<source><![CDATA[
+<!-- Declare a connection to Oracle database using sys user-->
+<connection driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB" user="sys as sysdba" password="password">
+    #Connection properties
+    plsql=true
+</connection>]]></source>
+			</section>
+			<section>
+				<title>&lt;script&gt;</title>
+				<p>Elements of this type contain executable content. The script language is connection specific.
+                    This element supports the following optional attributes:</p>
+				<p>
+					<strong>connection-id</strong> attribute specifies a connection identifier.</p>
+				<p>
+					<strong>new-tx</strong> attribute specifies transaction semantics. If new-tx=true a dedicated
+                    connection is used instead of the global one.
+                </p>
+				<p>
+					<strong>if</strong> attribute is used for conditional execution. The element content is executed
+                    only if the result of this attribute value evaluation is true. For example <br/>
+					<code>&lt;script if="rownum gt 1 and name!=null and name.length() gt 0"&gt;</code>
+					<br/>
+                    is evaluated only if rownum variable has value greater than 1 and the name variable is not empty.
+                </p>
+				<p>
+					<strong>Example</strong>
+				</p>
+				<source>
+                    &lt;--A script executed in a separate connection(new-tx=true)
+                    if drop_tables property has been set to true. --&gt;
+                    &lt;connection id="in" ...&gt;
+                    ....
+                    &lt;script connection-id="in" new-tx="true" if="drop_tables"&gt;
+                        DROP TABLE Table1;
+                        DROP TABLE Table2;
+                    &lt;/script&gt;
+                </source>
+			</section>
+			<section>
+				<title>&lt;query&gt;</title>
+				<p>Elements of this type contain query expressions. The query language is connection specific.
+                    This element supports the following optional attributes:</p>
+				<p>
+					<strong>connection-id</strong> attribute specifies a connection identifier.
+                    By default connection ID is inherited for child elements, but may be overriden.</p>
+				<p>
+					<strong>if</strong> attribute is used for conditional execution. The element content is executed
+                    only if the result of this attribute value evaluation is true. For example <br/>
+					<code>&lt;query if="migrate_users"&gt;</code>
+					<br/>
+                    is evaluated only if migrate_users variable has value of true, 1, on or yes.
+                </p>
+				<p>
+					<strong>Example</strong>
+				</p>
+				<source><![CDATA[
+                    <!--Declare connections -->;
+                    <connection id="in" .../>;
+                    <connection id="out" .../>;
+                    ....
+                    <!--Query selects users and executes nested elements if migrate_users is on-->;
+                    <query connection-id="in" if="migrate_users">
+                        SELECT * FROM Users;
+                        <!--For each row sends LDIF entry to a directory server-->
+                        <script connection-id="out">
+                            dn: uid=$user_name,ou=people,dc=scriptella
+                            objectClass: inetOrgPerson
+                            uid: $user_name
+                            cn: $user_name
+                        </script>
+                    </query>]]></source>
+			</section>
+			<fixme author="ejboy">Describe all elements</fixme>
+		</section>
+		<anchor id="BIND_VARIABLES"/>
+        <section>
+			<title>Expressions and Variables Substitution</title>
+			<p>Binding variables syntax varies between drivers. JDBC drivers support variables substitution and
+                expression evaluation based on the following syntax:</p>
+			<ul>
+				<li>$Property_Name - inserts a value of the specified property or variable.
+                    $ prefixed expressions are substituted in all parts except comments.</li>
+				<li>${expression} - inserts a value of the expression evaluation.
+                    <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax is used for expressions.<br/>
+                    $property and ${property} return the same value, but the first one is faster, because JEXL expression engine
+                    is not used to evaluate the expression.</li>
+				<li>?Property_Name or ?{expression} are used <em>only in SQL queries and scripts</em> to set prepared statement parameters.
+                ? prefixed expressions are not substituted inside quotes, comments and outside of query/script elements.</li>
+			</ul>
+			<p>The properties syntax described above is allowed in the following places:</p>
+			<ul>
+				<li>Attributes of ETL <code>&lt;connection&gt;</code> element,</li>
+				<li>
+					<code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements,</li>
+				<li>SQL scripts/queries processed by the JDBC-based providers</li>
+			</ul>
+            <p>Due to several JEXL limitations, Scriptella provides a helper variable available inside JEXL expressions.
+                The <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>etl</code></a> variable provides several utility objects:</p>
+            <ul>
+                <li>etl.date - Methods for parsing and formatting dates. <br/>Example: <code>${etl.date.today('yyyyMMdd')}</code>
+                    - formats the current date using the specified pattern. See <a href="../docs/api/scriptella/expression/EtlVariable.DateUtils.html">JavaDoc</a>
+                    for more details.
+                </li>
+                <li>etl.text - Methods for working with text. <br/>Example: <code>${etl.text.ifNull(a)}</code>
+                    - returns empty string if a=null. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
+                    for more details.
+                </li>
+
+            </ul>
+            <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
+                use <code>get(name)</code> to get variable's value.
+                 For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
+                The basic support for properties substitution
+                is provided by <a href="../docs/api/scriptella/expression/PropertiesSubstitutor.html">PropertiesSubstitutor</a>
+                core class which is based on a ${} syntax and used by drivers unless other rules are described.
+            </p>
+			<note>
+                In SQL scripts and queries try to minimize usages of <strong>$</strong>, use <strong>?</strong> instead.
+                In this case prepared statements may be cached thus increasing the performance of hot spot sections evaluated multiple times.
+                Use $ for direct substitution only if you have problems passing prepared statement parameters via ?, ?{} syntax.
+            </note>
+            <section>
+				<title>Implicit Variables</title>
+				<p>Scriptella supports the following implicit variables in scripts and queries:</p>
+				<table>
+					<tr>
+						<th>Variable</th>
+						<th>Description</th>
+						<th>Scope</th>
+					</tr>
+					<tr>
+						<td>
+							<code>rownum</code>
+						</td>
+						<td>Represents row number of query row set. Starts with 1.</td>
+						<td>Nested elements of Query</td>
+					</tr>
+				</table>
+				<p>Additionally SQL queries produce a set of implicit variables corresponding to selected column names.
+                    These variables are available in nested elements.
+                Columns may also be referenced using a result set column number, e.g. ?1, ?2 ,...</p>
+                <p>Typically non-SQL queries also produce virtual row sets and expose
+                variables available in nested elements. Consult driver specific Javadoc for more details.</p>
+            </section>
+			<section>
+				<title>Adding references to files from SQL scripts</title>
+				<p>The JDBC bridge supports referencing file content via
+				<code>?{file &lt;Expression&gt;}</code> and <code>?{textfile &lt;Expression&gt;}</code>
+				syntax.
+                Where Expression is any valid JEXL expression, e.g. <code>'file.dat'</code> or <code>protocol+path</code>
+				</p>
+				<p>The <code>file</code> prefix is used to reference binary files inserted as BLOB and 
+                    <code>textfile</code> references text files inserted as CLOBs.
+                    File references are set as prepared statement parameters of stream type,
+                    so LOBs of virtually any size supported by the database driver can be referenced.
+                    Please note that uploading large <strong>text</strong> files may create a temporary file on disk.</p>
+				<note>Music Store example demonstrates usage of file references</note>
+			</section>
+			<section>
+				<title>Examples</title>
+				<p>Execute a SQL query over a table specified by a TABLE property and inserts the first row into TABLE2</p>
+				<source><![CDATA[
+    <connection driver="hsqldb"/> <!--JDBC Bridge Driver-->
+    <query>
+        SELECT V1, V2, V3 from $TABLE;
+        <script if="rownum==1">
+            INSERT INTO $TABLE2 VALUES (?V1, ?{V2+V3});
+        </script>
+    </query>]]></source>
+			</section>
+		</section>
+		<section>
+			<title>Command Line Execution</title>
+			<p>If you followed the <a href="#INSTALLATION">Installation</a> instructions running Scriptella is simple - just type <code>scriptella</code> to execute a <code>etl.xml</code> in the current directory.</p>
+			<p>The Scriptella launching script loads all jars from SCRIPTELLA_DIR/lib directory and adds them to executed script(s) class path.</p>
+			<p>Alternatively a standard java launcher may be used to run a script:
+			<code>java -jar scriptella.jar [options] [file1] [file2] ... [fileN]</code>. It is assumed that the scriptella.jar file from the binary distribution is available in the current directory.</p>
+			<note label="Important">Java launcher does NOT load jars from lib directory so you would have to specify additional class path elements in script file connection declarations or use java -Xbootclasspath/a:path/to/driver1.jar;path/to/driver2.jar -jar scriptella.jar to overcome -jar option limitation.</note>
+			<section>
+				<title>Command Line Options</title>
+				<p>The scriptella launcher has the following invocation syntax:</p>
+				<source>scriptella [options] [file1] [file2] ... [fileN]</source>
+				<p>File names/paths are specified after options and separated by spaces.</p>
+				<table>
+					<tr>
+						<td>-help, -h</td>
+						<td>display help</td>
+					</tr>
+					<tr>
+						<td>-debug, -d</td>
+						<td>print debugging information</td>
+					</tr>
+					<tr>
+						<td>-nostat</td>
+						<td>Suppress statistics collecting. Improves performance.</td>
+					</tr>
+					<tr>
+						<td>-quiet, -q</td>
+						<td>be extra quiet</td>
+					</tr>
+					<tr>
+						<td>-version, -v</td>
+						<td>print version</td>
+					</tr>
+					<tr>
+						<td>-template, -t</td>
+						<td>creates an etl.xml template file in the current directory.
+                            See the list of <a href="#supported_templates">supported templates.</a></td>
+					</tr>
+				</table>
+			</section>
+			<fixme author="ejboy">Describe command line tools</fixme>
+		</section>
+		<section>
+			<title>Ant Integration</title>
+			<section>
+				<title>System requirements</title>
+				<p>Ant 1.6 or later is recommended.</p>
+			</section>
+			<section>
+				<title>Installation</title>
+				<p>Use scriptella.jar from the binary distribution. This file contains all necessary classes and
+                    resources for integration with Ant.</p>
+				<p>In order to use scriptella as Ant task you will need the following taskdef declaration:</p>
+				<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar"/>]]></source>
+				<p>You may also add paths to database drivers used inside the script:</p>
+				<source><![CDATA[<taskdef resource="antscriptella.properties"
+   <classpath>
+       <pathelement location="/path/to/scriptella.jar">
+       <pathelement location="lib/hsqldb.jar">
+       <pathelement location="lib/jconn2.jar">
+   </classpath>
+</taskdef>]]></source>
+			</section>
+			<p>These drivers will be available on the boot classpath.
+                In this case you don't have to specify classpath in &lt;connection&gt; elements.</p>
+			<section>
+				<title>&quot;etl&quot; Task</title>
+				<section>
+					<title>Parameters</title>
+					<table>
+						<tr>
+							<th>Attribute</th>
+							<th>Description</th>
+							<th>Required</th>
+						</tr>
+						<tr>
+							<td>file</td>
+							<td>The script file to execute.</td>
+							<td>Yes, unless a nested &lt;fileset&gt; element is used.</td>
+						</tr>
+						<tr>
+							<td>inheritAll</td>
+							<td>If true, pass Ant project properties to the Script Executor.</td>
+							<td>No, default value is <code>true</code>.</td>
+						</tr>
+						<tr>
+							<td>debug</td>
+							<td>If true, print debugging information.</td>
+							<td>No, default value is false.</td>
+						</tr>
+                        <tr>
+                            <td>nostat</td>
+                            <td>If true turns off statistics collecting.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                        <tr>
+							<td>quiet</td>
+							<td>If true, be extra quiet.</td>
+							<td>No, default value is false.</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<title>Nested Elements</title>
+					<p>The task supports nested
+                        <a href="http://ant.apache.org/manual/CoreTypes/fileset.html">&lt;fileset&gt;</a>
+                        element.
+                    </p>
+				</section>
+				<section>
+					<title>Examples</title>
+					<p>
+						<strong>Executes etl.xml file in the current directory:</strong>
+					</p>
+					<source>&lt;etl/&gt;</source>
+					<p>
+						<strong>Executes name.etl.xml file in the current directory:</strong>
+					</p>
+					<source><![CDATA[<etl file="name" />;
+<!--Or explicitly specifying the full name-->
+<etl file="name.etl.xml" >]]></source>
+					<p>
+						<strong>Executes all .etl.xml files in db directory:</strong>
+					</p>
+					<source><![CDATA[<etl>
+    <fileset dir="db" includes="*.etl.xml"/>;
+</etl>]]></source>
+				</section>
+			</section>
+            <section>
+                <title>&lt;etl-template&gt; Task</title>
+                <section>
+                    <title>Parameters</title>
+                    <table>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Description</th>
+                            <th>Required</th>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>ETL template name.</td>
+                            <td>No, default ETL template is generated.</td>
+                        </tr>
+                        <tr>
+                            <td>inheritAll</td>
+                            <td>If true, pass all properties to Scriptella. Defaults to <code>true</code>.
+                            </td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>debug</td>
+                            <td>If true print debugging information.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                        <tr>
+                            <td>quiet</td>
+                            <td>If true be extra quiet.</td>
+                            <td>No, default value is false.</td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <title>Nested Elements</title>
+                    <p>The task has no nested elements.</p>
+                </section>
+                <anchor id="supported_templates"/>
+                <section>
+                    <title>Supported Templates</title>
+                    <ul>
+                        <li>Default(no name) - Produces a simple ETL template for a quick start.</li>
+                        <li><a href="../docs/api/scriptella/tools/template/DataMigrator.html">DataMigrator</a> - Produces an ETL template for
+                            transferring data between tables of different databases.</li>
+                    </ul>
+                </section>
+                <section>
+                    <title>Examples</title>
+                    <p><strong>Produces default ETL template named etl.xml in the current directory:</strong></p>
+                    <source>    &lt;etl-template/&gt;</source>
+                    <p><strong>Produces data migration template named etl.xml in the current directory:</strong></p>
+                    <source><![CDATA[
+    <property file="etl.properties"/>
+    <!--
+    Ant properties
+        driver,class,user,password
+    must be set before calling "DataMigrator" etl-template
+    -->
+    <etl-template name="DataMigrator"/>]]>
+                    </source>
+                </section>
+            </section>
+        </section>
+		<section id="inprocess">
+			<title>In-Process Java Integration</title>
+			<p>Although Ant and command line execution are the most typical usage scenarious, it may be helpful to
+                invoke
+                Scriptella directly from Java code. Typical use cases for in-process integration:</p>
+			<ul>
+				<li>Preparing datasources for testing. Example: create the database before a test case, and cleanup on
+                    test completion.</li>
+				<li>Creating/upgrading database schema on application startup. Example: creating a database on web
+                    application initialization, very helpful in user friendly, zero-deployment or demo
+                    applications.</li>
+				<li>Custom migration solutions. Example: Client uploads a CSV file to a J2EE server and then Scriptella
+                    managed ETL script imports CSV data into several database tables.</li>
+			</ul>
+			<p>The invocation from java code is simple:</p>
+			<ul>
+				<li>Make sure scriptella.jar is available on classpath.</li>
+				<li>Use EtlExecutor.newExecutor to execute an ETL file. See
+                    <a href="../docs/api/scriptella/execution/EtlExecutor.html">EtlExecutor Javadoc</a>
+                    for more details.
+                </li>
+			</ul>
+			<note>
+                Typically you will need a
+                <a href="drivers.html#spring">Spring Driver</a>
+                or a
+                <a href="drivers.html#jndi">JNDI Driver</a>
+                to integrate with application deployment environment (Spring, J2EE or other).
+            </note>
+		</section>
+		<section id="jmx">
+			<title>JMX Monitoring and Management</title>
+			<p>Scriptella supports JMX by registering  a dedicated MBean for each ETL operation.
+			ETL mbeans use the following naming convention:</p>
+			<source><![CDATA[    scriptella:type=etl,url=<ETL_XML_FILE_URL>[,n=<COLLISION_ID>]]]></source>
+            <note>
+                The COLLISION_ID is appended only if files with identical URLs are executed simultaneously.
+            </note>
+			<p>ETL MBeans are registered automatically when Scriptella is launched from the command line or Ant.
+			    If <code>EtlExecutor</code> is invoked directly from Java code, set <code>jmxEnabled</code> property to <code>true</code>
+			    by calling <code>etlExecutor.setJmxEnabled(true)</code> before executing the ETL.</p>
+			<p>By default the mbeans are registered in a platform default MBean server and
+                the Java Monitoring and Management Console (jconsole.exe) can be used for remote control over ETL tasks.</p>
+			<note>Since Java SE 6 it is allowed to monitor local JVM without additional configuration changes. Just run jconsole.exe and choose a required JVM<br/>
+			    For Java SE 5 -Dcom.sun.management.jmxremote system property enables the JMX agent for local access.<br/>
+                See also <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html">Monitoring and Management Using JMX</a> for more details.
+			</note>
+			<figure src="../images/reference/jmxconsole.png" alt="Java SE Monitoring &amp; Management Console."/>
+			<section>
+				<title>Attributes</title>
+				<p>The following read-only attributes are available for monitoring:</p>
+				<ul>
+					<li><code>ExecutedStatementsCount</code> - number of executed statements by all connections of the ETL task.</li>
+					<li><code>StartDate</code> - date/time when ETL was started.</li>
+					<li><code>Throughput</code> - the throughput (number of statements per second) of the managed ETL task.</li>
+				</ul>
+			</section>
+			<section>
+				<title>Operations</title>
+				<p>Currently only cancellation is supported via JMX. The <code>cancel</code> operation terminates ETL and tries to roll back any changes made during the ETL execution.</p>
+			</section>
+		</section>
+		<section>
+			<title>JDBC Adapters</title>
+			<p>Scriptella is bundled with a set of adapters for popular
+            JDBC drivers. It is allowed to use any JDBC vendor driver, but
+            Scriptella adapters provide the following benefits:</p>
+			<ul>
+				<li>Simplified naming. No need to specify a full driver's class
+                name, alias may be used, e.g. driver="hslqdb", "oracle" etc.</li>
+				<li>Scriptella adapters are preconfigured for optimal performance, syntax parsing rules
+                and other execution options, e.g. BLOB handling for Oracle. In most cases
+                you can specify a generic JDBC property, but using adapters simplifies
+                switching between drivers and even a target platform e.g. Java/.Net</li>
+                <li>Different JDBC drivers can be used to access popular databases such as Microsoft SQL Server or Sybase ASE/ASA.
+                    Each driver has an individual class name. Example list of driver names for Sybase ASA/ASE: com.sybase.jdbc3.jdbc.SybDriver,
+                    com.sybase.jdbc2.jdbc.SybDriver, com.sybase.jdbc.jdbc.SybDriver, net.sourceforge.jtds.jdbc.Driver. With
+                    Scriptella you simply specify "jdbc" as a name of the driver and an available driver is loaded from classpath.
+                </li>
+            </ul>
+            <p>See <a href="drivers.html#jdbcbridge">JDBC Bridge Drivers Matrix</a> for the complete list of supported adapters.</p>
+			<note>
+                Scriptella driver's package short name is an alias for the driver, e.g. h2 is an alias
+                for scriptella.driver.h2.Driver
+            </note>
+            <section>
+                <title>Autodiscovery of JDBC drivers</title>
+                <p>Scriptella provides auto-discovery feature based on the connection URL. If driver name is not specified
+                the driver will be recognized based on the specified URL. Internally a driver named "auto"
+                    is used to select a target driver implementation. Example:</p>
+                <source><![CDATA[<connection url="jdbc:sybase:Tds:host:2048/database"/>]]></source>
+                <p>The "auto" driver will load the "sybase" driver, because the URL belongs to Sybase.</p>
+                <note>Autodiscovery serves for convenience purposes and works only with JDBC drivers and URL schemes supported by Scriptella, in other
+                cases driver's name has to be specified manually. See <a
+                href="../docs/api/scriptella/driver/auto/package-summary.html">JDBC autodiscovery driver JavaDoc</a>
+                    for autodiscovery implementation details.</note>
+            </section>
+        </section>
+		<section>
+			<title>Non-relational Datasources Interoperability</title>
+			<p>See <a href="drivers.html#nonjdbc">Non-JDBC Drivers Matrix</a> for the complete list of drivers.</p>
+			<p>Additionally various JDBC bridge drivers can be used to work with specific datasources like LDAP directories,
+                CSV files, XML files or object databases.
+            </p>
+			<section>
+				<title>Accessing directories based on LDAP</title>
+				<p>The feature of Scriptella is a possibility to write transformations
+                    in a language suitable for the datasource you operate, so we've added a
+                    <a href="drivers.html#ldap">built-in support</a>
+                    for LDIF scripts and RFC 2254 search filter queries.
+                </p>
+				<p>Alternatively you can use the freely available
+                    <a href="http://www.openldap.org/jdbcldap/">JDBC-LDAP Bridge Driver</a>
+                    (JDBC-LDAP) to access information held in directories.
+				This driver uses SQL-like syntax for scripts and queries. See
+                    <a href="http://www.octetstring.com/support/jdbcldapdriver/GettingStarted.php">Getting Started
+                        Documentation</a>. A similar driver is offered by Novell. See
+                    <a href="http://developer.novell.com/ndk/doc/ldapjdbc/">LDAP JDBC Driver</a>
+                    for more details.
+                </p>
+			</section>
+			<section>
+				<title>Working with CSV and text data</title>
+				<p>The <a href="drivers.html#csv">built-in CSV driver</a> allows to easily query and generate CSV files.</p>
+				<p>The <a href="drivers.html#text">built-in Text driver</a> provides a generic way to handle text data.</p>
+				<p>	HSQLDB <a href="http://www.hsqldb.org/doc/guide/ch06.html">text tables</a>
+                    feature can be used to work
+                    with CSV files.</p>
+            </section>
+            <section>
+                <title>Working with XML data</title>
+                <p>The <a href="drivers.html#xpath">built-in XPath driver</a> allows querying XML files with XPath expressions.</p>
+                <p><a href="drivers.html#text">Text driver</a> can be used to output XML files.</p>
+            </section>
+            <section>
+				<title>Using Java Code</title>
+				<p>Although Scriptella was designed for JDBC/SQL datasources under some circumstances it is
+				useful to embed or invoke Java from Scriptella file. The <a href="drivers.html#janino">Janino Provider</a>
+				is bundled with Scriptella distribution and provides a Java bridge. This driver also exposes a set of properties and methods for <a href="../docs/api/scriptella/driver/janino/JaninoScript.html">&lt;script&gt;</a> and <a href="../docs/api/scriptella/driver/janino/JaninoQuery.html">&lt;query&gt;</a> elements.</p>
+				<p>Scriptella has no equivalent of Ant Task API, although we provide two alternatives to integrate Java solutions:</p>
+				<ul>
+					<li>Writing a Service Provider Implementation (Scriptella Driver). This is the most powerful API, but it is harder to implement.</li>
+					<li>Calling compiled code from Janino scripting elements. Just specify your jar as an additional class-path entry for Janino connection and you can work with any class from this jar. This approach is easy-to-use and do not add dependencies on Scriptella API to your classes/tasks.</li>
+				</ul>
+				<p>Other Java compilers or interpreters can also be plugged in via custom Scriptella Drivers.</p>
+			</section>
+            <section>
+                <title>Interaction with Scripting Languages</title>
+                <p>Java SE 6 includes <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223: Scripting for the Java™
+                    Platform</a> API. This is a framework by which Java Applications can "host" script engines.
+                    Sun's implementation of Java SE 6 includes an example script engine based on
+                    <a href="http://www.mozilla.org/rhino/">Mozilla Rhino:JavaScript for Java</a>.
+                </p>
+                <p>Scriptella supports JSR 223 compatible scripting languages via <a href="drivers.html#script">javax.script Bridge</a>
+                    driver.</p>
+                <note>
+                    Java SE 6 or higher is required to work with JSR-223 scripts. 
+                </note>
+            </section>
+            <section>
+				<title>Producing Reports with Velocity</title>
+				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on
+				proven open source solutions instead of reinventing the wheel. The built-in <a href="drivers.html#velocity">Velocity Driver</a>
+				allows using velocity templates in &lt;script&gt; elements.Typically velocity report is generated in several steps:</p>
+				<ol>
+					<li>Printing a header</li>
+					<li>Query data from datasource(s) and produce a report body.</li>
+					<li>Printing a footer.</li>
+				</ol>
+				<p>
+					<em>Primes</em> example demonstrates how to produce a simple report using Velocity.</p>
+				<note>
+				Velocity Driver does not support query element. This limitation may be eliminated in future, but currently we do not see Velocity strengths for querying the data.
+				JDBC, JEXL or Janino drivers provide more powerful and easy-to-use solutions for dynamic queries.
+				</note>
+			</section>
+            <section>
+                <title>URL schemes supported by Scriptella</title>
+                <p>Scriptella allows specifying URLs to externally located resources. The following protocols are supported:</p>
+                <ul>
+                    <li>http, ftp, file, jar and other protocols supported by JRE</li>
+                </ul>
+                <p>Examples:</p>
+                <source><![CDATA[
+                <connection driver="xpath" url="http://snippets.dzone.com/rss/tag/scriptella"/>
+                <connection driver="csv" url="http://finance.google.com/finance/historical?q=JAVA&output=csv"/>
+                <connection driver="text" url="ftp://ftphostname/report.txt"/>
+                ]]>
+                </source>
+            </section>
+        </section>
+		<section>
+			<title>Examples</title>
+			<p>Download Scriptella examples from <a href="../download.html">Downloads</a> page.
+            The examples are ready to run, although you may have to download additional third party jars,
+                which cannot be redistributed, e.g. jdbcldap.jar etc. These dependencies are
+                specified in lib/readme.txt file.
+            </p>
+			<table>
+				<tr>
+					<td>Ant</td>
+					<td>This example demonstrates integration with ant.</td>
+				</tr>
+				<tr>
+					<td>CSV</td>
+					<td>Example of working with CSV data using HSQLDB CSV tables feature, Scriptella built-in CSV or Text driver.</td>
+				</tr>
+				<tr>
+					<td>DB Upgrade</td>
+					<td>This example shows how Scriptella can be used as a schema evolution tool.</td>
+				</tr>
+				<tr>
+					<td>LDAP</td>
+					<td>Example of migration script to exchange data between a database and LDAP directory.
+                        This example shows 2 ways to access LDAP directories from Scriptella:
+                        built-in LDAP driver and JDBC-LDAP Driver from OctetString.</td>
+				</tr>
+                <tr>
+                    <td>Mail</td>
+                    <td>This example shows how to produce and send E-Mails from Scriptella.</td>
+                </tr>
+                <tr>
+					<td>Music Store</td>
+					<td>This script create a sample database of music track. This sample shows how to
+                reference BLOB content in external files and use JDBC escaping syntax to pass dates
+                independently from the DB locale/date/time settings.</td>
+				</tr>
+				<tr>
+					<td>ODBC</td>
+					<td>
+                        Produces a HTML view of the MS Access Northwind Categories table.
+                        This example demonstrates working with ODBC datasources (Northwind.mdb) and producing a report with images.
+                    </td>
+				</tr>
+				<tr>
+					<td>Primes</td>
+					<td>Fills the database with prime numbers and produces HTML/CSV reports.
+                    This example demonstrates a combined usage of Velocity, JEXL, CSV Driver and SQL.</td>
+				</tr>
+                <tr>
+                    <td>XML</td>
+                    <td>This example shows how to work with XML data using XPath expressions.</td>
+
+                </tr>
+            </table>
+		</section>
+		<section>
+			<title>Best Practices</title>
+			<p>This chapter describes Scriptella usage best practices. The following list provides general
+                recommendations for Scriptella ETL scripts:</p>
+			<ul>
+				<li>Do not hardcode connection properties and other configuration settings e.g. driver names, urls, mode
+                    flags etc. Use a property file like etl.properties to store ETL configuration parameters</li>
+				<li>Use built-in Scriptella adapters for JDBC drivers if possible.</li>
+				<li>Use &lt;dialect&gt; for database specific SQL parts. Use properties to configure data types similar
+                    to domains, example:
+                    <source>
+CREATE TABLE User (
+ID $INTEGER,
+LOGIN $SMALL_STRING
+);
+--Values for $INTEGER AND $SMALL_STRING are
+--stored in a mapping property file e.g. type-mapping.properties
+--and easily reconfigurable for another DB vendor
+                    </source>
+				</li>
+				<li>Use JDBC escaping to specify time and date literals, function calls and other parameters
+                    independently from DB vendor. Examples:
+                    <br/>
+                    Calls without a return value:
+                    <code>{ call procedure_name (argument1, argument2,...) }</code>
+					<br/>
+                    Calls with a return value:
+                    <code>{ ? = call procedure_name (argument1, argument2,...) }</code>
+					<br/>
+                    Timestamp Literals:
+                    <code>{ts 'yyyy-mm-dd hh:mm:ss.f...'}</code>
+					<br/>
+				</li>
+				<li>Use
+                    <strong>.etl.xml</strong>
+                    naming convention for ETL scripts. In this case it would be easy to recognize scriptella
+                    files, moreover you wont have
+                    to specify etl.xml extension to run ETL files. Example: typing
+                    <code>scriptella init</code>
+                    executes
+                    <code>init.etl.xml</code>
+                    automatically if no file
+                    <code>init</code>
+                    was found.
+                </li>
+				<li>For large bulk-insert files use &lt;include&gt; element to avoid loading a whole file into
+                    memory.</li>
+			</ul>
+			<section>
+				<title>Using Scriptella as a Database Schema Evolution Tool</title>
+				<p>
+					<strong>dbupgrade</strong>
+                    example shows how to build a simple database upgrade(downgrade) script. The following steps are
+                    required to create a simple database upgrade framework:
+                </p>
+				<ul>
+					<li>If no DB present create an new database and fill it with up-to-date inital script</li>
+					<li>If old DB is present apply a set of incremental updates to migrate from version X to Y.</li>
+				</ul>
+				<p>Scriptella provides enough features to create a simple database upgrade framework, but the primary
+                    one is the ability to work with several datasources.
+                    This means you can change database vendors between builds and synchronize several datasources, e.g.
+                    LDAP-Database.</p>
+				<p>Scriptella is lightweight and can be easily added to a set of application libraries during
+                    deployment. In this case you can integrate your schema upgrade solution
+                    with application startup procedure typically written as a set of webapp context listeners or
+                    initializer servlets.</p>
+			</section>
+		</section>
+	</body>
+</document>

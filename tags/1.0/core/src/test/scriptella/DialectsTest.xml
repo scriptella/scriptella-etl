@@ -1,0 +1,57 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:dialectstest" user="sa" password=""/>
+    <script>
+        <!--must execute-->
+        CREATE TABLE Test (
+        ID INT,
+        VALUE VARCHAR(255)
+        );
+    </script>
+    <script>
+        <!--must execute-->
+        insert into test(id, value) values (1,'222');
+    </script>
+    <script>
+        <dialect name=".*oracle.*"><!--Skipped-->
+            insert into test(id, value) values (2,'333');
+        </dialect>
+    </script>
+    <script>
+        <dialect name="hsql.*"><!--must execute-->
+            insert into test(id, value) values (3,'333');
+        </dialect>
+        <dialect name=""><!--executes-->
+            insert into test(id, value) values (4,'333');
+        </dialect>
+    </script>
+    <script>
+        <dialect><!--must execute-->
+            insert into test(id, value) values (5,'333');
+        </dialect>
+    </script>
+    <script>
+        <dialect name="HSQL.*" version="1\.8\..*"><!--must execute-->
+            insert into test(id, value) values (6,'333');
+        </dialect>
+        <dialect name="hsql.*" version="1.8.*"><!--executes-->
+            insert into test(id, value) values (7,'333');
+        </dialect>
+        <dialect name="hsql.*" version="1\.9.*"><!--skipped-->
+            insert into test(id, value) values (8,'333');
+        </dialect>
+        insert into test(id, value) values (9,'333');
+
+    </script>
+    <script>
+        <dialect name="hsql" exclude="true"><!-- skipped -->
+            insert into test(id, value) values (10,'333');
+        </dialect>
+        <dialect name="oracle" exclude="true"> <!-- executes-->
+            insert into test(id, value) values (11,'333');
+        </dialect>
+
+    </script>
+
+
+</etl>

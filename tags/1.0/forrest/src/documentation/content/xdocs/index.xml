@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+    <header>
+        <title>Welcome to Scriptella ETL Project</title>
+    </header>
+    <body>
+        <section id="overview">
+            <title>About Scriptella</title>
+            <p>Scriptella is an open source ETL (Extract-Transform-Load) and script execution tool written in Java.</p>
+            <p>Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use
+                SQL (or other
+                scripting language suitable for the data source) to perform required transformations.</p>
+            <p>
+                <a href="download.html">Download</a>
+                and <a href="tutorial.html">use it</a>! Scriptella is licensed under the
+                <a href="license.html">Apache License, Version 2.0</a>
+            </p>
+        </section>
+        <section id="usage">
+            <title>Typical use</title>
+            <ul>
+                <li>Executing scripts written in SQL, JavaScript, JEXL, Velocity and <a href="reference/drivers.html">many more</a>.</li>
+                <li>Database migration. Interoperability with LDAP, JDBC, XML and other datasources.</li>
+                <li>Cross-database ETL operations, import/export from/to CSV, text and XML and other formats.</li>
+                <li>Alternative for Ant &lt;sql&gt; task.</li>
+                <li>Automated database schema upgrade.</li>
+            </ul>
+        </section>
+        <section id="features">
+            <title>Features</title>
+            <ul>
+                <li>
+                    <strong>Simple XML syntax</strong>
+                    for scripts. Add dynamics to your existing SQL scripts by creating a thin
+                    wrapper XML file:
+                    <source><![CDATA[
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="$driver" url="$url" user="$user" password="$password"/>
+    <script>
+        <include href="PATH_TO_YOUR_SCRIPT.sql"/>
+        -- And/or directly insert SQL statements here
+    </script>
+</etl>
+    ]]></source>
+                </li>
+                <li>Support for
+                    <strong>multiple datasources</strong>
+                    (or multiple connections to a single database) in a ETL file.
+                </li>
+                <li>Support for many useful
+                    <strong>JDBC features</strong>
+                    , e.g. parameters in SQL including references to file blobs and JDBC
+                    escaping.
+                </li>
+                <li>
+                    <strong>Performance.</strong>
+                    Performance and low memory usage are one of our primary goals.
+                </li>
+                <li>Support for
+                    <strong>evaluated expressions and properties</strong>
+                    (JEXL syntax)
+                </li>
+                <li>Support for
+                    <strong>cross-database ETL scripts</strong>
+                    by using &lt;dialect&gt; elements
+                </li>
+                <li>
+                    <strong>Transactional execution</strong>
+                </li>
+                <li>
+                    <strong>Error handling</strong>
+                    via &lt;onerror&gt; elements
+                </li>
+                <li>
+                    <strong>Conditional scripts/queries execution</strong>
+                    (similar to Ant if/unless attributes but more powerful)
+                </li>
+                <li>
+                    <strong>Easy-to-Use</strong>
+                    as a standalone tool or Ant task. No deployment/installation required.<br/>
+                    <strong>Easy-To-Run</strong> ETL files directly from <a href="reference/index.html#inprocess">Java code</a>.
+                </li>
+                <li>
+                    <strong>Built-in adapters</strong> for popular <a href="reference/drivers.html#jdbc">databases</a>
+                    for a tight integration. Support for any database with JDBC/ODBC compliant driver.
+                </li>
+                <li>
+                    <strong>
+                        <a href="docs/api/scriptella/spi/package-summary.html">Service Provider Interface (SPI)</a>
+                    </strong>
+                    for interoperability with non-JDBC DataSources and scripting languages.
+                    Out of the box <a href="reference/drivers.html#script">support for JSR 223</a>
+                    <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">(Scripting for the Java™ Platform)</a> compatible languages. 
+                </li>
+                <li>Built-In
+                    <a href="reference/drivers.html#nonjdbc">CSV, Excel, Text, XML, LDAP, Lucene, Velocity, JEXL and Janino</a>
+                    providers. Integration with Java EE, <a href="reference/drivers.html#spring">Spring Framework</a>,
+                    <a href="reference/index.html#jmx">JMX</a>
+                    , <a href="reference/drivers.html#jndi">JNDI</a> and <a href="reference/drivers.html#mail">JavaMail</a> 
+                    for <strong>enterprise ready</strong> scripts.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>News</title>
+            <section>
+                <title>Scriptella 1.0 Released (May 5, 2010)</title>
+                <p>We are pleased to announce the availability of Scriptella 1.0.
+                    This release fixes few minor bugs found in RCs:
+                </p>
+                <ul>
+                    <li>Fixed: ArrayIndexOutOfBounds thrown when lazy-initialization fails for connection</li>
+                    <li>Fixed: Cannot load class when scriptella is packaged in an EAR file in JBoss</li>
+                    <li>Fixed auto-discovery driver aliases for PostgreSQL/DB2</li>
+                    <li>Fixed: Cannot write to HTTP URL</li>
+                </ul>
+                <p>The following features are introduced:</p>
+                <ul>
+                    <li>Added <a href="http://www.cubrid.org/apps_and_tools">CUBRID Database driver</a>.</li>
+                    <li>Use null_string to expand $variable when it has null value. CSV, text driver</li>
+                    <li>nostat command line option to suppress statistics collecting</li>
+                </ul>
+                <p>Kudos to Hervé for providing Maven POM files. Work on Maven integration is in progress. See <a
+                        href="http://www.javaforge.com/issue/10631">TSK-10631</a> for more details</p>
+                <p>See
+                    <a href="changes.html">change log</a>  for additional details.
+                    <br/>
+                    <a href="tutorial.html">Make ETL easier</a> -<a href="download.html">Download Scriptella Now!</a>
+                </p>
+                <p>Work on 1.1 has started, see
+                    <a href="http://www.javaforge.com/wiki/69768">Roadmap for 1.1</a>
+                </p>
+            </section>
+        </section>
+        </body>
+</document>

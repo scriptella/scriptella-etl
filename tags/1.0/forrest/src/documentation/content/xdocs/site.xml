@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Forrest site.xml
+
+This file contains an outline of the site's information content.  It is used to:
+- Generate the website menus (though these can be overridden - see docs)
+- Provide semantic, location-independent aliases for internal 'site:' URIs, eg
+<link href="site:changes"> links to changes.html (or ../changes.html if in
+  subdir).
+- Provide aliases for external URLs in the external-refs section.  Eg, <link
+  href="ext:cocoon"> links to http://cocoon.apache.org/ 
+
+See http://forrest.apache.org/docs/linking.html for more info
+-->
+<site label="Scriptella" href="" xmlns="http://apache.org/forrest/linkmap/1.0" tab="">
+	<!-- Note: No matter what you configure here, Forrest will always try to load
+       index.html when you request http://yourHost/.
+       'How can I use a start-up-page other than index.html?' in the FAQs has more 
+       information tells you how to change that. 
+   -->
+	<scriptella label="Scriptella">
+		<about label="About" href="index.html" description="About Scriptella"/>
+		<license label="License" href="license.html" description="Scriptella License"/>
+        <changes label="Change History" href="changes.html"/>
+        <support label="Support" href="support.html" description="Scriptella Project Support"/>
+        <download label="Download" href="download.html" description="Download Scriptella Binary and Source Distribution"/>
+        <links label="Links" href="links.html" description="Scriptella Related Links"/>
+    </scriptella>
+	<getstart label="Getting Started">
+        <tutorial label="Two Minute Tutorial" href="tutorial.html" description="Two Minute Tutorial"/>
+        <faq label="FAQ" href="faq.html" description="Frequently Asked Questions"/>
+    </getstart>
+	<doc label="Documentation" tab="reference" description="Scriptella Documentation">
+        <index label="Reference Documentation" href="reference/index.html" description="Scriptella Reference Documentation"/>
+        <index label="Drivers Matrix" href="reference/drivers.html"/>
+        <!-- Temprorary solution to avoid broken links. See forrest FAQ for solution on apidocs links-->
+        <api label="API Docs" href="docs/api/index.html"/>
+        <dtd label="DTD Reference" href="docs/dtd/index.html"/>
+        <howtos label="How-Tos" tab="howto">
+            <ant label="Migrate from Ant SQL Task" href="howto/migrate-from-ant.html"/>
+            <ant label="Automated Database Initialization" href="howto/initialize-database.html"/>
+         </howtos>
+        <!--For now API Docs links breaks wholesite generation, resolve the problem and uncomment 
+        <whole_site_html label="Whole Site HTML" href="wholesite.html"/>
+        <whole_site_pdf label="Whole Site PDF" href="wholesite.pdf"/>-->
+    </doc>
+
+    <external-refs>
+		<forrest href="http://forrest.apache.org/">
+			<linking href="docs/linking.html"/>
+			<validation href="docs/validation.html"/>
+			<webapp href="docs/your-project.html#webapp"/>
+			<dtd-docs href="docs/dtd-docs.html"/>
+		</forrest>
+		<cocoon href="http://cocoon.apache.org/"/>
+		<xml.apache.org href="http://xml.apache.org/"/>
+    </external-refs>
+</site>

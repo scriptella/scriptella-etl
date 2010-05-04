@@ -1,0 +1,15 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        f1=file1.xml
+    </properties>
+    <connection id="c1" driver="scriptella"/>
+    <connection id="c2" driver="scriptella" url="file2.xml"/> <!-- Executed at first -->
+    <script connection-id="c1">
+        $f1
+        file1.xml
+    </script>
+    <script connection-id="c2">
+        file2.xml
+    </script>
+</etl>

@@ -1,0 +1,57 @@
+<body>
+Janino Driver for Scriptella.
+<p>This driver allows to embed Java code into &lt;query&gt; and &lt;script&gt; elements.
+This code is compiled by Janino and executed by Scriptella engine. For  simple
+scripting solutions refer to <a href="../jexl/package-summary.html">JEXL</a> expression language
+which is interpreted and less powerful.</p>
+<p>Janino scripting elements are implicit subclasses of <a href="JaninoQuery.html">Query</a> and <a href="JaninoScript.html">Script</a>
+base classes.</p>
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.janino.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>janino-2.5.11+.jar</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+</table>
+
+<h2>Script Syntax</h2>
+In Scriptella Janino script is a Java "block", i.e. the body of a method. For convenience protected and
+public methods of <a href="JaninoScript.html">JaninoScript</a> are accessible from Janino &lt;script&gt; elements.
+<p>In other words the script element is an implementation of <code>execute</code> method of <code>JaninoScript</code> class.</p>
+<h2>Query Syntax</h2>
+Queries are written using the same syntax as script elements with the only difference that protected/public methods from
+<a href="JaninoQuery.html">Query</a> class are accessible from &lt;query&gt; element.
+<p>In other words the query element is an implementation of <code>execute</code> method of <code>JaninoQuery</code> class.</p>
+<h2>Properties substitution</h2>
+The standard ant-style properties substitution is not supported.
+Instead, use get("variableName") to get the variable value and
+set("variableName", value) to set the variable value.
+<h2>Example</h2>
+<code><pre>
+    &lt;connection driver="janino"&gt;/&gt;
+
+    &lt;query&gt;
+        set("name", "John);
+        next();
+        &lt;script&gt;
+            System.out.println("Processing: "+get("name"));
+        &lt;/script&gt;
+    &lt;/query&gt;
+</pre></code>
+In this example the query produces a row having a column name=John.
+The child script is executed on a query result set and prints the message
+<pre>Processing: John</pre> to the console.
+<p>ODBC sample from Scriptella examples distribution also shows
+several use-cases for Janino.</p>
+</body>

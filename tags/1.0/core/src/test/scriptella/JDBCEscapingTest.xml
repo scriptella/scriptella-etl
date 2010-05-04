@@ -1,0 +1,14 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<!--
+This suite tests valid JDBC timestamp escaping support, e.g. {ts 'yyyy-mm-dd hh:mm:ss.f...'}
+-->
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcet" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT,
+        d DATETIME
+        );
+        insert into Test values (1,{ts '2005-10-10 22:33:44.1'});
+    </script>
+</etl>

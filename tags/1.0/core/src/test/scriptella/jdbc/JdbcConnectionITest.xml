@@ -1,0 +1,19 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+        transaction.isolation=READ_UNCOMMITTED
+        keepformat=true
+    </connection>
+    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+        transaction.isolation=1 <!--Read uncommitted-->
+        keepformat=true
+    </connection>
+
+    <script connection-id="c1">
+        COMMIT;
+    </script>
+    <script connection-id="c2">
+        COMMIT;
+    </script>
+
+</etl>

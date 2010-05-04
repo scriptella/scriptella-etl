@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+	<header>
+		<title>Two Minute Tutorial</title>
+	</header>
+	<body>
+		<section>
+			<title>Installation</title>
+			<ul>
+				<li><a href="download.html">Download</a> Scriptella binary distribution.</li>
+                <li>Unpack it and add a &lt;SCRIPTELLA_DIR&gt;/bin to a system <code>PATH</code> variable.
+                <p>Use <code>set PATH=%PATH%;SCRIPTELLA_DIR\bin</code> for Windows and
+                    <code>export PATH=${PATH}:SCRIPTELLA_DIR/bin</code> for Unix.</p></li>
+                <li>Check if JRE has been installed correctly by running java -version.</li>
+                <li><em>Optional step:</em> Put JDBC drivers required by your scripts to &lt;SCRIPTELLA_DIR&gt;/lib directory
+                    or directly specify classpath attribute in script connection elements.</li>
+			</ul>
+		</section>
+		<section>
+			<title>Use Scriptella as Ant Task</title>
+			<p>In order to use Scriptella as Ant task you will need the following taskdef declaration:</p>
+			<source><![CDATA[<taskdef resource="antscriptella.properties" classpath="/path/to/scriptella.jar[;additional_drivers.jar]"/>]]></source>
+            <note>Additional drivers classpath entries are optional. You may directly specify classpath attribute in
+            a connection XML element declaration. Example:<br/><code>&lt;connection driver="sybase" classpath="jconn3.jar"/&gt;
+            </code></note>
+            <p>Running Scriptella files from Ant is simple:</p>
+			<source><![CDATA[<etl/> <!-- Execute etl.xml file in the current directory -->]]></source>
+                <p>or</p>
+			<source><![CDATA[<etl file="path/to/your/file/> <!-- Execute ETL file from specified location -->]]></source>
+		</section>
+		<section>
+			<title>Command-Line Execution</title>
+			<p>Just type <code>scriptella</code> to run the file named etl.xml in the current directory.
+			Alternatively you can use java launcher:</p>
+			<source><![CDATA[java -jar scriptella.jar [arguments]]]></source>
+        </section>
+        <section>
+            <title>Executing ETL Files from Java</title>
+            <p>It is extremely easy to run Scriptella ETL files from java code.
+                Just make sure scriptella.jar is on classpath and use any of the following methods to execute an ETL file:</p>
+            <source><![CDATA[
+EtlExecutor.newExecutor(new File("etl.xml")).execute(); //Execute etl.xml file
+EtlExecutor.newExecutor(getClass().getResource("etl.xml")).execute(); //Execute etl.xml file loaded from classpath
+EtlExecutor.newExecutor(
+    servletContext.getResource("/WEB-INF/db/init.etl.xml")).execute(); //Execute init.etl.xml file from web application WEB-INF directory]]></source>
+            <p>See <a href="../docs/api/scriptella/execution/EtlExecutor.html">EtlExecutor Javadoc</a>
+                for more details on how to execute ETL files from Java code.
+            </p>
+        </section>
+
+        <section>
+			<title>Examples</title>
+            <p>For a quick start type <code>scriptella -t</code> to create a template etl.xml file.</p>
+            <section>
+				<title>Copy table to another database</title>
+                <figure src="./images/table_copy.png" alt="Migration of table records"/>
+                <p>Assume Database #1 contains Table Product with id, category and name columns. The following script
+                copies software products from this table to Database #2. Additionally Name column is changed to Product_Name.</p>
+				<p>etl.xml:</p>
+				<source><![CDATA[
+    <etl>
+        <connection id="db1" url="jdbc:database1:sample" user="sa" password="" classpath="external.jar"/>
+        <connection id="db2" url="jdbc:database2:sample" user="sa" password=""/>
+        <query connection-id="db1">
+            <!-- Select product from software category in db1-->
+            SELECT * FROM Product WHERE category='software';
+            <!-- for each row execute a script -->
+            <script connection-id="db2">
+                <!-- Insert all selected products to db2
+                     use ? to reference properties, columns or ?{expressions}-->
+                INSERT INTO Product(id, category, product_name) values (?id, ?{category}, ?name);
+            </script>
+        </query>
+    </etl>
+                    ]]></source>
+			</section>
+			<section>
+				<title>Working with BLOBs</title>
+                <figure src="./images/blob_insert.png" alt="Inserting BLOB content from URL"/>
+                <p>The following sample initializes table of music tracks. Each track has a DATA field containing
+ a file loaded from an external location. File song1.mp3 is stored in the same directory as etl.xml and song2.mp3
+ is loaded through the web.</p>
+				<p>etl.xml:</p>
+				<source><![CDATA[
+    <etl>
+        <connection url="jdbc:hsqldb:file:tracks" user="sa" password=""/>
+        <script>
+            CREATE TABLE Track (
+              ID INT,
+              ALBUM_ID INT,
+              NAME VARCHAR(100),
+              DATA LONGVARBINARY
+            );
+            <!-- Inserts file with path relative to executed script location -->
+            insert into Track(id, album_id, name, data) values
+                   (1, 1, 'Song1.mp3', ?{file 'song1.mp3'});
+            <!-- Inserts file from URL-->
+            insert into Track(id, album_id, name, data) values
+                   (2, 2, 'Song2.mp3', ?{file 'http://musicstoresample.com/song2.mp3'});
+        </script>
+    </etl>
+                    ]]></source>
+			</section>
+			<section>
+				<title>Supporting several SQL dialects</title>
+                <p>&lt;dialect&gt; element allows including vendor specific content.
+                    The following example creates database schema for Oracle/HSQLDB or MySql
+                    depending on a selected driver:</p>
+                <source><![CDATA[
+    <etl>
+        <properties><!-- Load external properties -->
+            <include href="etl.properties"/>
+        </properties>
+        <connection url="$url" user="$user"
+            password="$password" classpath="$classpath"/>
+        <script>
+            -- In this example dialects are used to
+            -- include different DDLs for data types:
+            -- Example: oracle-schema.sql for Oracle
+            <dialect name="hsql"> <!-- Regular expressions syntax supported-->
+                <include href="hsqldb-schema.sql"/>
+            </dialect>
+            <dialect name="oracle">
+                <include href="oracle-schema.sql"/>
+            </dialect>
+            <dialect name="mysql">
+                <include href="mysql-schema.sql"/>
+            </dialect>
+            -- SQL92 inserts - no need to use dialects
+            INSERT INTO Product(id, category, product_name)
+                VALUES (1, 'ETL', 'Scriptella ETL');
+            INSERT INTO Product(id, category, product_name)
+                VALUES (2, 'Development', 'Java SE 6');
+         </script>
+    </etl>]]></source>
+			</section>
+            <note>
+                For additional samples <a href="download.html">download</a>
+                Scriptella examples distribution. See also
+                <a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples on DZone Snippets</a>
+            </note>
+        </section>
+    </body>
+</document>

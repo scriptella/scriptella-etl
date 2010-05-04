@@ -1,0 +1,16 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:txtest2" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+        ID INT,
+        VALUE CHAR(11)
+        );
+        insert into test(id, value) values (1,'111');
+    </script>
+
+    <script new-tx="true">
+        insert into nosuchtable(id, value) values (11,'222');
+    </script>
+
+</etl>

@@ -1,0 +1,8 @@
+This folder contains project documentation files built by Apache Forrest.
+All proposals on better XML documentation/site solution are welcome!!!
+
+Notes:
+   1) Forrest 0.8 is required. Higher versions may work,
+      but experience shows that they do not follow backward compatibility...
+   2) JDK 1.5 required to build forrest docs :(
+      Please make sure forrest.bat is using the 1.5 version!

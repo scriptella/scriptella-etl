@@ -1,0 +1,36 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db1" user="sa" password=""/>
+    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db2" user="sa" password=""/>
+    <script connection-id="c1">
+        CREATE TABLE Test (
+        ID INT
+        );
+        insert into test values (1);
+        insert into test values (3);
+    </script>
+    <script connection-id="c2">
+        CREATE TABLE Test (
+        ID INT
+        );
+    </script>
+    <query connection-id="c1">
+        select ID*4 as id from test
+        <query connection-id="c1">
+            select id+?id as id from Test
+            <script connection-id="c2">
+                insert into test(id) values (?id)
+            </script>
+        </query>
+    </query>
+
+    <query connection-id="c1">
+        select ID*2 as id from Test
+        <script connection-id="c2">
+            insert into test(id) values (?id)
+        </script>
+
+    </query>
+
+
+</etl>

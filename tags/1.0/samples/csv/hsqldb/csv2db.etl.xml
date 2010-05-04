@@ -1,0 +1,41 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Imports CSV data from a file to a database table.
+        See http://www.hsqldb.org/doc/guide/ch06.html for details about
+        HSQLDB Text Tables.
+    </description>
+    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="../../lib/hsqldb.jar"/>
+    <connection id="out" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:db" user="sa" classpath="../../lib/hsqldb.jar"/>
+    <script connection-id="in">
+        <!-- Creates TEXT table to output CSV data -->
+        CREATE TEXT TABLE Bug (
+            <include href="fields.sql"/>
+        );
+        <!--Specify file to store table results -->
+        SET TABLE Bug SOURCE "bugs-in.csv";
+    </script>
+    <script connection-id="out">
+        <!-- Creates Bug table to output CSV data -->
+        DROP TABLE BUG IF EXISTS;
+        CREATE TABLE Bug (
+            <include href="fields.sql"/>
+        );
+    </script>
+
+    <query connection-id="in">
+        <!--Selects all bugs -->
+        SELECT * from Bug
+        <script connection-id="out">
+            INSERT INTO Bug VALUES (?ID, ?priority, ?summary, ?status);
+        </script>
+    </query>
+
+    <script connection-id="in"><!--Gracefully shutdown HSQLDB-->
+        COMMIT;SHUTDOWN;
+    </script>
+    <script connection-id="out"><!--Gracefully shutdown HSQLDB-->
+        COMMIT;SHUTDOWN;
+    </script>
+
+</etl>

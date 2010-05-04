@@ -1,0 +1,8 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="db" driver="---"/>
+    <connection driver="---"/>
+    <script connection-id="db">
+        SHUTDOWN;
+    </script>
+</etl>

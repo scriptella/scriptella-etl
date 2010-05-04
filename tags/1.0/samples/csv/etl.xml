@@ -1,0 +1,50 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>
+        Quieries CSV data from from file and store the results in a DB and other CSV file.
+    </description>
+    <connection id="in" driver="csv" url="bugs-in.csv"/>
+    <!--Filtered output to another file -->
+    <connection id="out" driver="csv" url="bugs-out.csv">
+        #Use empty quote to turn off quoting
+        quote=
+    </connection>
+    <!--Connection to output a filtered list of bugs as an Excel CSV file -->
+    <connection id="outFiltered" driver="csv" url="bugs-out-filtered.csv">
+        separator=;
+    </connection>
+    <!--In memory just for example-->
+    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:db" user="sa" classpath="../lib/hsqldb.jar"/>
+    <script connection-id="db">
+        <!-- Creates Bug table to output CSV data -->
+        DROP TABLE BUG IF EXISTS;
+        CREATE TABLE Bug (
+            <include href="hsqldb/fields.sql"/>
+        );
+    </script>
+
+    <script connection-id="out"><!--Writing header if necessary-->
+        id,priority, summary,status
+    </script>
+    <query connection-id="in">
+        <!--Empty CSV query means select all-->
+        <script connection-id="out">
+            $id,$priority,$summary,$status
+        </script>
+    </query>
+    <query connection-id="in">
+        <!--Select bugs with status open or reopened.
+        Unfortunately I don't know how to specify negation,e.g. !closed-->
+        ,,,open|reopened
+        <script connection-id="outFiltered">
+            $id,$priority,$summary,$status
+        </script>
+        <!--Inserts imported rows into a database using additional if filter-->
+        <script connection-id="db" if="!priority.equalsIgnoreCase('Low')">
+            INSERT INTO BUG VALUES (?id, ?priority, ?summary, ?status);
+        </script>
+
+    </query>
+
+
+</etl>
