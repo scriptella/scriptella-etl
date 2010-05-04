@@ -36,7 +36,7 @@
     <changes>
         <!--<release version="1.0" date="not yet released">-->
         <!--</release>-->
-        <release version="1.0" date="not yet released">
+        <release version="1.0" date="2010-05-05">
             <action context="code" type="add" dev="ejboy" fixes-bug="11778">
                 CUBRID Database driver
             </action>
