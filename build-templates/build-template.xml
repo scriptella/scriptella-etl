@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project name="scriptella-template" default="">
+<project name="scriptella-template" default="" xmlns:artifact="urn:maven-artifact-ant">
     <description>Base build for submodules</description>
     <property file="${basedir}/custom.build.properties"/>
     <property file="${basedir}/build.properties"/>
@@ -21,6 +21,7 @@
     <property file="${basedir}/../build.properties"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="jar.name" value="${ant.project.name}.jar"/>
+    <property name="src-jar.name" value="${ant.project.name}-sources.jar"/>
     <property name="tmp.dir" value="${build.dir}/tmp"/>
     <property name="classes.dir" value="${tmp.dir}/classes"/>
     <property name="src.dir" value="${basedir}/src"/>
@@ -92,5 +93,19 @@
                 <fileset dir="${test.dir}" includes="**/*Test.java"/>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="deploy">
+        <description>
+            Publish libraries to Maven repositories, snapshot or release depending on current
+        	version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
+        </description>
+
+        <jar basedir="${java.dir}" destfile="${build.dir}/${src-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
+
+        <artifact:deploy file="${build.dir}/${jar.name}">
+          <pom file="pom.xml" />
+          <attach file="${build.dir}/${src-jar.name}" classifier="sources"/>
+        </artifact:deploy>
     </target>
 </project>

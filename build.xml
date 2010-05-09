@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project name="scriptella" default="jar">
+<project name="scriptella" default="jar" xmlns:artifact="urn:maven-artifact-ant">
     <description>
         Build file for Scriptella Project.
         Use build.properties/custom.build.properties to customize its behaviour.
@@ -163,5 +163,28 @@
         <ant antfile="${basedir}/coverage.xml" inheritall="false"/>
     </target>
 
+    <target name="deploy">
+        <description>
+            Publish libraries to Maven repositories, snapshot or release depending on current
+        	version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
+        </description>
+        <!--Validation-->
+        <fail message="Maven Ant Tasks are required to publish libraries. Set maven-ant-tasks.jar property.
+        Maven Ant Tasks URL: http://maven.apache.org/ant-tasks/" unless="maven-ant-tasks.jar"/>
+        <condition property="no_maven-ant-tasks">
+            <available file="${maven-ant-tasks.jar}"/>
+        </condition>
+        <fail message="Maven Ant Tasks not found at ${no_maven-ant-tasks}" unless="no_maven-ant-tasks"/>
+        <!--End Validation-->
+        <path id="maven-ant-tasks.classpath" path="${maven-ant-tasks.jar}" />
+        <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant"
+                 classpathref="maven-ant-tasks.classpath"/>
 
+        <artifact:deploy file="pom.xml">
+          <pom file="pom.xml" />
+        </artifact:deploy>
+        <ant dir="${core}" antfile="${core}/build.xml" target="deploy" inheritall="false"/>
+        <ant dir="${drivers}" antfile="${drivers}/build.xml" target="deploy" inheritall="false"/>
+        <ant dir="${tools}" antfile="${tools}/build.xml" target="deploy" inheritall="false"/>
+    </target>
 </project>
