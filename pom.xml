@@ -72,12 +72,12 @@
 	<distributionManagement>
 		<!-- see https://issues.sonatype.org/browse/OSSRH-413 -->
 		<repository>
-			<id>scriptella</id>
+			<id>scriptella-releases</id>
 			<name>Scriptella Central Repository</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 		<snapshotRepository>
-			<id>scriptella</id>
+			<id>scriptella-snapshots</id>
 			<name>Scriptella Central Development Repository</name>
 			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
