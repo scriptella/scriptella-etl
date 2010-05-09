@@ -69,6 +69,20 @@
         <url>http://www.javaforge.com/proj/tracker/browseTracker.do?tracker_id=3136</url>
     </issueManagement>
 
+	<distributionManagement>
+		<!-- see https://issues.sonatype.org/browse/OSSRH-413 -->
+		<repository>
+			<id>scriptella</id>
+			<name>Scriptella Central Repository</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>scriptella</id>
+			<name>Scriptella Central Development Repository</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>CP1252</project.build.sourceEncoding>
     </properties>
