@@ -129,6 +129,7 @@
         </description>
 
 		<gpg file="pom.xml"/>
+		<gpg file="${build.dir}/${jar.name}"/>
         <artifact:deploy file="${build.dir}/${jar.name}">
           <pom file="pom.xml" />
           <attach file="pom.xml.asc" type="pom.asc"/>
