@@ -22,6 +22,7 @@
     <property name="build.dir" value="${basedir}/build"/>
     <property name="jar.name" value="${ant.project.name}.jar"/>
     <property name="src-jar.name" value="${ant.project.name}-sources.jar"/>
+    <property name="doc-jar.name" value="${ant.project.name}-javadoc.jar"/>
     <property name="tmp.dir" value="${build.dir}/tmp"/>
     <property name="classes.dir" value="${tmp.dir}/classes"/>
     <property name="src.dir" value="${basedir}/src"/>
@@ -31,6 +32,7 @@
     <property name="tests.tmp.dir" value="${tmp.dir}/tests"/>
     <property name="tests.xml.report.dir" value="${tmp.dir}/junit-xml"/>
     <property name="root.dir" value="${basedir}/.."/>
+    <property name="javadoc.dest.dir" value="${build.dir}/api"/>
     <tstamp/>
 
 	<xmlproperty file="${root.dir}/pom.xml" prefix="pom.xml" />
@@ -95,17 +97,46 @@
         </junit>
     </target>
 
-    <target name="deploy">
+    <target name="prepare-deploy">
+        <description>
+            Prepare publication of libraries to Maven release repository: create -sources.jar and -javadoc.jar,
+        	to be signed with gpg.
+        </description>
+
+    	<jar basedir="${java.dir}" destfile="${build.dir}/${src-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
+		<gpg file="${build.dir}/${src-jar.name}"/>
+
+        <delete dir="${javadoc.dest.dir}" failonerror="no"/>
+        <mkdir dir="${javadoc.dest.dir}"/>
+    	<xmlproperty file="pom.xml" prefix="local.pom.xml" />
+        <javadoc destdir="${javadoc.dest.dir}" includenosourcepackages="true"
+                 use="true" windowtitle="${local.pom.xml.project.name} API Documentation">
+            <classpath refid="test.classpath"/>
+            <classpath path="${ant.jar}"/>
+            <packageset dir="${java.dir}"/>
+            <doctitle><![CDATA[<h1>${local.pom.xml.project.name} API Documentation</h1>]]></doctitle>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; Copyright 2006-2009 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
+        </javadoc>
+    	<jar basedir="${javadoc.dest.dir}" destfile="${build.dir}/${doc-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
+		<gpg file="${build.dir}/${doc-jar.name}"/>
+    </target>
+
+    <target name="deploy" depends="prepare-deploy">
         <description>
             Publish libraries to Maven repositories, snapshot or release depending on current
         	version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
         </description>
 
-        <jar basedir="${java.dir}" destfile="${build.dir}/${src-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
-
+		<gpg file="pom.xml"/>
         <artifact:deploy file="${build.dir}/${jar.name}">
           <pom file="pom.xml" />
+          <attach file="pom.xml.asc" type="pom.asc"/>
+          <attach file="${build.dir}/${jar.name}.asc" type="jar.asc"/>
           <attach file="${build.dir}/${src-jar.name}" classifier="sources"/>
+          <attach file="${build.dir}/${src-jar.name}.asc" classifier="sources" type="jar.asc"/>
+          <attach file="${build.dir}/${doc-jar.name}" classifier="javadoc"/>
+          <attach file="${build.dir}/${doc-jar.name}.asc" classifier="javadoc" type="jar.asc"/>
         </artifact:deploy>
     </target>
 </project>
