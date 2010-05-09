@@ -74,7 +74,7 @@
 		<repository>
 			<id>scriptella-releases</id>
 			<name>Scriptella Central Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 		<snapshotRepository>
 			<id>scriptella-snapshots</id>
