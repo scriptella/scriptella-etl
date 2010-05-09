@@ -13,11 +13,12 @@
     <target name="dtd" depends="clean">
         <description>Generates DTD using DTDDoc</description>
         <!--Validation-->
+        <fail message="DTDDoc is required to build DTD documentation. Set dtddoc.dir property.
+        DTDDoc URL: http://dtddoc.sourceforge.net" unless="dtddoc.dir"/>
         <condition property="no_dtddoc">
             <available file="${dtddoc.dir}"/>
         </condition>
-        <fail message="DTDDoc is required to build DTD documentation. Set dtddoc.dir property.
-        DTDDoc URL: http://dtddoc.sourceforge.net" unless="no_dtddoc"/>
+        <fail message="DTDDoc not found in ${dtddoc.dir}" unless="no_dtddoc"/>
         <!--End Validation-->
         <taskdef name="DTDDoc"
                  classname="DTDDoc.DTDDocTask">
