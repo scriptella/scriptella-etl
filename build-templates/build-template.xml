@@ -35,7 +35,7 @@
     <property name="javadoc.dest.dir" value="${build.dir}/api"/>
     <tstamp/>
 
-	<xmlproperty file="${root.dir}/pom.xml" prefix="pom.xml" />
+    <xmlproperty file="${root.dir}/pom.xml" prefix="pom.xml" />
     <property name="version" value="${pom.xml.project.version}"/>
 
     <target name="init" depends="clean">
@@ -100,15 +100,15 @@
     <target name="prepare-deploy">
         <description>
             Prepare publication of libraries to Maven release repository: create -sources.jar and -javadoc.jar,
-        	to be signed with gpg.
+            to be signed with gpg.
         </description>
 
-    	<jar basedir="${java.dir}" destfile="${build.dir}/${src-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
-		<gpg file="${build.dir}/${src-jar.name}"/>
+        <jar basedir="${java.dir}" destfile="${build.dir}/${src-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
+        <gpg file="${build.dir}/${src-jar.name}"/>
 
         <delete dir="${javadoc.dest.dir}" failonerror="no"/>
         <mkdir dir="${javadoc.dest.dir}"/>
-    	<xmlproperty file="pom.xml" prefix="local.pom.xml" />
+        <xmlproperty file="pom.xml" prefix="local.pom.xml" />
         <javadoc destdir="${javadoc.dest.dir}" includenosourcepackages="true"
                  use="true" windowtitle="${local.pom.xml.project.name} API Documentation">
             <classpath refid="test.classpath"/>
@@ -118,18 +118,18 @@
             <bottom>
                 <![CDATA[<i>Copyright &#169; Copyright 2006-2009 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
         </javadoc>
-    	<jar basedir="${javadoc.dest.dir}" destfile="${build.dir}/${doc-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
-		<gpg file="${build.dir}/${doc-jar.name}"/>
+        <jar basedir="${javadoc.dest.dir}" destfile="${build.dir}/${doc-jar.name}" manifest="${tmp.dir}/MANIFEST.MF"/>
+        <gpg file="${build.dir}/${doc-jar.name}"/>
     </target>
 
     <target name="deploy" depends="prepare-deploy">
         <description>
             Publish libraries to Maven repositories, snapshot or release depending on current
-        	version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
+            version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
         </description>
 
-		<gpg file="pom.xml"/>
-		<gpg file="${build.dir}/${jar.name}"/>
+        <gpg file="pom.xml"/>
+        <gpg file="${build.dir}/${jar.name}"/>
         <artifact:deploy file="${build.dir}/${jar.name}">
           <pom file="pom.xml" />
           <attach file="pom.xml.asc" type="pom.asc"/>

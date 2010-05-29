@@ -163,13 +163,13 @@
         <ant antfile="${basedir}/coverage.xml" inheritall="false"/>
     </target>
 
-	<target name="deploy">
+    <target name="deploy">
         <description>
             Publish libraries to Maven repositories, snapshot or release depending on current
-        	version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
+            version in pom.xml. Requires maven-ant-tasks.jar to be specified in build.properties
         </description>
 
-		<!--Validation-->
+        <!--Validation-->
         <fail message="Maven Ant Tasks are required to publish libraries. Set maven-ant-tasks.jar property.
         Maven Ant Tasks URL: http://maven.apache.org/ant-tasks/" unless="maven-ant-tasks.jar"/>
         <condition property="no_maven-ant-tasks">
@@ -178,26 +178,26 @@
         <fail message="Maven Ant Tasks not found at ${no_maven-ant-tasks}" unless="no_maven-ant-tasks"/>
         <!--End Validation-->
 
-		<path id="maven-ant-tasks.classpath" path="${maven-ant-tasks.jar}" />
+        <path id="maven-ant-tasks.classpath" path="${maven-ant-tasks.jar}" />
         <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant"
                  classpathref="maven-ant-tasks.classpath"/>
 
-		<macrodef name="gpg">
-			<attribute name="file"/>
-			<sequential>
-				<delete file="@{file}.asc" failonerror="false"/>
-	 			<exec executable="gpg">
-				    <arg value="-u"/>
-				    <arg value="${gpg.key}"/>
-				    <arg value="-ab"/>
-					<arg value="--passphrase"/>
-				    <arg value="${gpg.passphrase}"/>
-					<arg value="@{file}"/>
-				</exec>
-			</sequential>
-		</macrodef>
+        <macrodef name="gpg">
+            <attribute name="file"/>
+            <sequential>
+                <delete file="@{file}.asc" failonerror="false"/>
+                 <exec executable="gpg">
+                    <arg value="-u"/>
+                    <arg value="${gpg.key}"/>
+                    <arg value="-ab"/>
+                    <arg value="--passphrase"/>
+                    <arg value="${gpg.passphrase}"/>
+                    <arg value="@{file}"/>
+                </exec>
+            </sequential>
+        </macrodef>
 
-		<gpg file="pom.xml"/>
+        <gpg file="pom.xml"/>
         <artifact:deploy file="pom.xml">
           <pom file="pom.xml" />
           <attach file="pom.xml.asc" type="pom.asc"/>
