@@ -16,6 +16,7 @@
 package scriptella.driver.xpath;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.StringResource;
@@ -38,15 +39,17 @@ import java.io.IOException;
  */
 public class XPathQueryExecutorTest extends AbstractTestCase {
     private DocumentBuilder documentBuilder;
+    private ThreadLocal<Node> context;
 
     protected void setUp() throws Exception {
         documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        context = new ThreadLocal<Node>();
     }
 
     public void test() throws ParserConfigurationException, IOException, SAXException {
         Document doc = documentBuilder.parse(getClass().getResourceAsStream("xml1.xml"));
         Resource res = new StringResource("/html/body/table/tr");
-        XPathQueryExecutor exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
+        XPathQueryExecutor exec = new XPathQueryExecutor(context, doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
         IndexedQueryCallback callback = new IndexedQueryCallback() {
 
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {
@@ -67,7 +70,7 @@ public class XPathQueryExecutorTest extends AbstractTestCase {
     public void test2() throws ParserConfigurationException, IOException, SAXException {
         Document doc = documentBuilder.parse(getClass().getResourceAsStream("xml2.xml"));
         Resource res = new StringResource("  /xml/element[@attribute=1]  | /xml/element[not(@attribute)]");
-        XPathQueryExecutor exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
+        XPathQueryExecutor exec = new XPathQueryExecutor(context, doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
         IndexedQueryCallback callback = new IndexedQueryCallback() {
 
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {
@@ -82,7 +85,7 @@ public class XPathQueryExecutorTest extends AbstractTestCase {
         assertEquals(2,callback.getRowsNumber());
         //Now select element2, also test substitution
         res = new StringResource(" /xml/$element2 ");
-        exec = new XPathQueryExecutor(doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
+        exec = new XPathQueryExecutor(context, doc, res, new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
         callback = new IndexedQueryCallback() {
 
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {

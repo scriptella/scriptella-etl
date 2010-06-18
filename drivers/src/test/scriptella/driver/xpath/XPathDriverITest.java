@@ -16,6 +16,7 @@
 package scriptella.driver.xpath;
 
 import scriptella.AbstractTestCase;
+import scriptella.configuration.ConfigurationFactory;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 
@@ -25,12 +26,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Integration test for {@link scriptella.driver.xpath.Driver XPath driver}.
  */
 public class XPathDriverITest extends AbstractTestCase {
     private ByteArrayOutputStream o;
+    private Map<String, String> params = new HashMap<String, String>();
 
     protected void setUp() throws Exception {
 
@@ -52,11 +56,48 @@ public class XPathDriverITest extends AbstractTestCase {
     }
 
 
-    public void test() throws EtlExecutorException, UnsupportedEncodingException {
+    public void test1() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "1");
         EtlExecutor e = newEtlExecutor();
         e.execute();
         assertNotNull(o);
         assertEquals("1;2\n3;4\n5;6\n", new String(o.toByteArray()));
     }
+    public void test2() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "2");
+        EtlExecutor e = newEtlExecutor();
+        e.execute();
+        assertNotNull(o);
+        assertEquals("1;Column2\n", new String(o.toByteArray()));
+    }
+    public void test3() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "3");
+        EtlExecutor e = newEtlExecutor();
+        e.execute();
+        assertNotNull(o);
+        assertEquals("2\n", new String(o.toByteArray()));
+    }
+    public void test4() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "4");
+        EtlExecutor e = newEtlExecutor();
+        e.execute();
+        assertNotNull(o);
+        assertEquals("1;2\n", new String(o.toByteArray()));
+    }
 
+    public void test5() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "5");
+        EtlExecutor e = newEtlExecutor();
+        e.execute();
+        assertNotNull(o);
+        assertEquals("2\n", new String(o.toByteArray()));
+    }
+
+
+    @Override
+    protected ConfigurationFactory newConfigurationFactory() {
+        ConfigurationFactory cf = super.newConfigurationFactory();
+        cf.setExternalParameters(params);
+        return cf;
+    }
 }

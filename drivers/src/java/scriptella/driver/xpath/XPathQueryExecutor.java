@@ -36,6 +36,7 @@ import java.io.IOException;
  * Executor for XPath queries.
  *
  * @author Fyodor Kupolov
+ * @author Martin Alderson
  * @version 1.0
  */
 public class XPathQueryExecutor implements ParametersCallback {
@@ -45,15 +46,20 @@ public class XPathQueryExecutor implements ParametersCallback {
     private String expressionStr;
     private XPathExpressionCompiler compiler;
     private AbstractConnection.StatementCounter counter;
+    ThreadLocal<Node> context;
 
     /**
      * Crates executor to query document using a specified xpath expression.
      *
+     * @param context       thread local for sharing current node between queries.
+     *                      The instance of thread local is shared between all connection queries.
      * @param document      document to query.
      * @param xpathResource resource with xpath expression.
+     * @param compiler      xpath expression compiler
      * @param counter       statement counter.
      */
-    public XPathQueryExecutor(Document document, Resource xpathResource, XPathExpressionCompiler compiler, AbstractConnection.StatementCounter counter) {
+    public XPathQueryExecutor(ThreadLocal<Node> context, Document document, Resource xpathResource, XPathExpressionCompiler compiler, AbstractConnection.StatementCounter counter) {
+        this.context = context;
         this.document = document;
         this.compiler = compiler;
         this.counter = counter;
@@ -71,38 +77,42 @@ public class XPathQueryExecutor implements ParametersCallback {
      * @param parentParameters parent parameters to inherit.
      */
     public void execute(final QueryCallback queryCallback, final ParametersCallback parentParameters) {
+        // Set the context node to the selected node of the nearest xpath query of this connection.
+        final Node contextNode = context.get();
         try {
             substitutor.setParameters(parentParameters);
             XPathExpression xpathExpression = compiler.compile(substitutor.substitute(expressionStr));
-            NodeList nList = (NodeList) xpathExpression.evaluate(document, XPathConstants.NODESET);
+            NodeList nList = (NodeList) xpathExpression.evaluate(
+                    contextNode == null ? document : contextNode, XPathConstants.NODESET);
             counter.statements++;
+
             int n = nList.getLength();
             for (int i = 0; i < n; i++) {
                 node = nList.item(i);
+                context.set(node); //store the context local to the current thread
                 queryCallback.processRow(this);
             }
         } catch (XPathExpressionException e) {
             throw new XPathProviderException("Failed to evaluate XPath query", e);
         } finally {
             substitutor.setParameters(null);
+            context.set(contextNode); //restore ThreadLocal state
         }
     }
 
     public Object getParameter(final String name) {
         Object result = null;
-        //If name is a number and node has attributes - try to get an attribute by index
-
         if (node instanceof Element) { //if element
             //Now we use a trick to determine if node contains "name" attribute
             //element.getAttribute returns "" for declared and declared attributes
             Node item = node.getAttributes().getNamedItem(name);
             result = item == null ? null : StringUtils.nullsafeTrim(item.getNodeValue()); //Get attribute value for name
         }
-        //If previos check was unsucessful and the selected node has specified name
+        //If previous check was unsuccessful and the selected node has specified name
         if (result == null && name.equals(node.getNodeName())) {
             result = StringUtils.nullsafeTrim(node.getTextContent()); //returns its text content
         }
-        //If previos check was unsucessful and the selected node is an element
+        //If previous check was unsuccessful and the selected node is an element
         if (result == null && node instanceof Element) {
             Element element = (Element) node;
             NodeList list = element.getElementsByTagName(name);
