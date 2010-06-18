@@ -17,6 +17,7 @@ package scriptella.driver.xpath;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
@@ -75,8 +76,8 @@ public class XPathConnectionPerfTest extends AbstractTestCase {
             row.setAttribute("id", String.valueOf(i));
             root.appendChild(row);
         }
-        //Quering 200 times.
-        XPathQueryExecutor qe = new XPathQueryExecutor(doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
+        //Querying 200 times.
+        XPathQueryExecutor qe = new XPathQueryExecutor(new ThreadLocal<Node>(), doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
         for (int i = 0; i < 20; i++) {
             IndexedQueryCallback queryCallback = new IndexedQueryCallback() {
                 protected void processRow(final ParametersCallback parameters, final int rowNumber) {

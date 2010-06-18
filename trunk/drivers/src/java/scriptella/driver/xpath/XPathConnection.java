@@ -16,6 +16,7 @@
 package scriptella.driver.xpath;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
@@ -40,6 +41,7 @@ public class XPathConnection extends AbstractConnection {
     private Map<Resource, XPathQueryExecutor> queriesCache = new IdentityHashMap<Resource, XPathQueryExecutor>();
     private XPathExpressionCompiler compiler = new XPathExpressionCompiler();
     private Document document;
+    private ThreadLocal<Node> queryContext=new ThreadLocal<Node>();
     private URL url;
     static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
 
@@ -62,7 +64,7 @@ public class XPathConnection extends AbstractConnection {
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         XPathQueryExecutor exec = queriesCache.get(queryContent);
         if (exec == null) {
-            exec = new XPathQueryExecutor(getDocument(), queryContent, compiler, counter);
+            exec = new XPathQueryExecutor(queryContext, getDocument(), queryContent, compiler, counter);
             queriesCache.put(queryContent, exec);
         }
         exec.execute(queryCallback, parametersCallback);
@@ -82,5 +84,7 @@ public class XPathConnection extends AbstractConnection {
     public void close() throws ProviderException {
         queriesCache = null;
         document = null;
+        queryContext.remove();
+        queryContext = null;
     }
 }
