@@ -55,4 +55,11 @@
             <script connection-id="out">$td</script>
         </query>
     </query>
+
+    <!-- Test6: Relative querying with 'node' variable.
+        Using relative xpaths select tr[2]/td[2] and tr[3]/td[2] -->
+    <query connection-id="in2" if="test==6">
+        /html/body/table
+        <script connection-id="out">${node.getString("./tr[2]/td[2]")};${node.getString("./tr[3]/td[2]")}</script>
+    </query>
 </etl>
