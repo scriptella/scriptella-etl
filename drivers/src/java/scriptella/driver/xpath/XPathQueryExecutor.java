@@ -102,6 +102,12 @@ public class XPathQueryExecutor implements ParametersCallback {
 
     public Object getParameter(final String name) {
         Object result = null;
+        
+        if (name.equals("node")) {
+            // A helper object.
+            return new NodeVariable(compiler, node);
+        }
+        
         if (node instanceof Element) { //if element
             //Now we use a trick to determine if node contains "name" attribute
             //element.getAttribute returns "" for declared and declared attributes
@@ -112,21 +118,12 @@ public class XPathQueryExecutor implements ParametersCallback {
         if (result == null && name.equals(node.getNodeName())) {
             result = StringUtils.nullsafeTrim(node.getTextContent()); //returns its text content
         }
-        //If previous check was unsuccessful and the selected node is an element
-        if (result == null && node instanceof Element) {
-            Element element = (Element) node;
-            NodeList list = element.getElementsByTagName(name);
-            int n = list.getLength();
-            //If element contains children with specified name
-            //Convert these elements to text and return a string instance or array
-            if (n > 0) {
-                String[] r = new String[n];
-                for (int i = 0; i < n; i++) {
-                    r[i] = StringUtils.nullsafeTrim(list.item(i).getTextContent());
-                }
-                result = r.length > 1 ? r : r[0];
-            }
+        
+        if (result == null) {
+            // Try to retrieve the text value(s) of the immediate child element(s) with the specified name
+            result = new NodeVariable(compiler, node).get("./" + name);
         }
+
         //if result=null fallback to parent parameters
         return result == null ? substitutor.getParameters().getParameter(name) : result;
     }

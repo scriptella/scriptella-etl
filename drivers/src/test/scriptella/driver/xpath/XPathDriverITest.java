@@ -93,6 +93,14 @@ public class XPathDriverITest extends AbstractTestCase {
         assertEquals("2\n", new String(o.toByteArray()));
     }
 
+    public void test6() throws EtlExecutorException, UnsupportedEncodingException {
+        params.put("test", "6");
+        EtlExecutor e = newEtlExecutor();
+        e.execute();
+        assertNotNull(o);
+        assertEquals("2;4\n", new String(o.toByteArray()));
+    }
+
 
     @Override
     protected ConfigurationFactory newConfigurationFactory() {
