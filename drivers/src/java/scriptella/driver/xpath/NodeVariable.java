@@ -26,7 +26,7 @@ import scriptella.util.StringUtils;
 
 /**
  * A special <code>node</code> variable for sub-queries and scripts that wraps
- * the node selected by XPath, exposing useful methods.
+ * the node selected by an XPath query, exposing useful methods.
  * @author Martin Alderson
  */
 public class NodeVariable {
