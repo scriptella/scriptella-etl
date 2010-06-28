@@ -148,6 +148,12 @@ public class ExecutionStatistics {
     private static String getElementName(String xpath) {
         int slash = xpath.lastIndexOf('/');
         int br = xpath.lastIndexOf('[');
+        if (br == -1) {
+            br = xpath.lastIndexOf('(');
+        }
+        if (br == -1) {
+            br = xpath.length();
+        }
         return xpath.substring(slash + 1, br);
     }
 

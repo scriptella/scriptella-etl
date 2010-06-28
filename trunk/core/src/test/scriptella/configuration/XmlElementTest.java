@@ -67,6 +67,32 @@ public class XmlElementTest extends AbstractTestCase {
 
     }
 
+    public void testGetXPathById() {
+        String xml = "<etl>\n" +
+                "    <query connection-id=\"db1\">\n" +
+                "        query1\n" +
+                "        <script connection-id=\"db2\">\n" +
+                "            SCRIPT1\n" +
+                "        </script>\n" +
+                "    </query>\n" +
+                "    <query connection-id=\"db3\" id=\"query2\">\n" +
+                "        query2\n" +
+                "        <query connection-id=\"db1\" id=\"query3\">\n" +
+                "            query3\n" +
+                "            <script connection-id=\"db4\">\n" +
+                "                script2\n" +
+                "            </script>\n" +
+                "        </query>\n" +
+                "    </query>\n" +
+                "\n" +
+                "</etl>";
+        XmlElement root = asElement(xml);
+        //selecting second query, first script
+        XmlElement el = root.getChildren("query").get(1).getChild("query").getChild("script");
+        assertEquals("id(\"query3\")/script[1]", el.getXPath());
+
+    }
+
     static XmlElement asElement(String xml) {
         try {
             Element el = BUILDER.parse(new InputSource(new StringReader(xml))).getDocumentElement();
