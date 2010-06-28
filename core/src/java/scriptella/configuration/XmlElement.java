@@ -68,8 +68,15 @@ public class XmlElement {
         List<String> l = new ArrayList<String>();
         Node cur = element;
         StringBuilder tmp = new StringBuilder();
+        String nearestIDSelector = null;
 
         while (!(cur instanceof Document)) {
+            String id = ((Element) cur).getAttribute("id");
+            if (!id.equals("")) {
+                nearestIDSelector = "id(\"" + id + "\")";
+                break;
+            }
+            
             int pos = 1;
             Node sib = cur;
             final String curTagName = ((Element) cur).getTagName();
@@ -99,6 +106,10 @@ public class XmlElement {
         }
 
         StringBuilder res = new StringBuilder(100);
+
+        if (nearestIDSelector != null) {
+            res.append(nearestIDSelector);
+        }
 
         for (int i = l.size() - 1; i >= 0; i--) {
             res.append('/');
