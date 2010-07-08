@@ -45,7 +45,7 @@
             <ol>
                 <li>Use System.setProperty and System.getProperty to share variable between scripts. This is definitely a
                 hack, but very easy to implement in JavaScript for example</li>
-                <li>Another approach is similar to the technqiue utilized in anonymous inner classes to
+                <li>Another approach is similar to the technique utilized in anonymous inner classes to
                 modify a single-element array declared as a final variable.</li>
             </ol>
              <p>The following example demonstrates both approaches:</p>
@@ -66,6 +66,15 @@
         </script>
     </query>
 </etl>
+         ]]></source>
+            </answer>
+        </faq>
+        <faq id="EXECUTE_STATIC_METHOD">
+            <question>How to call a static method in JEXL expression?</question>
+            <answer><p>Load a class by name by using class:forName Scriptella function</p>
+            <p>Example. Call System.getProperty:</p>
+            <source><![CDATA[
+${class:forName('java.lang.System').getProperty('propName')}
          ]]></source>
             </answer>
         </faq>

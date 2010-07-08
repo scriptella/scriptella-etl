@@ -64,4 +64,17 @@ public class JexlConnectionPerfTest extends AbstractTestCase {
 
     }
 
+    /**
+     * History:
+     * 27.06.2010 - Core2 Duo 2.4Mhz - 730 ms
+     */
+    public void testNotExistingVariableInALoop() {
+        Resource r = new StringResource("v=0;i=0 while(i<1000) { v=unknownVar+1;i=i+1};");
+        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        for (int i = 0; i < 200; i++) {
+            jc.executeScript(r, MockParametersCallbacks.NULL);
+        }
+    }
+
+
 }

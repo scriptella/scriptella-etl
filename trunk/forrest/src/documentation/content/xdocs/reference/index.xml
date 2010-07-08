@@ -278,19 +278,29 @@
 					<code>if</code> attribute of <code>&lt;query&gt;/&lt;script&gt;</code> elements,</li>
 				<li>SQL scripts/queries processed by the JDBC-based providers</li>
 			</ul>
-            <p>Due to several JEXL limitations, Scriptella provides a helper variable available inside JEXL expressions.
-                The <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>etl</code></a> variable provides several utility objects:</p>
+            <p>Scriptella extends JEXL by adding several built in functions available inside JEXL expressions.
+                <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>EtlVariable</code></a>
+                class provides an entry point for these extensions:</p>
             <ul>
-                <li>etl.date - Methods for parsing and formatting dates. <br/>Example: <code>${etl.date.today('yyyyMMdd')}</code>
+                <li>date: - Functions for parsing and formatting dates. <br/>Example: <code>${date:today('yyyyMMdd')}</code>
                     - formats the current date using the specified pattern. See <a href="../docs/api/scriptella/expression/EtlVariable.DateUtils.html">JavaDoc</a>
                     for more details.
                 </li>
-                <li>etl.text - Methods for working with text. <br/>Example: <code>${etl.text.ifNull(a)}</code>
+                <li>text: - Functions for working with text. <br/>Example: <code>${text:ifNull(a)}</code>
                     - returns empty string if a=null. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
+                    for more details. As of version 1.1 JEXL ternary operators may be used instead, e.g.
+                    <code>${a==null?'':a}</code>
+                </li>
+                <li>class: - Utility functions for class related operations. For now only class lookup is available.
+                    <br/>Example : <code>${class:forName('java.lang.System').getProperty('propName')}</code>
+                    - Loads java System class and invokes getProperty method on it. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
                     for more details.
                 </li>
 
             </ul>
+            <note>The old syntax based on etl variable is still supported, e.g. ${etl.date.now()}, however support for
+                it may be removed from future versions.
+            </note>
             <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
                 use <code>get(name)</code> to get variable's value.
                  For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.

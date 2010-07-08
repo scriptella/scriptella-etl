@@ -15,45 +15,56 @@
  */
 package scriptella.driver.jexl;
 
-import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl2.JexlContext;
 import scriptella.driver.script.ParametersCallbackMap;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
-import java.util.Map;
-
 /**
- * Mutable {@link org.apache.commons.jexl.JexlContext} implementation for
+ * Mutable {@link org.apache.commons.jexl2.JexlContext} implementation for
  * integration into Scriptella execution environment.
- * This class allows local variables to be set via {@link #put(String,Object)} method.
- * <br>{@link #getParameter(String)} allows reading variables.
+ * This class allows local variables to be set via {@link #set(String, Object)} method.
+ * <br>{@link #get(String)} allows reading variables.
+ * <p><b>Important:</b> This class is used instead of {@link org.apache.commons.jexl2.MapContext} because
+ * due to parameters model limitations and performance reasons {@link #has(String)} method should always return true.
  *
  * @author Fyodor Kupolov
- * @version 1.0
+ * @version 1.1
  */
-public final class JexlContextMap extends ParametersCallbackMap implements JexlContext {
+public final class JexlContextMap implements JexlContext {
+    private ParametersCallbackMap parametersMap;
+
     /**
-     * Initializes instance and set parent parameters to use in {@link #getParameter(String)}.
+     * Initializes instance and set parent parameters.
+     *
+     * @param parametersMap parent parameters.
+     */
+    public JexlContextMap(ParametersCallbackMap parametersMap) {
+        this.parametersMap = parametersMap;
+    }
+
+    /**
+     * Initializes instance and set parent parameters with query callback..
      *
      * @param parentParameters parent parameters.
+     * @param queryCallback    query callback
      */
-    public JexlContextMap(ParametersCallback parentParameters) {
-        super(parentParameters);
-    }
-
-
     public JexlContextMap(ParametersCallback parentParameters, QueryCallback queryCallback) {
-        super(parentParameters, queryCallback);
+        parametersMap = new ParametersCallbackMap(parentParameters, queryCallback);
     }
 
-    @SuppressWarnings("unchecked")
-    public void setVars(Map vars) {
-        clear();
-        putAll(vars);
+
+    public Object get(String name) {
+        return parametersMap.get(name);
     }
 
-    public Map<String, Object> getVars() {
-        return this;
+    public void set(String name, Object value) {
+        parametersMap.put(name, value);
     }
 
+    public boolean has(String name) {
+        //Current model does not allow to distinguish between null value and absence, so we assume
+        //variable is always present, otherwise JEXL will log warnings and throws errors internally
+        return true;
+    }
 }

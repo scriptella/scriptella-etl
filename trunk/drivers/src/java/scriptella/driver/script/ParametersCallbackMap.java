@@ -32,7 +32,7 @@ import java.util.Set;
  * <p>In query mode, a virtual variable <code>query</code> is available and exposes a method
  * {@link #next()} to populate result set.
  * </p>
- * <p><em>Note:</em> current implementation does not distinguish if a vairable is absent
+ * <p><em>Note:</em> current implementation does not distinguish if a variable is absent
  * or has a value of null.
  *
  * @author Fyodor Kupolov
