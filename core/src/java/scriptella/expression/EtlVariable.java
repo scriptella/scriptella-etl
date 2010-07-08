@@ -23,17 +23,29 @@ import java.util.Date;
 /**
  * Represents a global <code>etl</code> variable available for all ETL file elements.
  * <p>Currently it is available only in JEXL expressions, e.g. ${etl.date.now('MM-DD-YYYY')}
+ * <p>As of 1.1 a new syntax is introduced based on
+ * <a href="http://commons.apache.org/jexl/reference/syntax.html#Functions">JEXL function</a> namespaces:
+ * <ul>
+ * <li><code>date:</code> namespace contains functions from
+ * {@link scriptella.expression.EtlVariable.DateUtils}, e.g. <code>date:now()</code></li>
+ * <li><code>text:</code> namespace contains functions from
+ * {@link scriptella.expression.EtlVariable.TextUtils}, e.g. <code>text:ifNull()</code></li>
+ * <li><code>class:</code> namespace contains functions from
+ * {@link scriptella.expression.EtlVariable.ClassUtils},
+ * e.g. <code>class:forName('java.lang.System').getProperty('java.version')</code></li>
+ * </ul>
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public class EtlVariable {
-    //For now singleton, may be replaced with threadlocal in future
+    //For now singleton, may be replaced with ThreadLocal in future
     private static final EtlVariable INSTANCE = new EtlVariable();
     public static final String NAME = "etl";
 
     private final DateUtils date = new DateUtils();
     private final TextUtils text = new TextUtils();
+    private final ClassUtils clazz = new ClassUtils();
 
     /**
      * Returns the global <code>etl</code> variable.
@@ -50,6 +62,14 @@ public class EtlVariable {
 
     public TextUtils getText() {
         return text;
+    }
+
+    public ClassUtils getClazz() {
+        return clazz;
+    }
+
+    public Class loadClass(String name) throws ClassNotFoundException {
+        return Class.forName(name);
     }
 
 
@@ -118,6 +138,8 @@ public class EtlVariable {
     /**
      * Utility class for ETL file expressions.
      * <p>Provides text operations.
+     * <p><u>Note:</u> As of version 1.1 the same functionality can be achieved by directly
+     * using JEXL2.0 syntax elements like ternary operators.
      */
     public static class TextUtils {
 
@@ -156,5 +178,14 @@ public class EtlVariable {
 
     }
 
+    /**
+     * Utility class for ETL expressions.
+     * <p>Provides class utilities.
+     */
+    public static class ClassUtils {
+        public Class forName(String className) throws ClassNotFoundException {
+            return Class.forName(className);
+        }
+    }
 
 }

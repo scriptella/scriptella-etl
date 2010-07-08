@@ -30,12 +30,15 @@ import java.util.Collections;
  * @since 12.01.2007
  */
 public class JexlDriverITest extends AbstractTestCase {
-    private Number i;
+
+    private Number i; //set from script callback.notify
+    private static String s; //set from script by JexlDriverITest.runStatic
 
     public void test() throws EtlExecutorException {
         EtlExecutor ex = newEtlExecutor();
         ex.execute();
         assertEquals(10, i.intValue());
+        assertEquals("ok", s);
     }
 
     protected ConfigurationFactory newConfigurationFactory() {
@@ -47,5 +50,10 @@ public class JexlDriverITest extends AbstractTestCase {
     public void notify(Number i) {
         assertTrue(i != null && i.intValue() > 0 && i.intValue() <= 10);
         this.i = i;
+    }
+
+    //Called from test ETL file
+    public static void runStatic(String p) { 
+        s = p;
     }
 }

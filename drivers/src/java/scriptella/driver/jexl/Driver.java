@@ -28,7 +28,7 @@ import scriptella.spi.DialectIdentifier;
  * @version 1.0
  */
 public class Driver extends AbstractScriptellaDriver {
-    static final DialectIdentifier DIALECT = new DialectIdentifier("JEXL", "1.1");
+    static final DialectIdentifier DIALECT = new DialectIdentifier("JEXL", "2.0");
 
     public Connection connect(ConnectionParameters connectionParameters) {
         return new JexlConnection(connectionParameters);

@@ -15,8 +15,10 @@
  */
 package scriptella.driver.jexl;
 
-import org.apache.commons.jexl.Script;
-import org.apache.commons.jexl.ScriptFactory;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.Script;
+import scriptella.driver.script.ParametersCallbackMap;
+import scriptella.expression.JexlExpression;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
@@ -38,6 +40,8 @@ import java.util.Map;
  */
 public class JexlConnection extends AbstractConnection {
     private Map<Resource, Script> cache = new IdentityHashMap<Resource, Script>();
+    //Use the same factory method as in JexlExpression to share functions etc. 
+    private static final JexlEngine jexlEngine = JexlExpression.newJexlEngine();
 
     /**
      * Instantiates a new connection to JEXL.
@@ -49,11 +53,11 @@ public class JexlConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
-        run(scriptContent, new JexlContextMap(parametersCallback));
+        run(scriptContent, new JexlContextMap(new ParametersCallbackMap(parametersCallback)));
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
-        run(queryContent, new JexlContextMap(parametersCallback, queryCallback));
+        run(queryContent, new JexlContextMap(new ParametersCallbackMap(parametersCallback, queryCallback)));
     }
 
     private void run(Resource resource, JexlContextMap ctx) {
@@ -67,7 +71,7 @@ public class JexlConnection extends AbstractConnection {
             }
 
             try {
-                cache.put(resource, script = ScriptFactory.createScript(s));
+                cache.put(resource, script = jexlEngine.createScript(s));
             } catch (Exception e) {
                 throw new JexlProviderException("Failed to compile JEXL script", e);
             }
@@ -78,7 +82,6 @@ public class JexlConnection extends AbstractConnection {
             throw new JexlProviderException("Failed to execute JEXL script", e);
         }
     }
-
 
     /**
      * Closes the connection and releases all related resources.

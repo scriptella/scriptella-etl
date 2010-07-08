@@ -41,7 +41,7 @@ public class EtlVariableTest extends AbstractTestCase {
         assertTrue(d.now().getTime() >= System.currentTimeMillis());
         assertEquals("2007", d.format(d.parse("18.03.2007", "dd.MM.yyyy"), "yyyy"));
         //Tests if today method returns correct year 
-        assertTrue(d.today().indexOf(d.now("yyyy"))>0);
+        assertTrue(d.today().indexOf(d.now("yyyy")) > 0);
     }
 
     /**
@@ -74,4 +74,18 @@ public class EtlVariableTest extends AbstractTestCase {
                 Collections.singletonMap("a", 2)));
         assertEquals(2, o);
     }
+
+    public void testNewSyntax() {
+        Object o = Expression.compile("text:ifNull(a)").evaluate(MockParametersCallbacks.NULL);
+        assertEquals("", o);
+        Date d = (Date) Expression.compile("date:now()").evaluate(MockParametersCallbacks.NULL);
+        assertTrue(d.getTime() >= System.currentTimeMillis());
+        String p = (String) Expression.compile("class:forName('java.lang.System').getProperty('java.version')").
+                evaluate(MockParametersCallbacks.NULL);
+        assertTrue(p != null);
+    }
+
+
 }
+
+

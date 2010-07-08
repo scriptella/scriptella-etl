@@ -14,4 +14,8 @@
             callback.notify(i);
         </script>
     </query>
+    <script>
+        <!-- Using scriptella class: namespace function -->
+        class:forName('scriptella.driver.jexl.JexlDriverITest').runStatic(n == 10 ? 'ok' : 'error');
+    </script>
 </etl>

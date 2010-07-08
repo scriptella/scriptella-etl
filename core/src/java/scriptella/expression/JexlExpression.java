@@ -15,15 +15,13 @@
  */
 package scriptella.expression;
 
-import org.apache.commons.jexl.ExpressionFactory;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.parser.TokenMgrError;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.parser.TokenMgrError;
 import scriptella.spi.ParametersCallback;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 
 /**
  * Represents <a href="jakarta.apache.org/commons/jexl">JEXL</a> expression.
@@ -32,13 +30,14 @@ import java.util.Set;
  * @version 1.0
  */
 public final class JexlExpression extends Expression {
-    private org.apache.commons.jexl.Expression expression;
+    private org.apache.commons.jexl2.Expression expression;
+    private static final JexlEngine jexlEngine = newJexlEngine();
 
     protected JexlExpression(String expression) throws ParseException {
         super(expression);
 
         try {
-            this.expression = ExpressionFactory.createExpression(expression);
+            this.expression = jexlEngine.createExpression(expression);
         } catch (Exception e) {
             throw new ParseException(e.getMessage(), e);
         } catch (TokenMgrError e) {
@@ -58,79 +57,48 @@ public final class JexlExpression extends Expression {
     }
 
     /**
+     * Creates a preconfigured JexlEngine.
+     * <p>The instance is configured to use function namespaces from {@link scriptella.expression.EtlVariable}.
+     * @return instance of JexlEngine.
+     */
+    public static JexlEngine newJexlEngine() {
+        JexlEngine je = new JexlEngine();
+        Map<String, Object> fMap = new HashMap<String, Object>();
+        EtlVariable etl = EtlVariable.get();
+        fMap.put("date", etl.getDate());
+        fMap.put("text", etl.getText());
+        fMap.put("class", etl.getClazz());
+        je.setFunctions(fMap);
+        return je;
+    }
+
+    /**
      * Adapter for JexlContext to allow working with {@link ParametersCallback}.
      * <p>Also implements Map to represent ParametersCallback.
      */
-    private static class JexlContextAdapter implements JexlContext, Map {
+    private static class JexlContextAdapter implements JexlContext {
         private ParametersCallback callback;
 
         private JexlContextAdapter(ParametersCallback callback) {
             this.callback = callback;
         }
 
-        public void setVars(final Map map) {
-        }
-
-        public Map getVars() {
-            return this;
-        }
-
-        //-- Implementation of java.util.Map interface
-        //   Only {@link #get(Object)} method is supported. Invocations of other methods result in
-        //   {@link UnsupportedOperationException} thrown.
-
-        public int size() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean isEmpty() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean containsKey(final Object key) {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean containsValue(final Object value) {
-            throw new UnsupportedOperationException();
-        }
-
-        public Object get(final Object key) {
-            String name = (String) key;
-            if (EtlVariable.NAME.equals(key)) {
+        public Object get(final String name) {
+            if (EtlVariable.NAME.equals(name)) {
                 return EtlVariable.get();
             }
             return callback.getParameter(name);
         }
 
-        public Object put(final Object key, final Object o1) {
-            throw new UnsupportedOperationException();
+        public void set(String s, Object o) {
+            throw new UnsupportedOperationException("Setting variables in ${} JEXL expression is not allowed");
         }
 
-        public Object remove(final Object key) {
-            throw new UnsupportedOperationException();
+        public boolean has(String name) {
+            //Current model does not allow to distinguish between null value and absence, so we assume
+            //variable is always present, otherwise JEXL will log warnings and throws errors internally
+            return true;
         }
-
-        public void putAll(final Map map) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void clear() {
-            throw new UnsupportedOperationException();
-        }
-
-        public Set keySet() {
-            throw new UnsupportedOperationException();
-        }
-
-        public Collection values() {
-            throw new UnsupportedOperationException();
-        }
-
-        public Set<Entry<String, Object>> entrySet() {
-            throw new UnsupportedOperationException();
-        }
-
     }
 
 }
