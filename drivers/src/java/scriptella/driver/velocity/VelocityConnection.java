@@ -30,13 +30,14 @@ import scriptella.util.IOUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
  * Represents a session to velocity engine.
  */
 public class VelocityConnection extends AbstractTextConnection {
-    public static final String OUTPUT_ENCODING = "output.encoding";
     private final VelocityEngine engine;
     private final VelocityContextAdapter adapter;
     private Writer writer;//lazy initialized
@@ -159,30 +160,40 @@ public class VelocityConnection extends AbstractTextConnection {
      * Velocity Context adapter class for {@link ParametersCallback}.
      */
     private static class VelocityContextAdapter implements Context {
+        private static final Object[] EMPTY_ARRAY = new Object[0];
         private ParametersCallback callback;
+        private Map<Object, Object> localParameters;
+
 
         public void setCallback(ParametersCallback callback) {
             this.callback = callback;
         }
 
         public Object put(String key, Object value) {
-            throw new UnsupportedOperationException();
+            if (localParameters == null) {
+                localParameters = new HashMap<Object, Object>();
+            }
+
+            return localParameters.put(key, value);
         }
 
         public Object get(String key) {
+            if (containsKey(key)) {
+                return localParameters.get(key);
+            }
             return callback.getParameter(key);
         }
 
         public boolean containsKey(Object key) {
-            return false;
+            return localParameters != null && localParameters.containsKey(key);
         }
 
         public Object[] getKeys() {
-            throw new UnsupportedOperationException();
+            return localParameters == null ? EMPTY_ARRAY : localParameters.keySet().toArray();
         }
 
         public Object remove(Object key) {
-            throw new UnsupportedOperationException();
+            return localParameters == null ? null : localParameters.remove(key);
         }
     }
 

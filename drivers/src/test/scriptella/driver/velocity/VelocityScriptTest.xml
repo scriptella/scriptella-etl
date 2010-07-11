@@ -11,10 +11,18 @@
         INSERT INTO Test VALUES(20);
         INSERT INTO Test VALUES(30);
     </script>
-    <query connection-id="in">
+
+    <query connection-id="in" if="test==1">
         <!-- Produce a report for a query -->
         SELECT * FROM Test
         <script connection-id="report">$COL</script>
     </query>
+
+    <!-- Test2. History test for bug #12284. Velocity context was readonly -->
+    <script connection-id="report" if="test==2">
+    #foreach ($value in [2..3])
+        $value
+    #end
+    </script>
 
 </etl>
