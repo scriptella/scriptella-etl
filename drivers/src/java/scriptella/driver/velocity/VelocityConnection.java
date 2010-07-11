@@ -42,7 +42,6 @@ public class VelocityConnection extends AbstractTextConnection {
     private final VelocityContextAdapter adapter;
     private Writer writer;//lazy initialized
 
-
     /**
      * Instantiates a velocity connection.
      *
@@ -115,7 +114,6 @@ public class VelocityConnection extends AbstractTextConnection {
         return writer;
     }
 
-
     /**
      * Closes the connection and releases all related resources.
      */
@@ -154,7 +152,6 @@ public class VelocityConnection extends AbstractTextConnection {
             }
         }
     };
-
 
     /**
      * Velocity Context adapter class for {@link ParametersCallback}.
