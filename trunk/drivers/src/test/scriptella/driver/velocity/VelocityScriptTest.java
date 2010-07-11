@@ -99,5 +99,4 @@ public class VelocityScriptTest extends DBTestCase {
         cf.setExternalParameters(params);
         return cf;
     }
-
 }
