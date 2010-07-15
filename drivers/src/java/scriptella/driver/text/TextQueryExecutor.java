@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2010 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,9 +93,7 @@ class TextQueryExecutor implements ParametersCallback {
         List<Pattern> result = new ArrayList<Pattern>();
         try {
             for (String s; (s = r.readLine()) != null;) {
-                if (trim) {
-                    s = s.trim();
-                }
+                s = s.trim();
                 s = ps.substitute(s);
                 if (s.length() > 0) { //Not empty string
                     try {

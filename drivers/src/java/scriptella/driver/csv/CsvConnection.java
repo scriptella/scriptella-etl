@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2010 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,7 @@ import scriptella.driver.csv.opencsv.CSVReader;
 import scriptella.driver.csv.opencsv.CSVWriter;
 import scriptella.driver.text.AbstractTextConnection;
 import scriptella.expression.PropertiesSubstitutor;
-import scriptella.spi.ConnectionParameters;
-import scriptella.spi.ParametersCallback;
-import scriptella.spi.ProviderException;
-import scriptella.spi.QueryCallback;
-import scriptella.spi.Resource;
+import scriptella.spi.*;
 import scriptella.util.StringUtils;
 
 import java.io.IOException;
@@ -145,15 +141,16 @@ public class CsvConnection extends AbstractTextConnection {
         if (out != null) {
             throw new CsvProviderException("Cannot query and update a CSV file simultaneously.");
         }
-        final CSVReader queryReader;
+        final CSVReader queryContentReader;
         try {
-            queryReader = getScriptingElementReader(queryContent);
+            queryContentReader = getScriptingElementReader(queryContent);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
         try {
-            final CsvQuery q = newCsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback));
-            q.execute(new CSVReader(newInputReader(), separator, quote, skipLines), queryCallback, counter);
+            final CsvQuery q = newCsvQuery(queryContentReader, new PropertiesSubstitutor(parametersCallback));
+            CSVReader inputCSVContentReader = new CSVReader(newInputReader(), separator, quote, skipLines);
+            q.execute(inputCSVContentReader, queryCallback, counter);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
         }
