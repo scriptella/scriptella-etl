@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2010 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,57 @@ public class CsvQueryTest extends AbstractTestCase {
             }
         }, cnt);
         assertEquals(2, rows);
-
     }
+
+
+    /**
+     * History test for bug #12328 (Queries in csv/text driver should always be trimmed)
+     */
+    public void testExtraSpacesWithoutTrim() throws IOException {
+        //Test query with columns number exceeding the input data columns number
+        String data = "1,2,3\n11,2,3 ,4\n1";
+        String query = "   \n.*1.*,2,3 ,4\n   \n";
+        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, false);
+        rows = 0;
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
+        //only 11,2,3 ,4 matches the pattern
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                rows++;
+                assertEquals("11", parameters.getParameter("1"));
+                assertEquals("2", parameters.getParameter("2"));
+                assertEquals("3 ", parameters.getParameter("3"));
+                assertEquals("4", parameters.getParameter("4"));
+            }
+        }, cnt);
+        assertEquals(1, rows);
+        assertEquals(1, cnt.statements);
+    }
+
+    /**
+     * History test for bug #12328 (Queries in csv/text driver should always be trimmed)
+     */
+    public void testExtraSpacesWithTrim() throws IOException {
+        //Test query with columns number exceeding the input data columns number
+        String data = "1,2,3\n11,2,3,4\n1, 2,  3, 4";
+        String query = "   \n   .*1.* ,2,     3,4        \n   \n";
+        CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, true);
+        rows = 0;
+        AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
+        //only 11,2,3,4 matches the pattern
+        q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                rows++;
+                assertEquals("11", parameters.getParameter("1"));
+                assertEquals("2", parameters.getParameter("2"));
+                assertEquals("3", parameters.getParameter("3"));
+                assertEquals("4", parameters.getParameter("4"));
+            }
+        }, cnt);
+        assertEquals(1, rows);
+        assertEquals(1, cnt.statements);
+    }
+
 }
