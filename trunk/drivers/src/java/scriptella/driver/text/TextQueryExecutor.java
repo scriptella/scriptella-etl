@@ -93,7 +93,9 @@ class TextQueryExecutor implements ParametersCallback {
         List<Pattern> result = new ArrayList<Pattern>();
         try {
             for (String s; (s = r.readLine()) != null;) {
-                s = s.trim();
+                if (trim) {
+                    s = s.trim();
+                }
                 s = ps.substitute(s);
                 if (s.length() > 0) { //Not empty string
                     try {

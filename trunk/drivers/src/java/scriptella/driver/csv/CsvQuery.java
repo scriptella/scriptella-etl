@@ -22,7 +22,6 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 import scriptella.util.ColumnsMap;
 import scriptella.util.ExceptionUtils;
-import scriptella.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -175,19 +174,14 @@ public class CsvQuery implements ParametersCallback {
      */
     @SuppressWarnings("unchecked")
     void compileQueries(final CSVReader r) {
-        List<String[]> patternList;
+        List<String[]> list;
         try {
-            patternList = r.readAll();
+            list = r.readAll();
         } catch (IOException e) {
             throw new CsvProviderException("Unable to read CSV query", e);
         }
         List<Pattern[]> res = null;
-        for (String[] columns : patternList) {
-            //If only one empty column - skip the pattern row (fix for bug #12328)
-            if (columns.length == 1 && StringUtils.isAsciiWhitespacesOnly(columns[0])) {
-                continue;
-            }
-
+        for (String[] columns : list) {
             Pattern[] patterns = null;
             trim(columns);
             for (int i = 0; i < columns.length; i++) {
