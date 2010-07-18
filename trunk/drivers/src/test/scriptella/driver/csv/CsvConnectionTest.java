@@ -19,17 +19,9 @@ import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.driver.text.AbstractTextConnection;
-import scriptella.spi.ConnectionParameters;
-import scriptella.spi.MockDriverContext;
-import scriptella.spi.MockParametersCallbacks;
-import scriptella.spi.ParametersCallback;
-import scriptella.spi.QueryCallback;
+import scriptella.spi.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,11 +133,12 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.EOL, "\r\n");
         ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
 
+        rows = 0;
         CsvConnection con = new CsvConnection(cp);
         con.executeQuery(new StringResource(" c4.*"), //extra leading whitespace
                 MockParametersCallbacks.SIMPLE, new QueryCallback() {
                     public void processRow(final ParametersCallback parameters) {
-                        fail("Whitespace trimming should be suppressed.");
+                        rows++;
                     }
                 });
         con.executeScript(new StringResource(" $a,$b , $c "),
@@ -155,6 +148,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         String expected = " *a*,*b* , *c* \r\n";
         String actual = out.toString();
         assertEquals(expected, actual);
+        assertEquals(1, rows);
 
     }
 

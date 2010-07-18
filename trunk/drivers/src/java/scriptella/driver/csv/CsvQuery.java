@@ -77,7 +77,7 @@ public class CsvQuery implements ParametersCallback {
         try {
             columnsMap = parseHeader(reader);
             String[] r;
-            while ((r = trim(reader.readNext())) != null) {
+            while ((r = (trim ? trim(reader.readNext()) : reader.readNext())) != null) {
                 if (rowMatches(r)) {
                     processRow(queryCallback, r);
                 }
@@ -174,14 +174,14 @@ public class CsvQuery implements ParametersCallback {
      */
     @SuppressWarnings("unchecked")
     void compileQueries(final CSVReader r) {
-        List<String[]> list;
+        List<String[]> patternList;
         try {
-            list = r.readAll();
+            patternList = r.readAll();
         } catch (IOException e) {
             throw new CsvProviderException("Unable to read CSV query", e);
         }
         List<Pattern[]> res = null;
-        for (String[] columns : list) {
+        for (String[] columns : patternList) {
             Pattern[] patterns = null;
             trim(columns);
             for (int i = 0; i < columns.length; i++) {
@@ -219,13 +219,13 @@ public class CsvQuery implements ParametersCallback {
     }
 
     /**
-     * Trims array of strings if {@link #trim} flag is true.
+     * Trims array of strings
      *
      * @param s array of strings.
      * @return the same array instance.
      */
     private String[] trim(String[] s) {
-        if (s != null && trim) {
+        if (s != null) {
             for (int i = 0; i < s.length; i++) {
                 if (s[i] != null) {
                     s[i] = s[i].trim();
