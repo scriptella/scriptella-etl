@@ -141,15 +141,16 @@ public class CsvConnection extends AbstractTextConnection {
         if (out != null) {
             throw new CsvProviderException("Cannot query and update a CSV file simultaneously.");
         }
-        final CSVReader queryReader;
+        final CSVReader queryContentReader;
         try {
-            queryReader = getScriptingElementReader(queryContent);
+            queryContentReader = getScriptingElementReader(queryContent);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
         try {
-            final CsvQuery q = newCsvQuery(queryReader, new PropertiesSubstitutor(parametersCallback));
-            q.execute(new CSVReader(newInputReader(), separator, quote, skipLines), queryCallback, counter);
+            final CsvQuery q = newCsvQuery(queryContentReader, new PropertiesSubstitutor(parametersCallback));
+            CSVReader inputCSVContentReader = new CSVReader(newInputReader(), separator, quote, skipLines);
+            q.execute(inputCSVContentReader, queryCallback, counter);
         } catch (IOException e) {
             throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
         }
