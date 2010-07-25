@@ -18,6 +18,7 @@ package scriptella.expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.parser.TokenMgrError;
+import scriptella.core.EtlVariable;
 import scriptella.spi.ParametersCallback;
 
 import java.util.HashMap;
@@ -58,13 +59,14 @@ public final class JexlExpression extends Expression {
 
     /**
      * Creates a preconfigured JexlEngine.
-     * <p>The instance is configured to use function namespaces from {@link scriptella.expression.EtlVariable}.
+     * <p>The instance is configured to use function namespaces from {@link scriptella.core.EtlVariable}.
+     *
      * @return instance of JexlEngine.
      */
     public static JexlEngine newJexlEngine() {
         JexlEngine je = new JexlEngine();
         Map<String, Object> fMap = new HashMap<String, Object>();
-        EtlVariable etl = EtlVariable.get();
+        EtlVariable etl = new EtlVariable();
         fMap.put("date", etl.getDate());
         fMap.put("text", etl.getText());
         fMap.put("class", etl.getClazz());
@@ -84,9 +86,6 @@ public final class JexlExpression extends Expression {
         }
 
         public Object get(final String name) {
-            if (EtlVariable.NAME.equals(name)) {
-                return EtlVariable.get();
-            }
             return callback.getParameter(name);
         }
 

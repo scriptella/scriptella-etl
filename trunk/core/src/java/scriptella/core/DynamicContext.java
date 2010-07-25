@@ -22,6 +22,8 @@ import scriptella.spi.ParametersCallback;
 
 /**
  * Represents dynamic execution context for executable elements.
+ * <p>TODO: Probably it's better to extract interface from this class
+ * and merge implementation with {@link scriptella.execution.EtlContext}
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -29,6 +31,7 @@ import scriptella.spi.ParametersCallback;
 @ThreadSafe
 public class DynamicContext implements ParametersCallback {
     protected EtlContext globalContext;
+    protected EtlVariable etlVariable;
 
     protected DynamicContext() {
     }
@@ -38,6 +41,12 @@ public class DynamicContext implements ParametersCallback {
     }
 
     public Object getParameter(final String name) {
+        if (EtlVariable.NAME.equals(name)) {
+            if (etlVariable == null) {
+                etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
+            }
+            return etlVariable;
+        }
         return globalContext.getParameter(name);
     }
 

@@ -43,26 +43,38 @@
             It's like using GOTOs or global variables in programming languages.
                 But in several cases using a global variable may help to achieve required goal. We propose 2 approaches:</p>
             <ol>
-                <li>Use System.setProperty and System.getProperty to share variable between scripts. This is definitely a
-                hack, but very easy to implement in JavaScript for example</li>
+                <li>Use etl.globals map to work with global variables. Example ${etl.globals['globalVar']}</li>
                 <li>Another approach is similar to the technique utilized in anonymous inner classes to
                 modify a single-element array declared as a final variable.</li>
             </ol>
              <p>The following example demonstrates both approaches:</p>
             <source><![CDATA[
 <etl>
-    <connection driver="script"/>
-    <script> java.lang.System.setProperty('globalVar', 'Message from sript 1') </script>
-    <script> java.lang.System.out.println('globalVar='+java.lang.System.getProperty('globalVar')) </script>
+    <connection driver="script" id="js"/>
+    <connection url="jdbc:...." id="db"/>
 
-    <query>
-        var globalVar = []; //Declare global variable
+    <!-- Set number of records as a global variable -->
+    <query connection-id="db">
+        select count(id) as c from Errors
+        <script connection-id="js">
+            etl.globals['errorsCount'] = c;
+        <script>
+    </query>
+
+    <!-- Then reuse this variable in other parts of ETL file -->
+    <script connection-id="js" if="etl.globals['errorsCount'] gt 0">
+        java.lang.System.out.println('errors count ='+errorsCount);
+    </script>
+
+    <!-- Alternatively an outer query can be used to share an array based variable between scripts -->
+    <query connection-id="js">
+        var pseudoGlobalVar = []; //Declare pseudo-global variable available to nested element
         query.next(); //Executes child scripts
-        <script> //Updates global variable
-           globalVar[0] = 1;
+        <script> //Updates the variable
+           pseudoGlobalVar[0] = 1;
         </script>
         <script> //Outputs updated value of global variable
-             java.lang.System.out.println('globalVar[0]='+globalVar[0]);
+             java.lang.System.out.println('pseudoGlobalVar[0]='+pseudoGlobalVar[0]);
         </script>
     </query>
 </etl>
@@ -81,14 +93,16 @@ ${class:forName('java.lang.System').getProperty('propName')}
 
         <faq id="COLUMN_SPACES">
             <question>How to escape spaces in field names?</question>
-            <answer><p>Scriptella does not support whitespaces in field names, nevertheless several drivers
+            <answer><p>You can use <a href="docs/api/scriptella/expression/EtlVariable.html"><code>etl context variable</code></a> ${etl.getParameter('var name')} to reference any column names.
+                Additionally several drivers
                 including CSV and JDBC allow referencing columns by an index, i.e. $1, $2 ... $n.
                 <br/>Example:
             </p>
                 <source><![CDATA[
 <query connection-id="csv"> <!-- Read CSV file content -->
     <script connection-id="text">
-        $1,$2,$3,$4 <!-- Print columns 1-4 -->
+        <!-- Print columns, column 2,3 are referenced by name, 1,4 - by index -->
+        $1,$secondColumn,${etl.getParameter('My Column')},$4
     </script>
 </query>]]>
                 </source>

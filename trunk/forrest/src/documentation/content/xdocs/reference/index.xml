@@ -298,9 +298,6 @@
                 </li>
 
             </ul>
-            <note>The old syntax based on etl variable is still supported, e.g. ${etl.date.now()}, however support for
-                it may be removed from future versions.
-            </note>
             <p>Other providers may not support properties/expressions substitution or use alternative syntax, e.g. in Janino
                 use <code>get(name)</code> to get variable's value.
                  For details on variables/expressions syntax consult the driver's specific <a href="../docs/api/">Javadoc</a>.
@@ -329,6 +326,14 @@
 						<td>Represents row number of query row set. Starts with 1.</td>
 						<td>Nested elements of Query</td>
 					</tr>
+                    <tr>
+                        <td>
+                            <code>etl</code>
+                        </td>
+                        <td>Represents current context.
+                            See <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>EtlVariable</code></a> for additional details.</td>
+                        <td>All script and query elements</td>
+                    </tr>
 				</table>
 				<p>Additionally SQL queries produce a set of implicit variables corresponding to selected column names.
                     These variables are available in nested elements.

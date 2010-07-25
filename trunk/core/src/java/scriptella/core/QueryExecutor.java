@@ -52,9 +52,9 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
         for (int i = 0; i < nestedElements.length; i++) {
             ScriptingElement element = childElements.get(i);
             if (element instanceof QueryEl) {
-                nestedElements[i]=QueryExecutor.prepare((QueryEl) element);
+                nestedElements[i] = QueryExecutor.prepare((QueryEl) element);
             } else if (element instanceof ScriptEl) {
-                nestedElements[i]=ScriptExecutor.prepare((ScriptEl) element);
+                nestedElements[i] = ScriptExecutor.prepare((ScriptEl) element);
             } else {
                 throw new IllegalStateException("Type " + element.getClass() +
                         " not supported");
@@ -94,8 +94,7 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
     private final class QueryCtxDecorator extends DynamicContextDecorator implements QueryCallback {
         private ParametersCallback params;
         private int rownum; //current row number
-        private Map<String, Object> cachedParams;
-
+        private final Map<String, Object> cachedParams = new HashMap<String, Object>();
 
         public QueryCtxDecorator(DynamicContext context) {
             super(context);
@@ -106,9 +105,7 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
             EtlCancelledException.checkEtlCancelled();
             rownum++;
             params = parameters;
-            if (cachedParams != null) {
-                cachedParams.clear();
-            }
+            cachedParams.clear();
             if (debug) {
                 log.fine("Processing row #" + rownum + " for query " + getLocation());
             }
@@ -124,16 +121,20 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
             if ("rownum".equals(name)) { //return current row number
                 return rownum;
             }
-            Object res = cachedParams==null?null:cachedParams.get(name);
+            if (EtlVariable.NAME.equals(name)) {
+                if (etlVariable == null) {
+                    etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
+                }
+                return etlVariable;
+            }
+
+            Object res = cachedParams.get(name);
             if (res == null) {
                 res = params.getParameter(name);
                 if (res == null) {
                     res = NULL;
                 }
                 if (isCacheable(res)) {
-                    if (cachedParams==null) {
-                        cachedParams=new HashMap<String, Object>();
-                    }
                     cachedParams.put(name, res);
                 }
             }
@@ -142,6 +143,7 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
 
         /**
          * Check if object is cacheable, i.e. no need to fetch it again.
+         *
          * @param o object to check.
          * @return true if object is cacheable.
          */
