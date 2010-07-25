@@ -23,6 +23,8 @@ import scriptella.util.IOUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -40,6 +42,7 @@ public class EtlContext implements ParametersCallback, DriverContext {
     private ParametersCallback properties;
     private URL baseURL;
     private ExecutionStatisticsBuilder statisticsBuilder;
+    private Map<String, Object> globalVariables;
     Session session; //Connections related stuff is here
 
     public EtlContext() {
@@ -48,6 +51,7 @@ public class EtlContext implements ParametersCallback, DriverContext {
 
     public EtlContext(boolean collectStatistics) {
         statisticsBuilder = collectStatistics?new ExecutionStatisticsBuilder(): new SilentExecutionStatisticsBuilder();
+        globalVariables = new HashMap<String, Object>();
     }
 
     public Object getParameter(final String name) {
@@ -83,6 +87,9 @@ public class EtlContext implements ParametersCallback, DriverContext {
         return IOUtils.resolve(baseURL, uri);
     }
 
+    public Map<String, Object> getGlobalVariables() {
+        return globalVariables;
+    }
 
     public ExecutionStatisticsBuilder getStatisticsBuilder() {
         return statisticsBuilder;

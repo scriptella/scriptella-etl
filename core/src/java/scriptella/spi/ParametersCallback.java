@@ -18,6 +18,9 @@ package scriptella.spi;
 
 /**
  * Callback interface to obtain parameter values.
+ * <p><u>Note:</u> Currently Scriptella has a limitation which does not allow to distinguish between a value of null and
+ * an absence of the variable. This will be addressed in future versions.
+ * </p>
  *
  * @author Fyodor Kupolov
  * @version 1.0

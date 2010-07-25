@@ -13,47 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scriptella.expression;
+package scriptella.core;
+
+import scriptella.spi.ParametersCallback;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Represents a global <code>etl</code> variable available for all ETL file elements.
- * <p>Currently it is available only in JEXL expressions, e.g. ${etl.date.now('MM-DD-YYYY')}
  * <p>As of 1.1 a new syntax is introduced based on
  * <a href="http://commons.apache.org/jexl/reference/syntax.html#Functions">JEXL function</a> namespaces:
  * <ul>
  * <li><code>date:</code> namespace contains functions from
- * {@link scriptella.expression.EtlVariable.DateUtils}, e.g. <code>date:now()</code></li>
+ * {@link EtlVariable.DateUtils}, e.g. <code>date:now()</code></li>
  * <li><code>text:</code> namespace contains functions from
- * {@link scriptella.expression.EtlVariable.TextUtils}, e.g. <code>text:ifNull()</code></li>
+ * {@link EtlVariable.TextUtils}, e.g. <code>text:ifNull()</code></li>
  * <li><code>class:</code> namespace contains functions from
- * {@link scriptella.expression.EtlVariable.ClassUtils},
+ * {@link EtlVariable.ClassUtils},
  * e.g. <code>class:forName('java.lang.System').getProperty('java.version')</code></li>
  * </ul>
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class EtlVariable {
-    //For now singleton, may be replaced with ThreadLocal in future
-    private static final EtlVariable INSTANCE = new EtlVariable();
+public class EtlVariable implements ParametersCallback {
+
+
     public static final String NAME = "etl";
+
 
     private final DateUtils date = new DateUtils();
     private final TextUtils text = new TextUtils();
     private final ClassUtils clazz = new ClassUtils();
+    private ParametersCallback parametersCallback;
+    private Map<String, Object> globals;
 
-    /**
-     * Returns the global <code>etl</code> variable.
-     *
-     * @return global <code>etl</code> variable.
-     */
-    public static EtlVariable get() {
-        return INSTANCE;
+
+    public EtlVariable(ParametersCallback parametersCallback, Map<String, Object> globals) {
+        this.parametersCallback = parametersCallback;
+        this.globals = globals;
+    }
+
+    public EtlVariable() {
     }
 
     public DateUtils getDate() {
@@ -72,6 +77,27 @@ public class EtlVariable {
         return Class.forName(name);
     }
 
+    /**
+     * Accessor method for parameters available in the current execution context.
+     * Useful for cases when variables has special symbols which cannot be referenced as normal JEXL variables, e.g.
+     * <code>etl.getParameter('Column Name')</code>
+     *
+     * @param name parameter name.
+     * @return value of the parameter.
+     */
+    public Object getParameter(String name) {
+        return parametersCallback.getParameter(name);
+    }
+
+    /**
+     * Getter for a global variables storage.
+     * <p>This map is shared between all etl file elements and can be used for cases when there is a need to share some state globally.
+     * It is recommended to avoid using global variables except cases when it's really beneficiary and simplifies the ETL file.
+     * @return map of global variables in the scope of ETL file.
+     */
+    public Map<String, Object> getGlobals() {
+        return globals;
+    }
 
     /**
      * Utility class for ETL file expressions.
@@ -145,7 +171,8 @@ public class EtlVariable {
 
         /**
          * Substitute an object when a null value is encountered.
-         * @param object object to check.
+         *
+         * @param object      object to check.
          * @param replacement replacement object.
          * @return object or replacement if object==null
          */
@@ -155,6 +182,7 @@ public class EtlVariable {
 
         /**
          * Substitute an object with empty string when a null value is encountered.
+         *
          * @param object object to check.
          * @return object or empty string if object==null.
          */
@@ -164,15 +192,16 @@ public class EtlVariable {
 
         /**
          * If expr1 = expr2 is true, return NULL else return expr1.
+         *
          * @param expr1 first expression
          * @param expr2 second expression
          * @return true if expr1 = expr2, otherwise null.
          */
         public Object nullIf(Object expr1, Object expr2) {
-            if (expr1==null) {
+            if (expr1 == null) {
                 return null;
             } else {
-                return expr1.equals(expr2)?null:expr1;
+                return expr1.equals(expr2) ? null : expr1;
             }
         }
 
