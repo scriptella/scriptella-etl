@@ -27,13 +27,15 @@ should be used to produce a result set:</p>
     &lt;query&gt;
         i=0; while(i lt 10) {
             i=i+1;
-            query.next(); // Causes child script to be executed
+            <b>query.next();</b> // Causes child script to be executed
         }
         &lt;script&gt;......&lt;/script&gt;
     &lt;/query&gt;
 </pre>
-See <a href="../script/ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
 </code>
+See <a href="../script/ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
+<b>Note:</b> It is important to call query.next() so that the row produced by set(...) methods is created and
+inner elements are executed.
 <h2>Examples</h2>
 <code><pre>
 &lt;connection id="jexl" driver="jexl"/&gt;
@@ -43,7 +45,7 @@ See <a href="../script/ParametersCallbackMap.html">ParametersCallbackMap class J
     i=0;while (i lt 10) {
         i=i+1;
         login='login'+i;
-        query.next();
+        <b>query.next();</b>
     }
     &lt;script connection-id="out"&gt;
         INSERT INTO Table(ID, Login) VALUES (?i, ?login);
