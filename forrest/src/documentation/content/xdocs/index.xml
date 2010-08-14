@@ -51,7 +51,7 @@
                 </li>
                 <li>Support for many useful
                     <strong>JDBC features</strong>
-                    , e.g. parameters in SQL including references to file blobs and JDBC
+                    , e.g. batching, parameters in SQL including references to file blobs and JDBC
                     escaping.
                 </li>
                 <li>

@@ -15,6 +15,7 @@
  */
 package scriptella.util;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Properties;
@@ -81,6 +82,7 @@ public final class CollectionUtils {
     /**
      * Converts specified map to {@link java.util.Properties}. The keys and String values
      * are migrated unchnaged, other types of values are {@link Object#toString() converted to String}.
+     *
      * @param map map to convert.
      * @return converted map as Properties.
      */
@@ -93,6 +95,16 @@ public final class CollectionUtils {
             }
         }
         return props;
+    }
+
+    /**
+     * Null-safe utility method to check if collection is empty.
+     *
+     * @param collection collection to check.
+     * @return true if collection is empty or null.
+     */
+    public static boolean isEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
     }
 
 

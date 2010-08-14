@@ -29,8 +29,6 @@ import java.util.List;
  * @version 1.0
  */
 public class StatementCacheTest extends DBTestCase {
-
-
     private int simpleClosed;
     private int preparedClosed;
     private int preparedCleared;
@@ -39,9 +37,10 @@ public class StatementCacheTest extends DBTestCase {
     StatementCache sc;
 
     protected void setUp() {
-        sc = new StatementCache(null, 100) {
+        sc = new StatementCache(null, 100, 0, 0) {
+
             @Override
-            protected StatementWrapper.Simple create(final String sql, final JdbcTypesConverter converter) {
+            protected StatementWrapper.Simple create(final String sql) {
                 return new StatementWrapper.Simple(sql) {
                     public void close() {
                         simpleClosed++;
@@ -50,7 +49,7 @@ public class StatementCacheTest extends DBTestCase {
             }
 
             @Override
-            protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) {
+            protected StatementWrapper.Prepared prepare(final String sql) {
                 return new StatementWrapper.Prepared() {
                     @Override
                     public void close() {
@@ -83,16 +82,15 @@ public class StatementCacheTest extends DBTestCase {
         preparedCleared = 0;
         preparedParamsSet = 0;
         StringBuilder sb = new StringBuilder();
-        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
         for (int i = 0; i < 105; i++) {
             sb.append('.');
-            StatementWrapper s = sc.prepare(sb.toString(), Collections.emptyList(), converter);
+            StatementWrapper s = sc.prepare(sb.toString(), Collections.emptyList());
             assertEquals(i, preparedParamsSet);//Should be recognized as simple statement
             sc.releaseStatement(s);
             assertEquals(i, simpleClosed);
-            StatementWrapper s2 = sc.prepare(sb.toString(), params, converter);
+            StatementWrapper s2 = sc.prepare(sb.toString(), params);
             assertEquals(i + 1, preparedParamsSet); //Should be recognized as a prepared statement
             assertEquals(i + 1, simpleClosed); //statement should be closed
             assertEquals(i, preparedCleared);
@@ -111,12 +109,11 @@ public class StatementCacheTest extends DBTestCase {
 
 
         StringBuilder sb = new StringBuilder();
-        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
         for (int i = 0; i < 20; i++) {
             sb.append('.');
-            StatementWrapper s2 = sc.prepare(sb.toString(), params, converter);
+            StatementWrapper s2 = sc.prepare(sb.toString(), params);
             sc.releaseStatement(s2);
         }
         assertEquals(20, preparedCleared);
@@ -126,6 +123,5 @@ public class StatementCacheTest extends DBTestCase {
         assertEquals(20, preparedClosed);
 
     }
-
 
 }

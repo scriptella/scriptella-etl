@@ -5,15 +5,76 @@
         keepformat=true
     </connection>
     <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
-        transaction.isolation=1 <!--Read uncommitted-->
+        transaction.isolation=1     <!-- Read uncommitted-->
+        statement.fetchSize=1       <!-- Not important for the test case,
+                                        just to make sure this parameter is not breaking anything -->
         keepformat=true
     </connection>
+
+    <connection id="con_batch" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+        statement.batchSize=5
+    </connection>
+
+
 
     <script connection-id="c1">
         COMMIT;
     </script>
+
     <script connection-id="c2">
         COMMIT;
     </script>
 
+    <!-- Now test batching, Use non-batched connection to create table -->
+    <script connection-id="c2">
+        CREATE TABLE BatchTest (        <!-- Table for batch inserts -->
+            ID INT
+        );
+        CREATE TABLE BatchTestResults ( <!-- Store results of batch execution -->
+            Result INT
+        );
+        CREATE TABLE JoinBatchTest (    <!-- Table to be joined to itself for batch testing -->  
+            ID INT
+        );
+        INSERT INTO JoinBatchTest VALUES (1);
+        INSERT INTO JoinBatchTest VALUES (2);
+        INSERT INTO JoinBatchTest VALUES (3);
+        INSERT INTO JoinBatchTest VALUES (4);
+        COMMIT;
+    </script>
+
+    <script connection-id="con_batch">
+        INSERT INTO BatchTest VALUES (1);
+        INSERT INTO BatchTest VALUES (1);
+        INSERT INTO BatchTest VALUES (1);
+        INSERT INTO BatchTest VALUES (1);
+        INSERT INTO BatchTest VALUES (1);
+        INSERT INTO BatchTest VALUES (1);
+    </script>
+
+    <!-- Result1: Query should return 5, because one batch with size 5 has been sent -->
+    <query connection-id="c2">
+        SELECT COUNT(*) FROM BatchTest WHERE ID=1
+        <script>
+            INSERT INTO BatchTestResults VALUES (?1);
+        </script>
+    </query>
+
+    <query connection-id="c2">
+        SELECT ID as v1 FROM JoinBatchTest
+        <query>
+            SELECT ID as v2 FROM JoinBatchTest
+            <script connection-id="con_batch">
+                INSERT INTO BatchTest VALUES (2);
+            </script>
+        </query>
+    </query>
+
+    <!-- Result2: Query should return 15, because join is executed 4x4=16 times and 3 batches inserted (one record left)-->
+    <query connection-id="c2">
+        SELECT COUNT(*) FROM BatchTest WHERE ID=2
+        <script>
+            INSERT INTO BatchTestResults VALUES (?1);
+        </script>
+    </query>
 </etl>

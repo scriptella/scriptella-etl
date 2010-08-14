@@ -26,6 +26,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Abstraction for {@link java.sql.Statement} and {@link java.sql.PreparedStatement}.
@@ -34,6 +36,7 @@ import java.util.List;
  * @version 1.0
  */
 abstract class StatementWrapper<T extends Statement> implements Closeable {
+    private static final Logger LOG = Logger.getLogger(StatementWrapper.class.getName());
     protected final JdbcTypesConverter converter;
     protected final T statement;
 
@@ -103,10 +106,41 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
     }
 
     /**
+     * Flushes any pending operations.
+     *
+     * @return number of rows updated
+     * @throws SQLException if DB error occurs.
+     */
+    public int flush() throws SQLException {
+        return 0;
+    }
+
+    /**
      * @see java.sql.Statement#toString()
      */
     public String toString() {
         return statement.toString();
+    }
+
+    /**
+     * Helper method for executing a batch.
+     *
+     * @param statement statement to execute.
+     * @return sum of update counts for all commands.
+     * @throws SQLException if error occurs
+     */
+    protected static int executeBatch(Statement statement) throws SQLException {
+        int result = 0;
+        int[] results = statement.executeBatch();
+        for (int r : results) {
+            if (r > 0) {
+                result += r;
+            }
+        }
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Batch of " + results.length + " statements executed.");
+        }
+        return result;
     }
 
 
@@ -114,7 +148,7 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
      * {@link Statement} wrapper.
      */
     static class Simple extends StatementWrapper<Statement> {
-        private final String sql;
+        protected final String sql;
 
         /**
          * For testing only.
@@ -193,6 +227,150 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
 
         }
 
+    }
+
+    /**
+     * {@link StatementWrapper} for batching.
+     * <p>This instance is intended to be shared per ETL element.
+     * To overcome this and additional method {@link #setSql(String)} must be called prior to calling update.
+     */
+    static class Batched extends StatementWrapper<Statement> {
+        private int maxBatchSize;
+        private int currentBatchSize;
+        private String sql;
+
+        /**
+         * For testing only.
+         */
+        protected Batched() {
+        }
+
+        public Batched(Statement s, JdbcTypesConverter converter, int maxBatchSize) {
+            super(s, converter);
+            this.maxBatchSize = maxBatchSize;
+        }
+
+        public void setSql(String sql) {
+            this.sql = sql;
+        }
+
+        @Override
+        public int update() throws SQLException {
+            statement.addBatch(sql);
+            currentBatchSize++;
+            int result = 0;
+            if (currentBatchSize >= maxBatchSize) {
+                result = executeBatch();
+            }
+            return result;
+        }
+
+        /**
+         * Executes current batch.
+         *
+         * @return number of rows affected.
+         * @throws SQLException if error occurs
+         */
+        protected int executeBatch() throws SQLException {
+            try {
+                return executeBatch(statement);
+            } finally {
+                currentBatchSize = 0;
+                converter.close(); //Disposing converter
+            }
+        }
+
+        @Override
+        protected ResultSet query() throws SQLException {
+            throw new UnsupportedOperationException("Queries not supported in batch mode");
+        }
+
+        @Override
+        public void clear() {
+            this.sql = null;
+        }
+
+        @Override
+        public int flush() throws SQLException {
+            if (currentBatchSize > 0) {
+                return executeBatch();
+            }
+            return 0;
+        }
+
+        @Override
+        public void close() {
+            super.close();
+        }
+    }
+
+
+    /**
+     * {@link Prepared} for batching.
+     */
+    static class BatchedPrepared extends Prepared {
+        private int maxBatchSize;
+        private int currentBatchSize;
+
+        /**
+         * For testing only.
+         */
+        protected BatchedPrepared() {
+        }
+
+        public BatchedPrepared(PreparedStatement s, JdbcTypesConverter converter, int maxBatchSize) {
+            super(s, converter);
+            this.maxBatchSize = maxBatchSize;
+        }
+
+        @Override
+        public int update() throws SQLException {
+            statement.addBatch();
+            currentBatchSize++;
+            int result = 0;
+            if (currentBatchSize >= maxBatchSize) {
+                result = executeBatch();
+            }
+            return result;
+        }
+
+        /**
+         * Executes current batch.
+         *
+         * @return number of rows affected.
+         * @throws SQLException if error occurs
+         */
+        protected int executeBatch() throws SQLException {
+            try {
+                return executeBatch(statement);
+            } finally {
+                currentBatchSize = 0;
+                converter.close(); //Disposing converter
+            }
+        }
+
+        @Override
+        public void clear() {
+            //Do not clear parameters, until the batch is sent
+        }
+
+        @Override
+        public int flush() throws SQLException {
+            if (currentBatchSize > 0) {
+                return executeBatch();
+            }
+            return 0;
+        }
+
+        @Override
+        protected ResultSet query() throws SQLException {
+            throw new UnsupportedOperationException("Queries not supported in batch mode");
+        }
+
+        @Override
+        public void close() {
+            super.close();
+        }
     }
 
 

@@ -55,8 +55,8 @@ public class Session {
             } else {
                 String id = connections.size() > 1 ? ("id=" + c.getId() + ", ") : "";//print an ID if more than one connection
                 Connection connection = con.getConnection();
-                progressCallback.step(1, "Connection " + id + connection.toString() +
-                        ", " + connection.getDialectIdentifier() + " registered");
+                progressCallback.step(1, "Initialized connection " + id + connection.toString() +
+                        ", " + connection.getDialectIdentifier() + ", properties "+c.getProperties());
             }
             managedConnections.put(c.getId(), con);
         }

@@ -75,4 +75,13 @@ public class StringUtilsTest extends AbstractTestCase {
         assertEquals(null, StringUtils.removePrefix(null,"test"));
         assertEquals("test", StringUtils.removePrefix("url:test","url:"));
     }
+
+    public void testGetMaskedPassword() {
+        assertEquals("***", StringUtils.getMaskedPassword("123"));
+        assertEquals("", StringUtils.getMaskedPassword(""));
+        assertEquals("", StringUtils.getMaskedPassword(null));
+        assertEquals("**", StringUtils.getMaskedPassword("**"));
+    }
+
 }
+
