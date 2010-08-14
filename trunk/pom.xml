@@ -204,6 +204,7 @@
                 <version>2.4.3</version>
                 <configuration>
                     <test>**/*Test</test>
+                    <argLine>-Xmx256m</argLine>
                 </configuration>
             </plugin>
             <plugin>
