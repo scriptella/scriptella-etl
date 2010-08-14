@@ -19,9 +19,12 @@ import scriptella.AbstractTestCase;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +50,7 @@ public class H2ScriptTest extends AbstractTestCase {
         EtlExecutor se = newEtlExecutor();
         se.execute();
         ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Test ORDER BY ID");
-        List actual = new ArrayList();
+        List<Integer> actual = new ArrayList<Integer>();
         while (rs.next()) {
             Integer n = (Integer) rs.getObject(1);
             actual.add(n);
