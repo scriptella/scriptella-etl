@@ -314,8 +314,8 @@ public class ConnectionParameters {
     /**
      * Returns the url property resolved relative to a script location.
      *
-     * @throws ConfigurationException if connection URL is malformed or null.
      * @return resolved URL.
+     * @throws ConfigurationException if connection URL is malformed or null.
      */
     public URL getResolvedUrl() throws ConfigurationException {
         if (url == null) {
@@ -370,6 +370,8 @@ public class ConnectionParameters {
     }
 
     public String toString() {
-        return "ConnectionParameters{" + "properties=" + properties + ", url='" + url + '\'' + ", user='" + user + '\'' + ", password='" + password + '\'' + ", schema='" + schema + '\'' + ", catalog='" + catalog + '\'' + '}';
+        return "ConnectionParameters{" + "properties=" + properties + ", url='" + url + '\'' + ", user='" + user + '\'' +
+                (password == null ? "" : ", password='" + StringUtils.getMaskedPassword(password) + '\'') +
+                ", schema='" + schema + '\'' + ", catalog='" + catalog + '\'' + '}';
     }
 }

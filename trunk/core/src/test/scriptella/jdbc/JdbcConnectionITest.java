@@ -15,8 +15,14 @@
  */
 package scriptella.jdbc;
 
-import scriptella.AbstractTestCase;
+import scriptella.DBTestCase;
 import scriptella.execution.EtlExecutorException;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.QueryCallback;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Integration test for JDBC connection.
@@ -24,9 +30,42 @@ import scriptella.execution.EtlExecutorException;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JdbcConnectionITest extends AbstractTestCase {
+public class JdbcConnectionITest extends DBTestCase {
+    /**
+     * Integration test for {@link scriptella.jdbc.JdbcConnection}. This testcase focused on Batching feature.
+     *
+     * @throws EtlExecutorException
+     */
     public void test() throws EtlExecutorException {
-        //For now just a smoke test
+        Connection c = getConnection("jdbcconitest");
         newEtlExecutor().execute();
+        //Verify results1 for batch execution
+        final List<String> results = new ArrayList<String>();
+        QueryHelper q = new QueryHelper("SELECT * FROM BatchTestResults");
+        q.execute(c, new QueryCallback() {
+            public void processRow(ParametersCallback parameters) {
+                results.add(parameters.getParameter("1").toString());
+            }
+        });
+        assertEquals("Table BatchTestResults records count", 2, results.size());
+        assertEquals("Result1: Query should return 5, because one batch with size 5 has been sent", "5", results.get(0));
+        assertEquals("Result2: Query should return 15, 3 batches with size 5 has been sent", "15", results.get(1));
+
+        //Now verify that pending inserts were flushed correctly
+        results.clear();
+        q = new QueryHelper("SELECT COUNT(*) FROM BatchTest WHERE ID=1");
+        q.execute(c, new QueryCallback() {
+            public void processRow(ParametersCallback parameters) {
+                results.add(parameters.getParameter("1").toString());
+            }
+        });
+        assertEquals("6", results.get(0));
+        q = new QueryHelper("SELECT COUNT(*) FROM BatchTest WHERE ID=2");
+        q.execute(c, new QueryCallback() {
+            public void processRow(ParametersCallback parameters) {
+                results.add(parameters.getParameter("1").toString());
+            }
+        });
+        assertEquals("16", results.get(1));
     }
 }

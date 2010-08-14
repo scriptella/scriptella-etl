@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 /**
  * Represents a JDBC connection.
+ * TODO Extract JDBCConnectionParameters class and JDBCStatementFactory as described in statement cache
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -42,6 +43,8 @@ public class JdbcConnection extends AbstractConnection {
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
     public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
+    public static final String STATEMENT_BATCH_SIZE = "statement.batchSize";
+    public static final String STATEMENT_FETCH_SIZE = "statement.fetchSize";
     public static final String KEEPFORMAT_KEY = "keepformat";
     public static final String AUTOCOMMIT_KEY = "autocommit";
     public static final String AUTOCOMMIT_SIZE_KEY = "autocommit.size";
@@ -55,11 +58,14 @@ public class JdbcConnection extends AbstractConnection {
     private boolean transactable;
     private boolean autocommit;
     private ParametersParser parametersParser;
-    int statementCacheSize;
+    protected int statementCacheSize;
+    protected int statementBatchSize;
+    protected int statementFetchSize;
     protected String separator = ";";
     protected boolean separatorSingleLine;
     protected boolean keepformat;
     protected int autocommitSize;
+
     private Integer txIsolation;
     private final Map<Resource, SqlExecutor> resourcesMap = new IdentityHashMap<Resource, SqlExecutor>();
 
@@ -95,16 +101,35 @@ public class JdbcConnection extends AbstractConnection {
 
     /**
      * Called in constructor
+     *
      * @param parameters connection parameters.
      */
     protected void init(ConnectionParameters parameters) {
 
+        StringBuilder statusMsg = new StringBuilder();
+        if (!StringUtils.isAsciiWhitespacesOnly(parameters.getUrl())) {
+            statusMsg.append(parameters.getUrl()).append(": ");
+        }
         statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);
+        if (statementCacheSize > 0) {
+            statusMsg.append("Statement cache is enabled (cache size ").append(statementCacheSize).append("). ");
+        }
+        statementBatchSize = parameters.getIntegerProperty(STATEMENT_BATCH_SIZE, 0);
+        if (statementBatchSize > 0) {
+            statusMsg.append("Statement batching is enabled (batch size ").append(statementBatchSize).append("). ");
+        }
+        statementFetchSize = parameters.getIntegerProperty(STATEMENT_FETCH_SIZE, 0);
+        if (statementFetchSize != 0) {
+            statusMsg.append("Query statement fetching is enabled (fetch size ").append(statementFetchSize).append("). ");
+        }
         String separatorStr = parameters.getStringProperty(STATEMENT_SEPARATOR_KEY);
         if (!StringUtils.isEmpty(separatorStr)) {
             separator = separatorStr.trim();
         }
+        statusMsg.append("Statement separator '").append(separator).append('\'');
         separatorSingleLine = parameters.getBooleanProperty(STATEMENT_SEPARATOR_SINGLELINE_KEY, false);
+        statusMsg.append(separatorSingleLine ? " on a single line. " : ". ");
+
         keepformat = parameters.getBooleanProperty(KEEPFORMAT_KEY, false);
         String isolationStr = parameters.getStringProperty(TRANSACTION_ISOLATION_KEY);
         if (isolationStr != null) {
@@ -129,8 +154,19 @@ public class JdbcConnection extends AbstractConnection {
             }
 
         }
+        if (isolationStr != null) {
+            statusMsg.append("Transaction isolation level: ").append(txIsolation).
+                    append('(').append(isolationStr).append("). ");
+        }
         autocommit = parameters.getBooleanProperty(AUTOCOMMIT_KEY);
         autocommitSize = parameters.getIntegerProperty(AUTOCOMMIT_SIZE_KEY, 0);
+        statusMsg.append("Autocommit: ").append(autocommit);
+        if (autocommitSize > 0) {
+            statusMsg.append("(size ").append(autocommitSize).append(")");
+        }
+        statusMsg.append(".");
+        LOG.fine(statusMsg.toString());
+
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
     }
@@ -167,6 +203,9 @@ public class JdbcConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
+        if (statementBatchSize > 0) {
+            throw new JdbcException("Queries are not supported in batch mode. Consider using a separate connection.");
+        }
         SqlExecutor q = resourcesMap.get(queryContent);
         if (q == null) {
             resourcesMap.put(queryContent, q = new SqlExecutor(queryContent, this));
@@ -177,6 +216,14 @@ public class JdbcConnection extends AbstractConnection {
         }
     }
 
+    /**
+     * Creates an instance of statement cache.
+     * @return new instance of statement cache.
+     */
+    protected StatementCache newStatementCache() {
+        return new StatementCache(getNativeConnection(), statementCacheSize, statementBatchSize, statementFetchSize);
+    }
+
     ParametersParser getParametersParser() {
         return parametersParser;
     }
@@ -184,6 +231,16 @@ public class JdbcConnection extends AbstractConnection {
     public void commit() {
         if (con == null) {
             throw new IllegalStateException("Attempt to commit a transaction on a closed connection");
+        }
+        //Caches for ETL element executors are flushed
+        if (resourcesMap != null) {
+            for (SqlExecutor executor : resourcesMap.values()) {
+                try {
+                    executor.cache.flush();
+                } catch (SQLException e) {
+                    throw new JdbcException("Unable to commit transaction - cannot flush cache", e);
+                }
+            }
         }
         if (!transactable) {
             LOG.log(Level.INFO, "Connection " + toString() + " doesn't support transactions. Commit ignored.");

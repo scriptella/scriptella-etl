@@ -35,10 +35,11 @@ public class StatementCachePerfTest extends DBTestCase {
     private static class TestableStatementCache extends StatementCache {
 
         public TestableStatementCache(Connection connection, final int size) {
-            super(connection, size);
+            super(connection, size, 0, 0);
         }
+
         @Override
-        protected StatementWrapper.Simple create(final String sql, final JdbcTypesConverter converter) {
+        protected StatementWrapper.Simple create(final String sql) {
             return new StatementWrapper.Simple(sql) {
                 public void close() {
                 }
@@ -46,7 +47,7 @@ public class StatementCachePerfTest extends DBTestCase {
         }
 
         @Override
-        protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) {
+        protected StatementWrapper.Prepared prepare(final String sql) {
             return new StatementWrapper.Prepared() {
                 @Override
                 public void setParameters(List<Object> params) {
@@ -73,24 +74,23 @@ public class StatementCachePerfTest extends DBTestCase {
      */
     public void testCacheMiss() throws SQLException {
         //Testing cache miss
-        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
 
         for (int i = 0; i < LOOP_COUNT; i++) {
             setUp();
-            runStatements(sc, params, converter);
+            runStatements(sc, params);
         }
 
     }
 
-    private void runStatements(StatementCache cache, List<Object> params, JdbcTypesConverter converter) throws SQLException {
+    private void runStatements(StatementCache cache, List<Object> params) throws SQLException {
         StringBuilder sb = new StringBuilder(150);
         for (int j = 0; j < 150; j++) {
             sb.append('.');
-            StatementWrapper s = cache.prepare(sb.toString(), Collections.emptyList(), converter);
+            StatementWrapper s = cache.prepare(sb.toString(), Collections.emptyList());
             cache.releaseStatement(s);
-            StatementWrapper s2 = cache.prepare(sb.toString(), params, converter);
+            StatementWrapper s2 = cache.prepare(sb.toString(), params);
             cache.releaseStatement(s2);
         }
 
@@ -102,28 +102,27 @@ public class StatementCachePerfTest extends DBTestCase {
      */
     public void testCacheHit() throws SQLException {
         //Testing cache miss
-        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
 
         for (int i = 0; i < LOOP_COUNT; i++) {
-            runStatements(sc, params, converter);
+            runStatements(sc, params);
         }
 
     }
+
     /**
      * History:
      * 01.10.2006 - Duron 1.7Mhz - 1032 ms
      */
     public void testCacheDisable() throws SQLException {
         //Testing disabled cache
-        JdbcTypesConverter converter = new JdbcTypesConverter();
         List<Object> params = new ArrayList<Object>();
         params.add(1);
         StatementCache disabled = new TestableStatementCache(null, -1);
 
         for (int i = 0; i < LOOP_COUNT; i++) {
-            runStatements(disabled, params, converter);
+            runStatements(disabled, params);
         }
 
     }

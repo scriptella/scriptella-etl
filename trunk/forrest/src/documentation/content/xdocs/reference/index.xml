@@ -826,7 +826,7 @@ LOGIN $SMALL_STRING
 --and easily reconfigurable for another DB vendor
                     </source>
 				</li>
-				<li>Use JDBC escaping to specify time and date literals, function calls and other parameters
+				<li>Use standard JDBC escaping to specify time and date literals, function calls and other parameters
                     independently from DB vendor. Examples:
                     <br/>
                     Calls without a return value:
@@ -852,7 +852,7 @@ LOGIN $SMALL_STRING
                     was found.
                 </li>
 				<li>For large bulk-insert files use &lt;include&gt; element to avoid loading a whole file into
-                    memory.</li>
+                    memory. Also consider using statement.batchSize parameter to enable batching.</li>
 			</ul>
 			<section>
 				<title>Using Scriptella as a Database Schema Evolution Tool</title>

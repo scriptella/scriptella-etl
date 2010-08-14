@@ -44,7 +44,6 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     private static final Logger LOG = Logger.getLogger(SqlExecutor.class.getName());
     protected final Resource resource;
     protected final JdbcConnection connection;
-    protected final JdbcTypesConverter converter;
     protected final StatementCache cache;
     private QueryCallback callback;
     private ParametersCallback paramsCallback;
@@ -56,8 +55,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     public SqlExecutor(final Resource resource, final JdbcConnection connection) {
         this.resource = resource;
         this.connection = connection;
-        converter = new JdbcTypesConverter();
-        cache = new StatementCache(connection.getNativeConnection(), connection.statementCacheSize);
+        cache = connection.newStatementCache();
         counter = connection.getStatementCounter();
     }
 
@@ -124,7 +122,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         EtlCancelledException.checkEtlCancelled();
         StatementWrapper sw = null;
         try {
-            sw = cache.prepare(sql, params, converter);
+            sw = cache.prepare(sql, params);
             int updatedRows = -1;
             if (callback != null) {
                 sw.query(callback, paramsCallback);

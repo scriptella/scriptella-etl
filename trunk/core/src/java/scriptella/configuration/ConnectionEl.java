@@ -145,9 +145,6 @@ public class ConnectionEl extends XmlConfigurableBase {
         if (catalog != null) {
             res.append(", catalog='").append(catalog).append('\'');
         }
-        if (password != null) {
-            res.append(", password='").append(password).append('\'');
-        }
         if (user != null) {
             res.append(", user='").append(user).append('\'');
         }

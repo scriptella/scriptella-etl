@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
  */
 public final class StringUtils {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final Pattern ANY_CHAR_REGEX = Pattern.compile(".");
+    private static final String PASSWORD_MASK = "*";
 
     private StringUtils() {//singleton
     }
@@ -146,6 +148,7 @@ public final class StringUtils {
 
     /**
      * Removes a prefix from a string.
+     *
      * @param string original string. May be null.
      * @param prefix prefix to to check and remove. May be null.
      * @return string without a prefix, or unchanged string.
@@ -157,5 +160,14 @@ public final class StringUtils {
         return string;
     }
 
+    /**
+     * Masks password displaying to user.
+     *
+     * @param string password.
+     * @return masked password or empty string for empty/null password.
+     */
+    public static String getMaskedPassword(String string) {
+        return string == null ? "" : ANY_CHAR_REGEX.matcher(string).replaceAll(PASSWORD_MASK);
+    }
 
 }

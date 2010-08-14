@@ -20,12 +20,18 @@ import scriptella.util.LRUMap;
 
 import java.io.Closeable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import static scriptella.util.CollectionUtils.isEmpty;
+
 /**
  * Statements cache for {@link JdbcConnection}.
+ * TODO Extract statement handling policy interface and provide 2 implementations for normal and batched mode. (+1 for testing)
+ * TODO Use wrapper class for Jdbc ConnectionParameters to store typesafe parameters and overridable factories
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -33,15 +39,24 @@ import java.util.Map;
 class StatementCache implements Closeable {
     private Map<String, StatementWrapper> map;
     private final Connection connection;
+    private final JdbcTypesConverter converter;
+    private int batchSize;
+    private StatementWrapper.Batched sharedBatchedStatement; //see getter for description
+    private int fetchSize;
 
     /**
      * Creates a statement cache for specified connection.
      *
      * @param connection connection to create cache for.
      * @param size       cache size, 0 or negative means disable cache.
+     * @param batchSize  size of prepared statements batch.
+     * @param fetchSize  see {@link java.sql.Statement#setFetchSize(int)}
      */
-    public StatementCache(Connection connection, final int size) {
+    public StatementCache(Connection connection, final int size, final int batchSize, final int fetchSize) {
         this.connection = connection;
+        this.batchSize = batchSize;
+        this.converter = new JdbcTypesConverter();
+        this.fetchSize = fetchSize;
         if (size > 0) { //if cache is enabled
             map = new CacheMap(size);
         }
@@ -52,27 +67,32 @@ class StatementCache implements Closeable {
      * <p>The sql is used as a key to lookup a {@link StatementWrapper},
      * if cache miss the statement is created and put to cache.
      *
-     * @param sql       statement SQL.
-     * @param params    parameters for SQL.
-     * @param converter types converter to use.
+     * @param sql    statement SQL.
+     * @param params parameters for SQL.
      * @return a wrapper for specified SQL.
-     * @throws SQLException
+     * @throws SQLException if DB reports an error
      * @see StatementWrapper
      */
-    public StatementWrapper prepare(final String sql, final List<Object> params, final JdbcTypesConverter converter) throws SQLException {
-        StatementWrapper sw = map == null ? null : map.get(sql);
+    public StatementWrapper<?> prepare(final String sql, final List<Object> params) throws SQLException {
+        //In batch mode always use Batched statement for sql without parameters
+        if (isBatchMode() && isEmpty(params)) {
+            StatementWrapper.Batched batchedSt = getSharedBatchStatement();
+            batchedSt.setSql(sql);
+            return batchedSt;
+        }
+        StatementWrapper<?> sw = map == null ? null : map.get(sql);
 
         if (sw == null) { //If not cached
-            if (params == null || params.isEmpty()) {
-                sw = create(sql, converter);
+            if (isEmpty(params)) {
+                sw = create(sql);
             } else {
-                sw = prepare(sql, converter);
+                sw = prepare(sql);
             }
             put(sql, sw);
         } else if (sw instanceof StatementWrapper.Simple) {
-            //If simple statement is obtained second time - use prepared to improve performance
+            //if simple statement is obtained second time - use prepared to improve performance
             sw.close(); //closing unused statement
-            put(sql, sw = prepare(sql, converter));
+            put(sql, sw = prepare(sql));
         }
         sw.setParameters(params);
         return sw;
@@ -81,17 +101,47 @@ class StatementCache implements Closeable {
     /**
      * Testable template method to create simple statement
      */
-    protected StatementWrapper.Simple create(final String sql, final JdbcTypesConverter converter) throws SQLException {
-        return new StatementWrapper.Simple(connection.createStatement(), sql, converter);
+    protected StatementWrapper create(final String sql) throws SQLException {
+        Statement statement = connection.createStatement();
+        if (fetchSize != 0) {
+            statement.setFetchSize(fetchSize);
+        }
+        return new StatementWrapper.Simple(statement, sql, converter);
     }
 
     /**
      * Testable template method to create prepared statement
      */
-    protected StatementWrapper.Prepared prepare(final String sql, final JdbcTypesConverter converter) throws SQLException {
-        return new StatementWrapper.Prepared(connection.prepareStatement(sql), converter);
+    protected StatementWrapper.Prepared prepare(final String sql) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        if (fetchSize != 0) {
+            preparedStatement.setFetchSize(fetchSize);
+        }
+        if (isBatchMode()) {
+            return new StatementWrapper.BatchedPrepared(preparedStatement, converter, batchSize);
+        } else {
+            return new StatementWrapper.Prepared(preparedStatement, converter);
+        }
     }
 
+    private boolean isBatchMode() {
+        return batchSize > 0;
+    }
+
+    /**
+     * Returns an instance of StatementWrapper.Batched shared on the instance level.
+     * <p>Since each ETL element has its own cache, we are using a shared statement.
+     * This is critical in batch mode to allow grouping different statements in one batch.
+     *
+     * @return instance of shared statement.
+     * @throws SQLException if error occurs
+     */
+    protected StatementWrapper.Batched getSharedBatchStatement() throws SQLException {
+        if (sharedBatchedStatement == null) {
+            sharedBatchedStatement = new StatementWrapper.Batched(connection.createStatement(), converter, batchSize);
+        }
+        return sharedBatchedStatement;
+    }
 
     private void put(String key, StatementWrapper entry) {
         if (map != null) {
@@ -122,6 +172,24 @@ class StatementCache implements Closeable {
             //closing statements
             IOUtils.closeSilently(map.values());
             map = null;
+        }
+    }
+
+    /**
+     * Flushes pending batches.
+     *
+     * @throws SQLException if DB error occurs.
+     */
+    public void flush() throws SQLException {
+        if (isBatchMode()) {
+            if (sharedBatchedStatement != null) {
+                sharedBatchedStatement.flush();
+            }
+            if (map != null) {
+                for (StatementWrapper sw : map.values()) {
+                    sw.flush();
+                }
+            }
         }
     }
 
