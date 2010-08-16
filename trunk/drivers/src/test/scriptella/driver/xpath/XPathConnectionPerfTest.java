@@ -77,7 +77,7 @@ public class XPathConnectionPerfTest extends AbstractTestCase {
             root.appendChild(row);
         }
         //Querying 200 times.
-        XPathQueryExecutor qe = new XPathQueryExecutor(new ThreadLocal<Node>(), doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler(), new AbstractConnection.StatementCounter());
+        XPathQueryExecutor qe = new XPathQueryExecutor(new ThreadLocal<Node>(), doc, new StringResource("/table/row[@id mod 2=0]"), new XPathExpressionCompiler(), new AbstractConnection.StatementCounter(), false);
         for (int i = 0; i < 20; i++) {
             IndexedQueryCallback queryCallback = new IndexedQueryCallback() {
                 protected void processRow(final ParametersCallback parameters, final int rowNumber) {

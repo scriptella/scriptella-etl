@@ -46,6 +46,7 @@ public class XPathQueryExecutor implements ParametersCallback {
     private String expressionStr;
     private XPathExpressionCompiler compiler;
     private AbstractConnection.StatementCounter counter;
+    private boolean returnArrays;
     ThreadLocal<Node> context;
 
     /**
@@ -57,12 +58,14 @@ public class XPathQueryExecutor implements ParametersCallback {
      * @param xpathResource resource with xpath expression.
      * @param compiler      xpath expression compiler
      * @param counter       statement counter.
+     * @param returnArrays  true if string arrays should be returned for variables.
      */
-    public XPathQueryExecutor(ThreadLocal<Node> context, Document document, Resource xpathResource, XPathExpressionCompiler compiler, AbstractConnection.StatementCounter counter) {
+    public XPathQueryExecutor(ThreadLocal<Node> context, Document document, Resource xpathResource, XPathExpressionCompiler compiler, AbstractConnection.StatementCounter counter, boolean returnArrays) {
         this.context = context;
         this.document = document;
         this.compiler = compiler;
         this.counter = counter;
+        this.returnArrays = returnArrays;
         try {
             expressionStr = IOUtils.toString(xpathResource.open());
         } catch (IOException e) {
@@ -114,16 +117,22 @@ public class XPathQueryExecutor implements ParametersCallback {
             Node item = node.getAttributes().getNamedItem(name);
             result = item == null ? null : StringUtils.nullsafeTrim(item.getNodeValue()); //Get attribute value for name
         }
+
+        if (result == null) {
+            // Try to retrieve the text value(s) of the immediate child element(s) with the specified name
+            NodeVariable nodeVariable = new NodeVariable(compiler, node);
+            if (returnArrays) {
+                result = nodeVariable.getStringArray("./" + name);
+            } else {
+                result = nodeVariable.getString("./" + name);
+            }
+        }
+
         //If previous check was unsuccessful and the selected node has specified name
         if (result == null && name.equals(node.getNodeName())) {
             result = StringUtils.nullsafeTrim(node.getTextContent()); //returns its text content
         }
         
-        if (result == null) {
-            // Try to retrieve the text value(s) of the immediate child element(s) with the specified name
-            result = new NodeVariable(compiler, node).get("./" + name);
-        }
-
         //if result=null fallback to parent parameters
         return result == null ? substitutor.getParameters().getParameter(name) : result;
     }
