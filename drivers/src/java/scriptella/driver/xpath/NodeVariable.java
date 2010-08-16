@@ -42,12 +42,12 @@ public class NodeVariable {
     }
     
     /**
-     * Evaluates an XPath using the current node as the context.
+     * Gets the text values of the nodes selected by the specified XPath expression.
      *
      * @param expression xpath expression to evaluate.
-     * @return array of String values of the selected nodes.
+     * @return a String array of text values of the selected nodes.
      */
-    public String[] evaluateXPath(String expression) {
+    public String[] getStringArray(String expression) {
         try {
             XPathExpression xpathExpression = compiler.compile(expression);
             NodeList nList = (NodeList) xpathExpression.evaluate(node, XPathConstants.NODESET);
@@ -59,12 +59,12 @@ public class NodeVariable {
                     r[i] = StringUtils.nullsafeTrim(nList.item(i).getTextContent());
                 }
                 return r;
+            } else {
+                return new String[0];
             }
         } catch (XPathExpressionException e) {
             throw new XPathProviderException("Failed to evaluate XPath query", e);
         }
-        
-        return null;
     }
     
     /**
@@ -85,15 +85,19 @@ public class NodeVariable {
      * @return the text value of the first selected node, or the specified string if null.
      */
     public String getString(String expression, String ifNull) {
-        String[] strings = evaluateXPath(expression);
-        
-        if (strings == null || strings.length < 1) {
-            return ifNull;
-        } else {
-            return strings[0];
+        try {
+            XPathExpression xpathExpression = compiler.compile(expression);
+            Node foundNode = (Node) xpathExpression.evaluate(node, XPathConstants.NODE);
+            if (foundNode == null) {
+                return ifNull;
+            } else {
+                return StringUtils.nullsafeTrim(foundNode.getTextContent());
+            }
+        } catch (XPathExpressionException e) {
+            throw new XPathProviderException("Failed to evaluate XPath query", e);
         }
     }
-    
+
     /**
      * Gets the text value(s) of the node(s) selected by the specified XPath expression.
      * 
@@ -101,7 +105,7 @@ public class NodeVariable {
      * @return a String array of the selected nodes, or just a single String if one node found.
      */
     public Object get(String expression) {
-        String[] strings = evaluateXPath(expression);
+        String[] strings = getStringArray(expression);
         
         if (strings == null || strings.length < 1) {
             return null;
@@ -110,5 +114,18 @@ public class NodeVariable {
         } else {
             return strings;
         }
+    }
+
+    /**
+     * Removes this node from the document.  This is especially useful to improve
+     * performance and reduce memory usage when processing large documents.
+     */
+    public void remove()
+    {
+        Node parentNode = node.getParentNode();
+        if (parentNode == null) {
+            parentNode = node.getOwnerDocument();
+        }
+        parentNode.removeChild(node);
     }
 }

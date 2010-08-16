@@ -15,20 +15,22 @@
  */
 package scriptella.driver.xpath;
 
+import java.net.URL;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.net.URL;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 /**
  * Represents a connection to an XML file.
@@ -43,18 +45,29 @@ public class XPathConnection extends AbstractConnection {
     private Document document;
     private ThreadLocal<Node> queryContext=new ThreadLocal<Node>();
     private URL url;
+    private final boolean returnArrays;
     static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
+
+    /**
+     * Name of the <code>return_arrays</code> connection property.
+     * Value of <code>true</code> specifies that variables should return a string array, otherwise a single string is returned.
+     */
+    public static final String RETURN_ARRAYS = "return_arrays";
+    
 
     /**
      * For testing purposes only.
      */
     protected XPathConnection() {
+        returnArrays = false;
     }
 
     public XPathConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
         url = parameters.getResolvedUrl();
         //TODO implement trim option
+
+        returnArrays = parameters.getBooleanProperty(RETURN_ARRAYS, false);
     }
 
     public void executeScript(final Resource scriptContent, final ParametersCallback parametersCallback) throws ProviderException {
@@ -64,7 +77,7 @@ public class XPathConnection extends AbstractConnection {
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
         XPathQueryExecutor exec = queriesCache.get(queryContent);
         if (exec == null) {
-            exec = new XPathQueryExecutor(queryContext, getDocument(), queryContent, compiler, counter);
+            exec = new XPathQueryExecutor(queryContext, getDocument(), queryContent, compiler, counter, returnArrays);
             queriesCache.put(queryContent, exec);
         }
         exec.execute(queryCallback, parametersCallback);
