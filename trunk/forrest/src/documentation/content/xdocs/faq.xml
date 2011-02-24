@@ -63,7 +63,7 @@
 
     <!-- Then reuse this variable in other parts of ETL file -->
     <script connection-id="js" if="etl.globals['errorsCount'] gt 0">
-        java.lang.System.out.println('errors count ='+errorsCount);
+        java.lang.System.out.println('errors count ='+etl.globals['errorsCount']);
     </script>
 
     <!-- Alternatively an outer query can be used to share an array based variable between scripts -->
