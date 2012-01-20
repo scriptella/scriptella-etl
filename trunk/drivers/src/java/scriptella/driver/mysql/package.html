@@ -1,6 +1,6 @@
 <body>
-MySQL Driver Adapter for Scriptella.
-<p><b>Note: </b>The driver tries to load MySQL JDBC driver.
+MySQL Driver(Connector/J) adapter for Scriptella. 
+<p>See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
 <h2>General information</h2>
 <table>
     <tr>
@@ -26,6 +26,19 @@ MySQL Driver Adapter for Scriptella.
 <h2>Examples</h2>
 <code><pre>
     &lt;connection driver="mysql" url="jdbc:mysql://localhost:3306/test" user="username" password="password"&gt;
+    &lt;/connection&gt;
+</pre></code>
+The following example specifies a custom delimiter for statements. 
+This feature is similar to MySQL client <a href="http://dev.mysql.com/doc/refman/5.0/en/create-procedure.html">""DELIMITER" command</a>.
+<br><b>Notes:</b>
+<ul>
+<li>Delimiter is declared once and cannot be changed, so a separate connection might be necessary for processing SQL with a different delimiter.
+<li>DELIMITER command <b>should not</b> be used in scripts and queries.
+</ul>
+
+<code><pre>
+    &lt;connection driver="mysql" url="jdbc:mysql://localhost:3306/test" user="username" password="password"&gt;
+    	 statement.separator=$$ 
     &lt;/connection&gt;
 </pre></code>
 
