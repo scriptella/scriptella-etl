@@ -20,7 +20,7 @@ import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 
 /**
- * Scriptella bridge for the JSR 223: Scripting for the Java™ Platform.
+ * Scriptella bridge for the JSR 223: Scripting for the Java Platform.
  * <p/>
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
