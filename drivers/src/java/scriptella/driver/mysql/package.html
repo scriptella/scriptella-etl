@@ -21,6 +21,15 @@ MySQL Driver(Connector/J) adapter for Scriptella.
         <th>Description</th>
         <th>Required</th>
     </tr>
+    <tr>
+        <td>statement.fetchSize</th>
+        <td>For MySQL, set the value of this property to Integer.MIN_VALUE, in order to avoid loading all rows into memory:
+        <pre><code>statement.fetchSize = -2147483648</code></pre>
+        See <a href="http://bugs.mysql.com/bug.php?id=18148">MySQL bug #18148</a>.
+        </td>
+        <td>No, default value is determined by Connector/J JDBC driver.</th>
+    </tr>    
+    
 </table>
 
 <h2>Examples</h2>
