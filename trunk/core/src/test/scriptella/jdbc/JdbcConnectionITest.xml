@@ -15,6 +15,10 @@
         statement.batchSize=5
     </connection>
 
+    <connection id="con_batch_flush" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+        statement.batchSize=5
+        flushBeforeQuery=true
+    </connection>
 
 
     <script connection-id="c1">
@@ -43,6 +47,7 @@
         COMMIT;
     </script>
 
+    <!--  Inserting 6 rows in a batch -->
     <script connection-id="con_batch">
         INSERT INTO BatchTest VALUES (1);
         INSERT INTO BatchTest VALUES (1);
@@ -77,4 +82,34 @@
             INSERT INTO BatchTestResults VALUES (?1);
         </script>
     </query>
+    
+    <!--  Third test case checks if flushBeforeQuery parameter works
+     		i.e. the connection is flushed before query execution -->
+     		
+    <script connection-id="con_batch_flush">
+        INSERT INTO BatchTest VALUES (3);
+        INSERT INTO BatchTest VALUES (3);
+        INSERT INTO BatchTest VALUES (3);
+        INSERT INTO BatchTest VALUES (3);
+        INSERT INTO BatchTest VALUES (3);
+        INSERT INTO BatchTest VALUES (3);
+    </script>
+    
+    <!-- Result3: Query should return 5 (as in result 2) -->
+    <query connection-id="c2">
+        SELECT COUNT(*) FROM BatchTest WHERE ID = 3
+        <script>
+            INSERT INTO BatchTestResults VALUES (?1);
+        </script>
+    </query>
+
+    <!-- Result4: Query should return 6, because flush was triggered -->
+    <query connection-id="con_batch_flush">
+        SELECT COUNT(*) FROM BatchTest WHERE ID = 3
+        <script>
+            INSERT INTO BatchTestResults VALUES (?1);
+        </script>
+    </query>
+         		
+     		
 </etl>

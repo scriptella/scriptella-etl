@@ -20,6 +20,7 @@ import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 import scriptella.spi.ParametersCallback;
+import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
 import scriptella.spi.Resource;
 import scriptella.util.StringUtils;
@@ -48,6 +49,7 @@ public class JdbcConnection extends AbstractConnection {
     public static final String KEEPFORMAT_KEY = "keepformat";
     public static final String AUTOCOMMIT_KEY = "autocommit";
     public static final String AUTOCOMMIT_SIZE_KEY = "autocommit.size";
+    public static final String FLUSH_BEFORE_QUERY = "flushBeforeQuery";
     public static final String TRANSACTION_ISOLATION_KEY = "transaction.isolation";
     public static final String TRANSACTION_ISOLATION_READ_UNCOMMITTED = "READ_UNCOMMITTED";
     public static final String TRANSACTION_ISOLATION_READ_COMMITTED = "READ_COMMITTED";
@@ -61,6 +63,7 @@ public class JdbcConnection extends AbstractConnection {
     protected int statementCacheSize;
     protected int statementBatchSize;
     protected int statementFetchSize;
+    protected boolean flushBeforeQuery;
     protected String separator = ";";
     protected boolean separatorSingleLine;
     protected boolean keepformat;
@@ -165,7 +168,13 @@ public class JdbcConnection extends AbstractConnection {
             statusMsg.append("(size ").append(autocommitSize).append(")");
         }
         statusMsg.append(".");
+        flushBeforeQuery = parameters.getBooleanProperty(FLUSH_BEFORE_QUERY, false);
+        if (flushBeforeQuery) {
+            statusMsg.append("Flushing before query execution is enabled.");
+        }
+
         LOG.fine(statusMsg.toString());
+
 
         parametersParser = new ParametersParser(parameters.getContext());
         initDialectIdentifier();
@@ -203,12 +212,12 @@ public class JdbcConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) {
-        if (statementBatchSize > 0) {
-            throw new JdbcException("Queries are not supported in batch mode. Consider using a separate connection.");
-        }
-        SqlExecutor q = resourcesMap.get(queryContent);
+    	SqlExecutor q = resourcesMap.get(queryContent);
         if (q == null) {
             resourcesMap.put(queryContent, q = new SqlExecutor(queryContent, this));
+        }
+        if (flushBeforeQuery) {
+        	flush();
         }
         q.execute(parametersCallback, queryCallback);
         if (q.getUpdateCount() < 0) {
@@ -218,6 +227,7 @@ public class JdbcConnection extends AbstractConnection {
 
     /**
      * Creates an instance of statement cache.
+     *
      * @return new instance of statement cache.
      */
     protected StatementCache newStatementCache() {
@@ -232,16 +242,9 @@ public class JdbcConnection extends AbstractConnection {
         if (con == null) {
             throw new IllegalStateException("Attempt to commit a transaction on a closed connection");
         }
-        //Caches for ETL element executors are flushed
-        if (resourcesMap != null) {
-            for (SqlExecutor executor : resourcesMap.values()) {
-                try {
-                    executor.cache.flush();
-                } catch (SQLException e) {
-                    throw new JdbcException("Unable to commit transaction - cannot flush cache", e);
-                }
-            }
-        }
+
+        flush();
+
         if (!transactable) {
             LOG.log(Level.INFO, "Connection " + toString() + " doesn't support transactions. Commit ignored.");
         } else {
@@ -264,6 +267,19 @@ public class JdbcConnection extends AbstractConnection {
                 con.rollback();
             } catch (Exception e) {
                 throw new JdbcException("Unable to roll back transaction", e);
+            }
+        }
+    }
+
+    public void flush() throws ProviderException {
+        //Caches for ETL element executors are flushed
+        if (resourcesMap != null) {
+            for (SqlExecutor executor : resourcesMap.values()) {
+                try {
+                    executor.cache.flush();
+                } catch (SQLException e) {
+                    throw new JdbcException("Unable to commit transaction - cannot flush cache", e);
+                }
             }
         }
     }
