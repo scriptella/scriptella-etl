@@ -55,7 +55,7 @@ which will be used to configure the chosen Forrest skin.
 	<obfuscate-mail-links>true</obfuscate-mail-links>
 	<obfuscate-mail-value>.at.</obfuscate-mail-value>
 	<!-- Disable the javascript facility to change the font size -->
-	<disable-font-script>true</disable-font-script>
+	<disable-font-script>false</disable-font-script>
 	<!-- mandatory project logo
        default skin: renders it at the top -->
 	<project-name>Scriptella</project-name>
@@ -79,7 +79,7 @@ which will be used to configure the chosen Forrest skin.
 	<!-- relative url of a favicon file, normally favicon.ico -->
 	<favicon-url>favicon.ico</favicon-url>
 	<!-- The following are used to construct a copyright statement -->
-	<year>2006-2009</year>
+	<year>2006-2012</year>
 	<vendor>The Scriptella Project Team.</vendor>
 	<!-- The optional copyright-link URL will be used as a link in the
     copyright statement-->
@@ -96,7 +96,7 @@ which will be used to configure the chosen Forrest skin.
     directory.
   -->
 	<trail location="alt">
-		<link1 name="JavaForge Page" href="http://www.javaforge.com/proj/summary.do?proj_id=781"/>
+		<link1 name="" href=""/>
 		<link2 name="" href=""/>
 		<link3 name="" href=""/>
 	</trail>
@@ -106,7 +106,7 @@ which will be used to configure the chosen Forrest skin.
    generated Table of Contents (TOC). 
   @min-sections
    Minimum required to create a TOC.
-  @location ("page","menu","page,menu", "none")
+  @location ("page","menu","page,menu")
    Where to show the TOC.
   -->
 	<toc max-depth="2" min-sections="1" location="page"/>
@@ -133,24 +133,6 @@ which will be used to configure the chosen Forrest skin.
       both : both
     -->
 	<!--
-  <motd>
-    <motd-option pattern="docs_0_80">
-      <motd-title>v0.8-dev</motd-title>
-      <motd-page location="both">
-        This is documentation for development version v0.8
-      </motd-page>
-      <motd-page-url>/versions/index.html</motd-page-url>
-    </motd-option>
-    <motd-option pattern="docs_0_70">
-      <motd-title>v0.7</motd-title>
-      <motd-page location="both">
-        This is documentation for current version v0.7
-      </motd-page>
-      <motd-page-url>/versions/index.html</motd-page-url>
-    </motd-option>
-  </motd>
--->
-	<!--
     extra-css - here you can define custom css-elements that are 
     A) overriding the fallback elements or 
     B) adding the css definition from new elements that you may have 
@@ -175,164 +157,18 @@ which will be used to configure the chosen Forrest skin.
     #footer a:visited { color: #009999; }
   </extra-css>
 	<colors>
-		<!-- These values are used for the generated CSS files.
-    They essentially "override" the default colors defined in the chosen skin.
-    There are four duplicate "groups" of colors below, denoted by comments:
-      Color group: Forrest, Krysalis, Collabnet, and Lenya using Pelt.
-    They are provided for example only. To customize the colors of any skin,
-    uncomment one of these groups of color elements and change the values
-    of the particular color elements that you wish to change.
-    Note that by default, all color groups are commented-out which means that
-    the default colors provided by the skin are being used.
-  -->
-		<!-- Color group: Forrest: example colors similar to forrest.apache.org
-    Some of the element names are obscure, so comments are added to show how
-    the "pelt" skin uses them, other skins might use these elements in a different way.
-    Tip: temporarily change the value of an element to red (#ff0000) and see the effect.
-     pelt: breadtrail: the strip at the top of the page and the second strip under the tabs
-     pelt: header: top strip containing project and group logos
-     pelt: heading|subheading: section headings within the content
-     pelt: navstrip: the strip under the tabs which contains the published date
-     pelt: menu: the left-hand navigation panel
-     pelt: toolbox: the selected menu item
-     pelt: searchbox: the background of the searchbox
-     pelt: border: line border around selected menu item
-     pelt: body: any remaining parts, e.g. the bottom of the page
-     pelt: footer: the second from bottom strip containing credit logos and published date
-     pelt: feedback: the optional bottom strip containing feedback link
-  -->
-		<!--
-    <color name="breadtrail" value="#cedfef" font="#0F3660" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="header" value="#294563"/>
-    <color name="tab-selected" value="#4a6d8c" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="tab-unselected" value="#b5c7e7" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="subtab-selected" value="#4a6d8c" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="subtab-unselected" value="#4a6d8c" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="heading" value="#294563"/>
-    <color name="subheading" value="#4a6d8c"/>
-    <color name="published" value="#4C6C8F" font="#FFFFFF"/>
-    <color name="feedback" value="#4C6C8F" font="#FFFFFF" align="center"/>
-    <color name="navstrip" value="#4a6d8c" font="#ffffff" link="#0F3660" vlink="#0F3660" hlink="#000066"/>
-    <color name="menu" value="#4a6d8c" font="#cedfef" link="#ffffff" vlink="#ffffff" hlink="#ffcf00"/>    
-    <color name="toolbox" value="#4a6d8c"/>
-    <color name="border" value="#294563"/>
-    <color name="dialog" value="#4a6d8c"/>
-    <color name="searchbox" value="#4a6d8c" font="#000000"/>
-    <color name="body" value="#ffffff" link="#0F3660" vlink="#009999" hlink="#000066"/>
-    <color name="table" value="#7099C5"/>    
-    <color name="table-cell" value="#f0f0ff"/>    
-    <color name="highlight" value="#ffff00"/>
-    <color name="fixme" value="#cc6600"/>
-    <color name="note" value="#006699"/>
-    <color name="warning" value="#990000"/>
-    <color name="code" value="#CFDCED"/>
-    <color name="footer" value="#cedfef"/>
--->
-		<!-- Color group: Krysalis -->
-		<!--
-    <color name="header"    value="#FFFFFF"/>
-
-    <color name="tab-selected" value="#a5b6c6" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="tab-unselected" value="#F7F7F7"  link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="subtab-selected" value="#a5b6c6"  link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="subtab-unselected" value="#a5b6c6"  link="#000000" vlink="#000000" hlink="#000000"/>
-
-    <color name="heading" value="#a5b6c6"/>
-    <color name="subheading" value="#CFDCED"/>
-        
-    <color name="navstrip" value="#CFDCED" font="#000000" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="toolbox" value="#a5b6c6"/>
-    <color name="border" value="#a5b6c6"/>
-        
-    <color name="menu" value="#F7F7F7" link="#000000" vlink="#000000" hlink="#000000"/>    
-    <color name="dialog" value="#F7F7F7"/>
-            
-    <color name="body"    value="#ffffff" link="#0F3660" vlink="#009999" hlink="#000066"/>
-    
-    <color name="table" value="#a5b6c6"/>    
-    <color name="table-cell" value="#ffffff"/>    
-    <color name="highlight" value="#ffff00"/>
-    <color name="fixme" value="#cc6600"/>
-    <color name="note" value="#006699"/>
-    <color name="warning" value="#990000"/>
-    <color name="code" value="#a5b6c6"/>
-        
-    <color name="footer" value="#a5b6c6"/>
--->
-		<!-- Color group: Collabnet -->
-		<!--
-    <color name="header"    value="#003366"/>
-
-    <color name="tab-selected" value="#dddddd" link="#555555" vlink="#555555" hlink="#555555"/>
-    <color name="tab-unselected" value="#999999" link="#ffffff" vlink="#ffffff" hlink="#ffffff"/>
-    <color name="subtab-selected" value="#cccccc" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="subtab-unselected" value="#cccccc" link="#555555" vlink="#555555" hlink="#555555"/>
-
-    <color name="heading" value="#003366"/>
-    <color name="subheading" value="#888888"/>
-    
-    <color name="navstrip" value="#dddddd" font="#555555"/>
-    <color name="toolbox" value="#dddddd" font="#555555"/>
-    <color name="border" value="#999999"/>
-    
-    <color name="menu" value="#ffffff"/>    
-    <color name="dialog" value="#eeeeee"/>
-            
-    <color name="body"      value="#ffffff"/>
-    
-    <color name="table" value="#ccc"/>    
-    <color name="table-cell" value="#ffffff"/>   
-    <color name="highlight" value="#ffff00"/>
-    <color name="fixme" value="#cc6600"/>
-    <color name="note" value="#006699"/>
-    <color name="warning" value="#990000"/>
-    <color name="code" value="#003366"/>
-        
-    <color name="footer" value="#ffffff"/>
--->
-		<!-- Color group: Lenya using pelt-->
-		<!--
-
-    <color name="header" value="#ffffff"/>
-
-    <color name="tab-selected" value="#E5E4D9" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="tab-unselected" value="#F5F4E9" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="subtab-selected" value="#000000" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="subtab-unselected" value="#E5E4D9" link="#000000" vlink="#000000" hlink="#000000"/>
-
-    <color name="heading" value="#E5E4D9"/>
-    <color name="subheading" value="#000000"/>
-    <color name="published" value="#000000"/>
-    <color name="navstrip" value="#E5E4D9" font="#000000"/>
-    <color name="toolbox" value="#CFDCED" font="#000000"/>
-    <color name="border" value="#999999"/>
-
-    <color name="menu" value="#E5E4D9" font="#000000" link="#000000" vlink="#000000" hlink="#000000"/>
-    <color name="dialog" value="#CFDCED"/>
-    <color name="body" value="#ffffff" />
-
-    <color name="table" value="#ccc"/>
-    <color name="table-cell" value="#ffffff"/>
-    <color name="highlight" value="#ffff00"/>
-    <color name="fixme" value="#cc6600"/>
-    <color name="note" value="#006699"/>
-    <color name="warning" value="#990000"/>
-    <color name="code" value="#003366"/>
-
-    <color name="footer" value="#E5E4D9"/>
--->
-	</colors>
-	<!-- Settings specific to PDF output. -->
-	<pdf>
-		<!-- 
+    </colors>
+<!-- Settings specific to PDF output.  -->
+  <pdf>
+<!-- 
        Supported page sizes are a0, a1, a2, a3, a4, a5, executive,
        folio, legal, ledger, letter, quarto, tabloid (default letter).
        Supported page orientations are portrait, landscape (default
        portrait).
        Supported text alignments are left, right, justify (default left).
     -->
-		<page size="letter" orientation="portrait" text-align="left"/>
-		<!-- 
+    <page size="a4" orientation="portrait" text-align="left"/>
+<!-- 
        Pattern of the page numbering in the footer - Default is "Page x".
        first occurrence of '1' digit represents the current page number,
        second occurrence of '1' digit represents the total page number,
@@ -353,13 +189,13 @@ which will be used to configure the chosen Forrest skin.
        the outer edge vice versa.
        Specified below are the default settings.
     -->
-		<margins double-sided="false">
-			<top>1in</top>
-			<bottom>1in</bottom>
-			<inner>1.25in</inner>
-			<outer>1in</outer>
-		</margins>
-		<!--
+    <margins double-sided="false">
+      <top>1cm</top>
+      <bottom>1cm</bottom>
+      <inner>2cm</inner>
+      <outer>1.5cm</outer>
+    </margins>
+<!--
       Print the URL text next to all links going outside the file
     -->
 		<show-external-urls>false</show-external-urls>

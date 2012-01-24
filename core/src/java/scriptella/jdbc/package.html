@@ -46,16 +46,16 @@ Scriptella JDBC Bridge.
         <td>No, the default value is <code>0</code>.</td>
     </tr>
     <tr>
+        <td>flushBeforeQuery</td>
+        <td>True if flush of current connection need to be performed before query execution. 
+        Flushing might be necessary in batch mode, in order to send pending batches before executing a query. See <a href="#batching">Batching</a> section for more details.</td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+    <tr>
         <td>statement.separator.singleline</td>
         <td>True if the delimiter should only be recognized on a line by itself. Leading and trailing whitespaces are
         ignored when searching for a separator in <code>statement.separator.singleline=true</code> mode.
             Similar to Ant delimitertype property.</td>
-        <td>No, the default value is <code>false</code>.</td>
-    </tr>
-    <tr>
-        <td>flushBeforeQuery</td>
-        <td>True if flush of current connection need to be performed before query execution. 
-        Flushing might be necessary in batch mode, in order to send pending batches before executing a query.</td>
         <td>No, the default value is <code>false</code>.</td>
     </tr>
     <tr>
@@ -129,18 +129,33 @@ JDBC batching is a very important feature which allows sending multiple commands
 Scriptella batching is controlled by <code>statement.batchSize</code> parameter. The value of this parameter specifies number of statements
 to be combined in a batch before sending it to the database.
 <p>Please note that behavior for batching depends on the type of statements processed, as the result non-prepared
-SQL statements (statements without ? parameters) are processed in a single batch group different from parametrized prepared
+SQL statements (statements without ? parameters) are processed in a single batch group different from parameterized prepared
 SQL statements. The grouping rules are the following:
 <ul>
     <li>Normal(non-prepared) statements are always grouped in a single batch per ETL script element.</li>
     <li>Parameterized prepared statement use SQL text as a group key, i.e. different statements go into different groups
         what may introduce not always desired behavior.</li>
 </ul>
-As the result mixing parameterized (prepared statements) with normal statements in a single ETL element is NOT RECOMMENDED for batch-mode
-since statements are processed in different batch groups and results may be unexpected.
+<strong>Notes:</strong>
+<ul>
+<li>As the result, mixing parameterized (prepared statements) with normal statements in a single ETL element is NOT RECOMMENDED for batch-mode,
+because statements are processed in different batch groups and results might be unpredictable. The recommended approach is to create 
+2 connections: one for non-batched operations like DLL scripts, or non-parameterized statement and one for bulk load.
+<li>If data is updated in a batch and then selected using the same connection, 
+flushBeforeQuery connection parameter must be enabled in order to flush pending batch updates before querying the database.
+<li>When querying large tables, consider using statement.fetchSize to increase number of records fetched per each request to the database. 
+</ul>
 
 <p>The following 2 examples show a RECOMMENDED way of batching. Example 1. Extract->Load using PreparedStatement.setParameters/addBatch :
 <code><pre>
+
+&lt;connection id="in" url="$db_url" user="$db_user" password="$db_password"&gt;
+    #Fetch larger number of rows per DB request
+    statement.fetchSize=1000
+&lt;/connection&gt;
+&lt;connection id="out" url="$db_url" user="$db_user" password="$db_password"&gt;
+    statement.batchSize=5
+&lt;/connection&gt;
 &lt;query connection-id="in"&gt;
     SELECT * from Bug
     &lt;script connection-id="out"&gt;

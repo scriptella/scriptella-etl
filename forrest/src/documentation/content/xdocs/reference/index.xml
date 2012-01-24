@@ -3,7 +3,7 @@
 <document>
 	<header>
 		<title>Scriptella ETL Reference Documentation</title>
-		<version>1.0</version>
+		<version>1.1</version>
 		<authors>
 			<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
 		</authors>
@@ -657,6 +657,20 @@
                 href="../docs/api/scriptella/driver/auto/package-summary.html">JDBC autodiscovery driver JavaDoc</a>
                     for autodiscovery implementation details.</note>
             </section>
+            <section>
+                <title>Performance and batching</title>
+                <p>JDBC batching is a very important feature which allows sending multiple commands to the database in one call.
+Scriptella batching is controlled by <code>statement.batchSize</code> parameter. The value of this parameter specifies number of statements
+to be combined in a batch before sending it to the database. </p>
+                <p>Another important parameter is statement.fetchSize. It gives JDBC driver a hint about the number of rows that should be fetched from the database when more rows are needed for the result set. Example:</p>
+                <source><![CDATA[<connection url="jdbc:oracle:thin:@localhost:1521:orcl" ...>
+    #For performance reasons increase fetchSize
+    statement.fetchSize = 1000
+</connection>]]></source>
+                <p>Combining statement.fetchSize for queries and statement.batchSize for bulk load may significantly improve performance, especially when databases are located on diferrent machines. For additional details and examples, see <a
+                href="../docs/api/scriptella/jdbc/package-summary.html#batching">Batching</a> section of JDBC package overview and <a
+                href="http://scriptella.wordpress.com/tag/batching/">Batching tag</a> on our blog.</p>
+            </section>
         </section>
 		<section>
 			<title>Non-relational Datasources Interoperability</title>
@@ -720,6 +734,7 @@
                 </note>
             </section>
             <section>
+
 				<title>Producing Reports with Velocity</title>
 				<p>Velocity is a Java-based template engine which can be used to generate reports. Most other ETL tools provides custom reporting services, but Scriptella relies on
 				proven open source solutions instead of reinventing the wheel. The built-in <a href="drivers.html#velocity">Velocity Driver</a>
