@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Scriptella connection adapter for the JSR 223: Scripting for the Java™ Platform.
+ * Scriptella connection adapter for the JSR 223: Scripting for the Java Platform.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  * <p/>
  *
