@@ -47,9 +47,11 @@ public class JdbcConnectionITest extends DBTestCase {
                 results.add(parameters.getParameter("1").toString());
             }
         });
-        assertEquals("Table BatchTestResults records count", 2, results.size());
+        assertEquals("Table BatchTestResults records count", 4, results.size());
         assertEquals("Result1: Query should return 5, because one batch with size 5 has been sent", "5", results.get(0));
         assertEquals("Result2: Query should return 15, 3 batches with size 5 has been sent", "15", results.get(1));
+        assertEquals("Result3: Query should return 5 (as in result 2)", "5", results.get(2));
+        assertEquals("Result4: Query should return 6, because flush was triggered", "6", results.get(3));
 
         //Now verify that pending inserts were flushed correctly
         results.clear();
@@ -60,12 +62,23 @@ public class JdbcConnectionITest extends DBTestCase {
             }
         });
         assertEquals("6", results.get(0));
+
+        results.clear();
         q = new QueryHelper("SELECT COUNT(*) FROM BatchTest WHERE ID=2");
         q.execute(c, new QueryCallback() {
             public void processRow(ParametersCallback parameters) {
                 results.add(parameters.getParameter("1").toString());
             }
         });
-        assertEquals("16", results.get(1));
+        assertEquals("16", results.get(0));
+
+        results.clear();
+        q = new QueryHelper("SELECT COUNT(*) FROM BatchTest WHERE ID=3");
+        q.execute(c, new QueryCallback() {
+            public void processRow(ParametersCallback parameters) {
+                results.add(parameters.getParameter("1").toString());
+            }
+        });
+        assertEquals("6", results.get(0));
     }
 }

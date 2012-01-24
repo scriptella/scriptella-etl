@@ -53,6 +53,12 @@ Scriptella JDBC Bridge.
         <td>No, the default value is <code>false</code>.</td>
     </tr>
     <tr>
+        <td>flushBeforeQuery</td>
+        <td>True if flush of current connection need to be performed before query execution. 
+        Flushing might be necessary in batch mode, in order to send pending batches before executing a query.</td>
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+    <tr>
         <td>keepformat</td>
         <td>True if the original SQL formatting should be preserved.
         <p>This property is similar to Ant keepformat property except that Oracle-style hints (?*+ hint */) are always preserved in Scriptella.</p></td>

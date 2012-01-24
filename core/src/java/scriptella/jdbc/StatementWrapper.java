@@ -282,7 +282,9 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
 
         @Override
         protected ResultSet query() throws SQLException {
-            throw new UnsupportedOperationException("Queries not supported in batch mode");
+            //In a very unlikely case when the same SQL was used for batch updates
+            flush();
+            return statement.executeQuery(sql);
         }
 
         @Override
@@ -364,7 +366,9 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
 
         @Override
         protected ResultSet query() throws SQLException {
-            throw new UnsupportedOperationException("Queries not supported in batch mode");
+            //In a very unlikely case when the same SQL was used for batch updates
+            flush();
+            return super.query();
         }
 
         @Override
