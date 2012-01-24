@@ -36,20 +36,20 @@ Scriptella JDBC Bridge.
     <tr>
         <td>statement.batchSize</td>
         <td>Activates batching with specified batch size. See <a href="#batching">Batching</a> section for more details.</td>
-        <td>No, the default value is <code>0</code> (batching is disabled).</td>
+        <td>No, the default value is <code>0</code> (batching is disabled). Since version 1.1.</td>
     </tr>
     <tr>
         <td>statement.fetchSize</td>
         <td>Gives the JDBC driver a hint as to the number of rows that should be fetched from the database
             when more rows are needed for <code>ResultSet</code>. 
-            See <a href="http://download-llnw.oracle.com/javase/1.3/docs/api/java/sql/Statement.html#setFetchSize(int)">setFetchSize</a> JavaDoc for additional details.</td>
+            See <a href="http://docs.oracle.com/javase/6/docs/api/java/sql/Statement.html#setFetchSize(int)">setFetchSize</a> JavaDoc for additional details. Since version 1.1.</td>
         <td>No, the default value is <code>0</code>.</td>
     </tr>
     <tr>
         <td>flushBeforeQuery</td>
         <td>True if flush of current connection need to be performed before query execution. 
         Flushing might be necessary in batch mode, in order to send pending batches before executing a query. See <a href="#batching">Batching</a> section for more details.</td>
-        <td>No, the default value is <code>false</code>.</td>
+        <td>No, the default value is <code>false</code>. Since version 1.1.</td>
     </tr>
     <tr>
         <td>statement.separator.singleline</td>
@@ -126,7 +126,7 @@ select * FROM table_name where id=?
 
 <h2><a name="batching">Batching</a></h2>
 JDBC batching is a very important feature which allows sending multiple commands to the database in one call.
-Scriptella batching is controlled by <code>statement.batchSize</code> parameter. The value of this parameter specifies number of statements
+Scriptella batching was introduced in version 1.1 and controlled by <code>statement.batchSize</code> parameter. The value of this parameter specifies number of statements
 to be combined in a batch before sending it to the database.
 <p>Please note that behavior for batching depends on the type of statements processed, as the result non-prepared
 SQL statements (statements without ? parameters) are processed in a single batch group different from parameterized prepared
