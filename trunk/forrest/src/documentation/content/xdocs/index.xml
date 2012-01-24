@@ -106,7 +106,11 @@
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.0 Released (!Date!, 2010)</title>
+                <title>Scriptella 1.1 Preview Available (January 24, 2012)</title>
+                <p>Work on 1.1 release is in progress. Preview is available on the <a href="http://javaforge.com/dir/8354">dev downloads</a> page.</p>
+            </section>
+            <section>
+                <title>Scriptella 1.0 Released (May 5, 2010)</title>
                 <p>We are pleased to announce the availability of Scriptella 1.0.
                     This release fixes few minor bugs found in RCs:
                 </p>
