@@ -1,8 +1,10 @@
 <body>
-<a href="http://www.pcal.net/blog/?page_id=40">SQLSheet</a> Driver Adapter for Scriptella.
+<a href="http://code.google.com/p/sqlsheet/">SQLSheet</a> Driver Adapter for Scriptella.
 <p>
-<a href="http://www.pcal.net/blog/?page_id=40">SQLSheet</a> is a JDBC driver which allows you to interact with Microsoft Excel spreadsheets using SQL statements.
+<a href="http://code.google.com/p/sqlsheet/">SQLSheet</a> is a JDBC driver which allows you to interact with Microsoft Excel spreadsheets using SQL statements.
+<a href="http://code.google.com/p/sqlsheet/wiki/HowToScriptella">This how-to page</a> provides more details about using SQLSheet with Scriptella.  
 </p>
+
 
 <h2>General information</h2>
 <table>
@@ -16,7 +18,7 @@
         <td><b>Runtime dependencies:</b></td>
         <td>
             <ul>
-                <li><code><a href="http://www.pcal.net/downloads/sqlsheet/">sqlsheet.jar</a></code></li>
+                <li><code><a href="http://code.google.com/p/sqlsheet/downloads/list">sqlsheet.jar</a></code></li>
                 <li><code><a href="http://www.apache.org/dyn/closer.cgi/poi/release/">poi.jar</a></code></li>
                 <li><code><a href="http://jsqlparser.sourceforge.net/">jsqlparser.jar</a></code></li>
 
@@ -35,7 +37,7 @@
 
 <h2>Examples</h2>
 <code><pre>
-    &lt;connection id="xls" url="jdbc:xls:file:report.xls" classpath="sqlsheet-0.1.0.jar; poi-3.0.2-FINAL-20080204.jar; jsqlparser.jar"&gt;
+    &lt;connection id="xls" url="jdbc:xls:file:report.xls" classpath="sqlsheet-6.1.jar; poi-3.0.2-FINAL-20080204.jar; jsqlparser.jar"&gt;
     &lt;/connection&gt;
 
     &lt;script connection-id="xls"&gt;
