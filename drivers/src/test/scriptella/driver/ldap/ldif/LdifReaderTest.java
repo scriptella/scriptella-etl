@@ -112,13 +112,13 @@ public class LdifReaderTest extends TestCase {
     public void testLdifVersion() throws NamingException {
         String ldif =
                 "#Comment 1\r" +
-                "#\r" +
-                " th\n" +
-                " is is still a comment\n" +
-                "\n" +
-                "version:\n" +
-                " 2\n" +
-                "# end";
+                        "#\r" +
+                        " th\n" +
+                        " is is still a comment\n" +
+                        "\n" +
+                        "version:\n" +
+                        " 2\n" +
+                        "# end";
 
         LdifReader reader = new LdifReader(ldif);
         reader.asList();
@@ -667,7 +667,7 @@ public class LdifReaderTest extends TestCase {
         attr = entry.get("description");
         assertTrue(attr
                 .contains("What a careful reader you are!  This value is base-64-encoded because it has a control character in it (a CR).\r  By the way, you should really get out more."
-                .getBytes("UTF-8")));
+                        .getBytes("UTF-8")));
     }
 
     public void testLdifParserRFC2849Sample3VariousSpacing() throws NamingException, Exception {
@@ -718,27 +718,27 @@ public class LdifReaderTest extends TestCase {
         attr = entry.get("description");
         assertTrue(attr
                 .contains("What a careful reader you are!  This value is base-64-encoded because it has a control character in it (a CR).\r  By the way, you should really get out more."
-                .getBytes("UTF-8")));
+                        .getBytes("UTF-8")));
     }
 
     public void testLdifParserRFC2849Sample4() throws NamingException, Exception {
         String ldif =
                 "version: 1\n" +
                         "dn:: b3U95Za25qWt6YOoLG89QWlyaXVz\n" +
-                        "# dn:: ou=ı÷?ˆÂÌ˘√Ë,o=Airius\n" +
+                        "# dn:: ou=√µ√ñ?√∂√•√≠√π√É√®,o=Airius\n" +
                         "objectclass: top\n" +
                         "objectclass: organizationalUnit\n" +
                         "ou:: 5Za25qWt6YOo\n" +
-                        "# ou:: ı÷?ˆÂÌ˘√Ë\n" +
+                        "# ou:: √µ√ñ?√∂√•√≠√π√É√®\n" +
                         "ou;lang-ja:: 5Za25qWt6YOo\n" +
-                        "# ou;lang-ja:: ı÷?ˆÂÌ˘√Ë\n" +
+                        "# ou;lang-ja:: √µ√ñ?√∂√•√≠√π√É√®\n" +
                         "ou;lang-ja;phonetic:: 44GI44GE44GO44KH44GG44G2\n" +
-                        "# ou;lang-ja:: Û¡»Û¡ƒÛ¡ŒÛ¬«Û¡∆Û¡?\n" +
+                        "# ou;lang-ja:: √≥√Å√à√≥√Å√Ñ√≥√Å√é√≥√Ç√á√≥√Å√Ü√≥√Å?\n" +
                         "ou;lang-en: Sales\n" +
                         "description: Japanese office\n" +
                         "\n" +
                         "dn:: dWlkPXJvZ2FzYXdhcmEsb3U95Za25qWt6YOoLG89QWlyaXVz\n" +
-                        "# dn:: uid=rogasawara,ou=ı÷?ˆÂÌ˘√Ë,o=Airius\n" +
+                        "# dn:: uid=rogasawara,ou=√µ√ñ?√∂√•√≠√π√É√®,o=Airius\n" +
                         "userpassword: {SHA}O3HSv1MusyL4kTjP+HKI5uxuNoM=\n" +
                         "objectclass: top\n" +
                         "objectclass: person\n" +
@@ -747,31 +747,31 @@ public class LdifReaderTest extends TestCase {
                         "uid: rogasawara\n" +
                         "mail: rogasawara@airius.co.jp\n" +
                         "givenname;lang-ja:: 44Ot44OJ44OL44O8\n" +
-                        "# givenname;lang-ja:: Û√ÌÛ√…Û√ÀÛ√?\n" +
+                        "# givenname;lang-ja:: √≥√É√≠√≥√É√â√≥√É√ã√≥√É?\n" +
                         "sn;lang-ja:: 5bCP56yg5Y6f\n" +
-                        "# sn;lang-ja:: ı?œ˜Ï‡ıŒﬂ\n" +
+                        "# sn;lang-ja:: √µ?√è√∑√¨√†√µ√é√ü\n" +
                         "cn;lang-ja:: 5bCP56yg5Y6fIOODreODieODi+ODvA==\n" +
-                        "# cn;lang-ja:: ı?œ˜Ï‡ıŒﬂ Û√ÌÛ√…Û√ÀÛ√?\n" +
+                        "# cn;lang-ja:: √µ?√è√∑√¨√†√µ√é√ü √≥√É√≠√≥√É√â√≥√É√ã√≥√É?\n" +
                         "title;lang-ja:: 5Za25qWt6YOoIOmDqOmVtw==\n" +
-                        "# title;lang-ja:: ı÷?ˆÂÌ˘√Ë ˘√Ë˘’?\n" +
+                        "# title;lang-ja:: √µ√ñ?√∂√•√≠√π√É√® √π√É√®√π√ï?\n" +
                         "preferredlanguage: ja\n" +
                         "givenname:: 44Ot44OJ44OL44O8\n" +
-                        "# givenname:: Û√ÌÛ√…Û√ÀÛ√?\n" +
+                        "# givenname:: √≥√É√≠√≥√É√â√≥√É√ã√≥√É?\n" +
                         "sn:: 5bCP56yg5Y6f\n" +
-                        "# sn:: ı?œ˜Ï‡ıŒﬂ\n" +
+                        "# sn:: √µ?√è√∑√¨√†√µ√é√ü\n" +
                         "cn:: 5bCP56yg5Y6fIOODreODieODi+ODvA==\n" +
-                        "# cn:: ı?œ˜Ï‡ıŒﬂ Û√ÌÛ√…Û√ÀÛ√?\n" +
+                        "# cn:: √µ?√è√∑√¨√†√µ√é√ü √≥√É√≠√≥√É√â√≥√É√ã√≥√É?\n" +
                         "title:: 5Za25qWt6YOoIOmDqOmVtw==\n" +
-                        "# title:: ı÷?ˆÂÌ˘√Ë ˘√Ë˘’?\n" +
+                        "# title:: √µ√ñ?√∂√•√≠√π√É√® √π√É√®√π√ï?\n" +
                         "givenname;lang-ja;phonetic:: 44KN44Gp44Gr44O8\n" +
-                        "# givenname;lang-ja;phonetic:: Û¬ÕÛ¡ÈÛ¡ÎÛ√?\n" +
+                        "# givenname;lang-ja;phonetic:: √≥√Ç√ç√≥√Å√©√≥√Å√´√≥√É?\n" +
                         "sn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJ\n" +
-                        "# sn;lang-ja;phonetic:: Û¡ Û¡ÃÛ¡’Û¬œÛ¬…\n" +
+                        "# sn;lang-ja;phonetic:: √≥√Å√ä√≥√Å√å√≥√Å√ï√≥√Ç√è√≥√Ç√â\n" +
                         "cn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJIOOCjeOBqeOBq+ODvA==\n" +
-                        "# cn;lang-ja;phonetic:: Û¡ Û¡ÃÛ¡ŒÛ¬œÛ¬… Û¬ÕÛ¡ÈÛ¡ÎÛ√?\n" +
+                        "# cn;lang-ja;phonetic:: √≥√Å√ä√≥√Å√å√≥√Å√é√≥√Ç√è√≥√Ç√â √≥√Ç√ç√≥√Å√©√≥√Å√´√≥√É?\n" +
                         "title;lang-ja;phonetic:: 44GI44GE44GO44KH44GG44G2IOOBtuOBoeOCh+OBhg==\n" +
                         "# title;lang-ja;phonetic::\n" +
-                        "# Û¡»Û¡ƒÛ¡ŒÛ¬«Û¡∆Û¡? Û¡?Û¡·Û¬«Û¡∆\n" +
+                        "# √≥√Å√à√≥√Å√Ñ√≥√Å√é√≥√Ç√á√≥√Å√Ü√≥√Å? √≥√Å?√≥√Å√°√≥√Ç√á√≥√Å√Ü\n" +
                         "givenname;lang-en: Rodney\n" +
                         "sn;lang-en: Ogasawara\n" +
                         "cn;lang-en: Rodney Ogasawara\n" +
@@ -782,13 +782,13 @@ public class LdifReaderTest extends TestCase {
         String[][][] values =
                 {
                         {
-                                {"dn", "ou=\u55b6\u696d\u90e8,o=Airius"}, // 55b6 = ı÷?, 696d = ˆÂÌ, 90e8 = ˘√Ë
+                                {"dn", "ou=\u55b6\u696d\u90e8,o=Airius"}, // 55b6 = √µ√ñ?, 696d = √∂√•√≠, 90e8 = √π√É√®
                                 {"objectclass", "top"},
                                 {"objectclass", "organizationalUnit"},
                                 {"ou", "\u55b6\u696d\u90e8"},
                                 {"ou;lang-ja", "\u55b6\u696d\u90e8"},
-                                {"ou;lang-ja;phonetic", "\u3048\u3044\u304e\u3087\u3046\u3076"}, // 3048 = Û¡», 3044 = Û¡ƒ, 304e = Û¡Œ
-                                // 3087 = Û¬«, 3046 = Û¡∆, 3076 = Û¡?
+                                {"ou;lang-ja;phonetic", "\u3048\u3044\u304e\u3087\u3046\u3076"}, // 3048 = √≥√Å√à, 3044 = √≥√Å√Ñ, 304e = √≥√Å√é
+                                // 3087 = √≥√Ç√á, 3046 = √≥√Å√Ü, 3076 = √≥√Å?
                                 {"ou;lang-en", "Sales"},
                                 {"description", "Japanese office"}},
                         {
@@ -800,19 +800,19 @@ public class LdifReaderTest extends TestCase {
                                 {"objectclass", "inetOrgPerson"},
                                 {"uid", "rogasawara"},
                                 {"mail", "rogasawara@airius.co.jp"},
-                                {"givenname;lang-ja", "\u30ed\u30c9\u30cb\u30fc"},    // 30ed = Û√Ì, 30c9 = Û√…, 30cb = Û√À, 30fc = Û√?
-                                {"sn;lang-ja", "\u5c0f\u7b20\u539f"},    // 5c0f = ı?œ, 7b20 = ˜Ï‡, 539f = ıŒﬂ
+                                {"givenname;lang-ja", "\u30ed\u30c9\u30cb\u30fc"},    // 30ed = √≥√É√≠, 30c9 = √≥√É√â, 30cb = √≥√É√ã, 30fc = √≥√É?
+                                {"sn;lang-ja", "\u5c0f\u7b20\u539f"},    // 5c0f = √µ?√è, 7b20 = √∑√¨√†, 539f = √µ√é√ü
                                 {"cn;lang-ja", "\u5c0f\u7b20\u539f \u30ed\u30c9\u30cb\u30fc"},
-                                {"title;lang-ja", "\u55b6\u696d\u90e8 \u90e8\u9577"},   // 9577 = ˘’?
+                                {"title;lang-ja", "\u55b6\u696d\u90e8 \u90e8\u9577"},   // 9577 = √π√ï?
                                 {"preferredlanguage", "ja"},
                                 {"givenname", "\u30ed\u30c9\u30cb\u30fc"},
                                 {"sn", "\u5c0f\u7b20\u539f"},
                                 {"cn", "\u5c0f\u7b20\u539f \u30ed\u30c9\u30cb\u30fc"},
                                 {"title", "\u55b6\u696d\u90e8 \u90e8\u9577"},
-                                {"givenname;lang-ja;phonetic", "\u308d\u3069\u306b\u30fc"},  // 308d = Û¬Õ,3069 = Û¡È, 306b = Û¡Î
-                                {"sn;lang-ja;phonetic", "\u304a\u304c\u3055\u308f\u3089"}, // 304a = Û¡ , 304c = Û¡Ã,3055 = Û¡’,308f = Û¬œ, 3089 = Û¬…
+                                {"givenname;lang-ja;phonetic", "\u308d\u3069\u306b\u30fc"},  // 308d = √≥√Ç√ç,3069 = √≥√Å√©, 306b = √≥√Å√´
+                                {"sn;lang-ja;phonetic", "\u304a\u304c\u3055\u308f\u3089"}, // 304a = √≥√Å√ä, 304c = √≥√Å√å,3055 = √≥√Å√ï,308f = √≥√Ç√è, 3089 = √≥√Ç√â
                                 {"cn;lang-ja;phonetic", "\u304a\u304c\u3055\u308f\u3089 \u308d\u3069\u306b\u30fc"},
-                                {"title;lang-ja;phonetic", "\u3048\u3044\u304e\u3087\u3046\u3076 \u3076\u3061\u3087\u3046"}, // 304E = Û¡Œ, 3061 = Û¡·
+                                {"title;lang-ja;phonetic", "\u3048\u3044\u304e\u3087\u3046\u3076 \u3076\u3061\u3087\u3046"}, // 304E = √≥√Å√é, 3061 = √≥√Å√°
                                 {"givenname;lang-en", "Rodney"},
                                 {"sn;lang-en", "Ogasawara"},
                                 {"cn;lang-en", "Rodney Ogasawara"},
