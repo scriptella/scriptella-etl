@@ -40,13 +40,14 @@ import scriptella.spi.Resource;
  * @version 1.0
  */
 public class XPathConnection extends AbstractConnection {
-    private Map<Resource, XPathQueryExecutor> queriesCache = new IdentityHashMap<Resource, XPathQueryExecutor>();
-    private XPathExpressionCompiler compiler = new XPathExpressionCompiler();
-    private Document document;
-    private ThreadLocal<Node> queryContext=new ThreadLocal<Node>();
-    private URL url;
-    private final boolean returnArrays;
-    static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
+    
+    /**
+     * Name of the <code>cache_queries</code> connection property.
+     * Specifies flag to use queries cache, default is true.
+	 * If set to "false" XML document under URL will be parsed for each 
+	 * <query> or <script> tag in etl script. This allows to update XML content dynamically.
+     */
+    public static final String CACHE_QUERIES = "cache_queries";
 
     /**
      * Name of the <code>return_arrays</code> connection property.
@@ -54,17 +55,27 @@ public class XPathConnection extends AbstractConnection {
      */
     public static final String RETURN_ARRAYS = "return_arrays";
     
+    static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
 
+    private Map<Resource, XPathQueryExecutor> queriesCache = new IdentityHashMap<Resource, XPathQueryExecutor>();
+    private XPathExpressionCompiler compiler = new XPathExpressionCompiler();
+    private Document document;
+    private ThreadLocal<Node> queryContext=new ThreadLocal<Node>();
+    private URL url;
+    private final boolean returnArrays;
+    protected final boolean cache_queries;
     /**
      * For testing purposes only.
      */
     protected XPathConnection() {
+        cache_queries = true;
         returnArrays = false;
     }
 
     public XPathConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
         url = parameters.getResolvedUrl();
+        cache_queries = parameters.getBooleanProperty(CACHE_QUERIES, true);
         //TODO implement trim option
 
         returnArrays = parameters.getBooleanProperty(RETURN_ARRAYS, false);
@@ -78,13 +89,15 @@ public class XPathConnection extends AbstractConnection {
         XPathQueryExecutor exec = queriesCache.get(queryContent);
         if (exec == null) {
             exec = new XPathQueryExecutor(queryContext, getDocument(), queryContent, compiler, counter, returnArrays);
-            queriesCache.put(queryContent, exec);
+            if (cache_queries) {
+                queriesCache.put(queryContent, exec);
+            }
         }
         exec.execute(queryCallback, parametersCallback);
     }
 
     private Document getDocument() {
-        if (document == null) {
+        if (document == null || (!cache_queries)) {
             try {
                 document = DBF.newDocumentBuilder().parse(new InputSource(url.toString()));
             } catch (Exception e) {
