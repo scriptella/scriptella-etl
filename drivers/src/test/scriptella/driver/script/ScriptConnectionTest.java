@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2012 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package scriptella.driver.script;
 
+import junit.framework.Assert;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.StringResource;
@@ -57,9 +58,11 @@ public class ScriptConnectionTest extends AbstractTestCase {
         //Now test invalid syntax
         r = new StringResource("nosuchvar.nosuchmethod()");
         try {
-            newConnection().executeScript(r, MockParametersCallbacks.UNSUPPORTED);
+            newConnection().executeScript(r, MockParametersCallbacks.NULL);
             fail("Compilation errors must be reported");
         } catch (ScriptProviderException e) {
+            Assert.assertTrue("ScriptException is expected to be the cause, but was " + e.getCause(),
+                    e.getCause() instanceof ScriptException);
             //OK
         }
     }
