@@ -45,33 +45,39 @@
 </etl>
     ]]></source>
                 </li>
-                <li>Support for
+                <li>Work with
                     <strong>multiple datasources</strong>
-                    (or multiple connections to a single database) in a ETL file.
+                     in a single ETL file. 
+                    See example of <a href="tutorial.html#Copy+table+to+another+database">copying a table to another database</a>.
                 </li>
                 <li>Support for many useful
                     <strong>JDBC features</strong>
-                    , e.g. batching, parameters in SQL including references to file blobs and JDBC
+                    like <a href="reference/index.html#Performance+and+batching">batching</a>, prepared statements 
+                    and parameters in SQL including <a href="reference/index.html#Adding+references+to+files+from+SQL+scripts">references to files(BLOBs)</a> and JDBC
                     escaping.
                 </li>
                 <li>
                     <strong>Performance.</strong>
-                    Performance and low memory usage are one of our primary goals.
+                    Performance and low memory usage are one of our primary goals (and it won't take a lot of space on your <a href="http://www.webhostingsearch.com/dedicated-server.php">dedicated servers</a>). 
                 </li>
                 <li>Support for
                     <strong>evaluated expressions and properties</strong>
-                    (JEXL syntax)
+                    (based on <a href="http://commons.apache.org/jexl/reference/syntax.html">JEXL syntax</a>). Example of using a JEXL expression to concatenate NAME and SURNAME columns from another datasource:
+                    <source><![CDATA[
+INSERT INTO TARGET_TABLE(ID, FULL_NAME) VALUES (?ID, ?{NAME+' '+SURNAME});
+    ]]></source>
+                    
                 </li>
                 <li>Support for
                     <strong>cross-database ETL scripts</strong>
-                    by using &lt;dialect&gt; elements
+                    by using <a href="docs/dtd/scriptella/dtd/etl.dtd.html#dialect">&lt;dialect&gt;</a> elements
                 </li>
                 <li>
-                    <strong>Transactional execution</strong>
+                    <strong>Transactional execution</strong>. Changes are rolled back if a failure occurs while running the ETL.
                 </li>
                 <li>
-                    <strong>Error handling</strong>
-                    via &lt;onerror&gt; elements
+                    <strong>Flexible error handling</strong>
+                    by using <a href="docs/dtd/scriptella/dtd/etl.dtd.html#onerror">&lt;onerror&gt; </a> elements
                 </li>
                 <li>
                     <strong>Conditional scripts/queries execution</strong>
