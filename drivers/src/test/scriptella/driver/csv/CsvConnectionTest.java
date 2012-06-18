@@ -70,7 +70,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.HEADERS, "false");
         props.put(CsvConnection.QUOTE, "'");
         props.put(CsvConnection.SEPARATOR, ";");
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -109,7 +109,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.EOL, "\r\n");
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.SEPARATOR, ";");
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
         CsvConnection con = new CsvConnection(cp);
         //register handler for tst url
@@ -131,7 +131,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.TRIM, "no");
         props.put(CsvConnection.QUOTE, "");
         props.put(CsvConnection.EOL, "\r\n");
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
         rows = 0;
         CsvConnection con = new CsvConnection(cp);
@@ -157,7 +157,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         Map<String, String> props = new HashMap<String, String>();
         props.put(CsvConnection.FLUSH, "true");
         props.put(CsvConnection.QUOTE, "");
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
         CsvConnection con = new CsvConnection(cp);
         String str = "-test-";
@@ -166,12 +166,12 @@ public class CsvConnectionTest extends AbstractTestCase {
         assertEquals(str + "\n", new String(out.toByteArray()));
     }
 
-    public void testNullString() {
+    public void testNullStringScript() {
         //Create a configuration with non default values
         Map<String, String> props = new HashMap<String, String>();
         props.put(AbstractTextConnection.NULL_STRING, "");
         props.put(CsvConnection.QUOTE, "");
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(props, "tst://file"), MockDriverContext.INSTANCE);
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
         CsvConnection con = new CsvConnection(cp);
         String str = "$a,$b,$c";
@@ -182,6 +182,33 @@ public class CsvConnectionTest extends AbstractTestCase {
         con.close();
         assertEquals("1,,2\n", new String(out.toByteArray()));
     }
+
+    public void testNullStringQuery() {
+        //Create a configuration with non default values
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(AbstractTextConnection.NULL_STRING, "");
+        props.put(CsvConnection.HEADERS, "false");
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
+
+        CsvConnection con = new CsvConnection(cp);
+        testCsvInput= "a,,c";
+        final Map<String, Object> map = new HashMap<String, Object>();
+        con.executeQuery(new StringResource(""), MockParametersCallbacks.SIMPLE, new QueryCallback() {
+            @Override
+            public void processRow(ParametersCallback parameters) {
+                map.put("1", parameters.getParameter("1"));
+                map.put("2", parameters.getParameter("2"));
+                map.put("3", parameters.getParameter("3"));
+                map.put("4", parameters.getParameter("4"));
+            }
+        });
+        con.close();
+        assertEquals("a", map.get("1"));
+        assertNull("Null must be returned for a value=null_string", map.get("2"));
+        assertEquals("c", map.get("3"));
+        assertEquals("getParameter must delegate to the parent callback if parameter was not found", "*4*", map.get("4"));
+    }
+
 
     /**
      * Tests if skip_lines is working.
