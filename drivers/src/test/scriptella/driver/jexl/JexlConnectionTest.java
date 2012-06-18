@@ -20,6 +20,7 @@ import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.IndexedQueryCallback;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
@@ -43,14 +44,14 @@ public class JexlConnectionTest extends AbstractTestCase {
     public void testExecuteScript() {
         v=null;
         Resource r = new StringResource("x=0;while (x < 10) {x=x+2;};obj.setValue(x)");
-        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
         jc.executeScript(r, MockParametersCallbacks.fromMap(Collections.singletonMap("obj", this)));
         assertEquals(10, ((Number)v).intValue());
     }
 
     public void testExecuteQuery() {
         Resource r = new StringResource("i=0;a=a0;s='test';while (i < 10) {i=i+1;query.next();}");
-        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
         IndexedQueryCallback callback = new IndexedQueryCallback() {
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {
                 assertEquals(rowNumber+1, ((Number)parameters.getParameter("i")).intValue());

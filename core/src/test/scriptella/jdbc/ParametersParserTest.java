@@ -35,12 +35,11 @@ public class ParametersParserTest extends TestCase {
      */
     public void testValid() throws MalformedURLException {
 
-        final MockDriverContext dc = new MockDriverContext();
-        ParametersParser p = new ParametersParser(dc);
+        ParametersParser p = new ParametersParser(MockDriverContext.INSTANCE);
 
         String expr = "file 'myfile'";
         Lobs.UrlBlob actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.UNSUPPORTED);
-        URL expected = dc.resolve("myfile");
+        URL expected = MockDriverContext.INSTANCE.resolve("myfile");
         assertEquals(expected, actual.getUrl());
         expr = "file 'http'+'://127.0.0.1/'+name";
         actual = (Lobs.UrlBlob) p.evaluate(expr, MockParametersCallbacks.SIMPLE);
@@ -53,8 +52,7 @@ public class ParametersParserTest extends TestCase {
      */
     public void testInvalid() throws MalformedURLException {
 
-        final MockDriverContext dc = new MockDriverContext();
-        ParametersParser p = new ParametersParser(dc);
+        ParametersParser p = new ParametersParser(MockDriverContext.INSTANCE);
 
         try {
             p.evaluate("file myfile'", MockParametersCallbacks.UNSUPPORTED);

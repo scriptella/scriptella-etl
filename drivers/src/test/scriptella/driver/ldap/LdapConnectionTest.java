@@ -18,6 +18,7 @@ package scriptella.driver.ldap;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.spi.ConnectionParameters;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockDriverContext;
 
 import javax.naming.Context;
@@ -45,7 +46,7 @@ public class LdapConnectionTest extends AbstractTestCase {
         params.put(LdapConnection.SEARCH_SCOPE_KEY, "subtree");
         params.put(LdapConnection.FILE_MAXLENGTH_KEY, "100");
         final String url = "ldap://127.0.0.1:389/";
-        ConnectionParameters cp = new ConnectionParameters(new MockConnectionEl(params, url), new MockDriverContext());
+        ConnectionParameters cp = new MockConnectionParameters(params, url);
         ctxInitialized = false;
         LdapConnection con = new LdapConnection(cp) {
             @Override
