@@ -59,11 +59,9 @@ public class ColumnFormatInfo {
      * @param prefix     prefix for recognizing formatting properties.
      * @return {@link ColumnFormatInfo} with a specified column formatting.
      */
-    public static ColumnFormatInfo parse(Map<String, ?> properties, String prefix) {
+    public static ColumnFormatInfo parse(TypedPropertiesSource properties, String prefix) {
         Map<String, ColumnFormat> map = new LinkedHashMap<String, ColumnFormat>();
-        for (Map.Entry<String, ?> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        for (String key: properties.getKeys()) {
             if (isPrefixed(key, prefix)) {
                 String cleanKey = removePrefix(key, prefix);
                 //property name determined by the last component
@@ -76,12 +74,26 @@ public class ColumnFormatInfo {
                         ci = new ColumnFormat();
                         map.put(columnName, ci);
                     }
-                    ci.setProperty(columnProp, value);
+                    setProperty(ci, columnProp, key, properties);
                 }
             }
         }
-        String nullString = getStringPropertyValue(prefix == null ? NULL_STRING : prefix + NULL_STRING, properties);
+        String nullString = properties.getStringProperty(prefix == null ? NULL_STRING : prefix + NULL_STRING);
         return new ColumnFormatInfo(map, nullString);
+    }
+
+    protected static void setProperty(ColumnFormat f, String columnPropName, String key, TypedPropertiesSource ps) {
+        if ("pattern".equalsIgnoreCase(columnPropName)) {
+            f.setPattern(ps.getStringProperty(key));
+        } else if ("null_string".equalsIgnoreCase(columnPropName)) {
+            f.setNullString(ps.getStringProperty(key));
+        } else if ("locale".equalsIgnoreCase(columnPropName)) {
+            f.setLocale(ps.getLocaleProperty(key));
+        } else if ("trim".equalsIgnoreCase(columnPropName)) {
+            f.setTrim(ps.getBooleanProperty(key, false));
+        } else if ("type".equalsIgnoreCase(columnPropName)) {
+            f.setType(ps.getStringProperty(key));
+        }
     }
 
     private static String removePrefix(String key, String prefix) {
@@ -93,11 +105,6 @@ public class ColumnFormatInfo {
 
     private static boolean isPrefixed(String key, String prefix) {
         return prefix == null || key.startsWith(prefix);
-    }
-
-    static String getStringPropertyValue(String key, Map<String, ?> properties) {
-        final Object v = properties.get(key);
-        return v == null ? null : v.toString();
     }
 
 }

@@ -15,8 +15,6 @@
  */
 package scriptella.text;
 
-import scriptella.util.StringUtils;
-
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -70,16 +68,8 @@ public class ColumnFormat {
     }
 
 
-    public void setLocaleStr(String localeStr) {
-        if (StringUtils.isEmpty(localeStr)) {
-            this.locale = null;
-        } else {
-            String[] parts = localeStr.split("_");
-            String lang = parts.length > 0 ? parts[0] : "";
-            String country = parts.length > 1 ? parts[1] : "";
-            String variant = parts.length > 2 ? parts[2] : "";
-            this.locale = new Locale(lang, country, variant);
-        }
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 
     public boolean isTrim() {
@@ -146,22 +136,7 @@ public class ColumnFormat {
         return trim ? result.trim() : result;
     }
 
-    public void setProperty(String property, Object value) {
-        //TODO Move ConnectionParameters.get[Type]Property methods into a helper class
-        //Replace direct String conversion with calls to helper methods
-        if ("pattern".equalsIgnoreCase(property)) {
-            setPattern(value.toString());
-        } else if ("null_string".equalsIgnoreCase(property)) {
-            setNullString(value.toString());
-        } else if ("locale".equalsIgnoreCase(property)) {
-            setLocaleStr(value.toString());
-        } else if ("trim".equalsIgnoreCase(property)) {
-            setTrim(Boolean.valueOf(value.toString().trim()));
-        } else if ("type".equalsIgnoreCase(property)) {
-            setType(value.toString());
-        }
 
-    }
 
     @Override
     public String toString() {

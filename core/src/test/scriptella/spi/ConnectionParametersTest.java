@@ -100,7 +100,7 @@ public class ConnectionParametersTest extends AbstractTestCase {
         assertEquals(2, m.size());
         assertEquals("v1", m.get("p1"));
         assertEquals("flag", m.get("flag"));
-
-
     }
+
+
 }
