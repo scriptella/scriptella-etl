@@ -17,27 +17,11 @@ public class ColumnFormatTest extends TestCase {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyy", Locale.US);
 
-    public void testSetProperty() {
-        ColumnFormat ci = new ColumnFormat();
-        ci.setProperty("type", "number");
-        ci.setProperty("pattern", "#");
-        ci.setProperty("locale", "ru_RU");
-        ci.setProperty("trim", "true");
-        ci.setProperty("null_string", "NS");
-        assertEquals("NS", ci.getNullString());
-        final Locale locale = ci.getLocale();
-        assertEquals("RU", locale.getCountry());
-        assertEquals("ru", locale.getLanguage());
-        assertTrue(ci.isTrim());
-        assertEquals("#", ci.getPattern());
-        assertEquals("1", ci.getFormat().format(new Object[]{1.1}));
-    }
-
     public void testNumberFormat() {
         ColumnFormat ci = new ColumnFormat();
         ci.setType("number");
         ci.setPattern("00.00");
-        ci.setLocaleStr("en_US");
+        ci.setLocale(Locale.US);
         assertEquals("01.10", ci.format(1.1));
         //If array is passed, only the first value is used.
         assertEquals("01.10", ci.format(new Object[]{1.1, 1.2}));
@@ -55,7 +39,7 @@ public class ColumnFormatTest extends TestCase {
         ColumnFormat ci = new ColumnFormat();
         ci.setType("date");
         ci.setPattern("ddMMyy");
-        ci.setLocaleStr("en_US");
+        ci.setLocale(Locale.US);
 
         Date d = simpleDateFormat.parse("01012012");
         assertEquals("010112", ci.format(d));

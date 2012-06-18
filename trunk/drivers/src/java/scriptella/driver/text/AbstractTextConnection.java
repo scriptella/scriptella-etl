@@ -77,7 +77,7 @@ public abstract class AbstractTextConnection extends AbstractConnection {
 
     /**
      * Name of the <code>null_string</code> connection property.
-     * If set, specifies value of a string token to be parsed as Java <code>null</code> literal.
+     * If set, specifies value of a string token to be parsed/formatted as Java <code>null</code> literal.
      */
     public static final String NULL_STRING = "null_string";
 

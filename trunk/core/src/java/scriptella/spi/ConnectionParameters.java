@@ -18,6 +18,7 @@ package scriptella.spi;
 
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
+import scriptella.text.TypedPropertiesSource;
 import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ import java.util.Map;
  * @version 1.0
  */
 public class ConnectionParameters {
-    private Map<String, ?> properties;
+    private TypedPropertiesSource propertiesSource;
     private String url;
     private String user;
     private String password;
@@ -59,7 +59,7 @@ public class ConnectionParameters {
      * @param context driver context.
      */
     public ConnectionParameters(ConnectionEl conf, DriverContext context) {
-        this.properties = conf.getProperties();
+        this.propertiesSource = new TypedPropertiesSource(conf.getProperties());
         this.url = conf.getUrl();
         this.user = conf.getUser();
         this.password = conf.getPassword();
@@ -75,7 +75,7 @@ public class ConnectionParameters {
      * @return properties map.
      */
     public Map<String, ?> getProperties() {
-        return properties;
+        return propertiesSource.getProperties();
     }
 
     /**
@@ -86,7 +86,7 @@ public class ConnectionParameters {
      * @see #getProperties()
      */
     public Object getProperty(String name) {
-        return properties.get(name);
+        return propertiesSource.getProperty(name);
     }
 
     /**
@@ -96,8 +96,7 @@ public class ConnectionParameters {
      * @return property value.
      */
     public String getStringProperty(String name) {
-        Object v = properties.get(name);
-        return v == null ? null : v.toString();
+        return propertiesSource.getStringProperty(name);
     }
 
     /**
@@ -131,24 +130,7 @@ public class ConnectionParameters {
      * @see Long#decode(String)
      */
     public Number getNumberProperty(String name, Number defaultValue) throws ConfigurationException {
-        Object v = properties.get(name);
-        if (v == null) {
-            return defaultValue;
-        }
-        if (v instanceof Number) {
-            return ((Number) v);
-        }
-        String s = v.toString().trim();
-        if (s.length() == 0) {
-            return defaultValue;
-        }
-
-        //For now we do not support doubles etc.
-        try {
-            return Long.decode(s);
-        } catch (NumberFormatException e) {
-            throw new ConfigurationException(name + " property must be integer.");
-        }
+        return propertiesSource.getNumberProperty(name, defaultValue);
     }
 
 
@@ -174,26 +156,7 @@ public class ConnectionParameters {
      * @throws ConfigurationException if property has unrecognized value.
      */
     public boolean getBooleanProperty(String name, boolean defaultValue) throws ConfigurationException {
-        Object a = getProperty(name);
-        if (a == null) {
-            return defaultValue;
-        }
-        if (a instanceof Boolean) {
-            return (Boolean) a;
-        }
-        if (a instanceof Number) {
-            return ((Number) a).intValue() > 0;
-        }
-        String s = a.toString().trim();
-
-        if ("true".equalsIgnoreCase(s) || "1".equalsIgnoreCase(s) || "on".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s)) {
-            return true;
-        }
-
-        if ("false".equalsIgnoreCase(s) || "0".equalsIgnoreCase(s) || "off".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
-            return false;
-        }
-        throw new ConfigurationException("Unrecognized boolean property value " + a);
+        return propertiesSource.getBooleanProperty(name, defaultValue);
     }
 
     /**
@@ -204,18 +167,7 @@ public class ConnectionParameters {
      * @throws ConfigurationException if charset name is unsupported.
      */
     public String getCharsetProperty(String name) throws ConfigurationException {
-        Object cs = getProperty(name);
-        if (cs == null) {
-            return null;
-        }
-        if (cs instanceof Charset) {
-            return ((Charset) cs).name();
-        }
-        String enc = cs.toString().trim();
-        if (!Charset.isSupported(enc)) {
-            throw new ConfigurationException("Specified encoding " + enc + " is not supported. Supported encodings are " + Charset.availableCharsets().keySet());
-        }
-        return enc;
+        return propertiesSource.getCharsetProperty(name);
     }
 
     /**
@@ -370,7 +322,7 @@ public class ConnectionParameters {
     }
 
     public String toString() {
-        return "ConnectionParameters{" + "properties=" + properties + ", url='" + url + '\'' + ", user='" + user + '\'' +
+        return "ConnectionParameters{" + propertiesSource + ", url='" + url + '\'' + ", user='" + user + '\'' +
                 (password == null ? "" : ", password='" + StringUtils.getMaskedPassword(password) + '\'') +
                 ", schema='" + schema + '\'' + ", catalog='" + catalog + '\'' + '}';
     }
