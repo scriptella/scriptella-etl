@@ -26,7 +26,9 @@ import java.net.URL;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class MockDriverContext implements DriverContext {
+public enum MockDriverContext implements DriverContext {
+    INSTANCE;
+
     public URL getScriptFileURL() {
         try {
             return new URL("file:/mock");
@@ -38,9 +40,6 @@ public class MockDriverContext implements DriverContext {
     public URL resolve(final String uri) throws MalformedURLException {
         return IOUtils.resolve(getScriptFileURL(),uri);
     }
-
-    public static final DriverContext INSTANCE = new MockDriverContext();
-
 
     public Object getParameter(final String name) {
         return null;

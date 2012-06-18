@@ -28,11 +28,11 @@ import java.util.Map;
 public class MockConnectionParameters extends ConnectionParameters {
 
     public MockConnectionParameters() {
-        super(new MockConnectionEl(), new MockDriverContext());
+        super(new MockConnectionEl(), MockDriverContext.INSTANCE);
     }
 
     public MockConnectionParameters(Map<String,?>properties, String url) {
-        super(new MockConnectionEl(properties, url), new MockDriverContext());
+        super(new MockConnectionEl(properties, url), MockDriverContext.INSTANCE);
 
     }
 }

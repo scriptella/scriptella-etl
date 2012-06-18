@@ -20,6 +20,7 @@ import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.IndexedQueryCallback;
+import scriptella.spi.MockConnectionParameters;
 import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
@@ -40,7 +41,7 @@ public class JexlConnectionPerfTest extends AbstractTestCase {
      */
     public void testExecuteScript() {
         Resource r = new StringResource("x=0;while (x < 2000) {x=x+step;};");
-        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
         for (int i = 0; i < 200; i++) {
             jc.executeScript(r, MockParametersCallbacks.fromMap(Collections.singletonMap("step", 1)));
         }
@@ -52,7 +53,7 @@ public class JexlConnectionPerfTest extends AbstractTestCase {
      */
     public void testExecuteQuery() {
         Resource r = new StringResource("i=0;while (i < maxI) {i=i+1;query.next();}");
-        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
         IndexedQueryCallback callback = new IndexedQueryCallback() {
             protected void processRow(final ParametersCallback parameters, final int rowNumber) {
                 parameters.getParameter("i");
@@ -70,7 +71,7 @@ public class JexlConnectionPerfTest extends AbstractTestCase {
      */
     public void testNotExistingVariableInALoop() {
         Resource r = new StringResource("v=0;i=0 while(i<1000) { v=unknownVar+1;i=i+1};");
-        JexlConnection jc = new JexlConnection(new ConnectionParameters(new MockConnectionEl(), new MockDriverContext()));
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
         for (int i = 0; i < 200; i++) {
             jc.executeScript(r, MockParametersCallbacks.NULL);
         }
