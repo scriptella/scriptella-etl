@@ -84,6 +84,29 @@ public class SQLParserBaseTest extends AbstractTestCase {
 
     }
 
+    /**
+     * #52891 StringIndexOutOfBoundsException when parsing SQL statements with ternary expressions
+     */
+    public void testBug52891TernaryExpression() {
+        final String sql = "INSERT INTO TABLE VALUES (?{v==null?1:v})";
 
+        SqlParserBase p = new SqlParserBase() {
+            @Override
+            protected String handleParameter(final String name, final boolean expression, boolean jdbcParam) {
+                assertEquals("v==null?1:v", name);
+                assertTrue(expression);
+                assertTrue(jdbcParam);
+                return super.handleParameter(name, expression, jdbcParam);
+            }
+
+
+            @Override
+            protected void statementParsed(String parsedSql) {
+                assertEquals(sql, parsedSql);
+            }
+        };
+        p.parse(new StringReader(sql));
+
+    }
 
 }
