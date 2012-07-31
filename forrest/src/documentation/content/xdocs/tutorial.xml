@@ -136,9 +136,8 @@ EtlExecutor.newExecutor(
     </etl>]]></source>
 			</section>
             <note>
-                For additional samples <a href="download.html">download</a>
-                Scriptella examples distribution. See also
-                <a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples on DZone Snippets</a>
+                See <a href="https://github.com/ejboy/scriptella-examples">Scriptella examples on GitHub</a>
+                or <a href="download.html">download</a> Scriptella examples distribution.
             </note>
         </section>
     </body>
