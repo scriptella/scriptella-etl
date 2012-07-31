@@ -69,4 +69,11 @@ public class PropertiesSubstitutorTest extends AbstractTestCase {
         s = ps.substitute(expr);
         assertEquals(exp, s);
     }
+
+    public void testTernaryExpression() {
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(MockParametersCallbacks.NULL);
+        final String ex = "test ${v==null?1:v}";
+        final String s = ps.substitute(ex);
+        assertEquals("test 1", s);
+    }
 }
