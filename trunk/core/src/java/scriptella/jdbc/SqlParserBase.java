@@ -97,6 +97,10 @@ public class SqlParserBase {
             int lastPos = 0;
 
             for (int index : injections) {
+                //Bug #52891 - skip injection if it inside a previous expression
+                if (index < lastPos) {
+                    continue;
+                }
                 int ind = index + 1;
                 Matcher found = null;
                 boolean expr = false;
