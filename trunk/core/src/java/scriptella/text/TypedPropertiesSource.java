@@ -17,6 +17,7 @@
 package scriptella.text;
 
 import scriptella.configuration.ConfigurationException;
+import scriptella.spi.ConnectionParameters;
 import scriptella.util.StringUtils;
 
 import java.nio.charset.Charset;
@@ -26,6 +27,8 @@ import java.util.Set;
 
 /**
  * Typed view for properties.
+ * <p>
+ * FIXME: Extract interface
  *
  * @author Fyodor Kupolov
  * @version 1.1
@@ -175,5 +178,15 @@ public class TypedPropertiesSource {
     @Override
     public String toString() {
         return "Properties{" + properties + '}';
+    }
+
+    /**
+     * Converts connectionParameters to TypedPropertiesSource.
+     * FIXME: This method should not create a new instance, but return an internal delegate used by connection params.
+     * @param connectionParameters connection parameters
+     * @return connection parameters as TypedPropertiesSource
+     */
+    public static TypedPropertiesSource from(ConnectionParameters connectionParameters) {
+        return new TypedPropertiesSource(connectionParameters.getProperties());
     }
 }

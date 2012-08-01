@@ -8,41 +8,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests for {@link ColumnFormatter}.
+ * Tests for {@link PropertyFormatter}.
  *
  * @author Fyodor Kupolov
  * @version 1.1
  */
-public class ColumnFormatterTest extends TestCase {
-    private Map<String, ColumnFormat> formatsMap;
+public class PropertyFormatterTest extends TestCase {
+    private TypedPropertiesSource props;
+    private Map<String, String> formatsMap;
 
     @Override
     protected void setUp() throws Exception {
-        formatsMap = new HashMap<String, ColumnFormat>();
-        ColumnFormat cf = new ColumnFormat();
-        cf.setNullString("nullStr");
-        formatsMap.put("nullStrCol", cf);
-        cf = new ColumnFormat();
-        cf.setType("number");
-        cf.setPattern("00.00");
-        formatsMap.put("numberCol", cf);
+        formatsMap = new HashMap<String, String>();
+        formatsMap.put("nullStrCol.null_string", "nullStr");
+        formatsMap.put("numberCol.type", "number");
+        formatsMap.put("numberCol.pattern", "00.00");
+        props = new TypedPropertiesSource(formatsMap);
     }
 
     public void testParse() {
-        ColumnFormatInfo fi = new ColumnFormatInfo(formatsMap, null);
-        ColumnFormatter cf = new ColumnFormatter(fi);
-        Object result = cf.parse("nullStrCol", "nullStr");
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatter pf = new PropertyFormatter(fi);
+        Object result = pf.parse("nullStrCol", "nullStr");
         assertNull(result);
-        result = cf.parse("numberCol", "1.1");
+        result = pf.parse("numberCol", "1.1");
         assertEquals(1.1d, ((Number) result).doubleValue(), 0.001);
-        result = cf.parse("noSuchCol", "1.1");
+        result = pf.parse("noSuchCol", "1.1");
         assertEquals("1.1", result);
+        //Now test parsing of an integer with spaces
+        result = pf.parse("numberCol", " 1.1 ");
+        assertEquals(1.1d, ((Number) result).doubleValue(), 0.001);
     }
 
     public void testParseDefaultNullStr() {
         //Define column format with empty string as null
-        ColumnFormatInfo fi = new ColumnFormatInfo(formatsMap, "");
-        ColumnFormatter cf = new ColumnFormatter(fi);
+        formatsMap.put("null_string", "");
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.parse("nullStrCol", "nullStr");
         assertNull(result);
         result = cf.parse("nullStrCol", "");
@@ -60,8 +62,8 @@ public class ColumnFormatterTest extends TestCase {
     }
 
     public void testFormat() {
-        ColumnFormatInfo fi = new ColumnFormatInfo(formatsMap, null);
-        ColumnFormatter cf = new ColumnFormatter(fi);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
         assertEquals("Unmodified value is expected", "", result);
         result = cf.format("nullStrCol", null);
@@ -73,8 +75,9 @@ public class ColumnFormatterTest extends TestCase {
     }
 
     public void testFormatDefaultNullStr() {
-        ColumnFormatInfo fi = new ColumnFormatInfo(formatsMap, "");
-        ColumnFormatter cf = new ColumnFormatter(fi);
+        formatsMap.put("null_string", "");
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
         assertEquals("Unmodified value is expected", "", result);
         result = cf.format("nullStrCol", null);
@@ -90,11 +93,11 @@ public class ColumnFormatterTest extends TestCase {
 
 
     public void testFormattingCallback() {
-        ColumnFormatInfo fi = new ColumnFormatInfo(formatsMap, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("numberCol", 1.1);
         ParametersCallback c = new MapParametersCallback(params);
-        ColumnFormatter cf = new ColumnFormatter(fi);
+        PropertyFormatter cf = new PropertyFormatter(fi);
         ParametersCallback formatter = cf.format(c);
         Object result = formatter.getParameter("numberCol");
         assertEquals("Numeric value must be formatted", "01.10", result);
@@ -109,9 +112,10 @@ public class ColumnFormatterTest extends TestCase {
         assertNull("Null must be returned for numeric column without a value", result);
 
         //Now test with empty string as null string
-        fi = new ColumnFormatInfo(formatsMap, "");
+        formatsMap.put("null_string", "");
+        fi = PropertyFormatInfo.parse(props, null);
         params.put("numberCol", 1);
-        cf = new ColumnFormatter(fi);
+        cf = new PropertyFormatter(fi);
         formatter = cf.format(c);
         result = formatter.getParameter("numberCol");
         assertEquals("Numeric value must be formatted", "01.00", result);

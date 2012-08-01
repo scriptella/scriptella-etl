@@ -130,9 +130,9 @@ empty strings as nulls:
 <pre><code>&lt;connection driver="csv" url="report.csv"&gt;
     null_string=
     &lt;/connection&gt;</code></pre>
-Scriptella properties substitution engine cannot distinguish null value from unused variable or some random usage of
+Scriptella properties substitution engine cannot distinguish null value from an unused variable or some unintended usage of
 $var syntax,
-therefore we've chosen to preserve these blocks until user explicitly specify the value of null_string.
+therefore such blocks are preserved by default until user explicitly specify the value of null_string.
 
 <h2>Examples</h2>
 <code><pre>
@@ -160,4 +160,6 @@ therefore we've chosen to preserve these blocks until user explicitly specify th
 </code>
 Copies rows from data.csv file to report.csv, additionally the ID column is added.
 The result file will be semicolon separated.
+<h2>Custom formatting/parsing rules for properties</h2>
+See <a href="../text/package-summary.html#formatting">Text driver</a> for a description of formatting/parsing rules.
 </body>

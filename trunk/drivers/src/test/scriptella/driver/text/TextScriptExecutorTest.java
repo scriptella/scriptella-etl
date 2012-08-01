@@ -39,7 +39,7 @@ public class TextScriptExecutorTest extends AbstractTestCase {
     public void test() throws IOException {
         String s = "  $rownum;$name;$surname;${email.trim().replaceAll('@','_at_')}\n";
         StringWriter out = new StringWriter();
-        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n", null);
+        TextScriptExecutor ts = new TextScriptExecutor(out, new TextConnectionParameters());
         Map<String, String> m = new HashMap<String, String>();
         m.put("rownum", "1");
         m.put("name", "John");
@@ -70,7 +70,9 @@ public class TextScriptExecutorTest extends AbstractTestCase {
     public void testNullString() throws IOException {
         String s = "$rownum;$name;$surname\n";
         StringWriter out = new StringWriter();
-        TextScriptExecutor ts = new TextScriptExecutor(out, true, "\n", "Null");
+        TextConnectionParameters cp = new TextConnectionParameters();
+        cp.setDefaultNullString("Null");
+        TextScriptExecutor ts = new TextScriptExecutor(out, cp);
         Map<String, String> m = new HashMap<String, String>();
         m.put("rownum", "1");
         m.put("surname", "G");
