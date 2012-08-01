@@ -30,6 +30,7 @@ import scriptella.util.IOUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -78,8 +79,9 @@ public class VelocityConnection extends AbstractTextConnection {
         try {
             reader = scriptContent.open();
             Writer w = getWriter();
+            final URL url = getConnectionParameters().getUrl();
             engine.evaluate(adapter, w, url == null ? "System.out" : url.getFile(), reader);
-            if (flush) {
+            if (getConnectionParameters().isFlush()) {
                 w.flush();
             }
         } catch (Exception e) {
@@ -108,7 +110,7 @@ public class VelocityConnection extends AbstractTextConnection {
             try {
                 writer = IOUtils.asBuffered(newOutputWriter());
             } catch (IOException e) {
-                throw new VelocityProviderException("Unable to open URL " + url + " for output", e);
+                throw new VelocityProviderException("Unable to open URL " + getConnectionParameters().getUrl() + " for output", e);
             }
         }
         return writer;

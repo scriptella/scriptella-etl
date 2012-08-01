@@ -8,17 +8,17 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Tests for {@link ColumnFormat}
+ * Tests for {@link PropertyFormat}
  *
  * @author Fyodor Kupolov
  * @version 1.1
  */
-public class ColumnFormatTest extends TestCase {
+public class PropertyFormatTest extends TestCase {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyy", Locale.US);
 
     public void testNumberFormat() {
-        ColumnFormat ci = new ColumnFormat();
+        PropertyFormat ci = new PropertyFormat();
         ci.setType("number");
         ci.setPattern("00.00");
         ci.setLocale(Locale.US);
@@ -36,7 +36,7 @@ public class ColumnFormatTest extends TestCase {
     }
 
     public void testDateFormat() throws ParseException {
-        ColumnFormat ci = new ColumnFormat();
+        PropertyFormat ci = new PropertyFormat();
         ci.setType("date");
         ci.setPattern("ddMMyy");
         ci.setLocale(Locale.US);

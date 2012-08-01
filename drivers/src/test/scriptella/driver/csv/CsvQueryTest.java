@@ -39,8 +39,11 @@ public class CsvQueryTest extends AbstractTestCase {
         //Test query with columns number exceeding the input data columns number
         String data = "1,2,3\n11,2,3,4\n1";
         String query = ".*1.*,2,3,4";
+        final CsvConnectionParameters cp = new CsvConnectionParameters();
+        cp.setHeaders(false);
+        cp.setTrimLines(false);
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, false);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), cp);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3,4 matches the pattern
@@ -65,8 +68,10 @@ public class CsvQueryTest extends AbstractTestCase {
     public void testParametersLookup() throws IOException {
         String data = "a,b,c\n11,22,33";
         String query = "11,22,33";
+        final CsvConnectionParameters cp = new CsvConnectionParameters();
+
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), null, true, true);
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), cp);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
@@ -93,8 +98,9 @@ public class CsvQueryTest extends AbstractTestCase {
     public void testInvalidQuery() throws IOException {
         String query = "\\"; //bad query
         try {
+            final CsvConnectionParameters cp = new CsvConnectionParameters();
             new CsvQuery(new CSVReader(new StringReader(query)),
-                    new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, true, true);
+                    new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), cp);
             fail("Bad query syntax should be recognized");
         } catch (Exception e) {
             //OK
@@ -107,8 +113,12 @@ public class CsvQueryTest extends AbstractTestCase {
      */
     public void testNullString() throws IOException {
         String data = "1,NULL,c\n11,,33";
+        final CsvConnectionParameters cp = new CsvConnectionParameters();
+        cp.setHeaders(false);
+        cp.setDefaultNullString("NULL");
+
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader("")),
-                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), "NULL", false, true);
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), cp);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
@@ -124,8 +134,10 @@ public class CsvQueryTest extends AbstractTestCase {
         assertEquals(2, rows);
 
         //Now check if empty string is treated as null
+        cp.setDefaultNullString("");
+
         q = new CsvQuery(new CSVReader(new StringReader("")),
-                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), "", false, true);
+                new PropertiesSubstitutor(MockParametersCallbacks.SIMPLE), cp);
         rows = 0;
         q.execute(new CSVReader(new StringReader(data)), new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
@@ -148,8 +160,12 @@ public class CsvQueryTest extends AbstractTestCase {
         //Test query with columns number exceeding the input data columns number
         String data = "1,2,3\n11,2,3 ,4\n1";
         String query = "   \n.*1.*,2,3 ,4\n   \n";
+        final CsvConnectionParameters cp = new CsvConnectionParameters();
+        cp.setHeaders(false);
+        cp.setTrimLines(false);
+
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, false);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), cp);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3 ,4 matches the pattern
@@ -173,8 +189,11 @@ public class CsvQueryTest extends AbstractTestCase {
         //Test query with columns number exceeding the input data columns number
         String data = "1,2,3\n11,2,3 ,4\n";
         String query = "   \n   .*1.* ,2,     3,4        \n   \n";
+        final CsvConnectionParameters cp = new CsvConnectionParameters();
+        cp.setHeaders(false);
+        cp.setTrimLines(true);
         CsvQuery q = new CsvQuery(new CSVReader(new StringReader(query)),
-                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), null, false, true);
+                new PropertiesSubstitutor(MockParametersCallbacks.UNSUPPORTED), cp);
         rows = 0;
         AbstractConnection.StatementCounter cnt = new AbstractConnection.StatementCounter();
         //only 11,2,3,4 matches the pattern

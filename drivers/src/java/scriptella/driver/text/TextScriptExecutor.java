@@ -65,24 +65,19 @@ import java.io.Writer;
  */
 public class TextScriptExecutor implements Closeable, Flushable {
     private BufferedWriter out;
-    private boolean trim;
-    private String eol;
     private PropertiesSubstitutor ps;
+    private TextConnectionParameters textParams;
 
     /**
      * Creates an executor.
      *
      * @param out        writer for output.
-     * @param trim       true if each line in the output file should be trimmed
-     * @param eol        EOL separator.
-     * @param nullString null string.
+     * @param textParams text connection parameters.
      */
-    public TextScriptExecutor(Writer out, boolean trim, String eol, String nullString) {
+    public TextScriptExecutor(Writer out, TextConnectionParameters textParams) {
         ps = new PropertiesSubstitutor();
-        ps.setNullString(nullString);
         this.out = IOUtils.asBuffered(out);
-        this.trim = trim;
-        this.eol = eol;
+        this.textParams = textParams;
     }
 
     /**
@@ -93,19 +88,20 @@ public class TextScriptExecutor implements Closeable, Flushable {
      * @param counter statements counter.
      */
     public void execute(Reader reader, ParametersCallback pc, AbstractConnection.StatementCounter counter) {
-        ps.setParameters(pc);
+        ps.setParameters(textParams.getPropertyFormatter().format(pc));
         BufferedReader r = IOUtils.asBuffered(reader);
+        final boolean trimLines = textParams.isTrimLines();
         try {
             for (String line; (line = r.readLine()) != null;) {
                 EtlCancelledException.checkEtlCancelled();
-                if (trim) {
+                if (trimLines) {
                     line = line.trim();
                 }
                 //If trimming is disabled (keeping format) or if line is not empty 
-                if (!trim || line.length() > 0) {
+                if (!trimLines || line.length() > 0) {
                     try {
                         out.write(ps.substitute(line));
-                        out.write(eol);
+                        out.write(textParams.getEol());
                         counter.statements++;
                     } catch (IOException e) {
                         throw new TextProviderException("Failed writing to a text file", e);

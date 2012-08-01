@@ -38,29 +38,23 @@ import java.util.regex.Pattern;
  */
 public class CsvQuery implements ParametersCallback {
     protected static final Logger LOG = Logger.getLogger(CsvQuery.class.getName());
-    protected final boolean headers;
-    protected final boolean trim;
-    protected final String nullString;
     private ColumnsMap columnsMap; //column_name->column_number mapping
     private String[] row;
     private Pattern[][] patterns;
     private Matcher[][] matchers;
     private PropertiesSubstitutor substitutor;
+    private CsvConnectionParameters csvParams;
 
     /**
      * Creates a query for CSVReader.
      *
      * @param queryReader query CSVReader.
      * @param substitutor properties substitutor to use. The parameters for the substitutor must be set by a caller.
-     * @param headers     true if first line of input CSV file contains headers.
-     * @param trim        true if if extra whitespaces should be trimmed.
-     * @param nullString  string to treat as NULL.
+     * @param csvParams parsed parameters of the CSV connection
      */
-    public CsvQuery(CSVReader queryReader, PropertiesSubstitutor substitutor, String nullString, boolean headers, boolean trim) {
-        this.headers = headers;
-        this.trim = trim;
-        this.nullString = nullString;
+    public CsvQuery(CSVReader queryReader, PropertiesSubstitutor substitutor, CsvConnectionParameters csvParams) {
         this.substitutor = substitutor;
+        this.csvParams = csvParams;
         compileQueries(queryReader);
         closeSilently(queryReader);
     }
@@ -77,7 +71,11 @@ public class CsvQuery implements ParametersCallback {
         try {
             columnsMap = parseHeader(reader);
             String[] r;
-            while ((r = (trim ? trim(reader.readNext()) : reader.readNext())) != null) {
+            final boolean trimLines = csvParams.isTrimLines();
+            //BUG-52570 Currently trimming is done after the lines is parsed as CSV.
+            //This is wrong, because leading whitespaces confuses parser, i.e. quoted values are not recognized
+            //The solution is to wrap reader with a trimming BufferedReader
+            while ((r = (trimLines ? trim(reader.readNext()) : reader.readNext())) != null) {
                 if (rowMatches(r)) {
                     processRow(queryCallback, r);
                 }
@@ -94,7 +92,7 @@ public class CsvQuery implements ParametersCallback {
 
     protected ColumnsMap parseHeader(CSVReader reader) throws IOException {
         final ColumnsMap columnsMap = new ColumnsMap();
-        if (headers) {
+        if (csvParams.isHeaders()) {
             String[] row = reader.readNext();
             if (row != null) {
                 for (int i = 0; i < row.length; i++) {
@@ -257,7 +255,7 @@ public class CsvQuery implements ParametersCallback {
      */
     protected Object getCurrentRowValueAt(int columnIndex, String columnName) {
         final String s = row[columnIndex - 1];
-        return nullString != null && nullString.equals(s) ? null : s;
+        return csvParams.getPropertyFormatter().parse(columnName, s);
     }
 
     protected ColumnsMap getColumnsMap() {

@@ -73,19 +73,16 @@ import java.util.regex.Pattern;
  */
 class TextQueryExecutor implements ParametersCallback {
     private static final Logger LOG = Logger.getLogger(TextQueryExecutor.class.getName());
+    private static final String COLUMN_PREFIX = "column";
+
     private final PropertiesSubstitutor ps;
     private Pattern[] query;
     private Matcher result;
-    private boolean trim;
-    private int skipLines;
-    private String nullString;
-    private static final String COLUMN_PREFIX = "column";
+    private TextConnectionParameters textParams;
 
     public TextQueryExecutor(final Reader queryReader, final PropertiesSubstitutor substitutor,
-                             final boolean trim, final int skipLines, final String nullString) {
-        this.trim = trim;
-        this.skipLines = skipLines;
-        this.nullString = nullString;
+                             final TextConnectionParameters textParams) {
+        this.textParams = textParams;
         ps = substitutor;
         //Compiles patterns loaded from specified reader.
         //Patterns are read line-by-line.
@@ -124,9 +121,10 @@ class TextQueryExecutor implements ParametersCallback {
     public void execute(Reader reader, final QueryCallback qc, AbstractConnection.StatementCounter counter) {
         int qCount = query.length;
         Matcher[] matchers = new Matcher[qCount];
-        LineIterator it = new LineIterator(reader, ps, trim);
+
+        LineIterator it = new LineIterator(reader, ps, textParams.isTrimLines());
         //Skip a specified number of lines
-        for (int i = 0; i < skipLines && it.hasNext(); i++) {
+        for (int i = textParams.getSkipLines(); i > 0  && it.hasNext(); i--) {
             it.next();
         }
         while (it.hasNext()) {
@@ -169,7 +167,7 @@ class TextQueryExecutor implements ParametersCallback {
                 int ind = Integer.parseInt(str);
                 if (ind >= 0 && ind <= result.groupCount()) {
                     final String s = result.group(ind);
-                    return (nullString != null && nullString.equals(s)) ? null : s;
+                    return textParams.getPropertyFormatter().parse(name, s);
                 }
             } catch (NumberFormatException e) {
                 ExceptionUtils.ignoreThrowable(e);

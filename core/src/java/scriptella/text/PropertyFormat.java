@@ -21,13 +21,13 @@ import java.text.ParseException;
 import java.util.Locale;
 
 /**
- * Holds formatting/parsing rules for a column.
+ * Holds formatting/parsing rules for a property.
  *
  * @author Fyodor Kupolov
  * @version 1.1
  */
 //TODO Make formats extensible by enabling custom formats lookup via SPI.
-public class ColumnFormat {
+public class PropertyFormat {
     private String pattern;
     private Format format;
     private boolean trim;
@@ -93,13 +93,20 @@ public class ColumnFormat {
     }
 
     public Object parse(final String value) {
-        if ((value == null) || value.equals(nullString)) {
+        if (value == null) {
             return null;
         }
         String parseValue = trim ? value.trim() : value;
+        if (parseValue.equals(nullString)) {
+            return null;
+        }
         Object result = parseValue;
         if (getFormat() != null) {
             try {
+                //For numbers always trim the value, otherwise DecimalFormat will through an exception
+                if ("number".equals(type)) {
+                    parseValue = parseValue.trim();
+                }
                 result = getFormat().parseObject(parseValue);
                 //unwrap the array if necessary
                 if (result instanceof Object[]) {
@@ -108,7 +115,7 @@ public class ColumnFormat {
                 }
 
             } catch (ParseException e) {
-                throw new IllegalArgumentException("Value " + parseValue + " cannot be parsed using pattern " + pattern);
+                throw new IllegalArgumentException("Value \"" + parseValue + "\" cannot be parsed using pattern " + pattern, e);
             }
         }
         return result;

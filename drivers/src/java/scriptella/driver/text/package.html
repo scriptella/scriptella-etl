@@ -169,7 +169,6 @@ properties are expanded and the output is sent to the file specifed by a url con
         content.
     </li>
 </ul>
-</p>
 <br><u>Example:</u>
 <code>
     <pre>
@@ -186,7 +185,7 @@ Inserted a record with ID=1. Table=system
 </code>
 
 <h2>Properties substitution</h2>
-In text script and query elements ${property} or $property syntax is used for properties/variables substition.
+In text script and query elements ${property} or $property syntax is used for properties/variables substitution.
 <p><u>NOTE:</u></p>
 By default NULL variables and expressions are preserved, use <code>null_string</code> connection property to specify
 a string token for nulls.
@@ -219,4 +218,29 @@ therefore we've chosen to preserve these blocks until user explicitly specify th
 </code>
 Copies rows from data.csv file to report.csv, additionally the ID column is added.
 The result file is semicolon separated.
+<h2><a name="formatting">Custom formatting/parsing rules for properties</a></h2>
+Starting from version 1.1 Scriptella supports configurable rules for formatting and parsing of property values. The rules are
+described in a form of connection parameters prefixed with "format.".
+<br>Example of defining a format for a numeric property with 2 digits after a decimal point:
+<pre>
+format.someColumn.type=number
+format.someColumn.pattern=000.00
+</pre>
+
+<p>Each property has the following formatting/parsing options (see <a href="../../text/PropertyFormat.html">PropertyFormat</a> class for implementation details):
+<ul>
+    <li>trim - Set to true if the values must be trimmed. Default value is false.</li>
+    <li>null_string - Defines a string to represent null values when formatting or parsing.</li>
+    <li>type - type of the property. Built-in types: number,date,time,choice. The list might be extended with custom Format classes.</li>
+    <li>pattern - pattern to use for formatting or parsing. Depends on type of property. Java <a href="http://docs.oracle.com/javase/1.4.2/docs/api/java/text/MessageFormat.html">MessageFormat</a> patterns like dd.MM.yyyy, ##.## are supported out of the box</li>
+    <li>locale - locale to use</li>
+</ul>
+<h3>Default values for formatting and parsing rules</h3>
+It is possible to provide default values for the following properties:
+<ul>
+    <li>format.trim - default trim option for parsing and formatting property values</li>
+    <li>format.null_string - same as null_string. Default value to represent null values</li>
+    <li>locale - TBD</li>
+</ul>
+<a href="https://github.com/ejboy/scriptella-examples/tree/master/currency">Currency example</a> demonstrates usage of formatting rules.
 </body>

@@ -18,6 +18,7 @@ package scriptella.driver.text;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
+import scriptella.text.PropertyFormatInfo;
 import scriptella.util.IOUtils;
 
 import java.io.IOException;
@@ -27,19 +28,12 @@ import java.net.URL;
 
 /**
  * Base class for Text/CSV connections.
- * <p>TODO: Move this class to a spi.support.text package.
  *
  * @author Fyodor Kupolov
  * @version 1.0
  */
 public abstract class AbstractTextConnection extends AbstractConnection {
-    protected final String encoding;
-    protected final boolean trim;
-    protected final boolean flush;
-    protected final URL url; //if null - use console
-    protected final String eol;
-    protected final int skipLines;
-    protected final String nullString;
+    private TextConnectionParameters connectionParameters;
 
 
     /**
@@ -79,20 +73,18 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      * Name of the <code>null_string</code> connection property.
      * If set, specifies value of a string token to be parsed/formatted as Java <code>null</code> literal.
      */
-    public static final String NULL_STRING = "null_string";
+    public static final String NULL_STRING = PropertyFormatInfo.NULL_STRING;
 
+    /**
+     * Prefix for properties containing a definition of the column format.
+     */
+    public static final String FORMAT_PREFIX = "format.";
 
     /**
      * For testing only.
      */
     protected AbstractTextConnection() {
-        encoding = null;
-        trim = false;
-        flush = false;
-        url = null;
-        eol = "\n";
-        skipLines = 0;
-        nullString = null;
+        connectionParameters = new TextConnectionParameters();
     }
 
     /**
@@ -102,40 +94,14 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      * @param parameters
      */
     protected AbstractTextConnection(DialectIdentifier dialectIdentifier, ConnectionParameters parameters) {
-        super(dialectIdentifier, parameters);
-        //URL can be set null, in this case console is used for reading/writing
-        url = parameters.getUrl() == null ? null : parameters.getResolvedUrl();
-        encoding = parameters.getCharsetProperty(ENCODING);
-        trim = parameters.getBooleanProperty(TRIM, true);
-        //When printing to console - flushing is enabled
-        flush = url == null || parameters.getBooleanProperty(FLUSH, false);
-        String eolStr = parameters.getStringProperty(TextConnection.EOL);
-        eol = eolStr != null ? eolStr : "\n";//Default value
-        skipLines = parameters.getIntegerProperty(SKIP_LINES, 0);
-        nullString = parameters.getStringProperty(NULL_STRING);
+        this(dialectIdentifier, new TextConnectionParameters(parameters));
     }
 
-    public String getEncoding() {
-        return encoding;
+    protected AbstractTextConnection(DialectIdentifier dialectIdentifier, TextConnectionParameters parameters) {
+        super(dialectIdentifier, parameters.getConnectionParameters());
+        connectionParameters = parameters;
     }
 
-    public boolean isTrim() {
-        return trim;
-    }
-
-    /**
-     * Returns resolved URL for this connection.
-     * <p>If null, the console is used for reading/writing.
-     *
-     * @return resolved URL or null.
-     */
-    public URL getUrl() {
-        return url;
-    }
-
-    public String getEol() {
-        return eol;
-    }
 
     /**
      * Creates a new writer to send output to.
@@ -144,6 +110,8 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      * @throws IOException if IO error occured.
      */
     protected Writer newOutputWriter() throws IOException {
+        final URL url = connectionParameters.getUrl();
+        final String encoding = connectionParameters.getEncoding();
         return url == null ? ConsoleAdapters.getConsoleWriter(encoding) :
                 IOUtils.getWriter(IOUtils.getOutputStream(url), encoding);
     }
@@ -155,8 +123,13 @@ public abstract class AbstractTextConnection extends AbstractConnection {
      * @throws IOException if IO error occured.
      */
     protected Reader newInputReader() throws IOException {
+        final URL url = connectionParameters.getUrl();
+        final String encoding = connectionParameters.getEncoding();
         return url == null ? ConsoleAdapters.getConsoleReader(encoding) :
                 IOUtils.getReader(url.openStream(), encoding);
     }
 
+    protected TextConnectionParameters getConnectionParameters() {
+        return connectionParameters;
+    }
 }

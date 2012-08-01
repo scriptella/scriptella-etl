@@ -52,7 +52,7 @@ public class TextConnection extends AbstractTextConnection {
         try {
             reader = scriptContent.open();
             out.execute(reader, parametersCallback, counter);
-            if (flush) {
+            if (getConnectionParameters().isFlush()) {
                 out.flush();
             }
         } catch (IOException e) {
@@ -68,9 +68,9 @@ public class TextConnection extends AbstractTextConnection {
     protected void initOut() {
         if (out == null) {
             try {
-                this.out = new TextScriptExecutor(newOutputWriter(), trim, eol, nullString);
+                this.out = new TextScriptExecutor(newOutputWriter(), getConnectionParameters());
             } catch (IOException e) {
-                throw new TextProviderException("Unable to open file " + url + " for writing", e);
+                throw new TextProviderException("Unable to open file " + getConnectionParameters().getUrl() + " for writing", e);
             }
         }
     }
@@ -94,7 +94,7 @@ public class TextConnection extends AbstractTextConnection {
         }
 
         try {
-            new TextQueryExecutor(q, new PropertiesSubstitutor(parametersCallback), trim, skipLines, nullString).
+            new TextQueryExecutor(q, new PropertiesSubstitutor(parametersCallback), getConnectionParameters()).
                     execute(in, queryCallback, counter);
         } finally {
             IOUtils.closeSilently(q);

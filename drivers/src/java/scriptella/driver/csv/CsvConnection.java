@@ -20,7 +20,11 @@ import scriptella.driver.csv.opencsv.CSVReader;
 import scriptella.driver.csv.opencsv.CSVWriter;
 import scriptella.driver.text.AbstractTextConnection;
 import scriptella.expression.PropertiesSubstitutor;
-import scriptella.spi.*;
+import scriptella.spi.ConnectionParameters;
+import scriptella.spi.ParametersCallback;
+import scriptella.spi.ProviderException;
+import scriptella.spi.QueryCallback;
+import scriptella.spi.Resource;
 import scriptella.util.StringUtils;
 
 import java.io.IOException;
@@ -60,28 +64,8 @@ public class CsvConnection extends AbstractTextConnection {
      */
     public static final String HEADERS = "headers";
 
-    protected final char separator;
-    protected final char quote;
-    protected final boolean headers;
-
     public CsvConnection(ConnectionParameters parameters) {
-        super(Driver.DIALECT, parameters);
-        String sep = parameters.getStringProperty(SEPARATOR);
-        if (sep != null && sep.length() > 0) {
-            separator = sep.charAt(0);
-        } else {
-            separator = ',';
-        }
-        String q = parameters.getStringProperty(QUOTE);
-        if (q == null) {
-            quote = '\"'; //default value
-        } else if (q.length() > 0) {
-            quote = q.charAt(0);
-        } else { //otherwise no quoting
-            quote = CSVWriter.NO_QUOTE_CHARACTER;
-        }
-
-        headers = parameters.getBooleanProperty(HEADERS, true);
+        super(Driver.DIALECT, new CsvConnectionParameters(parameters));
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ProviderException {
@@ -101,14 +85,16 @@ public class CsvConnection extends AbstractTextConnection {
 
     void executeScript(CSVReader reader, ParametersCallback parametersCallback) throws IOException {
         CSVWriter out = getOut();
-        PropertiesSubstitutor ps = new PropertiesSubstitutor(parametersCallback);
-        ps.setNullString(nullString);
+        final CsvConnectionParameters csvParams = getConnectionParameters();
+        ParametersCallback formattingCallback = csvParams.getPropertyFormatter().format(parametersCallback);
+        final boolean trimLines = csvParams.isTrimLines();
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(formattingCallback);
         for (String[] row; (row = reader.readNext()) != null;) {
             EtlCancelledException.checkEtlCancelled();
             for (int i = 0; i < row.length; i++) {
                 String field = row[i];
                 if (field != null) {
-                    if (trim) {//removing extra whitespaces by default
+                    if (trimLines) {//removing extra whitespaces by default
                         field = field.trim();
                     }
                     row[i] = ps.substitute(field);
@@ -132,7 +118,7 @@ public class CsvConnection extends AbstractTextConnection {
                 }
             }
         }
-        if (flush) {
+        if (csvParams.isFlush()) {
             writer.flush();
         }
     }
@@ -147,12 +133,13 @@ public class CsvConnection extends AbstractTextConnection {
         } catch (IOException e) {
             throw new CsvProviderException("Failed to read query content", e);
         }
+        final CsvConnectionParameters csvParams = getConnectionParameters();
         try {
             final CsvQuery q = newCsvQuery(queryContentReader, new PropertiesSubstitutor(parametersCallback));
-            CSVReader inputCSVContentReader = new CSVReader(newInputReader(), separator, quote, skipLines);
+            CSVReader inputCSVContentReader = new CSVReader(newInputReader(), csvParams.getSeparator(), csvParams.getQuote(), csvParams.getSkipLines());
             q.execute(inputCSVContentReader, queryCallback, counter);
         } catch (IOException e) {
-            throw new CsvProviderException("Failed to open CSV file " + url + " for input", e);
+            throw new CsvProviderException("Failed to open CSV file " + csvParams.getUrl() + " for input", e);
         }
     }
 
@@ -165,11 +152,12 @@ public class CsvConnection extends AbstractTextConnection {
      */
     protected CSVWriter getOut() {
         if (out == null) {
+            final CsvConnectionParameters csvParams = getConnectionParameters();
             try {
                 writer = newOutputWriter();
-                out = new CSVWriter(writer, separator, quote, eol);
+                out = new CSVWriter(writer, csvParams.getSeparator(), csvParams.getQuote(), csvParams.getEol());
             } catch (IOException e) {
-                throw new CsvProviderException("Unable to open URL " + url + " for output", e);
+                throw new CsvProviderException("Unable to open URL " + csvParams.getUrl() + " for output", e);
             }
         }
         return out;
@@ -183,7 +171,7 @@ public class CsvConnection extends AbstractTextConnection {
      * @return constructed query for a specified input and parameters.
      */
     protected CsvQuery newCsvQuery(CSVReader csvReader, PropertiesSubstitutor ps) {
-        return new CsvQuery(csvReader, ps, nullString, headers, trim);
+        return new CsvQuery(csvReader, ps, getConnectionParameters());
     }
 
 
@@ -196,5 +184,10 @@ public class CsvConnection extends AbstractTextConnection {
                 LOG.log(Level.INFO, "A problem occured while trying to close CSV writer", e);
             }
         }
+    }
+
+    @Override
+    protected CsvConnectionParameters getConnectionParameters() {
+        return (CsvConnectionParameters) super.getConnectionParameters();
     }
 }
