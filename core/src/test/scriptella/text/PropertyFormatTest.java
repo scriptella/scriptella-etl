@@ -2,6 +2,7 @@ package scriptella.text;
 
 import junit.framework.TestCase;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,5 +64,26 @@ public class PropertyFormatTest extends TestCase {
         ci.setTrim(true);
         assertEquals("Value must be trimmed before parsing", d, ci.parse(" \n010112 "));
     }
+
+    public void testTimestampFormat() throws ParseException {
+        PropertyFormat ci = new PropertyFormat();
+        ci.setType("timestamp");
+
+        String expectedStr = "2012-05-25 01:02:03.0";
+        Date expectedTs = Timestamp.valueOf(expectedStr);
+        assertEquals(expectedStr, ci.format(expectedTs));
+        assertEquals(expectedTs, ci.parse(expectedStr));
+
+        //wrong data
+        try {
+            ci.parse("----");
+            fail("An error should be thrown for wrong format");
+        } catch (IllegalArgumentException e) {
+            //OK
+        }
+
+        assertEquals("Value with spaces must be parsed", expectedTs, ci.parse(" \n"+expectedStr));
+    }
+
 
 }

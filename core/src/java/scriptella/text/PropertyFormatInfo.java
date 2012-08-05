@@ -32,6 +32,10 @@ import java.util.Map;
 public class PropertyFormatInfo {
     public static final String NULL_STRING = "null_string";
     public static final String TRIM = "trim";
+    public static final String CLASS_NAME = "className";
+    public static final String PATTERN = "pattern";
+    public static final String LOCALE = "locale";
+    public static final String TYPE = "type";
     private Map<String, PropertyFormat> formatMap;
     private PropertyFormat defaultFormat;
 
@@ -130,16 +134,18 @@ public class PropertyFormatInfo {
     }
 
     protected static void setProperty(PropertyFormat f, String columnPropName, String key, TypedPropertiesSource ps) {
-        if ("pattern".equalsIgnoreCase(columnPropName)) {
+        if (PATTERN.equalsIgnoreCase(columnPropName)) {
             f.setPattern(ps.getStringProperty(key));
         } else if (NULL_STRING.equalsIgnoreCase(columnPropName)) {
             f.setNullString(ps.getStringProperty(key));
-        } else if ("locale".equalsIgnoreCase(columnPropName)) {
+        } else if (LOCALE.equalsIgnoreCase(columnPropName)) {
             f.setLocale(ps.getLocaleProperty(key));
         } else if (TRIM.equalsIgnoreCase(columnPropName)) {
             f.setTrim(ps.getBooleanProperty(key, false));
-        } else if ("type".equalsIgnoreCase(columnPropName)) {
+        } else if (TYPE.equalsIgnoreCase(columnPropName)) {
             f.setType(ps.getStringProperty(key));
+        } else if (CLASS_NAME.equalsIgnoreCase(columnPropName)) {
+            f.setClassName(ps.getStringProperty(key));
         }
     }
 
