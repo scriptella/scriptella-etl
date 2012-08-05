@@ -24,9 +24,8 @@ import java.util.Locale;
  * Holds formatting/parsing rules for a property.
  *
  * @author Fyodor Kupolov
- * @version 1.1
+ * @since 1.1
  */
-//TODO Make formats extensible by enabling custom formats lookup via SPI.
 public class PropertyFormat {
     private String pattern;
     private Format format;
@@ -34,6 +33,7 @@ public class PropertyFormat {
     private String nullString;
     private Locale locale;
     private String type;
+    private String className;
 
     String getPattern() {
         return pattern;
@@ -57,12 +57,9 @@ public class PropertyFormat {
 
     protected Format getFormat() {
         if (format == null && type != null) {
-            StringBuilder fmt = new StringBuilder("{0,").append(type);
-            if (pattern != null) {
-                fmt.append(",").append(pattern);
-            }
-            fmt.append("}");
-            format = new MessageFormat(fmt.toString(), locale == null ? Locale.getDefault() : locale);
+            ValueFormatBuilder b = new ValueFormatBuilder();
+            b.setClassName(className).setType(type).setPattern(pattern).setLocale(locale);
+            format = b.build();
         }
         return format;
     }
@@ -78,6 +75,19 @@ public class PropertyFormat {
 
     public void setTrim(boolean trim) {
         this.trim = trim;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    /**
+     * Sets class name of a custom formatter (subclass of java.text.Format).
+     *
+     * @param className class name of a custom formatter
+     */
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public String getNullString() {
@@ -127,9 +137,13 @@ public class PropertyFormat {
         }
         String result;
         if ((!(object instanceof String)) && getFormat() != null) {
-            //Wrap a single object into an array
-            Object param = object instanceof Object[] ? object : new Object[]{object};
-            result = getFormat().format(param);
+            Object param = object;
+            final Format format = getFormat();
+            //Wrap a single object into an array if MessageFormat
+            if (format instanceof MessageFormat && !(object instanceof Object[])) {
+                param = new Object[]{object};
+            }
+            result = format.format(param);
         } else {
             result = object.toString();
         }
@@ -142,7 +156,6 @@ public class PropertyFormat {
 
         return trim ? result.trim() : result;
     }
-
 
 
     @Override
