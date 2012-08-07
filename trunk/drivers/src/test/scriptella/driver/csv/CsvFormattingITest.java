@@ -52,13 +52,14 @@ public class CsvFormattingITest extends DBTestCase {
         };
         final EtlExecutor se = newEtlExecutor();
         se.execute();
-        String expectedResult = "1,One,One,11-07-2012 22:33,1.10\n" +
-                "2,Two, Two ,11-07-2012 20:00,2.10\n" +
-                "3,Three, Three ,11-07-2012 20:00,3.10\n" +
+        //The last number is left padded(width 6)
+        String expectedResult = "1,One,One,11-07-2012 22:33,  1.10\n" +
+                "2,Two, Two ,11-07-2012 20:00,  2.10\n" +
+                "3,Three, Three ,11-07-2012 20:00,  3.10\n" +
                 //The last 2 are imported from CSV to db and exported back to CSV
                 //The leading whitespaces for TextNoTrim is lost, because input was trimmed when read by a CSV driver
-                "10,Ten,Ten,12-07-2012 10:00,10.10\n" +
-                "11,Eleven,Eleven,12-07-2012 11:00,11.10\n";
+                "10,Ten,Ten,12-07-2012 10:00, 10.10\n" +
+                "11,Eleven,Eleven,12-07-2012 11:00, 11.10\n";
         assertEquals(expectedResult, out.toString());
     }
 }

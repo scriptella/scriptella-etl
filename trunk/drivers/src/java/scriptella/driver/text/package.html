@@ -231,9 +231,11 @@ format.someColumn.pattern=000.00
 <ul>
     <li>trim - Set to true if the values must be trimmed. Default value is false.</li>
     <li>null_string - Defines a string to represent null values when formatting or parsing.</li>
-    <li>type - type of the property. Built-in types: number,date,time,choice. The list might be extended with custom Format classes.</li>
+    <li>type - type of the property. Built-in types: number,date,time,choice and timestamp. Custom Format classes can be specified in className option.</li>
     <li>pattern - pattern to use for formatting or parsing. Depends on type of property. Java <a href="http://docs.oracle.com/javase/1.4.2/docs/api/java/text/MessageFormat.html">MessageFormat</a> patterns like dd.MM.yyyy, ##.## are supported out of the box</li>
     <li>locale - locale to use</li>
+    <li>pad_left, pad_right - Controls padding width of the formatted value</li>
+    <li>pad_char - character to use for padding</li>
 </ul>
 <h3>Default values for formatting and parsing rules</h3>
 It is possible to provide default values for the following properties:
@@ -242,5 +244,5 @@ It is possible to provide default values for the following properties:
     <li>format.null_string - same as null_string. Default value to represent null values</li>
     <li>locale - TBD</li>
 </ul>
-<a href="https://github.com/ejboy/scriptella-examples/tree/master/currency">Currency example</a> demonstrates usage of formatting rules.
+<a href="https://github.com/scriptella/scriptella-examples/tree/master/currency">Currency example</a> demonstrates usage of formatting rules.
 </body>

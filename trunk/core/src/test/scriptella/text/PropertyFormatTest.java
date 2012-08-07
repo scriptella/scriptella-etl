@@ -85,5 +85,17 @@ public class PropertyFormatTest extends TestCase {
         assertEquals("Value with spaces must be parsed", expectedTs, ci.parse(" \n"+expectedStr));
     }
 
+    public void testPad() throws ParseException {
+        PropertyFormat ci = new PropertyFormat();
+        ci.setType("number");
+        ci.setPattern("0.0");
+        ci.setPadLeft(5);
+
+        String expectedStr = "  1.0";
+        String actualStr = ci.format(1);
+        assertEquals(expectedStr, actualStr);
+    }
+
+
 
 }

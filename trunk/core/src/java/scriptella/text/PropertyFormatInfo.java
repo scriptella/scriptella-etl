@@ -36,6 +36,9 @@ public class PropertyFormatInfo {
     public static final String PATTERN = "pattern";
     public static final String LOCALE = "locale";
     public static final String TYPE = "type";
+    public static final String PAD_LEFT = "pad_left";
+    public static final String PAD_RIGHT = "pad_right";
+    public static final String PAD_CHAR = "pad_char";
     private Map<String, PropertyFormat> formatMap;
     private PropertyFormat defaultFormat;
 
@@ -95,7 +98,6 @@ public class PropertyFormatInfo {
      */
     public static PropertyFormatInfo parse(TypedPropertiesSource properties, String prefix) {
         Map<String, PropertyFormat> map = new LinkedHashMap<String, PropertyFormat>();
-        boolean trim = properties.getBooleanProperty(prefix == null ? TRIM : prefix + TRIM, false);
 
         //For null_string, fall back to non-prefix property(1.0 compatibility)
         String nullString = null;
@@ -107,7 +109,10 @@ public class PropertyFormatInfo {
         }
         PropertyFormat defaultFormat = new PropertyFormat();
         defaultFormat.setNullString(nullString);
-        defaultFormat.setTrim(trim);
+        setProperty(defaultFormat, TRIM, TRIM, properties);
+        setProperty(defaultFormat, PAD_LEFT, PAD_LEFT, properties);
+        setProperty(defaultFormat, PAD_RIGHT, PAD_LEFT, properties);
+        setProperty(defaultFormat, PAD_CHAR, PAD_CHAR, properties);
 
         for (String key : properties.getKeys()) {
             if (isPrefixed(key, prefix)) {
@@ -146,6 +151,13 @@ public class PropertyFormatInfo {
             f.setType(ps.getStringProperty(key));
         } else if (CLASS_NAME.equalsIgnoreCase(columnPropName)) {
             f.setClassName(ps.getStringProperty(key));
+        } else if (PAD_LEFT.equalsIgnoreCase(columnPropName)) {
+            f.setPadLeft(ps.getNumberProperty(key, 0).intValue());
+        } else if (PAD_RIGHT.equalsIgnoreCase(columnPropName)) {
+            f.setPadRight(ps.getNumberProperty(key, 0).intValue());
+        } else if (PAD_CHAR.equalsIgnoreCase(columnPropName)) {
+            String v = ps.getStringProperty(key);
+            f.setPadChar(v == null || v.length() == 0 ? ' ' : v.charAt(0));
         }
     }
 

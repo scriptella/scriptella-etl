@@ -83,5 +83,27 @@ public class StringUtilsTest extends AbstractTestCase {
         assertEquals("**", StringUtils.getMaskedPassword("**"));
     }
 
+    public void testPad() {
+        String result = StringUtils.pad("a", true, 3, ' ');
+        assertEquals("  a", result);
+        result = StringUtils.pad("b ", false, 3, ' ');
+        assertEquals("b  ", result);
+        result = StringUtils.pad("c", false, 1, ' ');
+        assertEquals("c", result);
+        result = StringUtils.pad("c", false, 0, ' ');
+        assertEquals("c", result);
+
+        result = StringUtils.pad("d", true, 2, '_');
+        assertEquals("_d", result);
+
+        result = StringUtils.pad("", true, 2, '_');
+        assertEquals("__", result);
+
+        result = StringUtils.pad(null, true, 2, '_');
+        assertEquals("__", result);
+
+
+    }
+
 }
 

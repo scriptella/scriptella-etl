@@ -15,6 +15,7 @@
  */
 package scriptella.util;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -168,6 +169,26 @@ public final class StringUtils {
      */
     public static String getMaskedPassword(String string) {
         return string == null ? "" : ANY_CHAR_REGEX.matcher(string).replaceAll(PASSWORD_MASK);
+    }
+
+    /**
+     * Pads a String with a specified character.
+     *
+     * @param str     string to pad. Null is treated as empty string.
+     * @param left    true if left pad, false if right
+     * @param width   with of the padded string
+     * @param padChar character to use for padding
+     * @return padded string.
+     */
+    public static String pad(String str, boolean left, int width, char padChar) {
+        String s = str == null ? "" : str;
+        if (width <= s.length()) {
+            return s;
+        }
+        char[] padChars = new char[width - s.length()];
+        Arrays.fill(padChars, padChar);
+        String padStr = new String(padChars);
+        return left ? padStr + s : s + padStr;
     }
 
 }
