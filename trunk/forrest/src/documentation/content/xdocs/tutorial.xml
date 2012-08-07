@@ -136,7 +136,7 @@ EtlExecutor.newExecutor(
     </etl>]]></source>
 			</section>
             <note>
-                See <a href="https://github.com/ejboy/scriptella-examples">Scriptella examples on GitHub</a>
+                See <a href="https://github.com/scriptella/scriptella-examples">Scriptella examples on GitHub</a>
                 or <a href="download.html">download</a> Scriptella examples distribution.
             </note>
         </section>
