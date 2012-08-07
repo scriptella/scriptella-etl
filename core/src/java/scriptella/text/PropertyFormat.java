@@ -15,6 +15,8 @@
  */
 package scriptella.text;
 
+import scriptella.util.StringUtils;
+
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -34,6 +36,9 @@ public class PropertyFormat {
     private Locale locale;
     private String type;
     private String className;
+    private int padLeft;
+    private int padRight;
+    private char padChar=' ';
 
     String getPattern() {
         return pattern;
@@ -102,6 +107,30 @@ public class PropertyFormat {
         return locale;
     }
 
+    public int getPadLeft() {
+        return padLeft;
+    }
+
+    public void setPadLeft(int padLeft) {
+        this.padLeft = padLeft;
+    }
+
+    public int getPadRight() {
+        return padRight;
+    }
+
+    public void setPadRight(int padRight) {
+        this.padRight = padRight;
+    }
+
+    public char getPadChar() {
+        return padChar;
+    }
+
+    public void setPadChar(char padChar) {
+        this.padChar = padChar;
+    }
+
     public Object parse(final String value) {
         if (value == null) {
             return null;
@@ -150,11 +179,20 @@ public class PropertyFormat {
         if (result == null) {
             result = nullString;
         }
+        //str=null means null_string is null - do not trim or pad in this case, it can be undefined variable
         if (result == null) {
             return result;
         }
 
-        return trim ? result.trim() : result;
+        //trim and pad the result
+        result =  trim ? result.trim() : result;
+        return pad(result);
+    }
+
+    private String pad(String str) {
+        boolean left = padLeft > 0;
+        int width = left ? padLeft : padRight;
+        return width == 0 ? str : StringUtils.pad(str, left, width, padChar);
     }
 
 

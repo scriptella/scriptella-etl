@@ -28,6 +28,7 @@
         format.NumCol.type=number
         format.NumCol.trim=true
         format.NumCol.pattern=#.00
+        format.NumCol.pad_left=6
     </connection>
 
     <script connection-id="db">

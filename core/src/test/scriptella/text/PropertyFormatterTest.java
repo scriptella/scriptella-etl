@@ -23,6 +23,14 @@ public class PropertyFormatterTest extends TestCase {
         formatsMap.put("nullStrCol.null_string", "nullStr");
         formatsMap.put("numberCol.type", "number");
         formatsMap.put("numberCol.pattern", "00.00");
+        formatsMap.put("padNumberCol.type", "number");
+        formatsMap.put("padNumberCol.pattern", "0.0");
+        formatsMap.put("padNumberCol.pad_right", "5");
+        formatsMap.put("padNumberCol2.type", "number");
+        formatsMap.put("padNumberCol2.pattern", "0.0");
+        formatsMap.put("padNumberCol2.pad_left", "5");
+        formatsMap.put("padNumberCol2.pad_char", "_");
+
         props = new TypedPropertiesSource(formatsMap);
     }
 
@@ -62,6 +70,7 @@ public class PropertyFormatterTest extends TestCase {
     }
 
     public void testFormat() {
+
         PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
         PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
@@ -76,6 +85,7 @@ public class PropertyFormatterTest extends TestCase {
 
     public void testFormatDefaultNullStr() {
         formatsMap.put("null_string", "");
+
         PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
         PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
@@ -91,6 +101,21 @@ public class PropertyFormatterTest extends TestCase {
         assertEquals("Default toString conversion is expected", "1.1", result);
     }
 
+    public void testPadding() {
+        //Set default padding options
+        formatsMap.put("pad_left", "8");
+        formatsMap.put("pad_char", "-");
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatter pf = new PropertyFormatter(fi);
+        String result = pf.format("padNumberCol", 1);
+        assertEquals("1.0  ", result);
+        result = pf.format("padNumberCol2", 1);
+        assertEquals("__1.0", result);
+        //Test default padding
+        result = pf.format("NoSuchCol", 1);
+        assertEquals("-------1", result);
+
+    }
 
     public void testFormattingCallback() {
         PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
