@@ -21,15 +21,15 @@ public class PropertyFormatterTest extends TestCase {
     protected void setUp() throws Exception {
         formatsMap = new HashMap<String, String>();
         formatsMap.put("nullStrCol.null_string", "nullStr");
-        formatsMap.put("numberCol.type", "number");
-        formatsMap.put("numberCol.pattern", "00.00");
-        formatsMap.put("padNumberCol.type", "number");
-        formatsMap.put("padNumberCol.pattern", "0.0");
-        formatsMap.put("padNumberCol.pad_right", "5");
-        formatsMap.put("padNumberCol2.type", "number");
-        formatsMap.put("padNumberCol2.pattern", "0.0");
-        formatsMap.put("padNumberCol2.pad_left", "5");
-        formatsMap.put("padNumberCol2.pad_char", "_");
+        formatsMap.put("numbercol.type", "number");
+        formatsMap.put("numbercol.pattern", "00.00");
+        formatsMap.put("padNumbercol.type", "number");
+        formatsMap.put("padNumbercol.pattern", "0.0");
+        formatsMap.put("padNumbercol.pad_right", "5");
+        formatsMap.put("padNumbercol2.type", "number");
+        formatsMap.put("padNumbercol2.pattern", "0.0");
+        formatsMap.put("padNumbercol2.pad_left", "5");
+        formatsMap.put("padNumbercol2.pad_char", "_");
 
         props = new TypedPropertiesSource(formatsMap);
     }
