@@ -22,13 +22,13 @@
 
     <connection id="csv" driver="csv" url="tst://testfile">
         quote=
-        format.Text.trim=true
-        format.DateCol.type=date
-        format.DateCol.pattern=dd-MM-yyyy HH:mm
-        format.NumCol.type=number
-        format.NumCol.trim=true
-        format.NumCol.pattern=#.00
-        format.NumCol.pad_left=6
+        format.text.trim=true
+        format.datecol.type=date
+        format.datecol.pattern=dd-MM-yyyy HH:mm
+        format.numcol.type=number
+        format.numcol.trim=true
+        format.numcol.pattern=#.00
+        format.numcol.pad_left=6
     </connection>
 
     <script connection-id="db">

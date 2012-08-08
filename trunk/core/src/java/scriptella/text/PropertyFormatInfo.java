@@ -16,10 +16,10 @@
 package scriptella.text;
 
 import scriptella.spi.ConnectionParameters;
+import scriptella.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -55,7 +55,8 @@ public class PropertyFormatInfo {
      *                      defined in formatMap.
      */
     public PropertyFormatInfo(Map<String, PropertyFormat> formatMap, PropertyFormat defaultFormat) {
-        this.formatMap = new HashMap<String, PropertyFormat>(formatMap);
+        this.formatMap = CollectionUtils.newCaseInsensitiveAsciiMap();
+        this.formatMap.putAll(formatMap);
         this.defaultFormat = defaultFormat;
     }
 
@@ -97,7 +98,7 @@ public class PropertyFormatInfo {
      * @return {@link PropertyFormatInfo} with a specified column formatting.
      */
     public static PropertyFormatInfo parse(TypedPropertiesSource properties, String prefix) {
-        Map<String, PropertyFormat> map = new LinkedHashMap<String, PropertyFormat>();
+        Map<String, PropertyFormat> map = new HashMap<String, PropertyFormat>();
 
         //For null_string, fall back to non-prefix property(1.0 compatibility)
         String nullString = null;
