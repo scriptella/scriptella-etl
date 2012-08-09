@@ -36,6 +36,17 @@ public class PropertyFormatTest extends TestCase {
 
     }
 
+    public void testChoiceFormat() {
+        PropertyFormat ci = new PropertyFormat();
+        ci.setType("choice");
+        ci.setPattern("0#no files|1#{0} file|2<{0} files");
+        ci.setLocale(Locale.US);
+        assertEquals("no files", ci.format(0));
+        assertEquals("1 file", ci.format(1));
+        assertEquals("3 files", ci.format(3));
+        //FIXME Parse not supported for now
+    }
+
     public void testDateFormat() throws ParseException {
         PropertyFormat ci = new PropertyFormat();
         ci.setType("date");
