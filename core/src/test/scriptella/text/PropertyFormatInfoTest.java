@@ -60,7 +60,7 @@ public class PropertyFormatInfoTest extends TestCase {
         map.put("colA.pattern", "00.0");
         map.put("colB.trim", "true");
         map.put("prefix.column.type", "number"); //wrong definition should be recognized as "prefix"
-        final PropertyFormatInfo metadata = PropertyFormatInfo.parse(new TypedPropertiesSource(map), null);
+        final PropertyFormatInfo metadata = PropertyFormatInfo.parse(new TypedPropertiesSource(map), "");
         final Set<String> names = metadata.getFormatMap().keySet();
         assertEquals(new LinkedHashSet<String>(Arrays.asList("colA", "colB", "prefix.column")), names);
     }
@@ -87,6 +87,30 @@ public class PropertyFormatInfoTest extends TestCase {
         assertTrue(ci.isTrim());
         assertEquals("#", ci.getPattern());
         assertEquals("1", ci.getFormat().format(new Object[]{1.1}));
+    }
+
+    public void testDefaults() {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("format.trim", "true");
+        map.put("format.null_string", "--");
+        map.put("format.pad_left", "10");
+        map.put("format.pad_right", "20");
+        map.put("format.pad_char", "_");
+        map.put("format.testProp.type", "number");
+        map.put("format.testProp.trim", "false");
+        final PropertyFormatInfo metadata = PropertyFormatInfo.parse(new TypedPropertiesSource(map), "format.");
+        assertTrue(metadata.getDefaultFormat().isTrim());
+        assertEquals("--", metadata.getDefaultFormat().getNullString());
+        assertEquals(10, metadata.getDefaultFormat().getPadLeft());
+        assertEquals(20, metadata.getDefaultFormat().getPadRight());
+        assertEquals('_', metadata.getDefaultFormat().getPadChar());
+        final PropertyFormat p = metadata.getPropertyFormat("testProp");
+        assertEquals("number", p.getType());
+        assertEquals(10, p.getPadLeft());
+        assertEquals(20, p.getPadRight());
+        assertEquals('_', p.getPadChar());
+        assertEquals('_', p.getPadChar());
+        assertFalse(p.isTrim());
     }
 
 }
