@@ -218,9 +218,9 @@ therefore we've chosen to preserve these blocks until user explicitly specify th
 </code>
 Copies rows from data.csv file to report.csv, additionally the ID column is added.
 The result file is semicolon separated.
-<h2><a name="formatting">Custom formatting/parsing rules for properties</a></h2>
+<h2><a name="formatting">Declarative formatting/parsing rules for property substitution</a></h2>
 Starting from version 1.1 Scriptella supports configurable rules for formatting and parsing of property values. The rules are
-described in a form of connection parameters prefixed with "format.".
+described in a form of connection parameters prefixed with a "format." string.
 <br>Example of defining a format for a numeric property with 2 digits after a decimal point:
 <pre>
 format.someColumn.type=number
@@ -229,20 +229,45 @@ format.someColumn.pattern=000.00
 
 <p>Each property has the following formatting/parsing options (see <a href="../../text/PropertyFormat.html">PropertyFormat</a> class for implementation details):
 <ul>
-    <li>trim - Set to true if the values must be trimmed. Default value is false.</li>
+    <li>trim - Set to true if the values must be trimmed when formatted or parsed. Default value is false.</li>
     <li>null_string - Defines a string to represent null values when formatting or parsing.</li>
     <li>type - type of the property. Built-in types: number,date,time,choice and timestamp. Custom Format classes can be specified in className option.</li>
-    <li>pattern - pattern to use for formatting or parsing. Depends on type of property. Java <a href="http://docs.oracle.com/javase/1.4.2/docs/api/java/text/MessageFormat.html">MessageFormat</a> patterns like dd.MM.yyyy, ##.## are supported out of the box</li>
+    <li>pattern - pattern to use for formatting or parsing. Depending on a "type" attribute, the following patterns are supported:
+        <table border="1">
+            <tr>
+                <th>Type(s)</th>
+                <th>Patterns</th>
+            </tr>
+            <tr>
+                <td>number</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html">Decimal format pattern</a>, e.g. <code>###,###.##</code> or <code>#.00</code></td>
+            </tr>
+            <tr>
+                <td>date<br>time</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">date/time pattern</a>, e.g. <code>yyyy-MM-dd'T'HH:mm:ss.SSSZ</code></td>
+            </tr>
+            <tr>
+                <td>timestamp</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/sql/Timestamp.html">JDBC timestamp escape format pattern</a> - <code> yyyy-mm-dd hh:mm:ss.fffffffff</code>, where <code>ffffffffff</code> indicates nanoseconds.</td>
+            </tr>
+            <tr>
+                <td>choice</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/ChoiceFormat.html">Choice-format pattern</a>, e.g. <code>0#no files|1#{0} file|2<{0} files</code>, .</td>
+            </tr>
+        </table>
+    </li>
+    <li>className - name of a custom format class. It must subclass java.text.Format and have a public no-args constructor.</li>
     <li>locale - locale to use</li>
     <li>pad_left, pad_right - Controls padding width of the formatted value</li>
     <li>pad_char - character to use for padding</li>
 </ul>
 <h3>Default values for formatting and parsing rules</h3>
-It is possible to provide default values for the following properties:
+It is possible to provide default values for most of the properties:
 <ul>
     <li>format.trim - default trim option for parsing and formatting property values</li>
     <li>format.null_string - same as null_string. Default value to represent null values</li>
-    <li>locale - TBD</li>
+    <li>locale - default locale for formatting and parsing.</li>
+    <li>pad_left, pad_right, pad_char - default padding options</li>
 </ul>
 <a href="https://github.com/scriptella/scriptella-examples/tree/master/currency">Currency example</a> demonstrates usage of formatting rules.
 </body>

@@ -35,7 +35,7 @@ public class PropertyFormatterTest extends TestCase {
     }
 
     public void testParse() {
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         PropertyFormatter pf = new PropertyFormatter(fi);
         Object result = pf.parse("nullStrCol", "nullStr");
         assertNull(result);
@@ -51,7 +51,7 @@ public class PropertyFormatterTest extends TestCase {
     public void testParseDefaultNullStr() {
         //Define column format with empty string as null
         formatsMap.put("null_string", "");
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.parse("nullStrCol", "nullStr");
         assertNull(result);
@@ -71,7 +71,7 @@ public class PropertyFormatterTest extends TestCase {
 
     public void testFormat() {
 
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
         assertEquals("Unmodified value is expected", "", result);
@@ -86,7 +86,7 @@ public class PropertyFormatterTest extends TestCase {
     public void testFormatDefaultNullStr() {
         formatsMap.put("null_string", "");
 
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         PropertyFormatter cf = new PropertyFormatter(fi);
         Object result = cf.format("nullStrCol", "");
         assertEquals("Unmodified value is expected", "", result);
@@ -105,10 +105,10 @@ public class PropertyFormatterTest extends TestCase {
         //Set default padding options
         formatsMap.put("pad_left", "8");
         formatsMap.put("pad_char", "-");
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         PropertyFormatter pf = new PropertyFormatter(fi);
         String result = pf.format("padNumberCol", 1);
-        assertEquals("1.0  ", result);
+        assertEquals("-----1.0", result);
         result = pf.format("padNumberCol2", 1);
         assertEquals("__1.0", result);
         //Test default padding
@@ -118,7 +118,7 @@ public class PropertyFormatterTest extends TestCase {
     }
 
     public void testFormattingCallback() {
-        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, null);
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("numberCol", 1.1);
         ParametersCallback c = new MapParametersCallback(params);
@@ -138,7 +138,7 @@ public class PropertyFormatterTest extends TestCase {
 
         //Now test with empty string as null string
         formatsMap.put("null_string", "");
-        fi = PropertyFormatInfo.parse(props, null);
+        fi = PropertyFormatInfo.parse(props, "");
         params.put("numberCol", 1);
         cf = new PropertyFormatter(fi);
         formatter = cf.format(c);
@@ -148,6 +148,15 @@ public class PropertyFormatterTest extends TestCase {
         assertEquals("null must be formatted as nullStr", "nullStr", result);
         result = formatter.getParameter("nosuchcol");
         assertEquals("Empty string must be returned for nonexistent column", "", result);
+    }
+
+    public void testDefaults() {
+        formatsMap.put("pad_left", "10");
+        formatsMap.put("pad_char", "_");
+        PropertyFormatInfo fi = PropertyFormatInfo.parse(props, "");
+        PropertyFormatter pf = new PropertyFormatter(fi);
+        final String s = pf.format("numbercol", 2);
+        assertEquals("_____02.00", s);
     }
 
 

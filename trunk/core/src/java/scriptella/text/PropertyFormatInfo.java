@@ -94,26 +94,27 @@ public class PropertyFormatInfo {
      * </pre>
      *
      * @param properties properties defining formatting.
-     * @param prefix     prefix for recognizing formatting properties.
+     * @param prefix     prefix for recognizing formatting properties. Nulls not allowed
      * @return {@link PropertyFormatInfo} with a specified column formatting.
      */
     public static PropertyFormatInfo parse(TypedPropertiesSource properties, String prefix) {
+        if (prefix == null) {
+            throw new IllegalArgumentException("Null prefix is not allowed - use empty string instead");
+        }
         Map<String, PropertyFormat> map = new HashMap<String, PropertyFormat>();
 
         //For null_string, fall back to non-prefix property(1.0 compatibility)
-        String nullString = null;
-        if (prefix != null) {
-            nullString = properties.getStringProperty(prefix + NULL_STRING);
-        }
+        String nullString = properties.getStringProperty(prefix + NULL_STRING);
         if (nullString == null) {
             nullString = properties.getStringProperty(NULL_STRING);
         }
         PropertyFormat defaultFormat = new PropertyFormat();
         defaultFormat.setNullString(nullString);
-        setProperty(defaultFormat, TRIM, TRIM, properties);
-        setProperty(defaultFormat, PAD_LEFT, PAD_LEFT, properties);
-        setProperty(defaultFormat, PAD_RIGHT, PAD_LEFT, properties);
-        setProperty(defaultFormat, PAD_CHAR, PAD_CHAR, properties);
+        setProperty(defaultFormat, TRIM, prefix + TRIM, properties);
+        setProperty(defaultFormat, PAD_LEFT, prefix + PAD_LEFT, properties);
+        setProperty(defaultFormat, PAD_RIGHT, prefix + PAD_RIGHT, properties);
+        setProperty(defaultFormat, PAD_CHAR, prefix + PAD_CHAR, properties);
+        setProperty(defaultFormat, LOCALE, prefix + LOCALE, properties);
 
         for (String key : properties.getKeys()) {
             if (isPrefixed(key, prefix)) {
@@ -129,6 +130,10 @@ public class PropertyFormatInfo {
                         //Copy defaults(can be overridden later)
                         ci.setNullString(defaultFormat.getNullString());
                         ci.setTrim(defaultFormat.isTrim());
+                        ci.setPadLeft(defaultFormat.getPadLeft());
+                        ci.setPadRight(defaultFormat.getPadRight());
+                        ci.setPadChar(defaultFormat.getPadChar());
+                        ci.setLocale(defaultFormat.getLocale());
                         map.put(columnName, ci);
                     }
                     setProperty(ci, columnProp, key, properties);
