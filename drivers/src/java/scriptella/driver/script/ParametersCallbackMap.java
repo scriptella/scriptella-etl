@@ -73,9 +73,10 @@ public class ParametersCallbackMap implements ParametersCallback, Map<String, Ob
      * @return value of variable or null if variable not found.
      */
     public Object getParameter(final String name) {
-        Object v = localVariables == null ? null : localVariables.get(name);
-        if (v != null) {
-            return v;
+        //TSK-52993 ParametersCallbackMap ignores a null value if a variable was already defined
+        //Always use an overridden value, even if it's null
+        if (localVariables != null && localVariables.containsKey(name)) {
+            return localVariables.get(name);
         }
         return parentParameters.getParameter(name);
     }

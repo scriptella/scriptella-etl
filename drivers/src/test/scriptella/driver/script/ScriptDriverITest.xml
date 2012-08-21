@@ -6,7 +6,8 @@
     <connection driver="script">
         language=JavaScript
     </connection>
-    <query><![CDATA[
+    <!-- test #1 - iterate through numbers from 0 to 9 and notify callback -->
+    <query if="testNr==1"><![CDATA[
         for (var i=0;i<n;i++) {
             k=i;
             query.next();
@@ -15,4 +16,23 @@
             callback.notify(k);
         </script>
     </query>
+
+    <!-- test #2 - tests overriding of "i" variable to null (BUG #52993 ) -->
+    <query if="testNr==2">
+        i=1;
+        query.next();
+        <query>
+            if (i==1) {
+                i=null;
+            }
+            query.next();
+            <script>
+                //Special check to avoid Rhino ReferenceError: "i" is not defined.
+                i = (typeof i == 'undefined')? null : i;
+
+                callback.notify(i);
+            </script>
+        </query>
+    </query>
+
 </etl>
