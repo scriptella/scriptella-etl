@@ -156,7 +156,7 @@ ${class:forName('java.lang.System').getProperty('propName')}
             </answer>
         </faq>
         <faq id="COMMIT">
-            <question>How to control committment and transactions?</question>
+            <question>How to control commit options and transactions?</question>
             <answer><p>The following connection parameters are supported by the JDBC bridge:</p>
                 <ul>
                     <li><code>transaction.isolation</code> - Transaction isolation level name</li>
@@ -173,6 +173,34 @@ ${class:forName('java.lang.System').getProperty('propName')}
     autocommit.size=4 <!-- Automatically commit after every 4th statement -->
     transaction.isolation=SERIALIZABLE <!-- Sets TX level to Serializable -->
 </connection>]]></source>
+            </answer>
+        </faq>
+        <faq id="UPSERT">
+            <question>How to UPSERT (update or insert into a table?)</question>
+            <answer><p>You can leverage database-specific SQL statements like MERGE or UPSERT. See answers on StackOverflow:</p>
+                <ul>
+                    <li><a href="http://stackoverflow.com/questions/237327/oracle-how-to-upsert-update-or-insert-into-a-table">Oracle</a></li>
+                    <li><a href="http://stackoverflow.com/questions/1218905/how-do-i-update-if-exists-insert-if-not-aka-upsert-or-merge-in-mysql">MySQL</a></li>
+                    <li><a href="http://stackoverflow.com/questions/108403/solutions-for-insert-or-update-on-sql-server">MS SQL Server</a></li>
+                </ul>
+                <p>An alternative approach, which is universal but is typically slower, is to use count(*) statement and do insert or update accordingly:</p>
+                <source>
+                    <![CDATA[
+<query connection-id="in">
+    SELECT * FROM Persons_In
+    <query connection-id="out">
+       SELECT COUNT(*) as cnt FROM Person_Out WHERE Person_ID=?Person_ID
+       <!-- If nothing found - insert -->
+       <script if="!cnt">
+          INSERT INTO Person_OUT VALUES (Person_ID, Person_Name, ...);
+       </script>
+       <!-- Otherwise - update -->
+       <script if="cnt">
+          UPDATE Person_OUT SET Person_Name=?Person_Name WHERE Person_ID = ?Person_ID;
+       </script>
+    </query>
+</query>]]>
+                </source>
             </answer>
         </faq>
     </faqsection>
