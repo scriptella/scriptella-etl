@@ -191,11 +191,11 @@ ${class:forName('java.lang.System').getProperty('propName')}
     <query connection-id="out">
        SELECT COUNT(*) as cnt FROM Person_Out WHERE Person_ID=?Person_ID
        <!-- If nothing found - insert -->
-       <script if="!cnt">
+       <script if="cnt==0">
           INSERT INTO Person_OUT VALUES (Person_ID, Person_Name, ...);
        </script>
        <!-- Otherwise - update -->
-       <script if="cnt">
+       <script if="cnt gt 0">
           UPDATE Person_OUT SET Person_Name=?Person_Name WHERE Person_ID = ?Person_ID;
        </script>
     </query>
