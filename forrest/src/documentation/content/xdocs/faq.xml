@@ -54,16 +54,17 @@
     <connection url="jdbc:...." id="db"/>
 
     <!-- Set number of records as a global variable -->
+    <!-- Note that JEXL syntax etl.globals['globalVar'] does not work in JavaScript -->
     <query connection-id="db">
         select count(id) as c from Errors
         <script connection-id="js">
-            etl.globals['errorsCount'] = c;
+            etl.globals.put('errorsCount', c);
         <script>
     </query>
 
     <!-- Then reuse this variable in other parts of ETL file -->
-    <script connection-id="js" if="etl.globals['errorsCount'] gt 0">
-        java.lang.System.out.println('errors count ='+etl.globals['errorsCount']);
+    <script connection-id="js" if="etl.globals.get('errorsCount') gt 0">
+        java.lang.System.out.println('errors count ='+etl.globals.get('errorsCount'));
     </script>
 
     <!-- Alternatively an outer query can be used to share an array based variable between scripts -->
