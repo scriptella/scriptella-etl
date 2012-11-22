@@ -355,6 +355,36 @@
                     Please note that uploading large <strong>text</strong> files may create a temporary file on disk.</p>
 				<note>Music Store example demonstrates usage of file references</note>
 			</section>
+            <section>
+                <title>Declarative formatting and parsing rules for variables</title>
+                <p>Scriptella supports declarative formatting/parsing rules for variables. This feature is available for the following drivers: <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>, <a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a> and <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>.
+                Rules can be specified as properties of a connection element. Depending on the context, the same rule can be used for formatting objects as strings and parse text as date/time or a number. Example: </p>
+                <source><![CDATA[
+                <connection id="csv_in" driver="csv" url="eurusd_in.csv">
+                    format.RateBid.type=number
+                    format.RateBid.pattern=#.#
+                </connection>]]></source>
+                <p>The declaration above instructs CSV driver to treat values of "RateBid" variable as a decimal number using "#.#:" format pattern. When the values are read from a CSV/text files,
+                the rule will be used for parsing.</p>
+                <source><![CDATA[
+                <query connection-id="csv_in">
+                    <script connection-id="db">
+                        INSERT INTO Rates(TIME, CurrencyPair, Bid, Ask) VALUES (?RateDateTime, ?CurrencyPair, ?RateBid, ?RateAsk);
+                    </script>
+                </query>]]></source>
+
+                <p>And vice versa, when producing the output file, the rules are used to format values of the outputted variables:</p>
+                <source><![CDATA[
+                <connection id="csv_in" driver="csv" url="eurusd_in.csv">
+                    format.Bid.type=number
+                    format.Bid.pattern=##.0000
+                </connection>
+                <script connection-id="csv">
+                    $CurrencyPair, $TIME, $Bid, $Ask
+                </script>]]></source>
+                <p>A complete example is provided in a blog post about <a href="http://scriptella.wordpress.com/2012/08/14/new-feature-flexible-formatting-and-parsing-rules-in-csv-and-text-files/">Flexible formatting and parsing rules in CSV and text files</a>.
+                Detailed information about available formatting/parsing options is available on <a href="../docs/api/scriptella/driver/text/package-summary.html#formatting">Text Driver overview page</a>.</p>
+            </section>
 			<section>
 				<title>Examples</title>
 				<p>Execute a SQL query over a table specified by a TABLE property and inserts the first row into TABLE2</p>
