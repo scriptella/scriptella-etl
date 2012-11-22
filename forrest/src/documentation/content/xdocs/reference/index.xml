@@ -560,13 +560,57 @@
                 </section>
             </section>
         </section>
-		<section id="inprocess">
+        <section id="maven">
+            <title>Maven Integration</title>
+            <p>The following POM dependency snippets can be used:</p>
+            <source><![CDATA[
+    <properties>
+        <scriptella.version>1.0</scriptella.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.javaforge.scriptella</groupId>
+            <artifactId>scriptella-core</artifactId>
+            <version>${scriptella.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.javaforge.scriptella</groupId>
+            <artifactId>scriptella-drivers</artifactId>
+            <version>${scriptella.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.javaforge.scriptella</groupId>
+            <artifactId>scriptella-tools</artifactId>
+            <version>${scriptella.version}</version>
+        </dependency>
+    </dependencies>
+]]>
+            </source>
+            <p>In order to use SNAPSHOT dependencies, the following repositories have to be added to pom.xml:</p>
+            <source><![CDATA[
+    <distributionManagement>
+        <repository>
+            <id>scriptella-releases</id>
+            <name>Scriptella Central Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>scriptella-snapshots</id>
+            <name>Scriptella Central Development Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+]]>
+            </source>
+        </section>
+        <section id="inprocess">
 			<title>In-Process Java Integration</title>
-			<p>Although Ant and command line execution are the most typical usage scenarious, it may be helpful to
+			<p>Although Ant and command line execution are the most typical usage scenarios, it may be helpful to
                 invoke
                 Scriptella directly from Java code. Typical use cases for in-process integration:</p>
 			<ul>
-				<li>Preparing datasources for testing. Example: create the database before a test case, and cleanup on
+				<li>Preparing data-sources for testing. Example: create the database before a test case, and cleanup on
                     test completion.</li>
 				<li>Creating/upgrading database schema on application startup. Example: creating a database on web
                     application initialization, very helpful in user friendly, zero-deployment or demo
