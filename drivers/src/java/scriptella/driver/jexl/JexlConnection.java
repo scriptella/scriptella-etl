@@ -17,6 +17,7 @@ package scriptella.driver.jexl;
 
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.Script;
+import scriptella.driver.script.MissingQueryNextCallDetector;
 import scriptella.driver.script.ParametersCallbackMap;
 import scriptella.expression.JexlExpression;
 import scriptella.spi.AbstractConnection;
@@ -57,8 +58,13 @@ public class JexlConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ProviderException {
-        run(queryContent, new JexlContextMap(new ParametersCallbackMap(parametersCallback, queryCallback)));
+        final ParametersCallbackMap parametersMap = new ParametersCallbackMap(parametersCallback, queryCallback);
+        MissingQueryNextCallDetector detector = new MissingQueryNextCallDetector(parametersMap, queryContent);
+        run(queryContent, new JexlContextMap(parametersMap));
+        detector.detectMissingQueryNextCall();
     }
+
+
 
     private void run(Resource resource, JexlContextMap ctx) {
         Script script = cache.get(resource);

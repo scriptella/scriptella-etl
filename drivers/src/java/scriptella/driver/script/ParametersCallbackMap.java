@@ -42,7 +42,7 @@ public class ParametersCallbackMap implements ParametersCallback, Map<String, Ob
     private Map<String, Object> localVariables;
     private ParametersCallback parentParameters;
     private QueryCallback queryCallback;
-
+    private boolean nextCalled;
 
     /**
      * Initializes instance and set parent parameters to use in {@link #getParameter(String)}.
@@ -156,9 +156,17 @@ public class ParametersCallbackMap implements ParametersCallback, Map<String, Ob
      * Executes nested elements and exposes local variables set by the current query.
      */
     public void next() {
+        nextCalled = true;
         queryCallback.processRow(this);
     }
 
+    /**
+     * CRQ-12257. Returns true if next was called on this query.
+     * @return true if next was called on this query.
+     */
+    public boolean isNextCalled() {
+        return nextCalled;
+    }
 
     //Unsupported operations
 
