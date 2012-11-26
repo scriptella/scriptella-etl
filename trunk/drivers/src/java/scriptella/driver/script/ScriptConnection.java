@@ -101,7 +101,7 @@ public class ScriptConnection extends AbstractConnection {
         }
         if (!StringUtils.isEmpty(parameters.getUrl())) { //if url is specified
             url = parameters.getResolvedUrl();
-            //setup reader and writer for it
+            //setUp reader and writer for it
             ScriptContext ctx = engine.getContext();
             ctx.setReader(new LazyReader());
             //JS engine bug - we have to wrap with PrintWriter, because otherwise print function won't work.
@@ -132,7 +132,10 @@ public class ScriptConnection extends AbstractConnection {
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ScriptProviderException, ConfigurationException {
-        run(queryContent, new BindingsParametersCallback(parametersCallback, queryCallback));
+        final BindingsParametersCallback bindingsParametersCallback = new BindingsParametersCallback(parametersCallback, queryCallback);
+        MissingQueryNextCallDetector detector = new MissingQueryNextCallDetector(bindingsParametersCallback, queryContent);
+        run(queryContent, bindingsParametersCallback);
+        detector.detectMissingQueryNextCall();
     }
 
     /**
