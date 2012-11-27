@@ -5,6 +5,7 @@
     <path id="test.classpath">
         <path refid="classpath"/>
         <pathelement location="${basedir}/../lib/hsqldb.jar"/>
+        <pathelement location="${basedir}/../lib/junit.jar"/>
         <pathelement location="${basedir}/../lib/commons-logging.jar"/>
     </path>
 

@@ -8,6 +8,7 @@
         <pathelement location="${basedir}/../lib/commons-logging.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/hsqldb.jar"/>
+        <pathelement location="${basedir}/../lib/junit.jar"/>
     </path>
     <import file="../build-templates/build-template.xml"/>
 
