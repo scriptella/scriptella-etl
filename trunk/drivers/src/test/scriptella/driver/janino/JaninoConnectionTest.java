@@ -15,7 +15,7 @@
  */
 package scriptella.driver.janino;
 
-import org.codehaus.janino.CompileException;
+import org.codehaus.commons.compiler.CompileException;
 import scriptella.AbstractTestCase;
 import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
@@ -87,14 +87,25 @@ public class JaninoConnectionTest extends AbstractTestCase {
             assertEquals("a='", e.getErrorStatement());
         }
         //test execution errors
+        //Enable debug info for Janino
+        System.setProperty("org.codehaus.janino.source_debugging.enable", "true");
         try {
             c.executeScript(new StringResource("int b=1;\nObject a=get(\"1\");"), MockParametersCallbacks.UNSUPPORTED);
             fail("Error statements must be recognized");
         } catch (JaninoProviderException e) {
+            assertTrue("UnsupportedOperationException is expected to be thrown by get() method", e.getCause() instanceof UnsupportedOperationException);
+            // Error statement cann be determined because line info is available
             assertEquals("Object a=get(\"1\");", e.getErrorStatement());
         }
-
-
-
+        //Disable debug info for Janino
+        System.getProperties().remove("org.codehaus.janino.source_debugging.enable");
+        try {
+            c.executeScript(new StringResource("int b=1;\nObject a=get(\"1\");"), MockParametersCallbacks.UNSUPPORTED);
+            fail("Error statements must be recognized");
+        } catch (JaninoProviderException e) {
+            assertTrue("UnsupportedOperationException is expected to be thrown by get() method", e.getCause() instanceof UnsupportedOperationException);
+            // Error statement cannot be determined because line info is not available
+            assertNull(e.getErrorStatement());
+        }
     }
 }
