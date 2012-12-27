@@ -41,11 +41,17 @@
             <action context="code" type="add" dev="ejboy" fixes-bug="12161">
                 JEXL 2.0 Support
             </action>
-            <action context="code" type="update" dev="ejboy" fixes-bug="52167">
+            <action context="code" type="add" dev="ejboy" fixes-bug="52167">
                 Flexible parsing/formatting rules for text/csv drivers
             </action>
             <action context="code" type="update" dev="ejboy" fixes-bug="14268">
                 JDBC: Add support for queries in batch-mode
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="12257">
+                Detect missing query.next call
+            </action>
+            <action context="code" type="update" dev="ejboy" fixes-bug="7157">
+                Add support for batch execution.
             </action>
         </release>
         <release version="1.0" date="2010-05-05">
