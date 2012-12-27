@@ -358,7 +358,7 @@
             <section>
                 <title>Declarative formatting and parsing rules for variables</title>
                 <p>Scriptella supports declarative formatting/parsing rules for variables. This feature is available for the following drivers: <a href="../docs/api/scriptella/driver/text/package-summary.html">Text</a>, <a href="../docs/api/scriptella/driver/csv/package-summary.html">CSV</a> and <a href="../docs/api/scriptella/driver/velocity/package-summary.html">Velocity</a>.
-                Rules can be specified as properties of a connection element. Depending on the context, the same rule can be used for formatting objects as strings and parse text as date/time or a number. Example: </p>
+                Rules can be specified as properties of a connection element. Depending on the context, the same rule can be used for converting objects to a string form and parse text values as date, time or numbers. Example: </p>
                 <source><![CDATA[
                 <connection id="csv_in" driver="csv" url="eurusd_in.csv">
                     format.RateBid.type=number
