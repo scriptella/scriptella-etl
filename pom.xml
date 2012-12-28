@@ -19,7 +19,7 @@
 
     <groupId>com.javaforge.scriptella</groupId>
     <artifactId>scriptella-parent</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Scriptella</name>
@@ -59,9 +59,9 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://anonymous:anon@javaforge.com/svn/scriptella/tags/scriptella-parent-1.1</connection>
-        <developerConnection>scm:svn:http://javaforge.com/svn/scriptella/tags/scriptella-parent-1.1</developerConnection>
-        <url>http://www.javaforge.com/proj/sources/sccBrowse.do?proj_id=781&amp;dirname=trunk/tags/scriptella-parent-1.1?proj_id=781&amp;dirname=trunk/</url>
+        <connection>scm:svn:http://anonymous:anon@javaforge.com/svn/scriptella/trunk/</connection>
+        <developerConnection>scm:svn:http://javaforge.com/svn/scriptella/trunk/</developerConnection>
+        <url>http://www.javaforge.com/proj/sources/sccBrowse.do?proj_id=781&amp;dirname=trunk/</url>
     </scm>
     <issueManagement>
         <system>JavaForge Bug Tracker</system>
