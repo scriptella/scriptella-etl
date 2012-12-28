@@ -1,0 +1,34 @@
+<body>
+JNDI Datasource Driver for Scriptella.
+<p>This driver allows to work with JNDI-bound datasource connections,
+    useful in J2EE environment</p>
+<p>This driver acts as a proxy and relies on <a href="../../jdbc/package-summary.html">JDBC Bridge</a>.</p>
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.jndi.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>Driver alias name:</b></td><td><code>jndi</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>JNDI name of the datasource</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+    </tr>
+</table>
+<h2>Notes</h2>
+<p>Depending on your environment you may need to specify additional JNDI properties
+inside a connection element. These settings will take precedence over jndi.properties and System properties.</p>
+
+<h2>Example</h2>
+<code><pre>
+    &lt;connection driver="jndi" url="ds/appDataSource"&gt;
+        #Default settings should work in J2EE environment, but you may reconfigure JNDI here
+        #java.naming.factory.initial=jndi.provider.Factory
+    &lt;/connection&gt;
+</pre></code>
+
+</body>

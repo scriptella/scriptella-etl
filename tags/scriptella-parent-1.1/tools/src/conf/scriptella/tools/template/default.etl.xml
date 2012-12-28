@@ -1,0 +1,29 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <description>Scriptella ETL File Template.</description>
+    <properties>
+        <include href="{0}"/> <!--Load from external properties file-->
+    </properties>
+    <!-- Connection declarations -->
+    <connection driver="$driver" url="$url" user="$user" password="$password" classpath="$classpath"/>
+    <!-- Uncomment and add extra connections if necessary. In this case connection-id is required for ALL connections
+    <connection id="con2" driver="$driver2" url="$url2" user="$user2" password="$password2" classpath="$classpath2">
+        connection.property.name=value
+    </conection>
+    -->
+
+    <!--ETL Queries and Scripts -->
+    <script>
+        -- Put SQL Here or use include element:
+        <!-- <include href="schema.sql"/> -->
+    </script>
+
+    <!-- Uncomment and modify to run a query-based transformation
+    <query connection-id="con1">
+        SELECT * FROM Table
+        <script connection-id="con2">
+            INSERT INTO Table(ID, Name, Password) VALUES (?1, ?2, ?password);
+        </script>
+    </query>
+    -->
+</etl>

@@ -1,0 +1,67 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        xpath=/Workbook/Worksheet/Table/Row
+    </properties>
+    <connection id="in1" driver="xpath" url="excel.xml">
+        return_arrays=true
+    </connection>
+    <connection id="in2" driver="xpath" url="xml1.xml"/>
+    <connection id="in3" driver="xpath" url="xml2.xml"/>
+    <connection id="out" driver="text" url="tst://testfile"/>
+
+
+    <query connection-id="in1" if="test==1">
+        ${xpath}
+        <script connection-id="out">${Cell[0]};${Cell[1]}</script>
+    </query>
+
+    <!-- Test2: Querying the same datasource. Joining <tr><td>1</td> with <th>Col1</th> -->
+    <query connection-id="in2" if="test==2">
+        /html/body/table/tr[2]/td[1]
+        <query>
+            /html/body/table/tr/th[2]
+            <script connection-id="out">$td;$th</script>
+        </query>
+    </query>
+
+    <!-- Test3: Querying the same datasource.
+        Using relative xpaths select tr[2]/td[2] -->
+    <query connection-id="in2" if="test==3">
+        /html/body/table/tr[2]
+        <query>
+            ./td[2]
+            <script connection-id="out">$td</script>
+        </query>
+    </query>
+
+    <!-- Test4: Querying 2 datasources.
+   Using relative xpaths select tr[2]/td[2] -->
+    <query connection-id="in2" if="test==4">
+        /html/body/table/tr[2]/td[1] <!-- <td>1</td> -->
+        <query connection-id="in3">
+            <!-- select <element attribute=1><attribute>2</attribute></element> -->
+            /xml/element[@attribute=$td]
+            <script connection-id="out">$td;$element</script>
+        </query>
+    </query>
+
+    <!-- Test5: History test for bug when query is overriding context of the sibling -->
+    <query connection-id="in2" if="test==5">
+        /html/body/table/tr[2]
+        <query>
+            ./td[1]
+        </query>
+        <query>
+            ./td[2]
+            <script connection-id="out">$td</script>
+        </query>
+    </query>
+
+    <!-- Test6: Relative querying with 'node' variable.
+        Using relative xpaths select tr[2]/td[2] and tr[3]/td[2] -->
+    <query connection-id="in2" if="test==6">
+        /html/body/table
+        <script connection-id="out">${node.getString("./tr[2]/td[2]")};${node.getString("./tr[3]/td[2]")}</script>
+    </query>
+</etl>

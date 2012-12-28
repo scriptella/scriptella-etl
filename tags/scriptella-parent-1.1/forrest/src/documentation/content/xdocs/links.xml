@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "dtd/document-v20.dtd">
+<document>
+    <header>
+        <title>Links related to Scriptella</title>
+    </header>
+    <body>
+        <section>
+            <title>Powered by Scriptella</title>
+            <p>Use this button to let people know your favorite ETL tool:</p>
+            <table>
+                <tr><td><figure alt="Powered by Scriptella ETL" src="images/scriptella-powered.gif"/></td><td>
+                    <![CDATA[<a href="http://scriptella.javaforge.com/"
+title="Powered by Scriptella ETL"><img src="http://scriptella.javaforge.com/images/scriptella-powered.gif"
+width="88" height="31" border="0" alt="Powered by Scriptella ETL"></a>]]></td></tr>
+            </table>
+        </section>
+        <section>
+            <title>Scriptella-Related Sites</title>
+            <ul>
+                <li><a href="http://scriptella.wordpress.com">Scriptella Blog</a></li>
+                <li><a href="http://jroller.com/page/ejboy">Author's Blog</a></li>
+                <li><a href="http://stackoverflow.com/tags/scriptella">Scriptella on StackOverflow</a></li>
+                <li><a href="https://github.com/scriptella/scriptella-examples">Scriptella Examples on GitHub</a></li>
+                <li>Article: <a href="http://www.javaworld.com/community/node/5234/">Groovy ETLs with Scriptella</a></li>
+                <li><a href="http://www.ohloh.net/projects/4526"><img src="http://www.ohloh.net/projects/4526/badge.gif" alt="Metrics by Ohloh"/></a> - Scriptella ETL metrics by Ohloh</li>
+                <li>Follow us on <a href="https://twitter.com/scriptella">Twitter</a></li>
+                <li>Scriptella is a member of <a href="http://www.datamigrationpro.com">DataMigrationPro.com</a> global professional community.</li>
+                <li><a href="http://snippets.dzone.com/tag/scriptella">Scriptella examples at DZone Snippets</a></li>
+            </ul>
+        </section>
+        <section>
+            <title>Companies and products that use Scriptella</title>
+            <ul>
+                <li><a href="http://www.cfosoft.com">CFOsoft</a> uses Scriptella for their <a href="http://www.cfosoft.com/technology_opensource.php">Laguna BI platform</a>.</li>
+            </ul>
+        </section>
+    </body>
+</document>

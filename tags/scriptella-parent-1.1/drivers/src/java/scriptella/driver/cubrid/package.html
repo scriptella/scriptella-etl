@@ -1,0 +1,41 @@
+<body>
+Cubrid Driver Adapter for Scriptella.
+<p><b>Note: </b>The driver tries to load Cubrid JDBC driver.
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td>
+        <td><code>scriptella.driver.cubrid.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td>
+        <td><code>Same as for Cubrid JDBC Driver. Ex:jdbc:CUBRID:127.0.0.1:30000:demodb:::</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td>
+        <td><code><a href="http://www.cubrid.org">cubrid-connector-java.jar</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <th>Broker Port</th>
+        <th>The port number used for connection</th>
+        <th>Yes</th>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection url="jdbc:CUBRID:127.0.0.1:30000:demodb:::" user="dba" password=""&gt;
+    &lt;/connection&gt;
+</pre>
+</code>
+
+</body>

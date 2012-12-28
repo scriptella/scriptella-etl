@@ -1,0 +1,273 @@
+<body>
+<h1>Text Driver for Scriptella.</h1>
+It allows querying a text file based on regular expressions, the text driver
+can also be used as a lightweight replacement for Velocity to produce
+simple output with properties substitution.
+<p>Text driver does depends on additional libraries and is generally faster than CSV or Velocity driver.</p>
+
+<p><b>Note: </b>The driver doesn't use SQL syntax
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td>
+        <td><code>scriptella.driver.text.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td>
+        <td><code>Text file URL. URIs are resolved relative to a script file directory.
+            If url has no value the output is read from/printed to the console (System.out).</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td>
+        <td><code>None</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>encoding</td>
+        <td>Specifies charset encoding of Text files.</td>
+        <td>No, the system default encoding is used.</td>
+    </tr>
+    <tr>
+        <td>eol</td>
+        <td>End-Of-Line suffix.<p>Only valid for &lt;script&gt; elements.</td>
+        <td>No, the default value is <code>\n</code>.</td>
+    </tr>
+    <tr>
+        <td>trim</td>
+        <td>Value of <code>true</code> specifies that the leading and trailing
+            whitespaces in text file lines should be omitted.
+        <td>No, the default value is <code>true</code>.</td>
+    </tr>
+    <tr>
+        <td>flush</td>
+        <td>Value of <code>true</code> specifies that the outputted content should flushed immediately when
+            the &lt;script&gt; element completes.
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+    <tr>
+        <td>skip_lines</td>
+        <td>The number of lines to skip before start reading.
+        <td>No, the default value is <code>0</code> (no lines are skipped).</td>
+    </tr>
+    <tr>
+        <td>null_string</td>
+        <td>Specifies string token to represent Java <code>null</code> literal.
+            <p>
+                When querying a text file, regex group equal to null_string is returned as Java null.<br>
+                When outputting content, if null_string is specified, all the missing variables, or the vars with a null
+                value
+                are substituted with <code>null_string</code>.
+
+            <p>Specify an empty string (<code>null_string=</code>) to automatically convert between nulls in memory and
+                empty strings in files.
+                For example: Query regex: <code>\d*,\d*,\d*</code>, input line <code>1,,5</code> is parsed into a set of
+                3 variables with the following values <code>{"1", null, "5"}</code>
+                as opposed to the default behaviour <code>{"1","","5"}</code>.
+            </p>
+        </td>
+        <td>No, by default strings are preserved, i.e. empty strings are not converted to nulls and null variables
+            references are not expanded in the output, i.e. ${nullvalue}.
+        </td>
+    </tr>
+</table>
+<h2>Query Syntax</h2>
+Text driver supports Regular expressions syntax to query text files.
+The file is read line-by-line from the location specified by the URL connection property and each line is matched
+against the regex pattern.
+<p>
+    If a line or a part of it matches the pattern this match produces a virtual row in a result set.
+    The column names in a virtual result set correspond to matched regex group names.
+    For example query <code>foo(.*)</code> matches <code>foobar</code> line and the produced
+    result set row contains two columns(groups): 0-foobar, 1-bar. These columns
+    can be referenced in child script or query elements by a numeric name or by a string name <code>columnN</code>.
+</p>
+
+<p>It also possible to specify more than one regular expressions to match file content.
+    Specify each regular expression on a separate line to match them using OR condition.
+
+<p>The Text driver uses <code>java.util.regex</code> implementation for pattern matching. See <a
+        href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">java.util.Pattern</a>
+    for supported syntax Javadoc.</p>
+
+<p>Additional notes:
+<ul>
+    <li>Regular expressions matching is case-insensitive</li>
+    <li>Empty query selects all lines from the input file.</li>
+    <li>The <code>0</code>(zero) column name in the produced result set contains the matched line.</li>
+    <li>Leading and trailing whitespaces in query element and input file lines are trimmed by default.</li>
+    <li>Use ^ and $ boundary matchers to match the <b>whole line</b>.</li>
+</ul>
+</p>
+<br><u>Example:</u>
+<code>
+    <pre>
+&lt;query&gt;
+  ^ERROR: (.*)
+  WARNING: (.*Failed.*)
+  ([\d]+) errors?
+&lt;/query&gt;
+    </pre>
+</code>
+This query consists of 3 regular expressions:
+<ol>
+    <li>selects lines starting with <code>ERROR:</code> prefix</li>
+    <li>selects <code>WARNING</code> lines having <code>Failed</code> substring</li>
+    <li>selects lines containg a number of errors, e.g. "Found 5 errors".</li>
+</ol>
+The query selects any line satisfying one of these 3 regular expressions.
+Suppose input file has the following content:
+<code>
+<pre>
+Log file started...
+INFO: INIT
+WARNING: CPU is slow
+WARNING: Failed to increase heap size
+ERROR: Process interrupted
+Operation completed with 1 error.
+</pre>
+</code>
+As the result of query execution the following set of rows is produced:
+<table border="1">
+    <tr>
+        <th>0</th>
+        <th>1</th>
+    </tr>
+    <tr>
+        <td>WARNING: Failed to increase heap size</td>
+        <td>Failed to increase heap size</td>
+    </tr>
+    <tr>
+        <td>ERROR: Process interrupted</td>
+        <td>Process interrupted</td>
+    </tr>
+    <tr>
+        <td>1 error</td>
+        <td>1</td>
+    </tr>
+
+</table>
+<h2>Script Syntax</h2>
+The &lt;script&gt; element content is read line-by-line, for each line
+properties are expanded and the output is sent to the file specifed by a url connection attribute.
+<p>Additional notes:
+<ul>
+    <li>Lines in the outputted file are separated by a EOL string specified by <code>eol</code> connection property.
+    </li>
+    <li>Leading and trailing whitespaces in the output file lines are trimmed by default.</li>
+    <li>No escaping is performed when properties are expanded. Use String.replace or other escaping techniques to
+        achieve output similar to CSV etc.
+    </li>
+    <li>If a script is executed multiple times (e.g. inside a parent query) the output is appended to the file
+        content.
+    </li>
+</ul>
+<br><u>Example:</u>
+<code>
+    <pre>
+&lt;script&gt;
+    Inserted a record with ID=$id. Table=${table}
+&lt;/script&gt;
+    </pre>
+</code>
+For id=1 and table=system this script produces the following output:
+<code>
+    <pre>
+Inserted a record with ID=1. Table=system
+    </pre>
+</code>
+
+<h2>Properties substitution</h2>
+In text script and query elements ${property} or $property syntax is used for properties/variables substitution.
+<p><u>NOTE:</u></p>
+By default NULL variables and expressions are preserved, use <code>null_string</code> connection property to specify
+a string token for nulls.
+For example setting null_string to empty string in the connection properties section will enable parsing
+empty strings as nulls:
+<pre><code>&lt;connection driver="csv" url="report.csv"&gt;
+    null_string=
+    &lt;/connection&gt;</code></pre>
+Scriptella properties substitution engine cannot distinguish null value from unused variable or some random usage of
+$var syntax,
+therefore we've chosen to preserve these blocks until user explicitly specify the value of null_string.
+<h2>Examples</h2>
+<code><pre>
+&lt;connection id="in" driver="text" url="data.csv"&gt;
+&lt;/connection&gt;
+&lt;connection id="out" driver="text" url="report.csv"&gt;
+&lt;/connection&gt;
+
+&lt;script connection-id="out"&gt;
+    ID;Priority;Summary;Status
+&lt;/script&gt;
+
+&lt;query connection-id="in"&gt;
+    &lt;script connection-id="out"&gt;
+        $rownum;$column0;$column1;$column2
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre>
+</code>
+Copies rows from data.csv file to report.csv, additionally the ID column is added.
+The result file is semicolon separated.
+<h2><a name="formatting">Declarative formatting/parsing rules for property substitution</a></h2>
+Starting from version 1.1 Scriptella supports configurable rules for formatting and parsing of property values. The rules are
+described in a form of connection parameters prefixed with a "format." string.
+<br>Example of defining a format for a numeric property with 2 digits after a decimal point:
+<pre>
+format.someColumn.type=number
+format.someColumn.pattern=000.00
+</pre>
+
+<p>Each property has the following formatting/parsing options (see <a href="../../text/PropertyFormat.html">PropertyFormat</a> class for implementation details):
+<ul>
+    <li>trim - Set to true if the values must be trimmed when formatted or parsed. Default value is false.</li>
+    <li>null_string - Defines a string to represent null values when formatting or parsing.</li>
+    <li>type - type of the property. Built-in types: number,date,time,choice and timestamp. Custom Format classes can be specified in className option.</li>
+    <li>pattern - pattern to use for formatting or parsing. Depending on a "type" attribute, the following patterns are supported:
+        <table border="1">
+            <tr>
+                <th>Type(s)</th>
+                <th>Patterns</th>
+            </tr>
+            <tr>
+                <td>number</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html">Decimal format pattern</a>, e.g. <code>###,###.##</code> or <code>#.00</code></td>
+            </tr>
+            <tr>
+                <td>date<br>time</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">date/time pattern</a>, e.g. <code>yyyy-MM-dd'T'HH:mm:ss.SSSZ</code></td>
+            </tr>
+            <tr>
+                <td>timestamp</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/sql/Timestamp.html">JDBC timestamp escape format pattern</a> - <code> yyyy-mm-dd hh:mm:ss.fffffffff</code>, where <code>ffffffffff</code> indicates nanoseconds.</td>
+            </tr>
+            <tr>
+                <td>choice</td>
+                <td><a href="http://docs.oracle.com/javase/6/docs/api/java/text/ChoiceFormat.html">Choice-format pattern</a>, e.g. <code>0#no files|1#{0} file|2<{0} files</code>, .</td>
+            </tr>
+        </table>
+    </li>
+    <li>className - name of a custom format class. It must subclass java.text.Format and have a public no-args constructor.</li>
+    <li>locale - locale to use</li>
+    <li>pad_left, pad_right - Controls padding width of the formatted value</li>
+    <li>pad_char - character to use for padding</li>
+</ul>
+<h3>Default values for formatting and parsing rules</h3>
+It is possible to provide default values for most of the properties:
+<ul>
+    <li>format.trim - default trim option for parsing and formatting property values</li>
+    <li>format.null_string - same as null_string. Default value to represent null values</li>
+    <li>locale - default locale for formatting and parsing.</li>
+    <li>pad_left, pad_right, pad_char - default padding options</li>
+</ul>
+<a href="https://github.com/scriptella/scriptella-examples/tree/master/currency">Currency example</a> demonstrates usage of formatting rules.
+</body>

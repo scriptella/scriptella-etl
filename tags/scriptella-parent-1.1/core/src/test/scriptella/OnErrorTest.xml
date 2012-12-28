@@ -1,0 +1,66 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:onerrortest" user="sa" password=""/>
+    <script>
+        CREATE TABLE Test (
+            COL INT
+        );
+    </script>
+    <script>
+        CREATE TABLE Test (
+            ID INT NOT NULL PRIMARY KEY,
+            VALUE VARCHAR(255)
+        );
+        insert into test(id, value) values (1,'111');
+        insert into test(id, value) values (2,'222');
+        insert into test(id, value) values (3,'333');
+        insert into test(id, value) values (5,'555');
+        <onerror codes="99999,22222,33333">
+            --does nothing so test should fail
+        </onerror>
+        <onerror retry="true" codes="???,S0001,-21"><!--S0001 or -21 means table already exists-->
+            DROP TABLE Test;
+        </onerror>
+    </script>
+    <script>
+        insert into test(id, value) values (1,'Updated');
+        <onerror>
+            <dialect name="fakedb">
+                skipped text
+            </dialect>
+            UPDATE test set value='Updated1' where ID=1;
+        </onerror>
+    </script>
+    <script>
+        insert into test(id, value) values (2,'Updated');<!--Already exists-->
+        <onerror><!-- Fails too-->
+            insert into test(id, value) values (2,'Updated');
+        </onerror>
+        <onerror message="unique constraint"><!--Updates-->
+            <dialect name="hsql">
+                UPDATE test set value='Updated2' where ID=2;
+            </dialect>
+        </onerror>
+    </script>
+    <script>
+        insert into test(id, value) values (3,'Updated');<!--Already exists-->
+        <onerror type="JDBCException"><!--Updates-->
+            UPDATE test set value='Updated3' where ID=3;
+        </onerror>
+    </script>
+    <script>
+        insert into test(id, value) values (4,'444');
+        <onerror><!--should not fire-->
+            UPDATE test set value='Updated4' where ID=4;
+        </onerror>
+    </script>
+    <script>
+        insert into test(id, value) values (5,'New value');
+        <onerror type="NoSuchException"><!--Updates-->
+            UPDATE test set value='Updated5' where ID=5;
+        </onerror>
+        <onerror/><!--means ignoring any exception-->
+    </script>
+
+
+</etl>

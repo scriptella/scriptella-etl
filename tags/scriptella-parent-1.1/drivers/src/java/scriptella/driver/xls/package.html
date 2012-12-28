@@ -1,0 +1,60 @@
+<body>
+<a href="http://code.google.com/p/sqlsheet/">SQLSheet</a> Driver Adapter for Scriptella.
+<p>
+<a href="http://code.google.com/p/sqlsheet/">SQLSheet</a> is a JDBC driver which allows you to interact with Microsoft Excel spreadsheets using SQL statements.
+<a href="http://code.google.com/p/sqlsheet/wiki/HowToScriptella">This how-to page</a> provides more details about using SQLSheet with Scriptella.  
+</p>
+
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.xls.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>Same as for SQLSheet JDBC Driver.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td>
+        <td>
+            <ul>
+                <li><code><a href="http://code.google.com/p/sqlsheet/downloads/list">sqlsheet.jar</a></code></li>
+                <li><code><a href="http://www.apache.org/dyn/closer.cgi/poi/release/">poi.jar</a></code></li>
+                <li><code><a href="http://jsqlparser.sourceforge.net/">jsqlparser.jar</a></code></li>
+
+            </ul>
+        </td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection id="xls" url="jdbc:xls:file:report.xls" classpath="sqlsheet-6.1.jar; poi-3.0.2-FINAL-20080204.jar; jsqlparser.jar"&gt;
+    &lt;/connection&gt;
+
+    &lt;script connection-id="xls"&gt;
+        CREATE TABLE SHEET1(
+		    COL1 INT,
+		    COL2 INT
+	    );
+    &lt;/script&gt;
+    ...
+    &lt;query connection-id="db"&gt;
+        ...
+        &lt;script connection-id="xls"&gt;
+            INSERT INTO SHEET1 (COL1,COL2) VALUES(${rownum},${col2_value});
+        &lt;/script&gt;
+    &lt;/query&gt;
+
+    
+</pre></code>
+
+</body>

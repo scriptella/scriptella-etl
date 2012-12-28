@@ -1,0 +1,54 @@
+<body>
+Oracle Driver Adapter for Scriptella.
+<p>See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.oracle.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>Same as for Oracle JDBC Driver.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td>
+        <td><code><a href="http://otn.oracle.com/software/tech/java/sqlj_jdbc/index.html">ojdbc14.jar</a></code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td><code>plsql</code></td>
+        <td>If true the slash on a single line is used as a separator for SQL statements.
+            This mode is required to create triggers and execute blocks of PL/SQL code.</td>
+        <td>No, the default value is <code>false</code></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection id="c1" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB" user="sys as sysdba" password="password"&gt;
+    &lt;/connection&gt;
+
+    &lt;connection id="c2" driver="oracle" url="jdbc:oracle:oci:@localhost:1521:DB" user="scott" password="tiger"&gt;
+        plsql=true;
+    &lt;/connection&gt;
+
+    &lt;script connection-id="c2"/&gt;
+        CREATE OR REPLACE PACKAGE PK_TEST_PACKAGE1 AS
+            PROCEDURE PP_TEST_PROCEDURE1( param   IN  VARCHAR2);
+        END PK_TEST_PACKAGE1;
+        /
+        CREATE OR REPLACE PACKAGE PK_TEST_PACKAGE2 AS
+            PROCEDURE PP_TEST_PROCEDURE2( param   IN  VARCHAR2);
+        END PK_TEST_PACKAGE2;
+        /
+    &lt;/script&gt;
+
+</pre></code>
+
+</body>

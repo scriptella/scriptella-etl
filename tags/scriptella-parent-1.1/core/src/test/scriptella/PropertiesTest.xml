@@ -1,0 +1,17 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <properties>
+        #a,b and foo
+        var=1
+        b=$var|$var|$var|${var}|${var}|${var}
+        <include href="PropertiesTest.properties"/>
+        url.prefix=jdbc:hsqldb:mem
+        dbname=propertiestest
+        driver=org.hsqldb.jdbcDriver
+        #url should be substituted
+        url=${url.prefix}:$dbname
+        user=sa
+        password=
+    </properties>
+    <connection driver="${driver}" url="${url}" user="${user}" password="${password}"/>
+</etl>

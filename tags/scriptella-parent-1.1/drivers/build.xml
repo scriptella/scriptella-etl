@@ -1,0 +1,24 @@
+<project name="scriptella-drivers" default="jar">
+    <path id="classpath">
+        <pathelement location="${basedir}/../core/build/tmp/classes"/>
+        <pathelement location="${basedir}/../lib/velocity-dep.jar"/>
+        <pathelement location="${basedir}/../lib/janino.jar"/>
+        <pathelement location="${basedir}/../lib/janino-commons-compiler.jar"/>
+        <pathelement location="${basedir}/../lib/spring.jar"/>
+        <pathelement location="${basedir}/../lib/lucene-core.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
+        <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
+        <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
+    </path>
+    <path id="test.classpath">
+        <path refid="classpath"/>
+        <pathelement location="${basedir}/../core/build/tmp/tests"/>
+        <pathelement location="${basedir}/../lib/commons-logging.jar"/>
+        <pathelement location="${basedir}/../lib/hsqldb.jar"/>
+        <pathelement location="${basedir}/../lib/h2.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
+        <pathelement location="${basedir}/../lib/junit.jar"/>
+    </path>
+    <import file="../build-templates/build-template.xml"/>
+
+</project>

@@ -1,0 +1,98 @@
+<body>
+<h1>XPath Driver for Scriptella.</h1>
+Allows querying an XML file based on XPath expressions.
+<p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.xpath.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>XML file URL. URIs are resolved relative to a script file directory.</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>None</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <!-- Not yet implemented.
+    <tr>
+        <td>trim</td>
+        <td>Value of <code>true</code> specifies that the leading and trailing
+     whitespaces in text file lines should be omitted..
+        <td>No, the default value is <code>true</code>.</td>
+    </tr>
+    -->
+    <tr>
+        <td>return_arrays</td>
+        <td>Value of <code>true</code> specifies that variables should
+        return a string array, otherwise a single string is returned.
+        <td>No, the default value is <code>false</code>.</td>
+    </tr>
+</table>
+<h2>Query Syntax</h2>
+XPath driver supports <a href="http://www.w3.org/TR/xpath">XPath syntax</a> to query text files.
+<p>
+The query is executed on an XML Document and produces a rowset for matched nodes. The attribute
+and element values can be referenced from nested scripts/queries. The following example
+    illustrates the querying mechanism:
+<p><u>Example:</u>
+<p>XPath: <code>/A</code> selects root element &lt;A&gt;
+</p><pre>
+<b>&lt;A B="1"&gt;</b>
+    &lt;B&gt;2&lt;/B&gt;
+    &lt;C&gt;3&lt;/C&gt;
+<b>&lt;/A&gt;</b></pre>
+Available variables for matched element &lt;A&gt;:
+<table>
+    <tr>
+        <th>Name</th><th>Value</th>
+    </tr>
+    <tr>
+        <td>A</td><td>2 3</td>
+    </tr>
+    <tr>
+        <td>B</td><td>1</td>
+    </tr>
+    <tr>
+        <td>C</td><td>3</td>
+    </tr>
+</table>
+The value of variable A represents text content inside XML element &lt;A&gt;,
+the value of variable B represents value of B attribute and
+    the value of variable C represents text content inside element &lt;C&gt;.
+
+<p>The context node for the XPath query is the selected node of the nearest outer XPath query, or the document root node if there isn't one. This allows relative queries using <code>./</code>
+
+<p>A special <code>node</code> variable is available to the nested queries/scripts which provides extra methods for querying relative to the current node. The node variable is an instance of <code>NodeVariable</code>. Using <code>${node.getString("./C")}</code> is equivalent to <code>$C</code>.
+
+<p>Additional notes:
+<ul>
+    <li>Currently only Node Set can be selected in XPath expressions, i.e. attributes or elements but not String, Boolean or Number</li>
+</ul>
+</p>
+<h2>Script Syntax</h2>
+&lt;script&gt; elements are not supported by the driver.
+<h2>Properties substitution</h2>
+In query elements ${property} or $property syntax is used for properties/variables substition.
+<h2>Examples</h2>
+<code><pre>
+&lt;connection id="in" driver="xpath" url="data.xml"/&gt;
+&lt;connection id="out" driver="text" url="report.csv"/&gt;
+
+&lt;query connection-id="in"&gt;
+    /HTML/BODY/TABLE/TR
+    &lt;script connection-id="out"&gt;
+        $rownum;${td[0]};${td[1]}
+    &lt;/script&gt;
+&lt;/query&gt;
+
+</pre></code>
+Extracts rows from tables in data.xml file and produces report.csv.
+</body>

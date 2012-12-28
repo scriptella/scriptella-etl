@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE faqs PUBLIC "-//APACHE//DTD FAQ V2.0//EN" "dtd/faq-v20.dtd">
+<faqs>
+	<title>Scriptella ETL Frequently Asked Questions</title>
+	<authors>
+		<person name="Fyodor Kupolov" email="kupolov@gmail.com"/>
+	</authors>
+	<faqsection>
+		<title>General</title>
+		<faq id="DRIVERS">
+			<question>Where can I find documentation on script syntax for driver FOO/BAR/...?</question>
+			<answer><p>An up to date drivers documentation is available in the <a href="docs/api/">Scriptella Javadoc</a>.
+			<a href="reference/index.html">Reference Documentation</a> also covers drivers usage and scripts syntax.</p></answer>
+        </faq>
+        <faq id="ODBC">
+            <question>Does Scriptella support Microsoft Access?</question>
+            <answer><p>Microsoft Access and other databases with ODBC interface are supported via ODBC-JDBC bridge driver which comes with Sun's JRE.
+                Download <a href="download.html">ODBC example</a> for more details. Connection declaration example:</p>
+                <source><![CDATA[
+                <connection url="jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=Northwind.mdb"/>
+                ]]></source>
+                </answer>
+        </faq>
+        <faq id="BIND_VARIABLES">
+            <question>What is the difference between $variable / ${expression} and ?variable / ?{expression} syntax.</question>
+			<answer><p>Binding variables syntax varies between drivers. JDBC drivers use the following rules
+                for properties substitution:</p>
+                <ul>
+                    <li>$variable - inserts a value of the variable as text content.</li>
+                    <li>${expression} - braces are used for JEXL expressions. For example
+                    ${column1+column2} inserts a sum of 2 columns.</li>
+                    <li>?variable, ?{expression} - syntax is the same as in 2 previous examples, but the
+                    result of evaluation is set as a prepared statement parameter, thus increasing the performance
+                    and eliminating the need to escape values.
+                    <br/>Please note that currently ?{} syntax is only supported by the JDBC drivers.</li>
+                </ul>
+                <p>See <a href="reference/index.html#BIND_VARIABLES">Reference Manual</a> for additional details.</p>
+            </answer>
+        </faq>
+        <faq id="SET_VARIABLE">
+            <question>How to share a mutable variable between script/query elements of an ETL file?</question>
+            <answer><p>In general such practice in not recommended because often it's a sign of a bad design.
+            It's like using GOTOs or global variables in programming languages.
+                But in several cases using a global variable may help to achieve required goal. We propose 2 approaches:</p>
+            <ol>
+                <li>Use etl.globals map to work with global variables. Example ${etl.globals['globalVar']}</li>
+                <li>Another approach is similar to the technique utilized in anonymous inner classes to
+                modify a single-element array declared as a final variable.</li>
+            </ol>
+             <p>The following example demonstrates both approaches:</p>
+            <source><![CDATA[
+<etl>
+    <connection driver="script" id="js"/>
+    <connection url="jdbc:...." id="db"/>
+
+    <!-- Set number of records as a global variable -->
+    <!-- Note that JEXL syntax etl.globals['globalVar'] does not work in JavaScript -->
+    <query connection-id="db">
+        select count(id) as c from Errors
+        <script connection-id="js">
+            etl.globals.put('errorsCount', c);
+        <script>
+    </query>
+
+    <!-- Then reuse this variable in other parts of ETL file -->
+    <script connection-id="js" if="etl.globals.get('errorsCount') gt 0">
+        java.lang.System.out.println('errors count ='+etl.globals.get('errorsCount'));
+    </script>
+
+    <!-- Alternatively an outer query can be used to share an array based variable between scripts -->
+    <query connection-id="js">
+        var pseudoGlobalVar = []; //Declare pseudo-global variable available to nested element
+        query.next(); //Executes child scripts
+        <script> //Updates the variable
+           pseudoGlobalVar[0] = 1;
+        </script>
+        <script> //Outputs updated value of global variable
+             java.lang.System.out.println('pseudoGlobalVar[0]='+pseudoGlobalVar[0]);
+        </script>
+    </query>
+</etl>
+         ]]></source>
+            </answer>
+        </faq>
+        <faq id="EXECUTE_STATIC_METHOD">
+            <question>How to call a static method in JEXL expression?</question>
+            <answer><p>Load a class by name by using class:forName Scriptella function</p>
+            <p>Example. Call System.getProperty:</p>
+            <source><![CDATA[
+${class:forName('java.lang.System').getProperty('propName')}
+         ]]></source>
+            </answer>
+        </faq>
+
+        <faq id="COLUMN_SPACES">
+            <question>How to escape spaces in field names?</question>
+            <answer><p>You can use <a href="docs/api/scriptella/expression/EtlVariable.html"><code>etl context variable</code></a> ${etl.getParameter('var name')} to reference any column names.
+                Additionally several drivers
+                including CSV and JDBC allow referencing columns by an index, i.e. $1, $2 ... $n.
+                <br/>Example:
+            </p>
+                <source><![CDATA[
+<query connection-id="csv"> <!-- Read CSV file content -->
+    <script connection-id="text">
+        <!-- Print columns, column 2,3 are referenced by name, 1,4 - by index -->
+        $1,$secondColumn,${etl.getParameter('My Column')},$4
+    </script>
+</query>]]>
+                </source>
+            </answer>
+        </faq>
+        <!-- More faqs or parts here -->
+	</faqsection>
+    <faqsection>
+        <title>SQL</title>
+        <faq id="PLSQL">
+            <question>How to create an Oracle trigger (run a PL/SQL block)?</question>
+            <answer><p>
+                To recognize Oracle PL/SQL statement blocks you'd have to specify <code>plsql=true</code> connection property
+                (supported only by <a href="reference/drivers.html#oracle">Scriptella Adapter for Oracle</a>).
+                In this case a slash(/) on a single line is used as a statement separator:</p>
+            <source><![CDATA[
+<connection driver="oracle" ...>
+    plsql=true
+</connection>
+<script>
+    CREATE OR REPLACE TRIGGER secure_del_trigger
+       BEFORE DELETE
+       ON emp
+       FOR EACH ROW
+    DECLARE
+       unauthorized_deletion   EXCEPTION;
+    BEGIN
+       IF <your business rule is violated> THEN
+         RAISE unauthorized_deletion;
+       END IF;
+    EXCEPTION
+       WHEN unauthorized_deletion
+       THEN
+          raise_application_error (-20500,
+            'This record cannot be deleted');
+    END;
+    /
+
+    -- Other statements separated with a slash on a single line
+</script>]]>
+
+            </source>
+                <p>If you are using Oracle JDBC driver directly then set the following configuration properties:</p>
+                <source><![CDATA[
+<connection driver="oracle.jdbc.driver.OracleDriver" ...>
+    statement.separator=/
+    statement.separator.singleline=true
+</connection>]]>
+                </source>
+                <p>This idea is similar to <a href="http://www.javaddicts.net/blog/index.php/2005/06/13/executing-oracle-plsql-from-ant/">Ant solution</a>.</p>
+            </answer>
+        </faq>
+        <faq id="COMMIT">
+            <question>How to control commit options and transactions?</question>
+            <answer><p>The following connection parameters are supported by the JDBC bridge:</p>
+                <ul>
+                    <li><code>transaction.isolation</code> - Transaction isolation level name</li>
+                    <li><code>autocommit</code> - Enables/disables auto-commit mode.</li>
+                    <li><code>autocommit.size</code> - Enables/disables auto-commit mode.</li>
+                </ul>
+                <note>
+                     In general avoid using <code>autocommit.size</code>, because in this case an ETL process cannot be rolled back correctly. Use this parameter only for performance critical operations (bulk inserts etc.).<br/>
+                     If the <code>autocommit</code> is true, then setting <code>autocommit.size</code> has no effect.
+                </note>
+                <p><strong>Example:</strong></p>
+                <source><![CDATA[
+<connection driver="auto" url="jdbc:hsqldb:mem:test">
+    autocommit.size=4 <!-- Automatically commit after every 4th statement -->
+    transaction.isolation=SERIALIZABLE <!-- Sets TX level to Serializable -->
+</connection>]]></source>
+            </answer>
+        </faq>
+        <faq id="UPSERT">
+            <question>How to UPSERT (update or insert into a table?)</question>
+            <answer><p>You can leverage database-specific SQL statements like MERGE or UPSERT. See answers on StackOverflow:</p>
+                <ul>
+                    <li><a href="http://stackoverflow.com/questions/237327/oracle-how-to-upsert-update-or-insert-into-a-table">Oracle</a></li>
+                    <li><a href="http://stackoverflow.com/questions/1218905/how-do-i-update-if-exists-insert-if-not-aka-upsert-or-merge-in-mysql">MySQL</a></li>
+                    <li><a href="http://stackoverflow.com/questions/108403/solutions-for-insert-or-update-on-sql-server">MS SQL Server</a></li>
+                </ul>
+                <p>An alternative approach, which is universal but is typically slower, is to use count(*) statement and do insert or update accordingly:</p>
+                <source>
+                    <![CDATA[
+<query connection-id="in">
+    SELECT * FROM Persons_In
+    <query connection-id="out">
+       SELECT COUNT(*) as cnt FROM Person_Out WHERE Person_ID=?Person_ID
+       <!-- If nothing found - insert -->
+       <script if="cnt==0">
+          INSERT INTO Person_OUT VALUES (Person_ID, Person_Name, ...);
+       </script>
+       <!-- Otherwise - update -->
+       <script if="cnt gt 0">
+          UPDATE Person_OUT SET Person_Name=?Person_Name WHERE Person_ID = ?Person_ID;
+       </script>
+    </query>
+</query>]]>
+                </source>
+            </answer>
+        </faq>
+    </faqsection>
+    <!-- More faqs or parts here -->
+    <faqsection>
+        <title>CSV/Text</title>
+        <faq id="NULLS">
+            <question>How to output null value as empty string in a CSV/Text file.</question>
+            <answer><p>Suppose we have 3 variables - a='valueA';b=null and c='valueC'.</p>
+                <p>Here is a <a href="docs/api/scriptella/driver/csv/package-summary.html#package_description">CSV</a>
+                    script which outputs them in a single line:</p>
+                <source>
+                    $a,$b,$c
+                </source>
+                <p>The output for this script:</p>
+                <source>
+        valueA,<strong>$b</strong>,valueC
+                </source>
+                <p>
+                By default NULL variables are not substituted, because Scriptella substitution engine cannot
+distinguish null value from undeclared variable. This behaviour is not always desired. As a workaround you can specify a null_string connection property as follows:</p>
+                <source><![CDATA[
+<connection driver="text">
+    null_string=<!-- Expand nulls to empty string -->
+</connection>]]>
+                </source>
+                <p>And the output is:</p>
+                <source>valueA,,valueC</source>
+    </answer>
+        </faq>
+    </faqsection>
+</faqs>

@@ -1,0 +1,41 @@
+<body>
+HSLQDB Driver Adapter for Scriptella.
+<p>Adds a possibility to control database shutdown. See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.hsqldb.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>Same as for HSQLDB</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td><code>hsqldb.jar</code></td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>hsql.shutdown_on_exit</td>
+        <td>True if SHUTDOWN command should be automatically executed before last connection closed. In 1.7.2,
+            in-process databases are no longer closed when the last connection to the database is explicitly closed via
+            JDBC,
+            a SHUTDOWN is required</td>
+        <td>No, default value is <code>true</code></td>
+    </tr>
+
+</table>
+
+<h2>Example</h2>
+<code><pre>
+    &lt;connection driver="hsqldb" url="jdbc:hsqldb:file:db" user="sa"&gt;
+        hsql.shutdown_on_exit=true;
+    &lt;/connection&gt;
+</pre></code>
+
+</body>

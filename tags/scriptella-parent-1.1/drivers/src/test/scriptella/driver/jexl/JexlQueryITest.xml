@@ -1,0 +1,38 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="jexl"/>
+    <!-- Test 1, query.next() call is skipped -->
+    <query>
+        v=1;
+        <script>
+            callback.notify(v);
+        </script>
+    </query>
+    <!-- Test 2 -->
+    <query>
+        v=2;
+        query.next();
+        <script>
+            callback.notify(v);
+        </script>
+    </query>
+    <!-- Test 3 -->
+    <query>
+        if (1==1) {
+        v=3;
+        query.next();
+        }
+        <script>
+            callback.notify(v);
+        </script>
+    </query>
+    <!-- Test 4 -->
+    <query>
+        if (1) {
+        v=4;
+        }
+        <script>
+            callback.notify(v);
+        </script>
+    </query>
+</etl>

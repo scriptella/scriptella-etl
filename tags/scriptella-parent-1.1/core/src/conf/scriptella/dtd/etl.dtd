@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+%
+ Copyright 2006-2012 The Scriptella Project Team.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+%
+@title Scriptella ETL File DTD
+@doctype etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd"
+@root etl
+-->
+
+<!--
+Root element of Scriptella XML file.
+<p><u>Example:</u><br>
+A simple example of the script file with only one connection obtained via
+JNDI bound datasource.
+%
+<etl>
+    <connection driver="jndi" url="java:projectDS"/>
+    <script>
+        INSERT INTO Test VALUES (1, "One")
+    </script>
+</etl>
+
+%
+-->
+<!ELEMENT etl (description?, properties?, connection*, (script*, query*)*)>
+
+<!--
+Contains description of ETL file.
+-->
+<!ELEMENT description (#PCDATA)>
+<!--
+The properties element contains a set of properties available for script elements.
+The content of this element conforms to format supported by java.util.Properties.
+This element may contain plain text or includes.
+<p><u>Example:</u>
+%
+<properties>
+    #standard properties syntax
+    table.size=10
+    tmp=c\:\\temp\\
+    #including content from external properties file
+    <include href="etl.properties"/>
+</properties>
+
+-->
+<!ELEMENT properties (#PCDATA | include)*>
+<!--
+The connection element specifies connection to a database or other system.
+This element may contain properties as plain text with includes.
+<p><u>Example:</u>
+%
+<connection id="in" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
+            url="jdbc:ldap://localhost:389/dc=scriptella"
+            user="cn=root,dc=scriptella" password="secret">
+    SEARCH_SCOPE=subTreeScope
+    ignore_transactions=true
+</connection>
+
+<connection driver="hsqldb"
+            url="jdbc:hsqldb:file:db"
+            user="sa" classpath="hsqldb.jar"/>
+%
+-->
+<!ELEMENT connection (#PCDATA | include)*>
+<!--
+ @attr id connection identifier. Connection is referenced by id in scripts and queries.
+       For single connection ETL files this attribute is optional.
+ @attr driver driver class name or alias. The default value is "auto",
+       in this case a target driver is guessed from an url attribute.
+ @attr url connection url.
+ @attr user database login
+ @attr password database password
+ @attr catalog catalog
+ @attr schema schema
+ @attr classpath the classpath to use when loading the driver.
+       Paths are colon/semicolon separated and resolved relative to a directory where ETL file resides.
+       Absolute URLs are also supported, e.g. ftp://server/lib.jar
+ @attr lazy-init <b>true</b> if connection initialization should be deferred until it is actually used.
+       The default value of <b>false</b> means that connection is initialized on ETL startup.
+-->
+<!ATTLIST connection
+id ID #IMPLIED
+driver CDATA "auto"
+url CDATA #IMPLIED
+user CDATA #IMPLIED
+password CDATA #IMPLIED
+catalog CDATA #IMPLIED
+schema CDATA #IMPLIED
+classpath CDATA #IMPLIED
+lazy-init (true | false) "false"
+>
+<!--
+The fallback element contains alternate content to be used if the requested resource cannot be found.
+This element may contain plain text or includes.
+<p><u>Example:</u>
+%
+<include href="http://no-such-url/file.txt">
+    <fallback> //First fallback
+        <include href="localFile.txt>
+            <fallback> //If alternative location also failed
+                Failed to retrieve full text
+            </fallback>
+        </include>
+    </fallback>
+</include>
+%
+-->
+<!ELEMENT fallback (#PCDATA | include)*>
+
+<!--
+The include element specifies content to include. Concept similar to XInclude.
+<p><u>Examples:</u>
+%
+<include href="http://host/file.sql"><fallback>SHUTDOWN</fallback></include>
+<include href="db/schema.sql"/>
+%
+-->
+<!ELEMENT include (fallback?)>
+<!--
+@attr href contains an URI pointing to the file to include. URIs are resolved relative to ETL file.
+@attr encoding Included text encoding name.
+-->
+<!ATTLIST include
+href CDATA #REQUIRED
+encoding CDATA #IMPLIED
+>
+<!--
+The dialect element defines a vendor specific script. Scripting elements may contain any number of nested dialects.
+This element may contain plain text or includes.
+<u>Example:</u>
+%
+<dialect name="oracle" version="10\.">
+    //Statements executed only for Oracle 10.x
+</dialect>
+<dialect name="oracle" exclude="true">
+    //Statements executed for any datasource except Oracle
+</dialect>
+
+%
+-->
+<!ELEMENT dialect (#PCDATA | include)*>
+<!--
+ @attr name case insensitive regular expression to match vendor name, e.g. .*oracle.*
+ @attr version case insensitive regular expression to match vendor version, e.g. 1\.0
+ @attr exclude optional attribute to invert the name/version matching.
+       Use exclude="true" to skip content for dialects with specified name and version.
+
+-->
+<!ATTLIST dialect
+name CDATA #IMPLIED
+version CDATA #IMPLIED
+exclude (true | false) "false"
+>
+
+<!--
+The onerror element defines fallback script to execute if error occurs.
+This element may contain plain text or includes.
+<p><u>Example:</u>
+%
+<onerror type="SQLException">
+    DROP TABLE MYTABLE
+</onerror>
+%
+Note: Attributes are applied using AND condition, so if you specified
+%<onerror type="ProviderException" codes="100,200">%
+so only exceptions with class name *.ProviderException having 100 and/or 200 error code are handled.
+-->
+<!ELEMENT onerror (#PCDATA | include | dialect)*>
+<!--
+ @attr type Regular expression pattern to match exception type. Partial matching is allowed.
+ @attr codes Comma-separated list of vendor codes/sql states. Triggered if any of these codes matches one of the codes reported by driver.
+ @attr message Regular expression pattern to match exception message. Partial matching is allowed.
+ @attr retry true if statement which caused a problem should be retried after this handler completes.
+-->
+<!ATTLIST onerror
+type CDATA #IMPLIED
+codes CDATA #IMPLIED
+message CDATA #IMPLIED
+retry (true | false) "false"
+>
+
+<!--
+The query element is used to specify a query producing a result set.
+This element may contain queries, scripts, plain text, includes and dialects.
+<p><u>Example:</u><br>
+Queries a table and writes the result into CSV file
+%
+<query connection-id="in">
+   SELECT * FROM Test WHERE id=&#063;id
+   <script connection-id="csv">
+        $id,$value
+   </script>
+</query>
+%
+-->
+<!ELEMENT query (#PCDATA | include | dialect | query | script)*>
+<!--
+ @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+       For single connection ETL files the connection-id is optional.
+ @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+        Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
+ @attr id script identifier(name).
+-->
+<!ATTLIST query
+connection-id IDREF #IMPLIED
+if CDATA #IMPLIED
+id ID #IMPLIED
+>
+
+<!--
+The script element is used to specify a script.
+This element may contain plain text,onerror handlers, includes and dialects.
+<p><u>Example:</u><br>
+Inserts a row into Test table if id>0
+%
+<script if="id>0">
+    INSERT INTO Test VALUES(&#063;id, &#063;name)
+</script>
+%
+-->
+<!ELEMENT script (#PCDATA | include | dialect | onerror)*>
+<!--
+ @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
+       For single connection ETL files the connection-id is optional.
+ @attr new-tx true if a new transaction(and extra connection) is required for this element.
+ @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
+        Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
+ @attr id script identifier(name).
+-->
+<!ATTLIST script
+connection-id IDREF #IMPLIED
+new-tx (true | false) "false"
+if CDATA #IMPLIED
+id ID #IMPLIED
+>

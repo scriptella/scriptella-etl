@@ -1,0 +1,38 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="jexl" id="jexl"/>
+    <connection driver="text" id="text" url="tst://file"/>
+
+    <script connection-id="jexl">
+        etl.globals['v1'] = '1'
+    </script>
+    <script connection-id="text">
+        ${etl.globals['v1']}
+        ${etl.globals['v2']='*v2*'}
+    </script>
+    <query connection-id="jexl">
+        localVar = 'local';
+        query.next();
+        <script connection-id="text">
+            local: ${etl.getParameter('local')?etl.getParameter('localVar'):'null444'}
+            global: ${etl.globals['v2']}
+        </script>
+    </query>
+
+    <query connection-id="jexl">
+        i=1;
+        while (i lt 3) {
+            query.next();
+            i=i+1;
+        }
+        <script connection-id="text">
+            i=$i
+        </script>
+    </query>
+
+    <!-- globals should also be available in if attributes -->
+    <script connection-id="text" if="etl.globals['v1']=='1'">
+        if_ok
+    </script>
+</etl>
+
