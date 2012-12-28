@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2012 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 package scriptella.configuration;
 
 import scriptella.AbstractTestCase;
-import static scriptella.configuration.XmlElementTest.asElement;
 import scriptella.spi.DialectIdentifier;
 
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static scriptella.configuration.XmlElementTest.asElement;
 
 /**
  * Tests for {@link DialectBasedContentEl} class.

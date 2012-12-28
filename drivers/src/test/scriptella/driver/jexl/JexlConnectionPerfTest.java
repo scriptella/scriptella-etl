@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2012 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,9 @@
 package scriptella.driver.jexl;
 
 import scriptella.AbstractTestCase;
-import scriptella.configuration.MockConnectionEl;
 import scriptella.configuration.StringResource;
-import scriptella.spi.ConnectionParameters;
 import scriptella.spi.IndexedQueryCallback;
 import scriptella.spi.MockConnectionParameters;
-import scriptella.spi.MockDriverContext;
 import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;

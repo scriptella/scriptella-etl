@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Scriptella Project Team.
+ * Copyright 2006-2012 The Scriptella Project Team.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scriptella.driver.csv.opencsv;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
-import java.io.Closeable;
 
 /**
  * A very simple CSV writer released under a commercial-friendly license.
