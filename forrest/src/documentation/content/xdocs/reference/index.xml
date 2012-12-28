@@ -595,7 +595,7 @@
             <p>The following POM dependency snippets can be used:</p>
             <source><![CDATA[
     <properties>
-        <scriptella.version>1.0</scriptella.version>
+        <scriptella.version>1.1</scriptella.version>
     </properties>
 
     <dependencies>
