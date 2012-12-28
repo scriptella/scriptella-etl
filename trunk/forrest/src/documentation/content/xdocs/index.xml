@@ -112,35 +112,22 @@ INSERT INTO TARGET_TABLE(ID, FULL_NAME) VALUES (?ID, ?{NAME+' '+SURNAME});
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.1 Preview Available (January 24, 2012)</title>
-                <p>Work on 1.1 release is in progress. Preview is available on the <a href="http://javaforge.com/dir/8354">dev downloads</a> page.</p>
-            </section>
-            <section>
-                <title>Scriptella 1.0 Released (May 5, 2010)</title>
-                <p>We are pleased to announce the availability of Scriptella 1.0.
-                    This release fixes few minor bugs found in RCs:
+                <title>Scriptella 1.1 Released (December 28, 2012)</title>
+                <p>Scriptella 1.1 has been released and available for <a href="download.html">download</a>.
+                    The following features and bug-fixes were added:
                 </p>
                 <ul>
-                    <li>Fixed: ArrayIndexOutOfBounds thrown when lazy-initialization fails for connection</li>
-                    <li>Fixed: Cannot load class when scriptella is packaged in an EAR file in JBoss</li>
-                    <li>Fixed auto-discovery driver aliases for PostgreSQL/DB2</li>
-                    <li>Fixed: Cannot write to HTTP URL</li>
+                    <li>JEXL 2.0 Support</li>
+                    <li><a href="reference/index.html#Declarative+formatting+and+parsing+rules+for+variables">Flexible parsing/formatting rules for text/csv drivers</a> </li>
+                    <li>StringIndexOutOfBoundsException when parsing SQL statements with ternary expressions </li>
+                    <li>Add support for batch execution</li>
+                    <li>Detection of  missing query.next calls in JavaScript/JEXL query elements</li>
                 </ul>
-                <p>The following features are introduced:</p>
-                <ul>
-                    <li>Added <a href="http://www.cubrid.org/apps_and_tools">CUBRID Database driver</a>.</li>
-                    <li>Use null_string to expand $variable when it has null value. CSV, text driver</li>
-                    <li>nostat command line option to suppress statistics collecting</li>
-                </ul>
-                <p>Kudos to Hervé for providing Maven POM files. Work on Maven integration is in progress. See <a
-                        href="http://www.javaforge.com/issue/10631">TSK-10631</a> for more details</p>
+                <p><a href="reference/index.html#maven">Maven artifacts have been published.</a></p>
                 <p>See
-                    <a href="changes.html">change log</a>  for additional details.
+                    <a href="changes.html">change log</a> for additional details.
                     <br/>
-                    <a href="tutorial.html">Make ETL easier</a> -<a href="download.html">Download Scriptella Now!</a>
-                </p>
-                <p>Work on 1.1 has started, see
-                    <a href="http://www.javaforge.com/wiki/69768">Roadmap for 1.1</a>
+                    <a href="tutorial.html">Make ETL easier</a> - <a href="download.html">Download Scriptella Now!</a>
                 </p>
             </section>
         </section>

@@ -6,21 +6,21 @@
 	</header>
 	<body>
         <section>
-			<title>Stable Version: 1.0 (May 5, 2010)</title>
+			<title>Stable Version: 1.1 (December 28, 2012)</title>
             <table>
-                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0.zip?doc_id=85090">scriptella-1.0.zip</a></td></tr>
-                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.0-src.zip?doc_id=85091">scriptella-1.0-src.zip</a></td></tr>
-                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.0.zip?doc_id=85092">scriptella-examples-1.0.zip</a></td></tr>
+                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1.zip?doc_id=170626">scriptella-1.1.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-src.zip?doc_id=170627">scriptella-1.1-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.1.zip?doc_id=170628">scriptella-examples-1.1.zip</a></td></tr>
             </table>
 		</section>
-        <section>
-			<title>Development Preview: 1.1-SNAPSHOT</title>
-            <table>
-                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-SNAPSHOT.zip?doc_id=90286">scriptella-1.1-SNAPSHOT.zip</a></td></tr>
-                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-SNAPSHOT-src.zip?doc_id=90288">scriptella-1.1-SNAPSHOT-src.zip</a></td></tr>
-                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.1-SNAPSHOT.zip?doc_id=90289">scriptella-examples-1.1-SNAPSHOT.zip</a></td></tr>
-            </table>
-		</section>
+        <!--<section>-->
+			<!--<title>Development Preview: 1.1-SNAPSHOT</title>-->
+            <!--<table>-->
+                <!--<tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-SNAPSHOT.zip?doc_id=90286">scriptella-1.1-SNAPSHOT.zip</a></td></tr>-->
+                <!--<tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-SNAPSHOT-src.zip?doc_id=90288">scriptella-1.1-SNAPSHOT-src.zip</a></td></tr>-->
+                <!--<tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.1-SNAPSHOT.zip?doc_id=90289">scriptella-examples-1.1-SNAPSHOT.zip</a></td></tr>-->
+            <!--</table>-->
+		<!--</section>-->
         <p>See also <a href="http://javaforge.com/proj/doc.do?doc_id=8353">JavaForge Downloads Page</a></p>
     </body>
 </document>
