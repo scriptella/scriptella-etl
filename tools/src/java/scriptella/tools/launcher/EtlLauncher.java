@@ -120,6 +120,15 @@ public class EtlLauncher {
     }
 
     /**
+     * Suppress JMX MBean registration for monitoring.
+     *
+     * @param noJmx true if JMX should be suppressed.
+     */
+    public void setNoJmx(boolean noJmx) {
+        exec.setJmxEnabled(!noJmx);
+    }
+
+    /**
      * Launches ETL script using command line arguments.
      *
      * @param args command line arguments.
@@ -163,6 +172,10 @@ public class EtlLauncher {
                     setNoStat(true);
                     continue;
                 }
+                if (arg.startsWith("-nojmx")) {
+                    setNoJmx(true);
+                    continue;
+				}
                 if (arg.startsWith("-")) {
                     err.println("Unrecognized option " + arg);
                     return ErrorCode.UNRECOGNIZED_OPTION;
@@ -227,6 +240,8 @@ public class EtlLauncher {
         out.println("  -debug,    -d        print debugging information");
         out.println("  -quiet,    -q        be extra quiet");
         out.println("  -version,  -v        print version");
+        out.println("  -nostat              Suppress statistics collecting. Improves performance");
+        out.println("  -nojmx               Suppress JMX MBean registration");
         out.println("  -template, -t        creates an etl.xml template file in the current directory");
     }
 

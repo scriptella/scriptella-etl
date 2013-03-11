@@ -35,9 +35,10 @@ import java.util.logging.Logger;
  */
 @ThreadSafe
 public class JmxEtlManager implements JmxEtlManagerMBean {
+	private static final int MAX_MBEANS_PER_FILE = 1000;
     private static Logger LOG = Logger.getLogger(JmxEtlManager.class.getName());
     private static final String MBEAN_NAME_PREFIX = "scriptella:type=etl";
-    private static MBeanServer mbeanServer;
+    private static volatile MBeanServer mbeanServer;
     private MBeanServer server;
     private EtlContext ctx;
     private Thread etlThread;
@@ -85,26 +86,31 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
         server = getMBeanServer();
         String url = ctx.getScriptFileURL().toString();
         boolean registered = false;
-        for (int i = 0; i < 1000; i++) {
-            if (name == null || server.isRegistered(name)) {
-                registered = true;
-                name = toObjectName(url, i);
+        //BUG-54489 Do additional synchronization on a platform mbean server to avoid race conditions.
+        //Simply using synchronized will not help since classes could belong to different classloaders
+        synchronized (getMBeanServer()) {
+            for (int i = 0; i < MAX_MBEANS_PER_FILE; i++) {
+                if (name == null || server.isRegistered(name)) {
+                    registered = true;
+                    name = toObjectName(url, i);
+                } else {
+                    registered = false;
+                    break;
+                }
+            }
+            etlThread = Thread.currentThread();
+            if (!registered) {
+                try {
+                    server.registerMBean(this, name);
+                    started = new Date();
+                    LOG.info("Registered JMX mbean: " + name);
+                } catch (Exception e) {
+                    throw new SystemException("Unable to register mbean " + name, e);
+                }
             } else {
-                registered = false;
-                break;
+                throw new SystemException("Unable to register mbean for url " + url
+                        + ": too many equal tasks already registered");
             }
-        }
-        etlThread = Thread.currentThread();
-        if (!registered) {
-            try {
-                server.registerMBean(this, name);
-                started = new Date();
-                LOG.info("Registered JMX mbean: " + name);
-            } catch (Exception e) {
-                throw new SystemException("Unable to register mbean " + name, e);
-            }
-        } else {
-            throw new SystemException("Unable to register mbean for url " + url + ": too many equal tasks already registered");
         }
     }
 
@@ -117,7 +123,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
      *
      * @return number of cancelled ETL tasks.
      */
-    public static synchronized int cancelAll() {
+    public static int cancelAll() {
         Set<ObjectName> names = findEtlMBeans();
         MBeanServer srv = getMBeanServer();
         int cancelled = 0;
@@ -137,7 +143,7 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
      *
      * @return set of object names.
      */
-    public static synchronized Set<ObjectName> findEtlMBeans() {
+    public static Set<ObjectName> findEtlMBeans() {
         try {
             return getMBeanServer().queryNames(new ObjectName(MBEAN_NAME_PREFIX + ",*"), null);
         } catch (MalformedObjectNameException e) {
@@ -174,5 +180,14 @@ public class JmxEtlManager implements JmxEtlManagerMBean {
             etlThread.interrupt();
             etlThread = null;
         }
+    }
+
+    /**
+     * Returns name of the MBean assigned at registration time.
+     *
+     * @return name of the mbean.
+     */
+    public ObjectName getName() {
+        return name;
     }
 }
