@@ -40,6 +40,7 @@ public class EtlExecuteTask extends EtlTaskBase {
     private String maxmemory;
     private boolean fork;
     private boolean nostat;
+    private boolean nojmx;
 
     public boolean isFork() {
         return fork;
@@ -55,6 +56,14 @@ public class EtlExecuteTask extends EtlTaskBase {
 
     public void setNostat(boolean nostat) {
         this.nostat = nostat;
+    }
+
+    public boolean isNojmx() {
+        return nojmx;
+    }
+
+    public void setNojmx(boolean nojmx) {
+        this.nojmx = nojmx;
     }
 
     /**
@@ -112,6 +121,7 @@ public class EtlExecuteTask extends EtlTaskBase {
         launcher.setProgressIndicator(new ConsoleProgressIndicator());
         launcher.setProperties(getProperties());
         launcher.setNoStat(nostat);
+        launcher.setNoJmx(nojmx);
 
         setupLogging();
         for (File file : files) {

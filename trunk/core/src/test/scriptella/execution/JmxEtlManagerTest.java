@@ -22,6 +22,13 @@ import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests for {@link JmxEtlManager}.
@@ -30,7 +37,10 @@ import java.net.URL;
  * @version 1.0
  */
 public class JmxEtlManagerTest extends AbstractTestCase {
-    public void testRegistration() throws MalformedURLException, MalformedObjectNameException {
+
+	public static final int NUMBER_OF_THREADS = 5;
+
+	public void testRegistration() throws MalformedURLException, MalformedObjectNameException {
         EtlContext ctx = new EtlContext();
         ctx.setBaseURL(new URL("file:/tmp"));
         JmxEtlManager m = new JmxEtlManager(ctx);
@@ -81,5 +91,40 @@ public class JmxEtlManagerTest extends AbstractTestCase {
         assertTrue(Thread.interrupted());
 
     }
+
+	/**
+	 * Test for BUG-54489 InstanceNotFoundException when running multiple executors of the same script
+	 */
+	public void testParallelExecution() throws MalformedURLException, InterruptedException {
+		final URL url = new URL("file:/tmp");
+		final ExecutorService ex = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+		final List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
+		final AtomicInteger cnt = new AtomicInteger();
+		for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+			ex.submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						EtlContext ctx = new EtlContext();
+						ctx.setBaseURL(url);
+						JmxEtlManager m = new JmxEtlManager(ctx);
+						m.register();
+						assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(m.getName()));
+						m.unregister();
+						cnt.incrementAndGet();
+					} catch (Throwable e) {
+						exceptions.add(e);
+					}
+				}
+			});
+		}
+		ex.shutdown();
+		ex.awaitTermination(1, TimeUnit.SECONDS);
+		ex.shutdownNow();
+		assertEquals("Errors occurred while executing in parallel", Collections.<Throwable> emptyList(),
+				exceptions);
+		assertEquals(NUMBER_OF_THREADS + " jobs are expected to complete", NUMBER_OF_THREADS, cnt.intValue());
+		JmxEtlManager.cancelAll();
+	}
 
 }
