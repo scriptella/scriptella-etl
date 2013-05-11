@@ -21,9 +21,12 @@ import scriptella.configuration.ScriptEl;
 import scriptella.spi.Connection;
 import scriptella.spi.DialectIdentifier;
 import scriptella.spi.Resource;
+import scriptella.spi.support.HierarchicalParametersCallback;
+import scriptella.spi.support.MapParametersCallback;
 import scriptella.util.ExceptionUtils;
 import scriptella.util.StringUtils;
 
+import java.util.Collections;
 import java.util.logging.Level;
 
 
@@ -72,17 +75,27 @@ public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
      */
     private boolean onError(Throwable t, OnErrorHandler errorHandler, DynamicContext ctx) {
         OnErrorEl onErrorEl = errorHandler.onError(t);
-        Connection con = ctx.getConnection();
-        DialectIdentifier dialectId = con.getDialectIdentifier();
         if (onErrorEl != null) { //if error handler present for this case
+            Connection con;
+            //CRQ-54586 Feature request: Allow different connection-id in onerror element
+            if (onErrorEl.getConnectionId() == null) {
+                con = ctx.getConnection();
+            } else {
+                con = ctx.getGlobalContext().getSession().getConnection(onErrorEl.getConnectionId()).getConnection();
+            }
+            DialectIdentifier dialectId = con.getDialectIdentifier();
+
             ContentEl content = prepareContent(onErrorEl.getContent(dialectId));
             if (log.isLoggable(Level.INFO)) {
                 log.log(Level.INFO, StringUtils.consoleFormat("Script " + getLocation() + " failed: " + t +
                         "\nUsing onError handler: " + onErrorEl));
             }
-
             try {
-                con.executeScript(content == null ? ContentEl.NULL_CONTENT : content, ctx);
+                //Make error details available to the onerror handler
+                //This is achieved by wrapping ctx into a new dynamic context with a variable "error"
+                MapParametersCallback pc = new MapParametersCallback(Collections.singletonMap("error", t));
+                HierarchicalParametersCallback hpc = new HierarchicalParametersCallback(pc, ctx);
+                con.executeScript(content == null ? ContentEl.NULL_CONTENT : content, hpc);
                 return onErrorEl.isRetry();
             } catch (Exception e) {
                 return onError(e, errorHandler, ctx); //calling this method again and triying to find another onerror

@@ -39,6 +39,7 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
         return connectionId;
     }
 
+    @SuppressWarnings("unused") //call via reflection in configure
     public void setConnectionId(final String connectionId) {
         this.connectionId = connectionId;
     }

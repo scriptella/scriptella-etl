@@ -35,6 +35,7 @@ public class OnErrorEl extends XmlConfigurableBase {
     private Pattern message;
     private Set<String> codes;
     private boolean retry;
+    private String connectionId;
     protected DialectBasedContentEl content;
 
     public OnErrorEl() {
@@ -55,6 +56,7 @@ public class OnErrorEl extends XmlConfigurableBase {
         }
         retry = element.getBooleanAttribute("retry", false);
         content = new DialectBasedContentEl(element);
+        setProperty(element, "connection-id", "connectionId");
     }
 
     /**
@@ -105,6 +107,14 @@ public class OnErrorEl extends XmlConfigurableBase {
         return content.getContent(id);
     }
 
+    public String getConnectionId() {
+        return connectionId;
+    }
+
+    @SuppressWarnings("unused") //Called via reflection in configure
+    public void setConnectionId(String connectionId) {
+        this.connectionId = connectionId;
+    }
 
     public String toString() {
         StringBuilder res = new StringBuilder("OnError{");

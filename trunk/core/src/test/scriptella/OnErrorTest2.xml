@@ -1,0 +1,16 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:onerrortest" user="sa" password=""/>
+    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:onerrortest2" user="sa" password=""/>
+    <script connection-id="c2">
+        CREATE TABLE ERROR_LOG (
+            MSG VARCHAR(100)
+        );
+    </script>
+    <script connection-id="c1">
+        SYNTAX ERROR
+        <onerror connection-id="c2">
+            INSERT INTO ERROR_LOG VALUES ('Error occurred: ${error}');
+        </onerror>
+    </script>
+</etl>
