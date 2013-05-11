@@ -42,10 +42,7 @@ public class DynamicContext implements ParametersCallback {
 
     public Object getParameter(final String name) {
         if (EtlVariable.NAME.equals(name)) {
-            if (etlVariable == null) {
-                etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
-            }
-            return etlVariable;
+            return getEtlVariable();
         }
         return globalContext.getParameter(name);
     }
@@ -60,4 +57,10 @@ public class DynamicContext implements ParametersCallback {
         return globalContext;
     }
 
+    EtlVariable getEtlVariable() {
+        if (etlVariable == null) {
+            etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
+        }
+        return etlVariable;
+    }
 }

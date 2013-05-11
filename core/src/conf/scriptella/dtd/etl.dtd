@@ -184,12 +184,14 @@ so only exceptions with class name *.ProviderException having 100 and/or 200 err
  @attr codes Comma-separated list of vendor codes/sql states. Triggered if any of these codes matches one of the codes reported by driver.
  @attr message Regular expression pattern to match exception message. Partial matching is allowed.
  @attr retry true if statement which caused a problem should be retried after this handler completes.
+ @attr connection-id optional connection ID. If omitted, the error handling code will be executed in the context of the current connection.
 -->
 <!ATTLIST onerror
 type CDATA #IMPLIED
 codes CDATA #IMPLIED
 message CDATA #IMPLIED
 retry (true | false) "false"
+connection-id IDREF #IMPLIED
 >
 
 <!--

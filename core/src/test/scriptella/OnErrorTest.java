@@ -17,6 +17,7 @@ package scriptella;
 
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
+import scriptella.jdbc.JdbcException;
 import scriptella.jdbc.QueryHelper;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
@@ -53,4 +54,27 @@ public class OnErrorTest extends DBTestCase {
         assertTrue(expected.isEmpty());
 
     }
+
+    /**
+     * CRQ-54586 Feature request: Allow different connection-id in ononerror element
+     * @throws EtlExecutorException
+     */
+    public void testCRQ54586() throws EtlExecutorException {
+        final Connection con = getConnection("onerrortest2");
+        EtlExecutor se = newEtlExecutor(getClass().getSimpleName()+"2.xml");
+        se.execute();
+        QueryHelper q = new QueryHelper("select * from error_log");
+        final int[] cnt = new int[1];
+        q.execute(con, new QueryCallback() {
+            public void processRow(final ParametersCallback parameters) {
+                String msg = (String) parameters.getParameter("msg");
+                assertTrue(msg.startsWith("Error occurred"));
+                assertTrue("Error message should contain JdbcException", msg.contains(JdbcException.class.getName()));
+                cnt[0]++;
+            }
+        });
+        assertEquals("One error should be logged", 1, cnt[0]);
+        getConnection("onerrortest"); //call getConnection simply to shutdown HSQLDB after the test
+    }
+
 }

@@ -254,6 +254,58 @@
                         </script>
                     </query>]]></source>
 			</section>
+            <section>
+                <title>&lt;onerror&gt;</title>
+                <p>The onerror element defines fallback script to execute if an error occurs.
+                    The java.lang.Throwable object representing an error can be referenced from
+                    &lt;onerror&gt; element by using a variable named "error".
+                    This element may contain plain text or includes.
+                    The element supports the following optional attributes:</p>
+                <p>
+                    <strong>type</strong> - regular expression pattern to match exception type. Partial matching is allowed.</p>
+                <p>
+                    <strong>codes</strong> - comma-separated list of vendor codes/sql states. Triggered if any of these codes matches one of the codes reported by driver.
+                </p>
+                <p>
+                    <strong>message</strong> - regular expression pattern to match exception message. Partial matching is allowed.
+                </p>
+                <p>
+                    <strong>retry</strong> - true if statement which caused a problem should be retried after this handler completes.
+                </p>
+                <p>
+                    <strong>connection-id</strong> - optional connection ID. If specified, the error will be handled by another connection.
+                    Setting this attribute may be useful to handle(or simply log) the error by a different driver like Java or Text.
+                </p>
+                <p>
+                    <strong>Examples</strong>
+                </p>
+
+                <source>
+                    &lt;--
+                        Example of how to use onerror to emulate CREATE TABLE ... IF NOT EXISTS:
+                        Drops a table if it already exists and then call CREATE again (retry=true).
+                    --&gt;
+                    &lt;script connection-id="in"&gt;
+                        CREATE TABLE Table1;
+                        &lt;onerror message=".*Table already exists*" retry="true"&gt;
+                            DROP TABLE Table1;
+                        &lt;/onerror&gt;
+                    &lt;/script&gt;
+
+                    &lt;--
+                        Example of how to log all errors in the script using a custom Java class
+                    --&gt;
+                    &lt;script connection-id="in"&gt;
+                        INSERT INTO TABLE TableName VALUES (1, 'Value1');
+                        &lt;onerror connection-id="java"&gt;
+                            //"error" object represents error details (java.lang.Throwable)
+                            Throwable error = (Throwable)get("error");
+                            com.app.ApplicationLogger.logEtlError(error);
+                        &lt;/onerror&gt;
+                    &lt;/script&gt;
+
+                </source>
+            </section>
 			<fixme author="ejboy">Describe all elements</fixme>
 		</section>
 		<anchor id="BIND_VARIABLES"/>
