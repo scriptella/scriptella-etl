@@ -279,7 +279,6 @@
                 <p>
                     <strong>Examples</strong>
                 </p>
-
                 <source>
                     &lt;--
                         Example of how to use onerror to emulate CREATE TABLE ... IF NOT EXISTS:
@@ -303,7 +302,6 @@
                             com.app.ApplicationLogger.logEtlError(error);
                         &lt;/onerror&gt;
                     &lt;/script&gt;
-
                 </source>
             </section>
 			<fixme author="ejboy">Describe all elements</fixme>
