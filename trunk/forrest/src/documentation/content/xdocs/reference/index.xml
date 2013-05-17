@@ -329,21 +329,21 @@
 				<li>SQL scripts/queries processed by the JDBC-based providers</li>
 			</ul>
             <p>Scriptella extends JEXL by adding several built in functions available inside JEXL expressions.
-                <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>EtlVariable</code></a>
+                <a href="../docs/api/scriptella/core/EtlVariable.html"><code>EtlVariable</code></a>
                 class provides an entry point for these extensions:</p>
             <ul>
                 <li>date: - Functions for parsing and formatting dates. <br/>Example: <code>${date:today('yyyyMMdd')}</code>
-                    - formats the current date using the specified pattern. See <a href="../docs/api/scriptella/expression/EtlVariable.DateUtils.html">JavaDoc</a>
+                    - formats the current date using the specified pattern. See <a href="../docs/api/scriptella/core/EtlVariable.DateUtils.html">JavaDoc</a>
                     for more details.
                 </li>
                 <li>text: - Functions for working with text. <br/>Example: <code>${text:ifNull(a)}</code>
-                    - returns empty string if a=null. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
+                    - returns empty string if a=null. See <a href="../docs/api/scriptella/core/EtlVariable.TextUtils.html">JavaDoc</a>
                     for more details. As of version 1.1 JEXL ternary operators may be used instead, e.g.
                     <code>${a==null?'':a}</code>
                 </li>
                 <li>class: - Utility functions for class related operations. For now only class lookup is available.
                     <br/>Example : <code>${class:forName('java.lang.System').getProperty('propName')}</code>
-                    - Loads java System class and invokes getProperty method on it. See <a href="../docs/api/scriptella/expression/EtlVariable.TextUtils.html">JavaDoc</a>
+                    - Loads java System class and invokes getProperty method on it. See <a href="../docs/api/scriptella/core/EtlVariable.TextUtils.html">JavaDoc</a>
                     for more details.
                 </li>
 
@@ -380,8 +380,9 @@
                         <td>
                             <code>etl</code>
                         </td>
-                        <td>Represents current context.
-                            See <a href="../docs/api/scriptella/expression/EtlVariable.html"><code>EtlVariable</code></a> for additional details.</td>
+                        <td>Represents the current execution context and provides access to utility methods,
+                            accessors for connection object and global variables.
+                            See <a href="../docs/api/scriptella/core/EtlVariable.html"><code>EtlVariable</code></a> for additional details.</td>
                         <td>All script and query elements</td>
                     </tr>
 				</table>

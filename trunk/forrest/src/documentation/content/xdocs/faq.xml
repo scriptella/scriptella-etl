@@ -94,7 +94,7 @@ ${class:forName('java.lang.System').getProperty('propName')}
 
         <faq id="COLUMN_SPACES">
             <question>How to escape spaces in field names?</question>
-            <answer><p>You can use <a href="docs/api/scriptella/expression/EtlVariable.html"><code>etl context variable</code></a> ${etl.getParameter('var name')} to reference any column names.
+            <answer><p>You can use <a href="docs/api/scriptella/core/EtlVariable.html"><code>etl context variable</code></a> ${etl.getParameter('var name')} to reference any column names.
                 Additionally several drivers
                 including CSV and JDBC allow referencing columns by an index, i.e. $1, $2 ... $n.
                 <br/>Example:
