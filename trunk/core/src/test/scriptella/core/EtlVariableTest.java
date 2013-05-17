@@ -16,6 +16,7 @@
 package scriptella.core;
 
 import scriptella.AbstractTestCase;
+import scriptella.execution.EtlContext;
 import scriptella.expression.Expression;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.MockParametersCallbacks;
@@ -105,7 +106,7 @@ public class EtlVariableTest extends AbstractTestCase {
     }
 
     public void testGetGlobalVars() {
-        EtlVariable etlVariable = new EtlVariable(MockParametersCallbacks.NULL, new HashMap<String, Object>());
+        EtlVariable etlVariable = new EtlVariable(MockParametersCallbacks.NULL, new EtlContext());
         etlVariable.getGlobals().put("g", "1");
         assertEquals("1", etlVariable.getGlobals().get("g"));
     }

@@ -15,6 +15,8 @@
  */
 package scriptella.core;
 
+import scriptella.execution.EtlContext;
+import scriptella.spi.Connection;
 import scriptella.spi.ParametersCallback;
 
 import java.text.DateFormat;
@@ -50,12 +52,12 @@ public class EtlVariable implements ParametersCallback {
     private final TextUtils text = new TextUtils();
     private final ClassUtils clazz = new ClassUtils();
     private ParametersCallback parametersCallback;
-    private Map<String, Object> globals;
+    private EtlContext globalContext;
 
 
-    public EtlVariable(ParametersCallback parametersCallback, Map<String, Object> globals) {
+    public EtlVariable(ParametersCallback parametersCallback, EtlContext globalContext) {
         this.parametersCallback = parametersCallback;
-        this.globals = globals;
+        this.globalContext = globalContext;
     }
 
     public EtlVariable() {
@@ -96,7 +98,17 @@ public class EtlVariable implements ParametersCallback {
      * @return map of global variables in the scope of ETL file.
      */
     public Map<String, Object> getGlobals() {
-        return globals;
+        return globalContext.getGlobalVariables();
+    }
+
+    /**
+     * Returns the <code>{@link Connection connection}</code> for the specified id,
+     *
+     * @param id id of the required connection. Null is allowed if script has only one connection.
+     * @return connection for the specified id.
+     */
+    public Connection getConnection(String id) {
+        return globalContext.getSession().getConnection(id).getConnection();
     }
 
     /**

@@ -22,6 +22,7 @@ package scriptella.spi;
  *
  * @author Fyodor Kupolov
  * @version 1.0
+ * @see NativeConnectionProvider
  */
 public interface Connection {
     /**
