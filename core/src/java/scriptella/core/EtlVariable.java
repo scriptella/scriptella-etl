@@ -27,6 +27,13 @@ import java.util.Map;
 
 /**
  * Represents a global <code>etl</code> variable available for all ETL file elements.
+ * <p>The variable provides the following functionalities:</p>
+ * <ul>
+ *     <li>Utility methods useful in JEXL expressions, e.g {@link DateUtils#format(java.util.Date, String)} or
+ *     {@link TextUtils#nullIf(Object, Object)}</li>
+ *     <li>{@link #getConnection(String)} method for obtaining underlying connection objects</li>
+ *     <li>{@link #getGlobals()} - container for global variables shared across different parts of ETL file</li>
+ * </ul>
  * <p>As of 1.1 a new syntax is introduced based on
  * <a href="http://commons.apache.org/jexl/reference/syntax.html#Functions">JEXL function</a> namespaces:
  * <ul>
@@ -38,9 +45,34 @@ import java.util.Map;
  * {@link EtlVariable.ClassUtils},
  * e.g. <code>class:forName('java.lang.System').getProperty('java.version')</code></li>
  * </ul>
+ *<h2>Examples</h2>
+ * <h3>Global variables</h3>
+ * <p>A global variable, which is set in one part of the ETL file can be later read from other places during ETL execution:
+ * <pre><code>
+ *     &lt;query connection-id="db"&gt;
+ *       SELECT COUNT(*) as userCount from Users
+ *       &lt;script connection-id="jexl"&gt;
+ *           etl.globals['globalVar'] = userCount;
+ *       &lt;/script&gt;
+ *     &lt;/query&gt;
+ *     &lt;script connection-id="log"&gt;
+ *         Global variable 'globalVar': ${etl.globals['globalVar']}
+ *    &lt;/script&gt;
+ * </code></pre>
+ * <h3>Obtain a native connection to the JDBC datasource</h3>
+ * <pre><code>
+ *    &lt;script connection-id="java"&gt;
+ *        scriptella.core.EtlVariable etl = (scriptella.core.EtlVariable)get("etl");
+ *        java.sql.Connection c = (java.sql.Connection)((scriptella.spi.NativeConnectionProvider)etl.getConnection("db")).getNativeConnection();
+ *        java.sql.ResultSet r = c.createStatement().executeQuery("SELECT COUNT(*) FROM Test");
+ *        r.next();
+ *        Object cnt = r.getObject(1);
+ *        java.util.logging.Logger.getLogger("mylogger").info("Count: "+cnt);
+ *    &lt;/script&gt;
+ * </code></pre>
  *
  * @author Fyodor Kupolov
- * @version 1.0
+ * @since 1.0
  */
 public class EtlVariable implements ParametersCallback {
 
@@ -96,6 +128,7 @@ public class EtlVariable implements ParametersCallback {
      * <p>This map is shared between all etl file elements and can be used for cases when there is a need to share some state globally.
      * It is recommended to avoid using global variables except cases when it's really beneficiary and simplifies the ETL file.
      * @return map of global variables in the scope of ETL file.
+     * @since 1.1
      */
     public Map<String, Object> getGlobals() {
         return globalContext.getGlobalVariables();
@@ -103,9 +136,14 @@ public class EtlVariable implements ParametersCallback {
 
     /**
      * Returns the <code>{@link Connection connection}</code> for the specified id,
+     * This method is convenient for cases when access to the native connection is required, e.g. invoking a specific method
+     * or for a manual control over a transaction boundaries.
+     * <p><b>Note:</b> The method should be used with caution because it might affect the flow of the ETL file execution
+     * and block some optimizations which may be added to the ETL engine in the future.
      *
      * @param id id of the required connection. Null is allowed if script has only one connection.
      * @return connection for the specified id.
+     * @since 1.2
      */
     public Connection getConnection(String id) {
         return globalContext.getSession().getConnection(id).getConnection();
