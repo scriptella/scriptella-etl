@@ -123,7 +123,7 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
             }
             if (EtlVariable.NAME.equals(name)) {
                 if (etlVariable == null) {
-                    etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
+                    etlVariable = new EtlVariable(this, globalContext);
                 }
                 return etlVariable;
             }

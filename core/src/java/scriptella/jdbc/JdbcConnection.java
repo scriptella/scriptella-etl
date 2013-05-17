@@ -19,6 +19,7 @@ import scriptella.configuration.ConfigurationException;
 import scriptella.spi.AbstractConnection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
+import scriptella.spi.NativeConnectionProvider;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.ProviderException;
 import scriptella.spi.QueryCallback;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  * @author Fyodor Kupolov
  * @version 1.0
  */
-public class JdbcConnection extends AbstractConnection {
+public class JdbcConnection extends AbstractConnection implements NativeConnectionProvider {
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
     public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";
@@ -301,6 +302,7 @@ public class JdbcConnection extends AbstractConnection {
         }
     }
 
+    @Override
     public Connection getNativeConnection() {
         return con;
     }

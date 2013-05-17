@@ -1,0 +1,20 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection id="java" driver="janino"/>
+    <connection id="db" url="jdbc:hsqldb:mem:janinogetnativedbconnectionitest"/>
+    <script connection-id="db">
+        CREATE TABLE Test (
+            ID INT
+        );
+        insert into Test values (1);
+    </script>
+    <script connection-id="java">
+        scriptella.core.EtlVariable etl = (scriptella.core.EtlVariable)get("etl");
+        java.sql.Connection c = (java.sql.Connection)((scriptella.spi.NativeConnectionProvider)etl.getConnection("db")).getNativeConnection();
+        java.sql.ResultSet r = c.createStatement().executeQuery("SELECT COUNT(*) FROM Test");
+        r.next();
+        Object cnt = r.getObject(1);
+        java.util.logging.Logger.getLogger("mylogger").info("Count: "+cnt);
+        scriptella.driver.janino.JaninoGetNativeDbConnectionITest.runStatic(cnt);
+    </script>
+</etl>

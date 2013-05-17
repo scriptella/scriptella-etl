@@ -59,7 +59,7 @@ public class DynamicContext implements ParametersCallback {
 
     EtlVariable getEtlVariable() {
         if (etlVariable == null) {
-            etlVariable = new EtlVariable(this, globalContext.getGlobalVariables());
+            etlVariable = new EtlVariable(this, globalContext);
         }
         return etlVariable;
     }
