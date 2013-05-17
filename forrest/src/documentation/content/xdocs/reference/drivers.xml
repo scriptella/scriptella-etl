@@ -297,6 +297,15 @@
                 </tr>
                 <tr>
                     <td>
+                        <anchor id="mongodb"/>
+                        <a href="https://github.com/scriptella/scriptella-mongodb">MongoDB</a>
+                    </td>
+                    <td>org.scriptella.mongodb.Driver
+                    </td>
+                    <td>Provides integration of <a href="http://mongodb.org/">MongoDB</a> with Scriptella.</td>
+                </tr>
+                <tr>
+                    <td>
                         <anchor id="mail"/>
                         <a href="../docs/api/scriptella/driver/mail/package-summary.html#package_description">Mail</a>
                     </td>
@@ -355,6 +364,15 @@
                     <td>scriptella.driver.<strong>velocity</strong>.Driver
                     </td>
                     <td>This driver allows to integrate velocity templates into script files.</td>
+                </tr>
+                <tr>
+                    <td>
+                        <anchor id="vtd-xml"/>
+                        <a href="https://github.com/floriankammermann/scriptella-vtdxml">vtd-xml</a>
+                    </td>
+                    <td>scriptella.driver.<strong>vtdxml</strong>.Driver
+                    </td>
+                    <td>Implementation of <a href="http://vtd-xml.sourceforge.net/">vtd-xml</a> as xpath driver for Scriptella.</td>
                 </tr>
                 <tr>
                     <td>
