@@ -130,10 +130,9 @@
 			<section>
 				<title>&lt;properties&gt;</title>
 				<p>In this element define properties to be substituted in other script elements. This concept is similar to
-                Ant.</p>
+                Ant properties. In case of multiple declarations of the same property, the one that comes first takes precedence over subsequent declarations.</p>
 				<p>&lt;include&gt; element is used to insert external content. This concept is almost identical to XInclude</p>
-				<note>The values of properties defined in this element are overridden by system properties or other
-                external properties depending on execution environment, e.g. Ant properties.</note>
+				<note>Values of properties defined in this element can be overridden by setting a system property or another external property depending on execution environment, e.g. Ant task.</note>
 			</section>
 			<section>
 				<title>&lt;connection&gt;</title>
