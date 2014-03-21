@@ -46,6 +46,7 @@ public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
             log.fine("Executing script " + getLocation());
         }
         boolean repeat;
+        OnErrorHandler onErrorHandler = null;
         do {
             repeat = false;
             try {
@@ -53,11 +54,14 @@ public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
                 if (debug) {
                     log.fine("Script " + getLocation() + " completed");
                 }
-
             } catch (Throwable t) {
                 ScriptEl scriptEl = getElement();
                 if (scriptEl.getOnerrorElements() != null) {
-                    repeat = onError(t, new OnErrorHandler(scriptEl), ctx);
+                    // Keep the same onerror handler during handling and retrying to avoid infinite loops
+                    if (onErrorHandler == null) {
+                        onErrorHandler = new OnErrorHandler(scriptEl);
+                    }
+                    repeat = onError(t, onErrorHandler, ctx);
                 } else {
                     ExceptionUtils.throwUnchecked(t);
                 }
@@ -98,7 +102,7 @@ public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
                 con.executeScript(content == null ? ContentEl.NULL_CONTENT : content, hpc);
                 return onErrorEl.isRetry();
             } catch (Exception e) {
-                return onError(e, errorHandler, ctx); //calling this method again and triying to find another onerror
+                return onError(e, errorHandler, ctx); //calling this method again and trying to find another onerror
             }
         } //if no onError found - rethrow the exception
         ExceptionUtils.throwUnchecked(t);

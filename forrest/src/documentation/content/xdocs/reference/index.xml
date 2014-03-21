@@ -255,8 +255,10 @@
 			</section>
             <section>
                 <title>&lt;onerror&gt;</title>
-                <p>The onerror element defines fallback script to execute if an error occurs.
-                    The java.lang.Throwable object representing an error can be referenced from
+                <p>The onerror element defines a fallback script to execute if an error occurs.
+                    If an error occurs inside a fallback script, it may be handled by other
+                    matching onerror elements of the original script or query.
+                    The java.lang.Throwable object representing an error is available to
                     &lt;onerror&gt; element by using a variable named "error".
                     This element may contain plain text or includes.
                     The element supports the following optional attributes:</p>
@@ -270,6 +272,7 @@
                 </p>
                 <p>
                     <strong>retry</strong> - true if statement which caused a problem should be retried after this handler completes.
+                    If the error occurs again, the same onerror element is not triggered to avoid infinite loops.
                 </p>
                 <p>
                     <strong>connection-id</strong> - optional connection ID. If specified, the error will be handled by another connection.
