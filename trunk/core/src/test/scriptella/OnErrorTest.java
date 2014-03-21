@@ -25,6 +25,9 @@ import scriptella.spi.QueryCallback;
 import java.sql.Connection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests support of onerror elements.
@@ -75,6 +78,22 @@ public class OnErrorTest extends DBTestCase {
         });
         assertEquals("One error should be logged", 1, cnt[0]);
         getConnection("onerrortest"); //call getConnection simply to shutdown HSQLDB after the test
+    }
+
+    /**
+     * BUG-193124 Error during script execution causes an infinite loop for an onerror handler with retry enabled
+     */
+    public void testRetry() throws EtlExecutorException, InterruptedException {
+      ExecutorService es = Executors.newFixedThreadPool(1);
+
+      EtlExecutor etlExecutor = newEtlExecutor(getClass().getSimpleName()+"3.xml");
+      es.submit((Runnable) etlExecutor);
+      es.shutdown();
+      es.awaitTermination(1, TimeUnit.SECONDS);
+      if (!es.isTerminated()) {
+        es.shutdownNow();
+        fail(etlExecutor + " should be terminated, but is still running.");
+      }
     }
 
 }
