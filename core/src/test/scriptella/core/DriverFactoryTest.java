@@ -17,6 +17,8 @@ package scriptella.core;
 
 import scriptella.AbstractTestCase;
 
+import java.util.logging.Logger;
+
 /**
  * Tests for {@link scriptella.core.DriverFactory}.
  *
@@ -24,12 +26,27 @@ import scriptella.AbstractTestCase;
  * @version 1.0
  */
 public class DriverFactoryTest extends AbstractTestCase {
+    private static final Logger logger = Logger.getLogger(DriverFactoryTest.class.getName());
+    public static final String SUN_JDBC_ODBC_JDBC_ODBC_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
+    private static boolean skipJdbcOdbc;
+
+    static {
+        try {
+            Class.forName(SUN_JDBC_ODBC_JDBC_ODBC_DRIVER);
+        } catch (ClassNotFoundException e) {
+            skipJdbcOdbc = true;
+            logger.warning(SUN_JDBC_ODBC_JDBC_ODBC_DRIVER + " not available starting from JDK8 - skipping related tests");
+        }
+    }
+
     /**
      * Tests correct handling of drivers in bootstrap classpath.
      */
     public void testGetBootstrapDriver() throws ClassNotFoundException {
-        //JDBC-ODBC
-        DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", null);
+        if (!skipJdbcOdbc) {
+            //JDBC-ODBC
+            DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", null);
+        }
     }
 
     /**
@@ -37,9 +54,9 @@ public class DriverFactoryTest extends AbstractTestCase {
      */
     public void testClassPathDriver() throws ClassNotFoundException {
         DriverFactory.getDriver("org.hsqldb.jdbcDriver", getClass().getClassLoader());
-        //Bootstrap classes should also be loaded using the classloader scriptella jars.
-        DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", getClass().getClassLoader());
+        if (!skipJdbcOdbc) {
+            //Bootstrap classes should also be loaded using the classloader scriptella jars.
+            DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", getClass().getClassLoader());
+        }
     }
-
-
 }
