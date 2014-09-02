@@ -28,7 +28,6 @@ import scriptella.util.ExceptionUtils;
 import scriptella.util.IOUtils;
 import scriptella.util.StringUtils;
 
-import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -57,8 +56,7 @@ import java.util.logging.Logger;
 public class ScriptConnection extends AbstractConnection {
     private static final Logger LOG = Logger.getLogger(ScriptConnection.class.getName());
     private Map<Resource, CompiledScript> cache;
-    private ScriptEngine engine;
-    private Compilable compiler;
+    private ScriptEngineWrapper engineWrapper;
     private String encoding;
     private URL url;
     private Writer out;
@@ -88,16 +86,22 @@ public class ScriptConnection extends AbstractConnection {
             lang = "js";
         }
 
-        engine = scriptEngineManager.getEngineByName(lang);
+        ScriptEngine engine = scriptEngineManager.getEngineByName(lang);
         if (engine == null) {
             throw new ConfigurationException("Specified " + LANGUAGE + "=" + lang + " not supported. Available values are: " +
                     getAvailableEngines(scriptEngineManager));
         }
-        if (engine instanceof Compilable) {
-            compiler = (Compilable) engine;
+        engineWrapper = new ScriptEngineWrapper(engine);
+        LOG.fine("Script engine selected: " + engine.getFactory().getEngineName());
+        if (engineWrapper.isCompilable()) {
             cache = new IdentityHashMap<Resource, CompiledScript>();
         } else {
             LOG.info("Engine " + engine.getFactory().getEngineName() + " does not support compilation. Running in interpreted mode.");
+        }
+        // TODO Remove this once #2 is fixed
+        if (engineWrapper.isNashornScriptEngine()) {
+            LOG.warning("Nashorn JavaScript Engine is currently not fully supported. \n" +
+                    "See https://github.com/scriptella/scriptella-etl/issues/2 for status.");
         }
         if (!StringUtils.isEmpty(parameters.getUrl())) { //if url is specified
             url = parameters.getResolvedUrl();
@@ -110,7 +114,6 @@ public class ScriptConnection extends AbstractConnection {
         encoding = parameters.getCharsetProperty(ENCODING);
         ScriptEngineFactory f = engine.getFactory();
         setDialectIdentifier(new DialectIdentifier(f.getLanguageName(), f.getLanguageVersion()));
-
     }
 
     /**
@@ -128,11 +131,11 @@ public class ScriptConnection extends AbstractConnection {
     }
 
     public void executeScript(Resource scriptContent, ParametersCallback parametersCallback) throws ScriptProviderException, ConfigurationException {
-        run(scriptContent, new BindingsParametersCallback(parametersCallback));
+        run(scriptContent, engineWrapper.newBindingsParametersCallback(parametersCallback));
     }
 
     public void executeQuery(Resource queryContent, ParametersCallback parametersCallback, QueryCallback queryCallback) throws ScriptProviderException, ConfigurationException {
-        final BindingsParametersCallback bindingsParametersCallback = new BindingsParametersCallback(parametersCallback, queryCallback);
+        final BindingsParametersCallback bindingsParametersCallback = engineWrapper.newBindingsParametersCallback(parametersCallback, queryCallback);
         MissingQueryNextCallDetector detector = new MissingQueryNextCallDetector(bindingsParametersCallback, queryContent);
         run(queryContent, bindingsParametersCallback);
         detector.detectMissingQueryNextCall();
@@ -146,14 +149,14 @@ public class ScriptConnection extends AbstractConnection {
      */
     private void run(Resource resource, BindingsParametersCallback parametersCallback) {
         try {
-            if (compiler == null) {
-                engine.eval(resource.open(), parametersCallback);
+            if (!engineWrapper.isCompilable()) {
+                engineWrapper.evalNoCompile(resource.open(), parametersCallback);
                 return;
             }
             CompiledScript script = cache.get(resource);
             if (script == null) {
                 try {
-                    cache.put(resource, script = compiler.compile(resource.open()));
+                    cache.put(resource, script = engineWrapper.compile(resource.open()));
                 } catch (ScriptException e) {
                     throw new ScriptProviderException("Failed to compile script", e, getErrorStatement(resource, e));
                 }
@@ -185,6 +188,7 @@ public class ScriptConnection extends AbstractConnection {
      * Closes the connection and releases all related resources.
      */
     public void close() throws ProviderException {
+        IOUtils.closeSilently(engineWrapper);
         cache = null;
     }
 

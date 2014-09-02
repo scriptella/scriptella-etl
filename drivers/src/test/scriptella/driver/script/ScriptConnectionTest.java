@@ -124,7 +124,8 @@ public class ScriptConnectionTest extends AbstractTestCase {
 
         c.executeScript(new StringResource("print('Hello '+name)"),
                 MockParametersCallbacks.fromMap(Collections.singletonMap("name", "world")));
-        assertEquals("Hello world", os.toString());
+        c.close();
+        assertEquals("Hello world", os.toString().trim()); //Starting with Java 8, print adds a new line
     }
 
     public void testGetErrorStatement() {
