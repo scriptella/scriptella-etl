@@ -142,7 +142,7 @@ public class SqlParserBase {
      * @return substituion string.
      */
     protected String handleParameter(final String name, final boolean expression, final boolean jdbcParam) {
-        return expression ? ((jdbcParam ? "?{" : "${") + name + '}') : ((jdbcParam ? "?{" : "$") + name);
+        return expression ? ((jdbcParam ? "?{" : "${") + name + '}') : ((jdbcParam ? "?" : "$") + name);
     }
 
     /**

@@ -109,4 +109,28 @@ public class SQLParserBaseTest extends AbstractTestCase {
 
     }
 
+  public void testCallableStatement() {
+    final String sql = "{call procName(?arg1, ?out_arg2, ?inout_arg3, 'value')}";
+
+    SqlParserBase p = new SqlParserBase() {
+      String[] paramNames = {"arg1", "out_arg2", "inout_arg3"};
+      int paramNumber;
+      @Override
+      protected String handleParameter(final String name, final boolean expression, boolean jdbcParam) {
+        assertEquals(paramNames[paramNumber], name);
+        assertFalse(expression);
+        assertTrue(jdbcParam);
+        paramNumber++;
+        String s = super.handleParameter(name, expression, jdbcParam);
+        return s;
+      }
+
+      @Override
+      protected void statementParsed(String parsedSql) {
+        assertEquals(sql, parsedSql);
+      }
+    };
+    p.parse(new StringReader(sql));
+  }
+
 }
