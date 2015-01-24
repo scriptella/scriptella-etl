@@ -43,5 +43,5 @@ if [ -z "$JAVACMD" ]; then                      # true if string's length is zer
     JAVACMD="java"
 fi
 
-$JAVACMD $_SCRIPTELLA_JAVA_OPTS -classpath $_SCRIPTELLA_CP scriptella.tools.launcher.EtlLauncher "$@"
+$JAVACMD "$_SCRIPTELLA_JAVA_OPTS" -classpath $_SCRIPTELLA_CP scriptella.tools.launcher.EtlLauncher "$@"
 

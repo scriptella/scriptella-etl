@@ -36,9 +36,11 @@ rem ---- define java cmd. Use JAVACMD to specify java.exe location and VM option
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if "%JAVACMD%" == "" set JAVACMD=%JAVA_HOME%\bin\java.exe
+set _SCRIPTELLA_JAVA_OPTS=%SCRIPTELLA_JAVA_OPTS%
+if "%_SCRIPTELLA_JAVA_OPTS%" == "" set _SCRIPTELLA_JAVA_OPTS=%JAVA_OPTS% 
 
 :noJavaHome
 if "%JAVACMD%" == "" set JAVACMD=java.exe
 
 rem ---- run scriptella
-%JAVACMD% -cp %_SCRIPTELLA_CP% scriptella.tools.launcher.EtlLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9
+%JAVACMD% %_SCRIPTELLA_JAVA_OPTS% -cp %_SCRIPTELLA_CP% scriptella.tools.launcher.EtlLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9
