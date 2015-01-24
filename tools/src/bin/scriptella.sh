@@ -21,6 +21,12 @@ if [ "x$SCRIPTELLA_HOME" = "x" ]; then
     SCRIPTELLA_HOME=`cd $BIN_DIR/..; pwd`       # goes one level up
 fi
 
+if [ "x$SCRIPTELLA_JAVA_OPTS" = "x" ]; then
+    _SCRIPTELLA_JAVA_OPTS="$JAVA_OPTS"
+else
+    _SCRIPTELLA_JAVA_OPTS="$SCRIPTELLA_JAVA_OPTS"
+fi
+
 _SCRIPTELLA_CP=""
 for _arg in $SCRIPTELLA_HOME/lib/*.jar; do
 	_SCRIPTELLA_CP=$_SCRIPTELLA_CP:$_arg
@@ -37,5 +43,5 @@ if [ -z "$JAVACMD" ]; then                      # true if string's length is zer
     JAVACMD="java"
 fi
 
-$JAVACMD -classpath $_SCRIPTELLA_CP scriptella.tools.launcher.EtlLauncher "$@"
+$JAVACMD $_SCRIPTELLA_JAVA_OPTS -classpath $_SCRIPTELLA_CP scriptella.tools.launcher.EtlLauncher "$@"
 
