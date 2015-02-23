@@ -1,0 +1,21 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:est" user="sa" password=""/>
+    <script>
+        create table t1 (
+        id int
+        );
+        create table t2 (
+        id int
+        );
+        insert into t1(id) values(1);
+        insert into t1(id) values(2);
+    </script>
+    <query>
+        select * from t1;
+        select * from t1;
+				<query if="id eq 1"> 
+        select * from t1;
+    		</query>
+    </query>
+</etl>
