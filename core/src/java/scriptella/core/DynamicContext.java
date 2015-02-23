@@ -16,6 +16,7 @@
 package scriptella.core;
 
 import scriptella.execution.EtlContext;
+import scriptella.execution.ExecutionStatisticsBuilder;
 import scriptella.spi.Connection;
 import scriptella.spi.ParametersCallback;
 
@@ -32,12 +33,14 @@ import scriptella.spi.ParametersCallback;
 public class DynamicContext implements ParametersCallback {
     protected EtlContext globalContext;
     protected EtlVariable etlVariable;
+    protected ExecutionStatisticsBuilder statisticsBuilder;
 
     protected DynamicContext() {
     }
 
     public DynamicContext(EtlContext globalContext) {
         this.globalContext = globalContext;
+        this.statisticsBuilder = globalContext.getStatisticsBuilder();
     }
 
     public Object getParameter(final String name) {
@@ -56,7 +59,11 @@ public class DynamicContext implements ParametersCallback {
     protected EtlContext getGlobalContext() {
         return globalContext;
     }
-
+    
+    protected ExecutionStatisticsBuilder getStatisticsBuilder(){
+    		return statisticsBuilder;
+    }
+    
     EtlVariable getEtlVariable() {
         if (etlVariable == null) {
             etlVariable = new EtlVariable(this, globalContext);

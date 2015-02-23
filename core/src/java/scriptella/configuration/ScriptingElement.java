@@ -28,6 +28,7 @@ import scriptella.spi.Resource;
 public abstract class ScriptingElement extends XmlConfigurableBase {
     private String connectionId;
     private String ifExpr;
+    private String commit;
     private DialectBasedContentEl contentEl;
     private ScriptingElement parent;
 
@@ -55,7 +56,15 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
     public void setIf(final String ifExpr) {
         this.ifExpr = ifExpr;
     }
-
+    
+    public String getCommit(){
+    		return commit;
+    }
+    
+    public void setCommit(final String commit){
+    		this.commit = commit;
+    }
+    
     public Resource getContent() {
         return contentEl.getContent(null);
     }
@@ -73,6 +82,7 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
         setLocation(element);
         setProperty(element, "connection-id", "connectionId");
         setProperty(element, "if");
+        setProperty(element, "commit");
         contentEl = new DialectBasedContentEl(element);
         contentEl.setLocation(getLocation());
     }
@@ -81,7 +91,7 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
     public String toString() {
         return "connectionId='" + connectionId + '\'' +
                 ", location=" + getLocation() +
-                ", ifExpr='" + ifExpr + '\'';
-
+                ", ifExpr='" + ifExpr + '\'' + 
+                ", commit='" + commit + '\'';
     }
 }

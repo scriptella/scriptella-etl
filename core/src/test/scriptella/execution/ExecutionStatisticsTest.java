@@ -139,6 +139,38 @@ public class ExecutionStatisticsTest extends DBTestCase {
             }
         }
     }
+    
+    /*
+     * Tests for NestedExecutionCount() and FilteredExecutionCount
+     */
+    public void test4() throws EtlExecutorException {
+      final EtlExecutor se = newEtlExecutor(
+          "ExecutionStatisticsTest4.xml");
+      final ExecutionStatistics s = se.execute();
+      final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
+
+      for (ExecutionStatistics.ElementInfo info : elements) {
+          if ("/etl/script[1]".equals(info.getId())) {
+            assertEquals(1, info.getSuccessfulExecutionCount());
+            assertEquals(0, info.getFailedExecutionCount());
+            assertEquals(4, info.getStatementsCount());
+            assertEquals(0, info.getNestedExecutionCount());
+          } else if ("/etl/query[1]".equals(info.getId())) {
+            assertEquals(1, info.getSuccessfulExecutionCount());
+            assertEquals(0, info.getFailedExecutionCount());
+            assertEquals(2, info.getStatementsCount());
+            assertEquals(4, info.getNestedExecutionCount());
+          } else if ("/etl/query[1]/query[1]".equals(info.getId())) {
+            assertEquals(2, info.getSuccessfulExecutionCount());
+            assertEquals(0, info.getFailedExecutionCount());
+            assertEquals(2, info.getFilteredExecutionCount());
+            assertEquals(2, info.getStatementsCount());
+            assertEquals(4, info.getNestedExecutionCount());
+          } else {
+              fail("Unrecognized statistic element " + info.getId());
+          }
+      }
+  }
 
     /**
      * Tests if total time is correctly printed.

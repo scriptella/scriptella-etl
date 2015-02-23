@@ -37,6 +37,7 @@ import java.util.logging.Level;
  * @version 1.0
  */
 public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
+		private boolean firstExecution = true;
     public ScriptExecutor(ScriptEl scriptEl) {
         super(scriptEl);
     }
@@ -45,6 +46,10 @@ public final class ScriptExecutor extends ContentExecutor<ScriptEl> {
         if (debug) {
             log.fine("Executing script " + getLocation());
         }
+	      if (firstExecution){
+	      	firstExecution = false;
+	        ctx.statisticsBuilder.elementProcessingStarted();
+	      }
         boolean repeat;
         OnErrorHandler onErrorHandler = null;
         do {

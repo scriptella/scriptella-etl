@@ -215,11 +215,13 @@ Queries a table and writes the result into CSV file
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
         Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
  @attr id script identifier(name).
+ @attr commit if set to true, it will commit all connections on query exit
 -->
 <!ATTLIST query
 connection-id IDREF #IMPLIED
 if CDATA #IMPLIED
 id ID #IMPLIED
+commit (true | false) "false"
 >
 
 <!--
