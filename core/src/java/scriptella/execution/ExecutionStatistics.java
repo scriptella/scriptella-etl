@@ -313,15 +313,23 @@ public class ExecutionStatistics {
         public long getWorkingTime() {
             return workingTime;
         }
+        
+        /**
+         * 
+         * @return total execution time in seconds.
+         */
+        public long getExecTime() {
+        		return (execEnd.getTime()-execStart.getTime())/1000;
+        }
 
         /**
-         * Returns throughput t=statements/workingTimeSeconds. The
+         * Returns throughput t=statements/execTimeSeconds. The
          * throughput has statements/second unit.
          *
-         * @return stmt/second thoughput or -1 if no statements info available or working time is zero.
+         * @return stmt/second thoughput or -1 if no statements info available or execution time is zero.
          */
         public double getThroughput() {
-            return statements <= 0 || workingTime <= 0 ? -1 : 1000000000d * getStatementsCount() / workingTime;
+            return statements <= 0 || getExecTime() <= 0 ? -1 : getStatementsCount() / getExecTime();
         }
 
         public String getId() {
