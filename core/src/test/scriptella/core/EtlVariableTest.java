@@ -44,7 +44,7 @@ public class EtlVariableTest extends AbstractTestCase {
      */
     public void test() throws ParseException {
         EtlVariable.DateUtils d = new EtlVariable().getDate();
-        assertTrue(d.now().getTime() >= System.currentTimeMillis());
+        assertTrue(d.now().getTime() <= System.currentTimeMillis());
         assertEquals("2007", d.format(d.parse("18.03.2007", "dd.MM.yyyy"), "yyyy"));
         //Tests if today method returns correct year 
         assertTrue(d.today().indexOf(d.now("yyyy")) > 0);
