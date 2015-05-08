@@ -78,6 +78,7 @@ public class CsvConnectionTest extends AbstractTestCase {
         props.put(CsvConnection.EOL, "\r\n");
         props.put(CsvConnection.HEADERS, "false");
         props.put(CsvConnection.QUOTE, "'");
+        props.put(CsvConnection.ESCAPE, "\\");
         props.put(CsvConnection.SEPARATOR, ";");
         ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
 
@@ -127,6 +128,22 @@ public class CsvConnectionTest extends AbstractTestCase {
                 MockParametersCallbacks.SIMPLE);
         con.close();
         String expected = "*row1*;value;value\r\n*row2*;;value\u0394\r\n";
+        String actual = out.toString("UTF8");
+        assertEquals(expected, actual);
+    }
+
+    public void testEscape() throws UnsupportedEncodingException {
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(CsvConnection.ESCAPE, "'");
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
+
+        CsvConnection con = new CsvConnection(cp);
+        //register handler for tst url
+        rows = 0;
+        con.executeScript(new StringResource("  $row1,\"value\",val${'ue'}\n$row2,'value',va'l'ue\n"),
+                MockParametersCallbacks.SIMPLE);
+        con.close();
+        String expected = "\"*row1*\",\"value\",\"value\"\n\"*row2*\",\"''value''\",\"va''l''ue\"\n";
         String actual = out.toString("UTF8");
         assertEquals(expected, actual);
     }
