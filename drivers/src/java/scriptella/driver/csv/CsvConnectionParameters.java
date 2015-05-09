@@ -32,16 +32,19 @@ public class CsvConnectionParameters extends TextConnectionParameters {
     public static final char DEFAULT_QUERY = '\"';
     public static final char DEFAULT_ESCAPE = '\"';
     public static final boolean DEFAULT_HEADERS = true;
+    public static final boolean DEFAULT_QUOTEALL = true;
     protected char separator;
     protected char quote;
     protected char escape;
     protected boolean headers;
+    protected boolean quoteall;
 
     protected CsvConnectionParameters() {
         separator = DEFAULT_SEPARATOR;
         quote = DEFAULT_QUERY;
         escape = DEFAULT_ESCAPE;
         headers = DEFAULT_HEADERS;
+        quoteall = DEFAULT_QUOTEALL;
     }
 
     public CsvConnectionParameters(ConnectionParameters parameters) {
@@ -70,6 +73,8 @@ public class CsvConnectionParameters extends TextConnectionParameters {
         }
 
         headers = parameters.getBooleanProperty(CsvConnection.HEADERS, DEFAULT_HEADERS);
+
+        quoteall = parameters.getBooleanProperty(CsvConnection.QUOTEALL, DEFAULT_QUOTEALL);
     }
 
     public char getSeparator() {
@@ -88,6 +93,10 @@ public class CsvConnectionParameters extends TextConnectionParameters {
         return headers;
     }
 
+    public boolean isQuoteall() {
+        return quoteall;
+    }
+
     public void setSeparator(char separator) {
         this.separator = separator;
     }
@@ -102,5 +111,9 @@ public class CsvConnectionParameters extends TextConnectionParameters {
 
     public void setHeaders(boolean headers) {
         this.headers = headers;
+    }
+
+    public void setQuoteall(boolean quoteall) {
+        this.quoteall = quoteall;
     }
 }

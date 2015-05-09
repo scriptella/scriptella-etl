@@ -71,6 +71,13 @@ public class CsvConnection extends AbstractTextConnection {
      */
     public static final String HEADERS = "headers";
 
+    /**
+     * Name of the <code>quoteall</code> connection property.
+     * false means only elements with the quote or escape character are quoted.
+     * Default value is true.
+     */
+    public static final String QUOTEALL = "quoteall";
+
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, new CsvConnectionParameters(parameters));
     }
@@ -95,6 +102,7 @@ public class CsvConnection extends AbstractTextConnection {
         final CsvConnectionParameters csvParams = getConnectionParameters();
         ParametersCallback formattingCallback = csvParams.getPropertyFormatter().format(parametersCallback);
         final boolean trimLines = csvParams.isTrimLines();
+        final boolean quoteall = csvParams.isQuoteall();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(formattingCallback);
         for (String[] row; (row = reader.readNext()) != null;) {
             EtlCancelledException.checkEtlCancelled();
@@ -118,7 +126,7 @@ public class CsvConnection extends AbstractTextConnection {
                 }
             } else {
                 try {
-                    out.writeNext(row);
+                    out.writeNext(row, quoteall);
                     counter.statements++;
                 } catch (Exception e) {
                     throw new CsvProviderException("Failed to write CSV row ", e);

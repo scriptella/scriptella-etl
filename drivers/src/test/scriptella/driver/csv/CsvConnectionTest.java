@@ -148,6 +148,22 @@ public class CsvConnectionTest extends AbstractTestCase {
         assertEquals(expected, actual);
     }
 
+    public void testQuoteall() throws UnsupportedEncodingException {
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(CsvConnection.QUOTEALL, "false");
+        ConnectionParameters cp = new MockConnectionParameters(props, "tst://file");
+
+        CsvConnection con = new CsvConnection(cp);
+        //register handler for tst url
+        rows = 0;
+        con.executeScript(new StringResource("  $row1,va\"l\"ue,val${'ue'}\n$row2,'value',va\"l\"ue\n"),
+                MockParametersCallbacks.SIMPLE);
+        con.close();
+        String expected = "*row1*,\"va\"\"l\"\"ue\",value\n*row2*,'value',\"va\"\"l\"\"ue\"\n";
+        String actual = out.toString("UTF8");
+        assertEquals(expected, actual);
+    }
+
     /**
      * Tests CSV processing with trim mode switched off.
      */

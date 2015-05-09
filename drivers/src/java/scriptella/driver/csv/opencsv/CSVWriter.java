@@ -156,7 +156,7 @@ public class CSVWriter implements Closeable {
      *            entry.
      * @throws java.io.IOException if I/O error occurs
      */
-    public void writeNext(String[] nextLine) throws IOException {
+    public void writeNext(String[] nextLine, boolean quoteall) throws IOException {
         final int colCount = nextLine.length;
         for (int i = 0; i < colCount; i++) {
             if (i != 0) {
@@ -166,18 +166,28 @@ public class CSVWriter implements Closeable {
             String nextElement = nextLine[i];
             if (nextElement == null)
                 continue;
-            if (quotechar != NO_QUOTE_CHARACTER)
+
+            final Boolean hasSpecialCharacters =  nextElement.indexOf(quotechar) != -1 || nextElement.indexOf(escapechar) != -1 || nextElement.indexOf(separator) != -1 
+                                               || nextElement.contains(lineEnd) || nextElement.contains("\r");
+
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER))
             	writer.append(quotechar);
-            final int length = nextElement.length(); //Kupolov: use local variable in a loop
-            for (int j = 0; j < length; j++) {
-                char nextChar = nextElement.charAt(j);
-                if (escapechar != NO_ESCAPE_CHARACTER && (nextChar == quotechar || nextChar == escapechar)) {
-                    writer.append(escapechar).append(nextChar);
-                } else {
-                    writer.append(nextChar);
+
+            if(!hasSpecialCharacters) {
+                writer.append(nextElement);
+            } else {
+                final int length = nextElement.length(); //Kupolov: use local variable in a loop
+                for (int j = 0; j < length; j++) {
+                    char nextChar = nextElement.charAt(j);
+                    if (escapechar != NO_ESCAPE_CHARACTER && (nextChar == quotechar || nextChar == escapechar)) {
+                        writer.append(escapechar).append(nextChar);
+                    } else {
+                        writer.append(nextChar);
+                    }
                 }
             }
-            if (quotechar != NO_QUOTE_CHARACTER)
+
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER))
             	writer.append(quotechar);
         }
 
