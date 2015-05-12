@@ -38,7 +38,8 @@ import java.util.logging.Logger;
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Fyodor Kupolov
- * @version 1.0
+ * @author Sean Summers
+ * @version 1.1
  */
 public class CsvConnection extends AbstractTextConnection {
     protected static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
@@ -56,6 +57,12 @@ public class CsvConnection extends AbstractTextConnection {
      * quoting.
      */
     public static final String QUOTE = "quote";
+    /**
+     * Name of the <code>escape</code> connection property.
+     * The character to use for escaped elements when writing to files. Use empty string to suppress
+     * escaping.
+     */
+    public static final String ESCAPE = "escape";
 
     /**
      * Name of the <code>headers</code> connection property.
@@ -63,6 +70,13 @@ public class CsvConnection extends AbstractTextConnection {
      * <p>Only valid for &lt;query&gt; elements.
      */
     public static final String HEADERS = "headers";
+
+    /**
+     * Name of the <code>quoteall</code> connection property.
+     * false means only elements with the quote or escape character are quoted.
+     * Default value is true.
+     */
+    public static final String QUOTEALL = "quoteall";
 
     public CsvConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, new CsvConnectionParameters(parameters));
@@ -88,6 +102,7 @@ public class CsvConnection extends AbstractTextConnection {
         final CsvConnectionParameters csvParams = getConnectionParameters();
         ParametersCallback formattingCallback = csvParams.getPropertyFormatter().format(parametersCallback);
         final boolean trimLines = csvParams.isTrimLines();
+        final boolean quoteall = csvParams.isQuoteall();
         PropertiesSubstitutor ps = new PropertiesSubstitutor(formattingCallback);
         for (String[] row; (row = reader.readNext()) != null;) {
             EtlCancelledException.checkEtlCancelled();
@@ -111,7 +126,7 @@ public class CsvConnection extends AbstractTextConnection {
                 }
             } else {
                 try {
-                    out.writeNext(row);
+                    out.writeNext(row, quoteall);
                     counter.statements++;
                 } catch (Exception e) {
                     throw new CsvProviderException("Failed to write CSV row ", e);
@@ -155,7 +170,7 @@ public class CsvConnection extends AbstractTextConnection {
             final CsvConnectionParameters csvParams = getConnectionParameters();
             try {
                 writer = newOutputWriter();
-                out = new CSVWriter(writer, csvParams.getSeparator(), csvParams.getQuote(), csvParams.getEol());
+                out = new CSVWriter(writer, csvParams.getSeparator(), csvParams.getQuote(), csvParams.getEscape(), csvParams.getEol());
             } catch (IOException e) {
                 throw new CsvProviderException("Unable to open URL " + csvParams.getUrl() + " for output", e);
             }

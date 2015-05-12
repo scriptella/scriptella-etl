@@ -24,6 +24,7 @@ import java.io.Writer;
  *
  * @author Glen Smith
  * @author Fyodor Kupolov
+ * @author Sean Summers
  *
  */
 public class CSVWriter implements Closeable {
@@ -34,10 +35,15 @@ public class CSVWriter implements Closeable {
 
     private char quotechar;
 
+    private char escapechar;
+
     private String lineEnd;
 
-    /** The character used for escaping quotes. */
-    public static final char ESCAPE_CHARACTER = '"';
+    /** The default character used for escaping quotes. */
+    public static final char DEFAULT_ESCAPE_CHARACTER = '"';
+
+    /** The escape constant to use when you wish to suppress all escaping. */
+    public static final char NO_ESCAPE_CHARACTER = '\u0000';
 
     /** The default separator to use if none is supplied to the constructor. */
     public static final char DEFAULT_SEPARATOR = ',';
@@ -87,7 +93,39 @@ public class CSVWriter implements Closeable {
      *            the character to use for quoted elements
      */
     public CSVWriter(Writer writer, char separator, char quotechar) {
-    	this(writer, separator, quotechar, "\n");
+    	this(writer, separator, quotechar, DEFAULT_ESCAPE_CHARACTER);
+    }
+
+    /**
+     * Constructs CSVWriter with supplied separator and quote char.
+     *
+     * @param writer
+     *            the writer to an underlying CSV source.
+     * @param separator
+     *            the delimiter to use for separating entries
+     * @param quotechar
+     *            the character to use for quoted elements
+     * @param escapechar
+     *            the character to use for escaping
+     */
+    public CSVWriter(Writer writer, char separator, char quotechar, char escapechar) {
+    	this(writer, separator, quotechar, escapechar, DEFAULT_LINE_END);
+    }
+
+    /**
+     * Constructs CSVWriter with supplied separator and quote char.
+     *
+     * @param writer
+     *            the writer to an underlying CSV source.
+     * @param separator
+     *            the delimiter to use for separating entries
+     * @param quotechar
+     *            the character to use for quoted elements
+     * @param escapechar
+     *            the character to use for escaping
+     */
+    public CSVWriter(Writer writer, char separator, char quotechar, String lineEnd) {
+    	this(writer, separator, quotechar, DEFAULT_ESCAPE_CHARACTER, lineEnd);
     }
 
     /**
@@ -102,13 +140,13 @@ public class CSVWriter implements Closeable {
      * @param lineEnd
      * 			  the line feed terminator to use
      */
-    public CSVWriter(Writer writer, char separator, char quotechar, String lineEnd) {
+    public CSVWriter(Writer writer, char separator, char quotechar, char escapechar, String lineEnd) {
         this.writer = writer;
         this.separator = separator;
         this.quotechar = quotechar;
+        this.escapechar = escapechar;
         this.lineEnd = lineEnd;
     }
-
 
     /**
      * Writes the next line to the file.
@@ -118,7 +156,7 @@ public class CSVWriter implements Closeable {
      *            entry.
      * @throws java.io.IOException if I/O error occurs
      */
-    public void writeNext(String[] nextLine) throws IOException {
+    public void writeNext(String[] nextLine, boolean quoteall) throws IOException {
         final int colCount = nextLine.length;
         for (int i = 0; i < colCount; i++) {
             if (i != 0) {
@@ -126,23 +164,37 @@ public class CSVWriter implements Closeable {
             }
 
             String nextElement = nextLine[i];
-            if (nextElement == null)
+            if (nextElement == null) {
                 continue;
-            if (quotechar != NO_QUOTE_CHARACTER)
+            }
+
+            final boolean hasSpecialCharacters =  nextElement.indexOf(quotechar) != -1 
+                                               || nextElement.indexOf(escapechar) != -1 
+                                               || nextElement.indexOf(separator) != -1 
+                                               || nextElement.contains(lineEnd)  
+                                               || nextElement.contains("\r");
+
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER)) {
             	writer.append(quotechar);
-            final int length = nextElement.length(); //Kupolov: use local variable in a loop
-            for (int j = 0; j < length; j++) {
-                char nextChar = nextElement.charAt(j);
-                if (nextChar == quotechar) {
-                    writer.append(ESCAPE_CHARACTER).append(nextChar);
-                } else if (nextChar == ESCAPE_CHARACTER) {
-                    writer.append(ESCAPE_CHARACTER).append(nextChar);
-                } else {
-                    writer.append(nextChar);
+            }
+
+            if(!hasSpecialCharacters) {
+                writer.append(nextElement);
+            } else {
+                final int length = nextElement.length(); //Kupolov: use local variable in a loop
+                for (int j = 0; j < length; j++) {
+                    char nextChar = nextElement.charAt(j);
+                    if (escapechar != NO_ESCAPE_CHARACTER && (nextChar == quotechar || nextChar == escapechar)) {
+                        writer.append(escapechar).append(nextChar);
+                    } else {
+                        writer.append(nextChar);
+                    }
                 }
             }
-            if (quotechar != NO_QUOTE_CHARACTER)
+
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER)) {
             	writer.append(quotechar);
+            }
         }
 
         writer.append(lineEnd);
