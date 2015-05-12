@@ -164,14 +164,19 @@ public class CSVWriter implements Closeable {
             }
 
             String nextElement = nextLine[i];
-            if (nextElement == null)
+            if (nextElement == null) {
                 continue;
+            }
 
-            final Boolean hasSpecialCharacters =  nextElement.indexOf(quotechar) != -1 || nextElement.indexOf(escapechar) != -1 || nextElement.indexOf(separator) != -1 
-                                               || nextElement.contains(lineEnd) || nextElement.contains("\r");
+            final boolean hasSpecialCharacters =  nextElement.indexOf(quotechar) != -1 
+                                               || nextElement.indexOf(escapechar) != -1 
+                                               || nextElement.indexOf(separator) != -1 
+                                               || nextElement.contains(lineEnd)  
+                                               || nextElement.contains("\r");
 
-            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER))
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER)) {
             	writer.append(quotechar);
+            }
 
             if(!hasSpecialCharacters) {
                 writer.append(nextElement);
@@ -187,8 +192,9 @@ public class CSVWriter implements Closeable {
                 }
             }
 
-            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER))
+            if ((quoteall || hasSpecialCharacters) && (quotechar != NO_QUOTE_CHARACTER)) {
             	writer.append(quotechar);
+            }
         }
 
         writer.append(lineEnd);
