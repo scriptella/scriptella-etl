@@ -10,8 +10,8 @@
             <p>Use this button to let people know your favorite ETL tool:</p>
             <table>
                 <tr><td><figure alt="Powered by Scriptella ETL" src="images/scriptella-powered.gif"/></td><td>
-                    <![CDATA[<a href="http://scriptella.javaforge.com/"
-title="Powered by Scriptella ETL"><img src="http://scriptella.javaforge.com/images/scriptella-powered.gif"
+                    <![CDATA[<a href="http://scriptella.org/"
+title="Powered by Scriptella ETL"><img src="http://scriptella.org/images/scriptella-powered.gif"
 width="88" height="31" border="0" alt="Powered by Scriptella ETL"></a>]]></td></tr>
             </table>
         </section>
