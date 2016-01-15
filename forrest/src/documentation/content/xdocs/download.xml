@@ -8,9 +8,9 @@
         <section>
 			<title>Stable Version: 1.1 (December 28, 2012)</title>
             <table>
-                <tr><td>Binary distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1.zip?doc_id=170626">scriptella-1.1.zip</a></td></tr>
-                <tr><td>Source distribution</td><td><a href="http://javaforge.com/displayDocument/scriptella-1.1-src.zip?doc_id=170627">scriptella-1.1-src.zip</a></td></tr>
-                <tr><td>Examples</td><td><a href="http://javaforge.com/displayDocument/scriptella-examples-1.1.zip?doc_id=170628">scriptella-examples-1.1.zip</a></td></tr>
+                <tr><td>Binary distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.1/scriptella-1.1.zip">scriptella-1.1.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.1/scriptella-1.1-src.zip">scriptella-1.1-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.1/scriptella-examples-1.1.zip">scriptella-examples-1.1.zip</a></td></tr>
             </table>
 		</section>
         <!--<section>-->
