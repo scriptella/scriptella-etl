@@ -16,7 +16,7 @@
  limitations under the License.
 %
 @title Scriptella ETL File DTD
-@doctype etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd"
+@doctype etl SYSTEM "http://scriptella.org/dtd/etl.dtd"
 @root etl
 -->
 

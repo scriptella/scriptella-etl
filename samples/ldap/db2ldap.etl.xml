@@ -1,4 +1,4 @@
-<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
     <description>
         Migrates data from Database to LDAP.
