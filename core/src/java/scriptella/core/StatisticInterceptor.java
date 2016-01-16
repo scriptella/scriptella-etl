@@ -16,7 +16,6 @@
 package scriptella.core;
 
 import scriptella.configuration.Location;
-import scriptella.execution.ExecutionStatisticsBuilder;
 
 
 /**
@@ -35,16 +34,15 @@ public final class StatisticInterceptor extends ElementInterceptor {
 
     public void execute(final DynamicContext ctx) {
         boolean ok = false;
-        final ExecutionStatisticsBuilder statisticsBuilder = ctx.getGlobalContext().getStatisticsBuilder();
-        statisticsBuilder.elementStarted(location, ctx.getConnection());
+        ctx.statisticsBuilder.elementStarted(location, ctx.getConnection());
         try {
             executeNext(ctx);
             ok = true;
         } finally {
             if (ok) {
-                statisticsBuilder.elementExecuted();
+                ctx.statisticsBuilder.elementExecuted();
             } else {
-                statisticsBuilder.elementFailed();
+                ctx.statisticsBuilder.elementFailed();
             }
         }
 

@@ -54,7 +54,6 @@ public final class IfInterceptor extends ElementInterceptor {
 
     public void execute(final DynamicContext ctx) {
         boolean ok = false;
-
         try {
             final Object res = expression.evaluate(ctx);
 
@@ -75,6 +74,7 @@ public final class IfInterceptor extends ElementInterceptor {
         if (ok) { //if expr evaluated to true
             executeNext(ctx);
         } else {
+        		ctx.statisticsBuilder.incrementFilteredExecutionCount(location);
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("if=\""+expression.getExpression()+"\" is false, element body is skipped.");
             }

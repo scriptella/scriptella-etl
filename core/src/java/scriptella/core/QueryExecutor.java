@@ -61,14 +61,16 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
             }
         }
     }
-
-
+    
     protected void execute(Connection connection, Resource resource, DynamicContext ctx) {
         final QueryCtxDecorator ctxDecorator = new QueryCtxDecorator(ctx);
         if (debug) {
             log.fine("Executing query " + getLocation());
         }
         connection.executeQuery(resource, ctx, ctxDecorator);
+        if (getElement().getCommit().equalsIgnoreCase("TRUE")){
+    			ctx.getGlobalContext().getSession().commit();
+        }
         if (debug) {
             if (ctxDecorator.rownum == 0) {
                 log.fine("Query " + getLocation() + " returned no results.");
@@ -103,6 +105,10 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
 
         public void processRow(final ParametersCallback parameters) {
             EtlCancelledException.checkEtlCancelled();
+            if (rownum == 0){
+              statisticsBuilder.elementProcessingStarted();
+            }
+            statisticsBuilder.incrementNestedExecutionCount();
             rownum++;
             params = parameters;
             cachedParams.clear();

@@ -56,14 +56,15 @@ public class DynamicContextDecorator extends DynamicContext {
 
 
     /**
-     * Dynamically changes context beign decorated.
-     * <p>Should be used with caution mostly for performance reasosns.
+     * Dynamically changes context being decorated.
+     * <p>Should be used with caution mostly for performance reasons.
      *
      * @param context new context to decorate.
      */
     void setContext(final DynamicContext context) {
         this.context = context;
         globalContext = context.getGlobalContext();
+    		statisticsBuilder = globalContext.getStatisticsBuilder();
         cachedConnection = null;
     }
 

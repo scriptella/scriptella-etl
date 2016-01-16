@@ -46,6 +46,9 @@ public class ExecutionStatisticsBuilder {
 
     //Execution stack for nested elements
     protected ElementsStack executionStack = new ElementsStack();
+    
+    //current element (shortcut for performance reasons)
+    protected ExecutionStatistics.ElementInfo currentEInfo;
 
     /**
      * Called when new element execution started.
@@ -53,11 +56,27 @@ public class ExecutionStatisticsBuilder {
      * @param loc element location.
      */
     public void elementStarted(final Location loc, Connection connection) {
-        ExecutionStatistics.ElementInfo ei = getInfo(loc);
-        executionStack.push(ei);
-        ei.statementsOnStart = connection.getExecutedStatementsCount();
-        ei.connection = connection;
-        ei.started = System.nanoTime();
+    		currentEInfo = getInfo(loc);
+        currentEInfo.started = System.nanoTime();
+        // check, because script elements will call elementStarted every time in the query loop
+        if (currentEInfo.execStart == null){
+        	currentEInfo.execStart = new Date();
+        }
+        executionStack.push(currentEInfo);
+        currentEInfo.statementsOnStart = connection.getExecutedStatementsCount();
+        currentEInfo.connection = connection;
+    }
+    
+    public void incrementNestedExecutionCount(){
+    	currentEInfo.nestedExecutionCount++;
+    }
+    
+    public void incrementFilteredExecutionCount(final Location loc){
+    	getInfo(loc).filteredExecutionCount++;
+    }
+    
+    public void elementProcessingStarted(){
+    	currentEInfo.processingStart = new Date();
     }
 
     /**
@@ -74,7 +93,8 @@ public class ExecutionStatisticsBuilder {
         executionStatistics = new ExecutionStatistics();
         executionStatistics.setStarted(new Date());
     }
-
+    
+    
     /**
      * Invoked on ETL completion.
      */
@@ -93,6 +113,11 @@ public class ExecutionStatisticsBuilder {
      */
     private void setElementState(boolean ok) {
         ExecutionStatistics.ElementInfo ended = executionStack.pop();
+        if (executionStack.size() > 0){
+        	currentEInfo = executionStack.get(executionStack.size() -1);
+        }
+
+        ended.execEnd = new Date();
         long ti = System.nanoTime() - ended.started;
         ended.workingTime += ti; //increase the total working time for element
         if (ended.workingTime < 0) {
@@ -103,9 +128,9 @@ public class ExecutionStatisticsBuilder {
         long conStatements = con.getExecutedStatementsCount();
         long elStatements = conStatements - ended.statementsOnStart;
         if (ok) {
-            ended.okCount++;
+            ended.successfulExecutionCount++;
         } else {
-            ended.failedCount++;
+            ended.failedExecutionCount++;
         }
 
         if (elStatements > 0) {

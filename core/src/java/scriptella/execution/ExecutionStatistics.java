@@ -104,11 +104,11 @@ public class ExecutionStatistics {
         for (ElementInfo ei : elements) {
             sb.append(ei.id).append(":");
 
-            if (ei.okCount > 0) {
+            if (ei.successfulExecutionCount > 0) {
                 sb.append(" Element successfully executed");
-                if (ei.okCount > 1) {
+                if (ei.successfulExecutionCount > 1) {
                     sb.append(' ');
-                    appendPlural(sb, ei.okCount, "time");
+                    appendPlural(sb, ei.successfulExecutionCount, "time");
                 }
                 if (ei.statements > 0) {
                     sb.append(" (");
@@ -117,9 +117,9 @@ public class ExecutionStatistics {
                 sb.append('.');
             }
 
-            if (ei.failedCount > 0) {
+            if (ei.failedExecutionCount > 0) {
                 sb.append(" Element failed ");
-                appendPlural(sb, ei.failedCount, "time");
+                appendPlural(sb, ei.failedExecutionCount, "time");
                 sb.append('.');
             }
             sb.append(" Working time ").append(ei.workingTime / 1000000).append(" milliseconds.");
@@ -248,21 +248,50 @@ public class ExecutionStatistics {
 
 
     public static class ElementInfo {
-        int okCount;
-        Connection connection;
+    		Connection connection;
+        int successfulExecutionCount;
+        int filteredExecutionCount;
+        int failedExecutionCount;
+        int nestedExecutionCount;
         long statementsOnStart;
         long statements;
-        int failedCount;
         long started;
+        Date execStart;
+        Date processingStart;
+        Date execEnd;
         long workingTime;
         String id;
-
+        
+        public Date getProcessingStart(){
+        		return processingStart;
+        }
+        
+        public Date getExecStart(){
+        	return execStart;
+        }
+        
+        public Date getExecEnd(){
+        	return execEnd;
+        }
+        
+        public int getTotalExecutionCount(){
+        	return filteredExecutionCount + successfulExecutionCount + failedExecutionCount;
+        }
+        
+        public int getFilteredExecutionCount(){
+        	return filteredExecutionCount;
+        }
+        
         public int getSuccessfulExecutionCount() {
-            return okCount;
+            return successfulExecutionCount;
         }
 
         public int getFailedExecutionCount() {
-            return failedCount;
+            return failedExecutionCount;
+        }
+        
+        public int getNestedExecutionCount(){
+        	return nestedExecutionCount;
         }
 
         /**
@@ -284,15 +313,23 @@ public class ExecutionStatistics {
         public long getWorkingTime() {
             return workingTime;
         }
+        
+        /**
+         * 
+         * @return total execution time in seconds.
+         */
+        public long getExecTime() {
+        		return (execEnd.getTime()-execStart.getTime())/1000;
+        }
 
         /**
-         * Returns throughput t=statements/workingTimeSeconds. The
-         * throughput has statement/second unit.
+         * Returns throughput t=statements/execTimeSeconds. The
+         * throughput has statements/second unit.
          *
-         * @return statement/second thoughput or -1 if no statements info available or working time is zero.
+         * @return stmt/second thoughput or -1 if no statements info available or execution time is zero.
          */
         public double getThroughput() {
-            return statements <= 0 || workingTime <= 0 ? -1 : 1000000000d * statements / workingTime;
+            return statements <= 0 || getExecTime() <= 0 ? -1 : getStatementsCount() / getExecTime();
         }
 
         public String getId() {
