@@ -42,6 +42,7 @@
     <target name="javadoc" depends="clean">
         <mkdir dir="${javadoc.dest.dir}"/>
         <javadoc destdir="${javadoc.dest.dir}" includenosourcepackages="true"
+                 additionalparam="-Xdoclint:none --allow-script-in-comments"
                  use="true" windowtitle="Scriptella API Documentation">
             <classpath refid="class.path"/>
             <classpath path="${ant.jar}"/>
@@ -50,7 +51,7 @@
             <packageset dir="tools/src/java"/>
             <doctitle><![CDATA[<h1>Scriptella API Documentation</h1>]]></doctitle>
             <bottom>
-                <![CDATA[<i>Copyright &#169; Copyright 2006-2012 The <a href="http://scriptella.javaforge.com">Scriptella Project</a> Team.</i>]]></bottom>
+                <![CDATA[<i>Copyright &#169; Copyright 2006-2019 The <a href="http://scriptella.org">Scriptella Project</a> Team.</i>]]></bottom>
         </javadoc>
     </target>
 
