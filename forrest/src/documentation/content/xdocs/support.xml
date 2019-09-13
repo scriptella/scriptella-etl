@@ -31,9 +31,25 @@
         </section>
         -->
         <section>
+            <title>Commercial Support</title>
+            <p>Scriptella is in maintenance mode and hasn't been actively developed for several years.
+                Due to <a href="https://www.linkedin.com/in/kupolov">my primary employment</a> at various tech companies
+                in Silicon Valley, it's very difficult or even impossible to spend time working on open source.
+            </p>
+            <p>
+                If you are using Scriptella for business or interested in using it in the future, feel free to share
+                your ideas/proposals on the mailing list or drop me a line at
+                <a href="mailto:scriptella@gmail.com?Subject=Support Request">scriptella@gmail.com</a> to discuss
+                options for commercial support or any other business ideas. I'm exploring different options that will allow me to focus more on
+                Scriptella ETL development.
+                Starting with evaluation of demand for commercial support and feature development.
+            </p>
+        </section>
+
+        <section>
             <title>Issue Tracker</title>
             <p>If you think that you've found a bug or want to propose a feature to implement?
-                Use JavaForge project <a href="https://github.com/scriptella/scriptella-etl/issues">Issue Tracker</a>.</p>
+                Use GitHub project <a href="https://github.com/scriptella/scriptella-etl/issues">Issue Tracker</a>.</p>
         </section>
     </body>
 </document>
