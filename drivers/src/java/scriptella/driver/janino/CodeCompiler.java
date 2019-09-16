@@ -100,7 +100,9 @@ final class CodeCompiler {
                     pe.setErrorStatement(line);
                 }
             }
-        } catch (NoClassDefFoundError e) {
+        // Added NoSuchMethodError to fix for #30 Janino Driver 3.11 fails
+        // TODO Add propoer support for Janino 3 as part of JDK11 upgrade #31
+        } catch (NoClassDefFoundError | NoSuchMethodError e) {
             //BUG-36290 Error with Janino 2.6.0
             LOG.severe("Error statement cannot be determined due to " + e + ". Try upgrading Janino to version 2.6 or newer.");
         }
