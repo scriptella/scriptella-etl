@@ -59,13 +59,13 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://anonymous:anon@javaforge.com/svn/scriptella/trunk/</connection>
-        <developerConnection>scm:svn:http://javaforge.com/svn/scriptella/trunk/</developerConnection>
-        <url>http://www.javaforge.com/proj/sources/sccBrowse.do?proj_id=781&amp;dirname=trunk/</url>
+        <connection>scm:git:git://github.com/scriptella/scriptella-etl.git</connection>
+        <developerConnection>scm:git:ssh://github.com:scriptella/scriptella-etl.git</developerConnection>
+        <url>https://github.com/scriptella/scriptella-etl/tree/master</url>
     </scm>
     <issueManagement>
-        <system>JavaForge Bug Tracker</system>
-        <url>http://www.javaforge.com/proj/tracker/browseTracker.do?tracker_id=3136</url>
+        <url>https://github.com/scriptella/scriptella-etl/issues</url>
+        <system>GitHub Issues</system>
     </issueManagement>
 
 	<distributionManagement>
