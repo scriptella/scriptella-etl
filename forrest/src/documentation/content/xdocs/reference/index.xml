@@ -662,17 +662,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.javaforge.scriptella</groupId>
+            <groupId>org.scriptella</groupId>
             <artifactId>scriptella-core</artifactId>
             <version>${scriptella.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.javaforge.scriptella</groupId>
+            <groupId>org.scriptella</groupId>
             <artifactId>scriptella-drivers</artifactId>
             <version>${scriptella.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.javaforge.scriptella</groupId>
+            <groupId>org.scriptella</groupId>
             <artifactId>scriptella-tools</artifactId>
             <version>${scriptella.version}</version>
         </dependency>
