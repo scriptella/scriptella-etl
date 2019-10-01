@@ -62,11 +62,6 @@
             <artifactId>velocity</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>commons-logging</groupId>
