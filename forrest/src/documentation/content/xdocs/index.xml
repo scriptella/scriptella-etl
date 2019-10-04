@@ -115,18 +115,16 @@ INSERT INTO TARGET_TABLE(ID, FULL_NAME) VALUES (?ID, ?{NAME+' '+SURNAME});
         <section>
             <title>News</title>
             <section>
-                <title>Scriptella 1.1 Released (December 28, 2012)</title>
-                <p>Scriptella 1.1 has been released and available for <a href="download.html">download</a>.
+                <title>Scriptella 1.2 Released (October 3, 2019)</title>
+                <p>Scriptella 1.2 has been released and available for <a href="download.html">download</a>.
                     The following features and bug-fixes were added:
                 </p>
                 <ul>
-                    <li>JEXL 2.0 Support</li>
-                    <li><a href="reference/index.html#Declarative+formatting+and+parsing+rules+for+variables">Flexible parsing/formatting rules for text/csv drivers</a> </li>
-                    <li>StringIndexOutOfBoundsException when parsing SQL statements with ternary expressions </li>
-                    <li>Add support for batch execution</li>
-                    <li>Detection of  missing query.next calls in JavaScript/JEXL query elements</li>
+                    <li>Switched Maven groupId to <strong>org.scriptella</strong>. <a href="reference/index.html#maven">See Maven integration.</a></li>
+                    <li>Upgraded Janino driver to 3.1.0</li>
+                    <li>Various bugfixes and performance improvements.
+                        <a href="https://github.com/scriptella/scriptella-etl/compare/scriptella-parent-1.1...scriptella-parent-1.2">Commit log</a></li>
                 </ul>
-                <p><a href="reference/index.html#maven">Maven artifacts have been published.</a></p>
                 <p>See
                     <a href="changes.html">change log</a> for additional details.
                     <br/>

@@ -6,7 +6,15 @@
 	</header>
 	<body>
         <section>
-			<title>Stable Version: 1.1 (December 28, 2012)</title>
+            <title>Version: 1.2 (October 3, 2019)</title>
+            <table>
+                <tr><td>Binary distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.2/scriptella-1.2.zip">scriptella-1.2.zip</a></td></tr>
+                <tr><td>Source distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.2/scriptella-1.2-src.zip">scriptella-1.2-src.zip</a></td></tr>
+                <tr><td>Examples</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.2/scriptella-examples-1.2.zip">scriptella-examples-1.2.zip</a></td></tr>
+            </table>
+        </section>
+        <section>
+			<title>Version: 1.1 (December 28, 2012)</title>
             <table>
                 <tr><td>Binary distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.1/scriptella-1.1.zip">scriptella-1.1.zip</a></td></tr>
                 <tr><td>Source distribution</td><td><a href="https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.1/scriptella-1.1-src.zip">scriptella-1.1-src.zip</a></td></tr>
