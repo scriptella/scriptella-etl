@@ -19,7 +19,7 @@
 
     <groupId>org.scriptella</groupId>
     <artifactId>scriptella-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>pom</packaging>
 
     <name>Scriptella</name>
@@ -62,7 +62,8 @@
         <connection>scm:git:git://github.com/scriptella/scriptella-etl.git</connection>
         <developerConnection>scm:git:git@github.com:scriptella/scriptella-etl.git</developerConnection>
         <url>https://github.com/scriptella/scriptella-etl/tree/master</url>
-    </scm>
+      <tag>scriptella-parent-1.2</tag>
+  </scm>
     <issueManagement>
         <url>https://github.com/scriptella/scriptella-etl/issues</url>
         <system>GitHub Issues</system>
