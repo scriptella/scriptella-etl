@@ -28,7 +28,7 @@
         Our primary focus is simplicity. You don't have to study yet another complex XML-based language - use SQL (or
         other scripting language suitable for the data source) to perform required transformations.
     </description>
-    <url>http://scriptella.javaforge.com/</url>
+    <url>https://scriptella.org/</url>
     <inceptionYear>2006</inceptionYear>
     <licenses>
         <license>
