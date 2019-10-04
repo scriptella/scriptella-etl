@@ -60,7 +60,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/scriptella/scriptella-etl.git</connection>
-        <developerConnection>scm:git:ssh://github.com:scriptella/scriptella-etl.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:scriptella/scriptella-etl.git</developerConnection>
         <url>https://github.com/scriptella/scriptella-etl/tree/master</url>
     </scm>
     <issueManagement>
