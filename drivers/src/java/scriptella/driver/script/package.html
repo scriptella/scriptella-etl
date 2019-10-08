@@ -4,6 +4,12 @@ Allows usage of <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a> compat
 ETL &lt;query&gt; and &lt;script&gt; elements.
 <p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from Java SE 6.
 The default language expected by the driver is JavaScript which is bundled with JRE.</p>
+
+<p><b>Important:</b> Due to Nashorn being <a href="https://openjdk.java.net/jeps/335">deprecated in JDK11</a> and its incompatibilities with Scriptella, please use <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino">Rhino</a>
+with javax.script adapter (language=rhino in connection properties). <br>If you use Maven, add cat.inspiracion:rhino-js-engine dependency.
+Jars can be found in the <a href="https://github.com/scriptella/scriptella-etl/tree/master/lib">lib directory</a> of the Github repository.
+For more details see <a href="https://github.com/scriptella/scriptella-etl/issues/2">GitHub Issue</a>
+</p>
 <h2>General information</h2>
 <table>
     <tr>

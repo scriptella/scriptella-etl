@@ -8,6 +8,8 @@
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
+        <pathelement location="${basedir}/../lib/rhino-js-engine.jar"/>
+        <pathelement location="${basedir}/../lib/rhino.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>

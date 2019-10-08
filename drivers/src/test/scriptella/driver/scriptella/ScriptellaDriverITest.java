@@ -34,11 +34,6 @@ public class ScriptellaDriverITest extends AbstractTestCase {
     private static final Logger logger = Logger.getLogger(SpringDriverTest.class.getName());
     public static String global = "";
 
-    @Override
-    protected void runTest() {
-        // TODO re-enable the test
-    }
-
     public void test() throws EtlExecutorException {
         try {
             newEtlExecutor().execute();

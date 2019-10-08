@@ -94,7 +94,7 @@ public class ScriptConnection extends AbstractConnection {
         engineWrapper = new ScriptEngineWrapper(engine);
         LOG.fine("Script engine selected: " + engine.getFactory().getEngineName());
         if (engineWrapper.isCompilable()) {
-            cache = new IdentityHashMap<Resource, CompiledScript>();
+            cache = new IdentityHashMap<>();
         } else {
             LOG.info("Engine " + engine.getFactory().getEngineName() + " does not support compilation. Running in interpreted mode.");
         }

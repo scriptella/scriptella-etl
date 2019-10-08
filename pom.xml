@@ -154,6 +154,12 @@
                 <artifactId>h2</artifactId>
                 <version>1.1.116</version>
             </dependency>
+            <!-- https://github.com/scriptella/scriptella-etl/issues/2 -->
+            <dependency>
+                <groupId>cat.inspiracio</groupId>
+                <artifactId>rhino-js-engine</artifactId>
+                <version>1.7.10</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -192,7 +198,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -289,9 +299,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>3.1.0</version>
                 <configuration>
-                    <additionalparam>-Xdoclint:none --allow-script-in-comments</additionalparam>
+                    <doclint>none</doclint>
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none --allow-script-in-comments</additionalOption>
+                    </additionalOptions>
                 </configuration>
                 <executions>
                     <execution>
@@ -330,7 +343,7 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <version>2.7.1</version>
                         <configuration>
-                            <targetJdk>1.5</targetJdk>
+                            <targetJdk>1.8</targetJdk>
                         </configuration>
                     </plugin>
                     <plugin>

@@ -63,6 +63,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- https://github.com/scriptella/scriptella-etl/issues/2
+        We are using javax.script adapter for Rhino provided by https://www.inspiracio.cat -->
+        <dependency>
+                <groupId>cat.inspiracio</groupId>
+            <artifactId>rhino-js-engine</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>

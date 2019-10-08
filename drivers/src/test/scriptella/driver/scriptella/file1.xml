@@ -5,7 +5,9 @@
         f1=Overriden by a parent file
         localProp=visible
     </properties>
-    <connection driver="script"/>
+    <connection driver="script">
+        language=rhino
+    </connection>
     <script>
         with(JavaImporter(Packages.scriptella.driver.scriptella)) {
             ScriptellaDriverITest.global+=f1+'_'+localProp+'\n';
