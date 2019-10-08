@@ -35,22 +35,7 @@ public class ScriptellaDriverITest extends AbstractTestCase {
     public static String global = "";
 
     public void test() throws EtlExecutorException {
-        try {
-            newEtlExecutor().execute();
-        } catch (EtlExecutorException e) {
-            // TODO remove this code once #2 is fixed. Simply checks that the error is caused by Nashorn issue
-            StringWriter stackTrace = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stackTrace);
-            e.printStackTrace(printWriter);
-            printWriter.close();
-            if (stackTrace.toString().contains("jdk.nashorn.api.scripting.NashornScriptEngine")) {
-                logger.log(Level.SEVERE, "Test failure due to incomplete support for JDK8 Nashorn engine. " +
-                        "Suppressing the failure until https://github.com/scriptella/scriptella-etl/issues/2 is fixed", e);
-                return;
-            } else {
-                throw e;
-            }
-        }
+        newEtlExecutor().execute();
         assertEquals("file2_file1.xml_visible\nfile1.xml_visible\nfile2_", global);
     }
 

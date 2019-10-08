@@ -98,10 +98,9 @@ public class ScriptConnection extends AbstractConnection {
         } else {
             LOG.info("Engine " + engine.getFactory().getEngineName() + " does not support compilation. Running in interpreted mode.");
         }
-        // TODO Remove this once #2 is fixed
         if (engineWrapper.isNashornScriptEngine()) {
-            LOG.warning("Nashorn JavaScript Engine is currently not fully supported. \n" +
-                    "See https://github.com/scriptella/scriptella-etl/issues/2 for status.");
+            LOG.warning("Nashorn JavaScript Engine is not fully supported. \n" +
+                    "See https://github.com/scriptella/scriptella-etl/issues/2 for status and workarounds.");
         }
         if (!StringUtils.isEmpty(parameters.getUrl())) { //if url is specified
             url = parameters.getResolvedUrl();

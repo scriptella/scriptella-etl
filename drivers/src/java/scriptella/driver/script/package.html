@@ -5,10 +5,7 @@ ETL &lt;query&gt; and &lt;script&gt; elements.
 <p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from Java SE 6.
 The default language expected by the driver is JavaScript which is bundled with JRE.</p>
 
-<p><b>Important:</b> Due to Nashorn being <a href="https://openjdk.java.net/jeps/335">deprecated in JDK11</a> and its incompatibilities with Scriptella, please use <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino">Rhino</a>
-with javax.script adapter (language=rhino in connection properties). <br>If you use Maven, add cat.inspiracion:rhino-js-engine dependency.
-Jars can be found in the <a href="https://github.com/scriptella/scriptella-etl/tree/master/lib">lib directory</a> of the Github repository.
-For more details see <a href="https://github.com/scriptella/scriptella-etl/issues/2">GitHub Issue</a>
+<p><b>Important:</b> See <a href="#nashorn_notes">Nashorn JavaScript engine notes</a>
 </p>
 <h2>General information</h2>
 <table>
@@ -67,10 +64,20 @@ should be used to produce a result set:</p>
 </pre>
 See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
 </code>
-<h2>JDK 8 Nashorn JavaScript Engine notes</h2>
-<b>Important:</b> Nashorn engine is not fully supported yet. See GitHub issue
-<a href="https://github.com/scriptella/scriptella-etl/issues/2">Fix JDK 8 Nashorn JavaScript engine integration #2</a>
-for status and additional details.
+<h2><a name="nashorn_notes">JDK 8 Nashorn JavaScript Engine notes<a></h2>
+Due to Nashorn being <a href="https://openjdk.java.net/jeps/335">deprecated in JDK11</a> and its incompatibilities with Scriptella,
+please use <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino">Rhino</a>
+with javax.script adapter (language=rhino in connection properties).
+<br>If you use Maven, add cat.inspiracion:rhino-js-engine dependency.
+<br>Jars can be found in the <a href="https://github.com/scriptella/scriptella-etl/tree/master/lib">lib directory</a> of the Github repository.
+
+<p>Example of the connection declaration:
+<pre>
+    &lt;connection driver="script"&gt;
+        language=rhino
+    &lt;/connection&gt;
+</pre>
+For more details see <a href="https://github.com/scriptella/scriptella-etl/issues/2">GitHub Issue</a>
 <a name="examples"></a>
 <h2>Examples</h2>
 The following query executes a child script 10 times. As the result of execution 10 records
