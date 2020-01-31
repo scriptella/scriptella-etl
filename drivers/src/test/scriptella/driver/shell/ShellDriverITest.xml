@@ -1,0 +1,32 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
+<etl>
+    <connection id="in" driver="shell" url="tst://testfile">
+        encoding=UTF8
+    </connection>
+    <connection id="out" driver="shell" url="tst://testfile2">
+    </connection>
+
+    <!-- testfile2 will contain 3 lines (Exported Line1/2 and Done) -->
+    <query connection-id="in">
+        echo Line${1}
+        echo Line2
+        <script connection-id="out">
+            echo Exported $row
+        </script>
+    </query>
+    <script connection-id="out">
+        echo Done
+    </script>
+
+    <script connection-id="in">
+        <dialect name=".*win.*">
+            Echo Running Windows
+        </dialect>
+        <dialect name=".*linux.*">
+            echo Running Linux/Unix
+        </dialect>
+        <dialect name=".*mac.*">
+            echo Running Mac OS
+        </dialect>
+    </script>
+</etl>

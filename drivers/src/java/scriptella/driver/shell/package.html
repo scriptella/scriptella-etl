@@ -1,0 +1,71 @@
+<body>
+<h1>Shell scripts driver.</h1>
+Allows executing OS shell scripts in ETL files.
+<p>The query works by executing a shell script and exporting its output as a set of rows,
+each row representing a line in the output.
+Script works by sending output of the script to stdout or resource specified by the URL connection parameter.
+<p>
+    The driver provides a limited abstraction from the operating system shell environment by the following means:
+    <ul>
+    <li>Optional use of &lt;dialect&gt; element allows executing different commands for different environments,
+        e.g. <code>&lt;dialect name="*windows*&gt;</code></li>
+    <li> The driver chooses OS behavior by inspecting <code>os.name</code> and <code>os.version</code> system properties.
+        This behavior can be overriden by explicitly setting os_behavior property</li>
+</ul>
+
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.shell.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td>URL of the file to read from and send output to. URIs are resolved relative to a script file.
+    If url is not specified console (<code>System.in/out</code>) is used. Only applies to &lt;script&gt; elements</td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td><td>None. </td>
+    </tr>
+</table>
+<h2>Driver Specific Properties</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Required</th>
+    </tr>
+    <tr>
+        <td>os_behavior</td>
+        <td>Specifies target OS environment and behavior.</td>
+        <td>No, by default the behavior is inferred from <code>os.name/os.version</code> system properties.</td>
+    </tr>
+    <tr>
+        <td>shell_cmd</td>
+        <td>Comma-separated list of arguments, representing shell command executable and its parameters, e.g. <br><code>/bin/sh,-c</code>.</td>
+        <td>No, the default list of arguments is OS-specific and is controled by the os_behavior property.</td>
+    </tr>
+</table>
+
+<h2>Query and Script Syntax</h2>
+
+Query elements are defined in a form of shell commands. The stdout is captured and exported as a set of rows,
+each row representing a line in the output. Lines are accessible as <code>row</code> variable to inner elements.
+
+Script elements also defined as shell commands. The difference from query element is that it's possible to control
+where the stdout goes by means of <code>url</code> connection parameter.
+
+<code>
+<pre>
+    &lt;!-- The shell script of the query element produces 2 lines. They are consumed by the inner script element
+    which is printing every line of the consumed row prepended with "Exported" prefix. -->
+    &lt;query connection-id="in">
+        echo Line${1}
+        echo Line2
+        &lt;script connection-id="out">
+            echo Exported $row
+        &lt;/script>
+    &lt;/query>
+</pre>
+See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
+</code>
+
+</body>
