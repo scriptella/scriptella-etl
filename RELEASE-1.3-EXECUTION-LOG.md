@@ -2,6 +2,8 @@
 
 Detailed notes, commands, outputs, and decisions recorded while working through the plan.
 
+**Repository:** `scriptella-etl/` on branch `exp-v1.3`
+
 ---
 
 ## Chunk 1 — Repository and Build Baseline

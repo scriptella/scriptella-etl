@@ -1,0 +1,10 @@
+build/
+core/build/
+core/target/
+drivers/build/
+drivers/target/
+tools/build/
+tools/target/
+samples/lib/
+*.zip
+*.log
