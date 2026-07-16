@@ -685,6 +685,10 @@ A validated site structure before full migration.
 
 # Phase 6: Full Website Migration
 
+## Validation Cadence
+
+Keep browser testing during Chunks 12–16 lightweight: check the files and links touched by the chunk, then perform one representative desktop and one narrow-layout smoke test for obvious rendering or overflow problems. Defer the exhaustive viewport matrix, site-wide crawl, legacy-anchor verification, keyboard-focus review, contrast review, and cross-page visual inspection to the dedicated cleanup and validation pass in Chunk 17.
+
 ## Chunk 12 — Remaining Root Pages
 
 **Status:** ✅ Complete
@@ -719,7 +723,7 @@ All high-value root pages migrated.
 
 ## Chunk 13 — Reference Manual Migration, Part 1
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 
@@ -776,7 +780,7 @@ All high-value root pages migrated.
 * examples
 * best practices
 * remaining sections
-* final anchor validation
+* preserve known anchors; perform final anchor validation in Chunk 17
 
 The exact split may be changed based on page size and complexity.
 
