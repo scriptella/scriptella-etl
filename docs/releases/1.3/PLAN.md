@@ -1014,6 +1014,16 @@ A website ready for the final artifacts.
 
 ### Work
 
+* before any irreversible or externally visible action, research the current
+  release interfaces and prepare a detailed operator runbook for steps that
+  cannot be safely automated or would be disproportionately expensive to
+  automate; cover required access and credentials, the exact publication
+  order, GPG interaction, Central Portal review and manual approval, GitHub
+  Release creation, website deployment, propagation checks, evidence to
+  record, stop conditions, and recovery options
+* have the maintainer review that runbook and explicitly confirm the final
+  go/no-go decision; do not tag, upload, approve, publish, or deploy until this
+  action item is complete
 * set final versions
 * run the final clean build
 * tag the release
