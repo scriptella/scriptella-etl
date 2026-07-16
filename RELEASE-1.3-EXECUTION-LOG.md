@@ -545,3 +545,42 @@ The generated `linkmap.html` page was removed because it was a Forrest navigatio
 ### Repository State
 
 The completed website work is recorded through `1944b6b` on local branch `scriptella.github.io/exp-v1.3`. It has not been pushed or deployed.
+
+---
+
+## Chunk 16 — Remaining Documentation Pages
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Pages Migrated
+
+The last Forrest-skinned content pages now use the shared HTML5 docs shell and stylesheet:
+
+* `reference/drivers.html` — JDBC bridge and non-JDBC driver matrices, with all legacy driver fragment IDs preserved (`#jdbcbridge`, `#nonjdbc`, and per-driver IDs such as `#oracle`, `#spring`, `#csv`).
+* `howto/migrate-from-ant.html` — Ant SQL task migration guide with legacy section anchors preserved (`#Intended-Audience`, `#Purpose`, `#Prerequisites`, `#Steps`, `#The+simplest+case`).
+
+There were no other high-value nested content pages still on the Forrest layout. Generated `docs/api/` and `docs/dtd/` remain separate and unchanged.
+
+### Changes
+
+* Applied the documentation layout (primary nav, docs sidebar, footer, theme toggle) used by the reference manual and the other how-to.
+* Wrapped wide driver tables in keyboard-focusable `.table-scroll` regions.
+* Fixed the SQL Server row (extra empty table cell in the legacy HTML).
+* Light polish only: grammar fix (“provides”), HTTPS for a few external links, clearer notes, and a Related links section on the Ant migration how-to.
+* Removed Forrest markup, PDF links, StatCounter, and publication UI from both pages.
+
+### Validation
+
+| Check | Result |
+|-------|--------|
+| No remaining Forrest content pages outside `docs/` and `skin/` | ✅ |
+| Driver row IDs (29) | ✅ All present |
+| How-to section anchors | ✅ All preserved |
+| Nested relative paths for CSS, theme, logo, favicon | ✅ Match docs shell |
+| Generated API/DTD docs | ✅ Unchanged |
+
+### Repository State
+
+Website changes are on local branch `scriptella.github.io/exp-v1.3` and have not been pushed or deployed. Publication remains deferred to Chunk 17 cleanup and the final Release 1.3 deployment decision.
