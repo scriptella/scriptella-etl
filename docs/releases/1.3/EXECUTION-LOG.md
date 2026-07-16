@@ -1009,12 +1009,37 @@ JavaScript, and whitespace validation passed.
 
 ## Chunk 25 — Merge RC1 and Deploy Website
 
-**Status:** Pending
+**Status:** ✅ Complete — 2026-07-16
 
-Merges both `exp-v1.3` branches to `master` and deploys the RC1 website. This
-is the final open chunk in the modernization plan. After verification, retain
-both development branches unchanged as archival pointers and keep `master` at
-the near-final `1.3-SNAPSHOT` baseline.
+Both reviewed development branches were refreshed from GitHub, confirmed clean,
+and fast-forwarded to their default branches without merge commits.
+
+| Item | Recorded result |
+|---|---|
+| RC1 source commit | `ae6b375` |
+| Archived source `exp-v1.3` pointer | `ae6b375` |
+| Reviewed website commit | `0bf319f` |
+| Archived website `exp-v1.3` pointer | `0bf319f` |
+| Deployed website commit | `55f1e85` |
+
+The first GitHub Pages build attempted to run Jekyll and failed when
+`jekyll-github-metadata` received HTTP 503 from GitHub's organization API.
+Because the site is directly maintained static HTML, commit `55f1e85` added
+`.nojekyll` on website `master`. The replacement deployment bypassed Jekyll
+and published successfully without advancing the archival website branch.
+
+Live HTTPS verification returned HTTP 200 for the homepage, download,
+tutorial, FAQ, support, license, changes, links, reference index, drivers,
+both how-to pages, generated API documentation, generated DTD documentation,
+`/dtd/etl.dtd`, the shared CSS and JavaScript, the logo, and the favicon.
+The deployed homepage identifies Scriptella 1.3 RC1, the download page says
+1.3 is not yet available from Maven Central, Scriptella 1.2 remains the latest
+generally available release, and no final 1.3 asset links are exposed.
+
+Both local and remote `exp-v1.3` branches remain fixed archival pointers. No
+RC1 tag, final tag, RC artifacts, GitHub Release, or Maven publication was
+created. Final Scriptella 1.3 publication remains assigned to the focused
+follow-up issue after Sonatype access is restored.
 
 ---
 

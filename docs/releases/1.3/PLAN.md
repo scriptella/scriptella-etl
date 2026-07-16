@@ -1317,7 +1317,7 @@ publication issue is completed.
 
 ## Chunk 25 — Merge RC1 and Deploy Website
 
-**Status:** Pending
+**Status:** ✅ Complete — 2026-07-16
 
 **Target effort:** approximately 2–4 hours
 
