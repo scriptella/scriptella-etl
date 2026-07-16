@@ -1011,37 +1011,116 @@ JavaScript, and whitespace validation passed.
 
 **Status:** Pending
 
-Merges both `exp-v1.3` branches to `master` and deploys the RC1 website.
+Merges both `exp-v1.3` branches to `master` and deploys the RC1 website. This
+is the final open chunk in the modernization plan. After verification, retain
+both development branches unchanged as archival pointers and keep `master` at
+the near-final `1.3-SNAPSHOT` baseline.
 
 ---
 
 ## Chunk 26 — JDK 17 Compatibility Feasibility
 
-**Status:** Pending after RC1
+**Status:** Closed — deferred to Scriptella 1.4
 
-Bounded diagnostic chunk to determine whether JDK 17 support fits within
-one additional implementation chunk.
+No JDK 17 feasibility work will run for Release 1.3.
 
 ---
 
 ## Chunk 27 — JDK 17 Compatibility and RC2 Validation
 
-**Status:** Conditional on Chunk 26 outcome
+**Status:** Closed — deferred to Scriptella 1.4
 
-Implement and validate JDK 17 compatibility, or defer to 1.4.
+No RC2 will be produced for Release 1.3.
 
 ---
 
 ## Chunk 28 — Final Publication Readiness
 
-**Status:** Pending external access
+**Status:** Closed in this plan — moved to follow-up GitHub issue
 
-Prepare the selected RC baseline for final immutable 1.3 publication.
+Final readiness remains required after Sonatype access is restored, but it is
+no longer an open modernization-plan chunk.
 
 ---
 
 ## Chunk 29 — Final Scriptella 1.3 Release
 
-**Status:** Pending
+**Status:** Closed in this plan — moved to follow-up GitHub issue
 
-Publish signed Maven artifacts, GitHub Release, and final website.
+Final publication remains incomplete and is transferred to the issue described
+below.
+
+---
+
+## Plan Closure Decision and Final-Publication Follow-up
+
+**2026-07-16**
+
+**Status:** Approved
+
+This decision supersedes the optional RC2 and post-RC1 JDK 17 sequencing in
+the earlier Release Strategy Revision.
+
+After Chunk 25 completes, close the Scriptella 1.3 modernization plan as
+complete through RC1 integration and website deployment. This closure does not
+claim that final Scriptella 1.3 artifacts have been published.
+
+Decisions:
+
+* retain both local and remote `exp-v1.3` branches as fixed archival pointers
+* merge their reviewed contents into the corresponding `master` branches
+* do not delete or advance the archival branches
+* keep `scriptella-etl/master` at the near-final `1.3-SNAPSHOT` baseline except
+  for required final-publication fixes
+* defer JDK 17 compatibility and RC2 to Scriptella 1.4
+* close Chunks 26–27 as deferred
+* close Chunks 28–29 in this plan and transfer their remaining work to one
+  focused GitHub issue
+* keep RC1 wording live until immutable final artifacts actually exist
+
+### Recommended GitHub issue
+
+Create this issue in `scriptella/scriptella-etl` after Chunk 25 records the
+exact RC1 source and website commits.
+
+**Title:** Publish Scriptella 1.3 after Sonatype access is restored
+
+**Suggested body:**
+
+> Scriptella 1.3 modernization and RC1 integration are complete. Final 1.3
+> publication is blocked only by restoration and verification of Sonatype
+> Central Portal access. The source remains at the near-final
+> `1.3-SNAPSHOT` baseline, and the public website must retain RC1 wording until
+> every immutable release surface has been verified.
+
+Include the exact RC1 source commit, website deployment commit, and a link to
+this plan and execution log when creating the issue.
+
+**Checklist:**
+
+* [ ] Restore and verify Sonatype Central Portal access for `org.scriptella`.
+* [ ] Verify the private Maven publishing token without recording credentials.
+* [ ] Verify the durable OpenPGP signing key and published fingerprint.
+* [ ] Confirm GitHub repository, release, and Pages administration access.
+* [ ] Re-read the final-release operator runbook and update stale dates or
+      assumptions.
+* [ ] Re-run the complete Java 8 Maven, Ant, distribution, archive, launcher,
+      ETL, Maven-consumer, signature, and checksum validation gates.
+* [ ] Confirm the exact RC1-derived source commit selected for final 1.3.
+* [ ] Prepare and inspect the `1.3` release commit, final tag
+      `scriptella-parent-1.3`, and next-development commit locally.
+* [ ] Obtain explicit maintainer approval before any immutable publication.
+* [ ] Publish and verify signed Maven artifacts through the Central Portal.
+* [ ] Create and verify the final GitHub Release and distribution assets.
+* [ ] Update the website from RC1 to final wording and enable verified 1.3
+      download links.
+* [ ] Deploy and verify the final website, canonical URLs, documentation, and
+      downloads.
+* [ ] Advance `master` to `1.4-SNAPSHOT` after successful final publication.
+* [ ] Record final commit IDs, tag, deployment identifiers, asset hashes,
+      validation results, and publication timestamps.
+
+**Completion condition:**
+
+Close the issue only after Maven Central coordinates, the final GitHub Release,
+all release assets, and the final website are publicly available and verified.

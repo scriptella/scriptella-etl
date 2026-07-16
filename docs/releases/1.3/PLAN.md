@@ -6,11 +6,14 @@
 
 Modernize Scriptella with the minimum practical effort, publish a credible 1.3 release, replace the Forrest-based website with directly maintained HTML and CSS, and learn what continued maintenance of the project realistically requires.
 
-Release 1.3 has three possible public milestones:
+Release 1.3 now has two public milestones:
 
 1. **RC1** — existing Java 8 modernization baseline, integrated and deployed on the default branches.
-2. **RC2** — optional bounded JDK 17 compatibility, built on the RC1 baseline.
-3. **Final 1.3** — immutable Maven and GitHub publication from the selected RC.
+2. **Final 1.3** — immutable Maven and GitHub publication from the RC1 baseline after Sonatype access is restored.
+
+The earlier optional RC2 path is closed for Release 1.3. JDK 17 compatibility
+is deferred to Scriptella 1.4 so `master` can remain near-final while external
+publication access is recovered.
 
 This is not intended to be a comprehensive modernization or architectural rewrite.
 
@@ -34,9 +37,8 @@ The preferred approach is to preserve existing behavior, build processes, packag
 * Use Release 1.3 to establish a maintainable baseline and evaluate whether further investment in Scriptella is justified.
 * Do not let external publishing-account access block default-branch integration or website modernization.
 * Use release candidates to expose validated progress without claiming final artifact availability.
-* Treat JDK 17 as a bounded feasibility decision, not an open-ended requirement.
 * Preserve Java 8 compatibility throughout Release 1.3.
-* Defer JDK 17 to 1.4 if it exceeds one diagnosis chunk plus one implementation chunk.
+* Defer JDK 17 compatibility to Scriptella 1.4.
 
 ## Work Classification
 
@@ -99,8 +101,8 @@ The reasoning level estimates how much ambiguity, compatibility judgment, and ri
 | A6   | Preserve useful assets and remove obsolete Forrest artifacts.                                 | keep `images/`, `favicon.ico`, `CNAME`, `dtd/etl.dtd`; remove `skin/`, PDFs, `broken-links.xml`                      |
 | A7   | Validate internal links, deep links, image paths, nested paths, and download URLs.            | full site                                                                                                            |
 | A8   | Adjust public wording and deploy the modernized site for RC1.                                 | `scriptella.github.io` repository, RC1 wording                                                                         |
-| A9   | Update the site for RC2 only if bounded JDK 17 compatibility succeeds.                       | `scriptella.github.io` repository, RC2 wording                                                                         |
-| A10  | Switch the site to final 1.3 wording and download links after final artifacts exist.          | `scriptella.github.io` repository, final wording                                                                       |
+| A9   | Closed — defer RC2 website work with JDK 17 compatibility to 1.4.                            | follow-up planning for 1.4                                                                                             |
+| A10  | Track final 1.3 wording and download links in the publication follow-up issue.                | `scriptella.github.io` repository, final wording                                                                       |
 
 ## Workstream B: Project Modernization (`scriptella-etl/`)
 
@@ -116,9 +118,9 @@ The reasoning level estimates how much ambiguity, compatibility judgment, and ri
 | B8   | Update project status, README, and changelog.                                                     | `README.md`, `CHANGELOG.md`, `forrest/status.xml` |
 | B9   | Verify Maven publication and Ant distribution packaging.                                          | Maven release config, `ant dist`                  |
 | B10  | Integrate and publish the validated Java 8 baseline as RC1.                                        | all release files, RC1 wording                     |
-| B11  | Perform bounded JDK 17 compatibility feasibility.                                                 | JDK 17 environment, test results                   |
-| B12  | Implement and validate RC2 only if feasibility succeeds.                                          | all release files, RC2 wording                     |
-| B13  | Complete final signed Maven and GitHub publication.                                                | all release files, final wording                   |
+| B11  | Closed — defer JDK 17 compatibility feasibility to 1.4.                                            | follow-up planning for 1.4                         |
+| B12  | Closed — no RC2 is planned for 1.3.                                                               | follow-up planning for 1.4                         |
+| B13  | Track final signed Maven and GitHub publication in the publication follow-up issue.                  | all release files, final wording                   |
 
 ---
 
@@ -127,10 +129,9 @@ The reasoning level estimates how much ambiguity, compatibility judgment, and ri
 ## Java
 
 * Java 8 is the required baseline runtime and bytecode target for Scriptella 1.3.
-* After RC1, JDK 17 compatibility will receive one bounded diagnosis chunk and, only if justified, one implementation and validation chunk.
-* If compatibility cannot be restored safely within that boundary, JDK 17 is deferred to Scriptella 1.4.
+* JDK 17 compatibility is deferred to Scriptella 1.4.
 * Java 8 source, bytecode, and compatibility must be preserved throughout Release 1.3.
-* Do not claim JDK 17 support until the RC2 validation chunk passes.
+* Do not claim JDK 17 support for Scriptella 1.3.
 * Avoid raising the minimum Java version unless doing so is necessary for a 1.3 blocker.
 * Document the tested runtime and build environments.
 
@@ -1120,7 +1121,8 @@ scriptella.github.io/exp-v1.3 -> master
 
 Record that after the merge:
 
-* development continues on `master`
+* `master` remains the near-final 1.3 baseline and receives only required
+  release-blocker fixes until final publication
 * POM versions remain `1.3-SNAPSHOT`
 * no final `scriptella-parent-1.3` tag exists
 * no immutable `1.3` Maven coordinates are published
@@ -1288,6 +1290,31 @@ website merge and deployment (Chunk 25).
 
 ---
 
+## Plan Closure Decision
+
+**Status:** Approved — 2026-07-16
+
+This decision supersedes the optional RC2 and post-RC1 JDK 17 sequencing in
+the earlier Release Strategy Revision.
+
+Chunk 25 is the final open execution chunk in this modernization plan. After
+the two `exp-v1.3` branches are merged, pushed, and the RC1 website is verified:
+
+* close this modernization plan as complete through RC1 integration
+* retain both local and remote `exp-v1.3` branches as fixed archival pointers
+* do not delete or advance the archival branches
+* keep `master` at the near-final `1.3-SNAPSHOT` baseline except for required
+  final-publication fixes
+* defer JDK 17 compatibility and any RC2 work to Scriptella 1.4
+* track Sonatype access recovery and final 1.3 publication in one focused
+  GitHub follow-up issue
+
+Closing this plan will not mean that final Scriptella 1.3 artifacts have been
+published. The live site must retain accurate RC1 wording until the follow-up
+publication issue is completed.
+
+---
+
 ## Chunk 25 — Merge RC1 and Deploy Website
 
 **Status:** Pending
@@ -1384,10 +1411,11 @@ Do not create RC artifacts or a GitHub Release unless separately approved.
 
 After both merges are verified:
 
-* document that new work continues on `master`
-* retain `exp-v1.3` temporarily only if useful for audit or rollback
-* do not continue normal development on it
-* delete it later only through a separate deliberate cleanup action
+* retain both local and remote `exp-v1.3` branches as fixed archival pointers
+* do not continue development on or advance either archival branch
+* do not delete the archival branches
+* keep `master` at the near-final `1.3-SNAPSHOT` baseline except for required
+  final-publication fixes
 
 ### Output
 
@@ -1410,11 +1438,11 @@ Stop before pushing if:
 
 ---
 
-# Phase 10: Bounded JDK 17 Compatibility Decision
+# Phase 10: JDK 17 Compatibility — Closed and Deferred to 1.4
 
 ## Chunk 26 — JDK 17 Compatibility Feasibility
 
-**Status:** Pending after RC1
+**Status:** Closed — deferred to Scriptella 1.4
 
 **Target effort:** one focused chunk, approximately 4 hours
 
@@ -1425,6 +1453,12 @@ Stop before pushing if:
 Determine whether JDK 17 support is a small, safe RC2 improvement or work for Scriptella 1.4.
 
 This chunk is diagnostic. Do not turn it into an unbounded compatibility migration.
+
+### Closure decision
+
+This chunk will not run for Release 1.3. The validated Java 8 RC1 baseline is
+the final-publication candidate, and JDK 17 compatibility belongs to the 1.4
+follow-up scope.
 
 ### Compatibility objective
 
@@ -1599,13 +1633,16 @@ Do not continue investigating merely because additional modernization opportunit
 
 ## Chunk 27 — JDK 17 Compatibility and RC2 Validation
 
-**Status:** Conditional
+**Status:** Closed — deferred to Scriptella 1.4
 
 **Target effort:** one focused chunk, approximately 4 hours
 
 **Reasoning level:** Higher — runtime compatibility and scripting behavior require full cross-JDK validation.
 
 ### Entry condition
+
+This entry condition is superseded by the plan closure decision. No RC2 will
+be produced for Release 1.3.
 
 Create and execute this chunk only if Chunk 26 explicitly concludes that the work is bounded and suitable for RC2.
 
@@ -1768,11 +1805,11 @@ If implementation reveals broader work than Chunk 26 predicted:
 
 ---
 
-# Phase 11: Final Release Readiness and Publication
+# Phase 11: Final Publication — Closed in This Plan and Moved to Follow-up Issue
 
 ## Chunk 28 — Final Publication Readiness
 
-**Status:** Pending external access
+**Status:** Closed in this plan — moved to the final-publication follow-up issue
 
 **Target effort:** approximately 2–4 hours after credentials are available
 
@@ -1782,10 +1819,13 @@ If implementation reveals broader work than Chunk 26 predicted:
 
 Prepare the selected RC baseline for final immutable Scriptella 1.3 publication.
 
-The final baseline is:
+### Closure decision
 
-* RC2, if Chunk 27 completed successfully
-* otherwise RC1, with JDK 17 explicitly deferred to 1.4
+This work remains required for the final release but is no longer an open
+chunk in the modernization plan. After Chunk 25, track it together with Chunk
+29 in the focused GitHub issue specified in the execution log.
+
+The final baseline is RC1, with JDK 17 explicitly deferred to 1.4.
 
 ### External prerequisites
 
@@ -1851,7 +1891,7 @@ Do not proceed to final publication if:
 
 ## Chunk 29 — Final Scriptella 1.3 Release
 
-**Status:** Pending
+**Status:** Closed in this plan — moved to the final-publication follow-up issue
 
 **Target effort:** approximately 2–4 hours
 
@@ -1860,6 +1900,12 @@ Do not proceed to final publication if:
 ### Purpose
 
 Publish Scriptella 1.3 final from the approved RC baseline.
+
+### Closure decision
+
+Final publication is not complete. Execute this work from the GitHub follow-up
+issue after Sonatype access is restored; retain the detailed procedure below
+as reference material.
 
 ### Preconditions
 
@@ -2022,23 +2068,23 @@ Unless they become necessary blockers:
 ## Deferred migration follow-up
 
 * Replace the temporarily bundled Rhino JARs with a deterministic dependency-staging step after Release 1.3. The future step should use Maven dependency tooling to populate a generated build directory; it must not read hard-coded paths from a developer's local Maven repository.
-* JDK 17 compatibility is evaluated immediately after RC1. If it fails the bounded feasibility test, move it explicitly to Scriptella 1.4.
+* JDK 17 compatibility and any RC2 work are deferred to Scriptella 1.4.
 * Java 21 compatibility remains future work after JDK 17 unless later planning changes that target.
 
 ---
 
 # Recommended Execution Order
 
-Chunks 23–29 execute in order:
+The remaining modernization-plan work ends with Chunk 25:
 
 * **Chunk 23** — Revise RC1 website wording and release policy.
 * **Chunk 24** — Restore StatCounter tracking.
 * **Chunk 24A** — Website branding and SEO.
 * **Chunk 25** — Merge both `exp-v1.3` branches into `master` and deploy the RC1 website.
-* **Chunk 26** — Perform bounded JDK 17 feasibility.
-* **Chunk 27** — Implement and publish RC2 only if feasibility succeeds; otherwise defer JDK 17 to 1.4 and skip this chunk.
-* **Chunk 28** — Recover Sonatype access; repeat final release gate from a clean checkout.
-* **Chunk 29** — Publish immutable Scriptella 1.3 artifacts, GitHub Release, and final website; advance to the next snapshot.
+
+Chunks 26–27 are closed and deferred to Scriptella 1.4. Chunks 28–29 are
+closed in this plan and transferred to the final-publication GitHub issue
+described in the execution log.
 
 The website migration (completed and pending) may proceed in parallel with dependency and bug work after the representative shell has been validated.
 
@@ -2057,21 +2103,15 @@ RC1 is successful when:
 * Scriptella 1.2 remains identified as the latest generally available release
 * POM versions remain `1.3-SNAPSHOT`
 * the existing Java 8 release gate remains valid
-* development continues from `master`
+* `master` contains the near-final `1.3-SNAPSHOT` baseline
+* both `exp-v1.3` branches remain fixed archival pointers
+* the modernization plan is closed with final publication accurately tracked
+  by the follow-up GitHub issue
 
-## RC2 success
+## RC2 disposition
 
-RC2 is successful only if:
-
-* Java 8 compatibility remains intact
-* JDK 17 compatibility is implemented within the bounded scope
-* all required Java 8 tests pass
-* all claimed JDK 17 tests pass
-* Rhino and JavaScript behavior has focused regression coverage
-* the actual build and runtime matrix is documented
-* the website accurately identifies RC2 without claiming final release availability
-
-If these conditions cannot be met within the scope boundary, successful deferral to 1.4 is an acceptable outcome.
+RC2 is not part of Release 1.3. JDK 17 compatibility and any corresponding
+release-candidate work are deferred to Scriptella 1.4.
 
 ## Final 1.3 success
 
