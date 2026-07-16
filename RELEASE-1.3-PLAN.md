@@ -384,7 +384,7 @@ Fix only defects that affect correctness, compatibility with the selected Java t
 | Issue | Description | Scope |
 |-------|-------------|-------|
 | [#29](https://github.com/scriptella/scriptella-etl/issues/29) | DTD error: `<include>` in `<script>` not declared | Fix — concrete, small |
-| [#20](https://github.com/scriptella/scriptella-etl/issues/20) | ID columns/variables overridden | Investigate briefly; fix only if reproducible, clearly serious, and bounded |
+| [#20](https://github.com/scriptella/scriptella-etl/issues/20) | ID columns/variables overridden | Investigated — not reproducible; regression coverage added; no runtime fix for 1.3 |
 | — | Ant/Maven test divergence | Resolve or document — directly affects release confidence |
 | — | Ant test reports success despite failures | Fix or add a reliable release check |
 
@@ -545,7 +545,18 @@ A consistent dependency set across Maven artifacts and the standalone distributi
 
 If an issue expands beyond one or two chunks, pause and reconsider whether it belongs in Release 1.3.
 
-Issue #20 remains a separate bounded investigation before website work begins.
+## Bounded Investigation — Issue #20
+
+**Status:** ✅ Complete
+
+The report contains no reproduction steps, database/driver details, or example ETL. The common JDBC case was investigated because it is the narrowest reasonable interpretation of the report.
+
+* JDBC result-set columns are resolved case-insensitively before parent/global properties.
+* The query execution context reserves only `rownum` and `etl`; `id` has no special treatment.
+* Existing table-copy and nested-query tests already pass `ID` columns through nested scripts successfully.
+* New regression coverage verifies that an `ID` result column takes precedence over a same-named global `id` property for `$id`, `${id}`, `?id`, and `?{id}` bindings.
+
+The reported behavior is not reproducible under Java 8 with the release-baseline HSQLDB/JDBC path. No production change is justified without a concrete failing ETL and database/driver combination. The issue is deferred unless such a reproduction is provided; the Release 1.3 investigation is complete.
 
 ---
 

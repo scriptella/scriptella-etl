@@ -418,3 +418,46 @@ No changelog entry was added because runtime behavior and the canonical DTD did 
 | `ant clean test` with Ant 1.10.17 | ✅ Passed |
 
 An incremental Core test run again exposed the pre-existing cancellation/JMX test-state sensitivity documented during Chunk 8. The clean full Maven run passed all 301 tests.
+
+---
+
+## Bounded Investigation — Issue #20
+
+**2026-07-15 17:58**
+
+**Status:** ✅ Complete — not reproducible; no production fix
+
+### Report Boundary
+
+Issue #20 states only that columns/variables named `id` seem to be overridden. It provides no ETL example, expected or observed value, database, driver, Scriptella version, or comments. The bounded investigation therefore covered the common JDBC interpretation without speculating about unreported driver-specific behavior.
+
+### Code and Existing-Coverage Findings
+
+* `ResultSetAdapter` registers both JDBC column names and labels in a case-insensitive map and resolves a result-set column before falling back to parent parameters.
+* `QueryExecutor.QueryCtxDecorator` gives special treatment only to the documented `rownum` and `etl` variables. It does not reserve or replace `id`.
+* Existing `DBTableCopyTest`, `NestedQueryTest`, and `SQLParametersTest` cases successfully retrieve and bind `ID`/`id` result columns, including nested query scopes.
+
+### Reproduction Attempt and Regression Coverage
+
+Added `Issue20IdColumnTest` with an HSQLDB ETL fixture that deliberately defines a global `id=999` property while querying rows whose `ID` values are 1 and 2. A nested JDBC script copies each result-column value through all supported JDBC forms:
+
+* `$id`
+* `${id}`
+* `?id`
+* `?{id}`
+
+All four forms resolve to each row's `ID`, not the same-named global property. This directly covers the most plausible override collision and preserves the expected precedence as regression coverage.
+
+### Decision
+
+The issue is not reproducible on the Release 1.3 Java 8 baseline with the bundled HSQLDB/JDBC path. A production change would be speculative and could alter established variable precedence. No runtime fix or changelog entry is warranted for 1.3.
+
+Reconsider only if a concrete failing ETL plus database/driver and expected/actual values is supplied. The upstream issue may remain open for that information, but it no longer blocks website work or Release 1.3.
+
+### Verification (Java 8 — Temurin 1.8.0_492)
+
+| Check | Result |
+|-------|--------|
+| Issue #20 JDBC/property-collision regression | ✅ Passed |
+| `mvn clean test` | ✅ 302 tests passed (Core 149, Drivers 141, Tools 12) |
+| `ant clean test` with Ant 1.10.17 | ✅ Passed |
