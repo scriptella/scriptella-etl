@@ -983,7 +983,7 @@ A release-candidate artifact set and checklist.
 
 ## Chunk 22 — Release Website Preparation
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 

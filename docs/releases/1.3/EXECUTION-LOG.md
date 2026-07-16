@@ -831,3 +831,64 @@ changed.
 No Git tag was created, no Central deployment was uploaded, and nothing was
 published. The candidate passed the local release gate and is ready for Chunk
 22 website preparation.
+
+---
+
+## Chunk 22 — Release Website Preparation
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Work completed (`scriptella.github.io` branch `exp-v1.3`)
+
+Content pages were updated for the 1.3 release candidate asset names and
+requirements. Nothing was pushed to `master` or deployed to GitHub Pages.
+
+| Page | Changes |
+|------|---------|
+| `download.html` | Added Version 1.3 section with GitHub Release URLs under tag `scriptella-parent-1.3` for `scriptella-1.3.zip`, `scriptella-1.3-src.zip`, and `scriptella-examples-1.3.zip`; noted Java 8 and Maven Central; kept 1.2/1.1 archives |
+| `index.html` | Homepage news now announces Scriptella 1.3 (2026-07-16); preserved the legacy 1.2 announcement anchor |
+| `changes.html` | Added Version 1.3 entry from `CHANGELOG.md` with upgrade notes |
+| `tutorial.html` | Standalone install steps reference the 1.3 binary ZIP and Java 8 baseline |
+| `support.html` | Status wording reflects 1.3 as the current maintenance baseline |
+| `reference/index.html` | Binary layout matches the candidate ZIP (`scriptella-1.3/`, root `scriptella.jar`, `lib/` modules, README/CHANGELOG/LICENSE/NOTICE) |
+| `reference/drivers.html` | Added shell driver; noted Rhino for JavaScript; removed the obsolete Lucene row (driver removed from source; not in 1.3 Javadoc) |
+| `howto/migrate-from-ant.html` | JAR size and Java 8 wording updated |
+
+### Generated documentation
+
+API and DTD documentation under `docs/api/` and `docs/dtd/` were refreshed from
+the Release 1.3 candidate build (`release-dir/build/docs/`). The site `dtd/etl.dtd`
+was synced. Notable diffs versus the previously published 1.2 Javadoc:
+
+* Shell driver package documentation is present.
+* Lucene package documentation is gone (driver already removed from source).
+* Javadoc tree matches the Java 8 / Ant dist generation used by the candidate.
+
+### Candidate asset URL verification
+
+Expected GitHub Release download URLs (live only after Chunk 23 publishes the
+release assets under tag `scriptella-parent-1.3`, matching 1.1/1.2 tag naming):
+
+* `…/releases/download/scriptella-parent-1.3/scriptella-1.3.zip`
+* `…/releases/download/scriptella-parent-1.3/scriptella-1.3-src.zip`
+* `…/releases/download/scriptella-parent-1.3/scriptella-examples-1.3.zip`
+
+These names match the candidate archives validated in Chunk 21.
+
+### Preview validation
+
+* Local relative links on updated content pages resolve (example `.sql` /
+  `.properties` sample hrefs excluded as intentional non-files).
+* Local HTTP preview served key pages with HTTP 200, including shell package
+  summary and DTD index.
+* Homepage and download page content include the 1.3 announcement and asset names.
+
+### Still deferred to Chunk 23
+
+* Final go/no-go and operator runbook for irreversible publication steps
+* Tagging, Maven Central upload/approval, GitHub Release asset upload
+* Push of `scriptella.github.io` to deploy GitHub Pages (and any merge to
+  `master` per the website branch policy)
+* Adjusting the published release date string if publication is not 2026-07-16
