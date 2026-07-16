@@ -345,3 +345,41 @@ mvn clean install
 - The historical DTDDoc Ant task runs successfully under Java 8 and generates current HTML documentation from `core/src/conf/scriptella/dtd/etl.dtd`.
 - `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` succeeds and packages the generated DTD HTML and `etl.dtd` under `docs/dtd/`.
 - DTDDoc remains an external release tool and is not bundled into Scriptella's runtime `lib/` directory.
+
+---
+
+## Chunk 8 — Apply Low-Risk Dependency Changes
+
+**2026-07-15 17:38**
+
+**Status:** ✅ Complete
+
+### Changes Applied
+
+1. **Reconciled Velocity at 1.6.2** (`pom.xml`):
+   - Updated Maven dependency management from Velocity 1.5 to 1.6.2.
+   - Kept the existing `lib/velocity-dep.jar`, which already reports version 1.6.2 in its manifest.
+   - Confirmed the root bundled JAR, generated sample copy, and examples ZIP entry are byte-for-byte identical.
+   - Confirmed Maven resolves `org.apache.velocity:velocity:1.6.2` for the Drivers module.
+
+2. **Added explicit Velocity distribution license material** (`lib/velocity-dep.license.txt`):
+   - Records the Apache License 2.0 terms and points to the complete license and notice texts embedded in the JAR.
+   - The Ant `jar` target copies it into `samples/lib/`, and the examples ZIP includes it next to `velocity-dep.jar`.
+
+3. **Kept all other dependencies unchanged**:
+   - Chunk 3 approved no other updates.
+   - Spring, JavaMail/Jakarta, modern-JDK Rhino work, reporting plugins, and publication-plugin validation remain deferred as recorded in the plan.
+
+### Verification (Java 8 — Temurin 1.8.0_492)
+
+| Check | Result |
+|-------|--------|
+| Drivers tests with Maven-resolved Velocity 1.6.2 | ✅ 141 tests passed |
+| `mvn clean install` | ✅ 300 tests passed; all modules built and installed |
+| `ant clean test` with Ant 1.10.17 | ✅ Passed |
+| `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` | ✅ Passed |
+| Examples ZIP dependency metadata | ✅ `velocity-dep=1.6.2` |
+| Examples ZIP Velocity license | ✅ Present |
+| Bundled/sample/archive Velocity JAR SHA-256 | ✅ Identical (`8b3d055e...c96c4e`) |
+
+An initial incremental Maven reactor run encountered failures in two core cancellation/JMX tests before reaching the Drivers module. A clean full build immediately passed all 300 tests; the focused Drivers run also passed all 141 tests. No Velocity-related failure was observed.

@@ -502,7 +502,7 @@ Do not unnecessarily remove Javadocs or DTD documentation required by the distri
 
 ## Chunk 8 — Apply Low-Risk Dependency Changes
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 

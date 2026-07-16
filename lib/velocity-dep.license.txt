@@ -1,0 +1,4 @@
+Apache Velocity 1.6.2
+
+Velocity 1.6.2 is licensed under the Apache License, Version 2.0.
+The complete license and notice texts are included in velocity-dep.jar under META-INF/.
