@@ -19,7 +19,7 @@ Detailed notes, commands, outputs, and decisions recorded while working through 
 | Tool  | Version | Path |
 |-------|---------|------|
 | Java 8 (required baseline) | 1.8.0_492 (Temurin) | `/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home` |
-| Java 17 (required modern-LTS) | 17.0.15 (Temurin) | `/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home` |
+| Java 17 (available reference JDK) | 17.0.15 (Temurin) | `/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home` |
 | Java 24 | 24.0.1 (Temurin) | `/Library/Java/JavaVirtualMachines/temurin-24.jdk/Contents/Home` (reference only) |
 | Maven | 3.9.9 | IntelliJ bundled |
 | Ant   | 1.10.17 | `../apache-ant-1.10.17/` |
@@ -102,7 +102,7 @@ No build changes will be made until that decision is reviewed. This is tracked i
 | Decision | Value |
 |----------|-------|
 | Java 8 (required baseline) | Temurin 1.8.0_492 — build & full test |
-| Java 17 (required modern-LTS check) | Temurin 17.0.15 — compile & test |
+| Modern-LTS compatibility check | Postponed; target Java 21 after the Java 8 release baseline is stable |
 | Ant version | 1.10.17 |
 | Maven requirement | 3.6+ (tested with 3.9.9) |
 
@@ -134,7 +134,7 @@ Drafted and added to plan. Ready to be copied into README and release documentat
 | commons-logging | 1.0.4 | test | No change |
 | hsqldb | 1.8.0.10 | test | No change — investigate only if tests or supported behavior require newer |
 | h2 | 1.1.116 | test | No change — investigate only if tests or supported behavior require newer |
-| rhino-js-engine | 1.7.10 | compile (drivers) | No change — works on Java 8; verify on Java 17 |
+| rhino-js-engine | 1.7.10 | compile (drivers) | No change — works on Java 8; verify during the deferred Java 21 compatibility stage |
 
 ### Bundled Libraries (lib/)
 
@@ -212,7 +212,7 @@ All defer or remove — reporting profile is not required for 1.3.
 | [#36](https://github.com/scriptella/scriptella-etl/issues/36) — Spring 5.x | Optional driver; Spring upgrade is high-risk, deferred |
 | [#33](https://github.com/scriptella/scriptella-etl/issues/33) — Environment variables | Feature request / support question |
 | [#32](https://github.com/scriptella/scriptella-etl/issues/32) — Shell driver | New feature, out of scope for 1.3 |
-| [#31](https://github.com/scriptella/scriptella-etl/issues/31) — JDK11 compatibility | Covered by release plan; Java 17 upgrade deferred to after 1.3 |
+| [#31](https://github.com/scriptella/scriptella-etl/issues/31) — JDK11 compatibility | Covered by release plan; modern-JDK work deferred to the Java 21 compatibility stage after the Java 8 baseline |
 | [#27](https://github.com/scriptella/scriptella-etl/issues/27) — YEAR column → timestamp | Minor bug, low impact |
 | [#26](https://github.com/scriptella/scriptella-etl/issues/26) — JavaScript variable scope | JDK-dependent, hard to reproduce |
 | [#24](https://github.com/scriptella/scriptella-etl/issues/24) — Null/blank formatting error | Minor bug |
@@ -247,3 +247,101 @@ All defer or remove — reporting profile is not required for 1.3.
 
 All other open issues remain deferred as previously classified.
 
+---
+
+## Chunk 5 — Maven Build Fixes
+
+**2026-07-15 16:53**
+
+**Status:** ✅ Complete
+
+### Fixes Applied
+
+1. **Removed cobertura-maven-plugin `clean` execution from `<build>` section** (`pom.xml:235-246`)
+   - The Cobertura 2.6 plugin's `clean` goal was bound to the `clean` lifecycle in `<build><plugins>`, causing every `mvn clean` to fail on JDK 9+ (could not resolve `com.sun:tools:jar:0`).
+   - Cobertura remains available in the `reporting` profile for site generation — only the build-breaking default execution was removed.
+
+2. **Documented `JAVA_HOME` requirement for Javadoc**
+   - The `maven-javadoc-plugin:3.1.0` requires `JAVA_HOME` to find the `javadoc` executable.
+   - Build command for environments without `JAVA_HOME` set: `export JAVA_HOME=$(/usr/libexec/java_home) && mvn clean install`
+
+### Build Results (Java 8 — Temurin 1.8.0_492)
+
+```
+mvn clean install
+```
+
+| Module | Tests | Status |
+|--------|-------|--------|
+| Scriptella (parent) | — | ✅ SUCCESS |
+| Scriptella Core | 147 ✅ | ✅ SUCCESS |
+| Scriptella Drivers | 141 ✅ | ✅ SUCCESS |
+| Scriptella Tools | 12 ✅ | ✅ SUCCESS |
+| **Total** | **300** | **✅ BUILD SUCCESS** |
+
+### Artifacts Generated
+
+| Artifact | Generated |
+|----------|-----------|
+| Module JARs | ✅ core, drivers, tools |
+| Source JARs | ✅ core, drivers, tools |
+| Javadoc JARs | ✅ core, drivers, tools |
+| Test JAR | ✅ core (test-jar) |
+
+### Remaining Issues (pre-existing, not blocking build)
+
+- **Rhino/JS test failures on JDK 21+**: The `cat.inspiracio:rhino-js-engine:1.7.10` does not register via `javax.script.ScriptEngineFactory` on JDK 21+ due to module system service discovery restrictions. All 9 JS-related tests fail (`ScriptConnectionTest`, `ScriptConnectionPerfTest`, `ScriptDriverITest`, `ScriptingQueryITest`). This was already documented in Chunk 2 findings. Fix deferred to Phase 4 dependency work.
+- **Cobertura stays in reporting profile**: Not removed from the `reporting` profile, just from the build-breaking `<build>` section execution.
+
+---
+
+## Chunk 6 — Ant Build and Distribution Preservation
+
+**2026-07-15 17:00**
+
+**Status:** ✅ Complete
+
+### Fixes Applied
+
+1. **Preserved required DTD documentation generation** — verified DTDDoc 1.1.0 under Java 8 and retained the fail-fast `dtddoc.dir` check. Distribution builds cannot silently omit DTD documentation.
+
+2. **Fixed Ant test failure detection** (`build-template.xml:86`, `build.xml:154`):
+   - Added `failureproperty="unit.tests.failed"` to `<junit>` task in the build template (was `errorproperty` only, missing `failureproperty`).
+   - Replaced the broken `<fail if="unit.tests.failed">` check in `build.xml` with a reliable check that scans the generated `TESTS-TestSuites.xml` for non-zero `errors` or `failures` attributes.
+   - Before: Ant tests could fail but build would exit SUCCESSFUL.
+   - After: `ant test` properly fails the build when any test fails.
+
+3. **Documented Rhino JAR dependency in `drivers/build.xml`** — Resolved the Ant/Maven test divergence:
+   - Restored `lib/rhino.jar` and `lib/rhino-js-engine.jar` from Maven repo (they were referenced by the Ant build but never committed to git).
+   - Added a TODO comment in `drivers/build.xml` about replacing with a Maven dependency copy script.
+   - Root cause: These missing JARs caused `ScriptellaDriverITest` (which uses `language=rhino` in a sub-ETL) to fail during Ant test runs.
+   - Maven was unaffected because it resolves these dependencies from the repository.
+   - Release 1.3 decision: commit these JARs and their required license material under `lib/`. This is the shortest path to a reproducible Ant build from a fresh checkout and deliberately avoids making Maven a prerequisite for Ant.
+   - Deferred migration: replace the committed Rhino JARs after Release 1.3 with a deterministic Maven dependency-staging step into a generated build directory. Do not copy from hard-coded `~/.m2` paths.
+
+### Build Results (Java 8 — Temurin 1.8.0_492, Ant 1.10.17)
+
+| Target | Status |
+|--------|--------|
+| `ant clean jar` | ✅ SUCCESS (module JARs + all-in-one scriptella.jar) |
+| `ant clean test` | ✅ SUCCESS (all tests pass, build fails on failure) |
+| `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` | ✅ SUCCESS (all artifacts produced, including DTD documentation) |
+
+### Artifacts Produced by `ant dist`
+
+| Artifact | Size |
+|----------|------|
+| `scriptella.jar` (all-in-one) | 579 KB |
+| Module JARs (core, drivers, tools) | ✅ |
+| `scriptella-1.3-SNAPSHOT.zip` (binary) | 2.6 MB |
+| `scriptella-1.3-SNAPSHOT-src.zip` (source) | 7.4 MB |
+| `scriptella-examples-1.3-SNAPSHOT.zip` | 4.6 MB |
+| `build/docs/api/` (Javadoc) | ✅ |
+
+### DTDDoc verification and release command
+
+- Downloaded `DTDDoc_1_1_0.zip` from the SourceForge DTDDoc 1.1.0 release.
+- The archive contains `DTDDoc.jar`, `dtdparser120.jar`, `jakarta-regexp-1.2.jar`, and `jhighlight.jar`; no separate dependency reconstruction is necessary.
+- The historical DTDDoc Ant task runs successfully under Java 8 and generates current HTML documentation from `core/src/conf/scriptella/dtd/etl.dtd`.
+- `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` succeeds and packages the generated DTD HTML and `etl.dtd` under `docs/dtd/`.
+- DTDDoc remains an external release tool and is not bundled into Scriptella's runtime `lib/` directory.

@@ -12,14 +12,12 @@
     <target name="codereports" depends="dtd, javadoc"/>
     <target name="dtd" depends="clean">
         <description>Generates DTD using DTDDoc</description>
-        <!--Validation-->
         <fail message="DTDDoc is required to build DTD documentation. Set dtddoc.dir property.
-        DTDDoc URL: http://dtddoc.sourceforge.net" unless="dtddoc.dir"/>
+        Download DTDDoc 1.1.0 from https://sourceforge.net/projects/dtddoc/files/dtddoc/1.1.0/" unless="dtddoc.dir"/>
         <condition property="no_dtddoc">
             <available file="${dtddoc.dir}"/>
         </condition>
         <fail message="DTDDoc not found in ${dtddoc.dir}" unless="no_dtddoc"/>
-        <!--End Validation-->
         <taskdef name="DTDDoc"
                  classname="DTDDoc.DTDDocTask">
             <classpath>

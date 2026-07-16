@@ -1,0 +1,7 @@
+Mozilla Rhino 1.7.10
+
+Rhino 1.7.10 is licensed under the Mozilla Public License, Version 2.0.
+The complete license text is included as LICENSE.txt inside rhino.jar.
+
+Project: https://github.com/mozilla/rhino
+License: https://www.mozilla.org/MPL/2.0/

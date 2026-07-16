@@ -8,6 +8,7 @@
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
+        <!-- Rhino JARs — committed in lib/; TODO: replace with a Maven dependency copy script -->
         <pathelement location="${basedir}/../lib/rhino-js-engine.jar"/>
         <pathelement location="${basedir}/../lib/rhino.jar"/>
     </path>

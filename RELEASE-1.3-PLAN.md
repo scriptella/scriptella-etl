@@ -49,6 +49,14 @@ Work should pause and the requirement should be reconsidered before proceeding.
 
 Potentially useful, but not necessary for Release 1.3 or for assessing project health.
 
+## Reasoning Levels
+
+The reasoning level estimates how much ambiguity, compatibility judgment, and risk analysis a chunk requires. It is independent of elapsed effort: a long mechanical migration may need less reasoning than a short release-policy decision.
+
+* **Lower:** bounded, repeatable work with clear validation criteria.
+* **Moderate:** some investigation or cross-file judgment, but limited architectural or release risk.
+* **Higher:** ambiguous failures, compatibility decisions, dependency or licensing reconciliation, broad validation, or externally consequential release actions.
+
 ---
 
 # Scope Summary
@@ -100,8 +108,8 @@ Potentially useful, but not necessary for Release 1.3 or for assessing project h
 ## Java
 
 * Java 8 is the required baseline runtime and bytecode target.
-* Java 17 (Temurin) is the required modern-LTS compatibility check.
-* All changes must compile and pass tests on both JDKs.
+* Modern-JDK compatibility work is postponed until after the Java 8 release baseline is stable.
+* Java 21 (Temurin) will be the later modern-LTS compatibility target; it is not a blocker for the initial Release 1.3 build-preservation chunks.
 * Avoid raising the minimum Java version unless doing so is necessary for a 1.3 blocker.
 * Document the tested runtime and build environments.
 
@@ -194,6 +202,8 @@ Legacy anchors may be retained alongside cleaner new IDs when necessary.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Moderate — requires diagnosing and classifying failures across two legacy build systems.
+
 ### Work
 
 * Record the available Java, Maven, and Ant versions.
@@ -232,6 +242,8 @@ If Maven or Ant requires major environment reconstruction, document the blocker 
 
 **Target effort:** approximately 2–4 hours
 
+**Reasoning level:** Higher — establishes compatibility promises and separates release blockers from deferred modern-JDK work.
+
 ### Work
 
 * Confirm whether Java 8 remains a practical runtime and bytecode target.
@@ -254,7 +266,7 @@ If Maven or Ant requires major environment reconstruction, document the blocker 
 
 **Compatibility policy (for README and release docs):**
 
-> **Java:** Release 1.3 targets Java 8 runtime compatibility as the required baseline. Java 17 (Eclipse Temurin) is the required modern-LTS compatibility check. All changes must compile and pass tests on both JDKs.
+> **Java:** Release 1.3 targets Java 8 runtime compatibility as the required baseline. Modern-JDK compatibility work is postponed until the Java 8 release baseline is stable and will target Java 21 (Eclipse Temurin). Java 21 failures must be recorded as follow-up work but do not block the initial build-preservation chunks.
 >
 > **Maven:** Maven 3.6+ is required to build from source. IntelliJ IDEA's bundled Maven is also supported.
 >
@@ -271,6 +283,8 @@ If Maven or Ant requires major environment reconstruction, document the blocker 
 **Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — requires dependency, packaging, licensing, and compatibility judgment across Maven and bundled libraries.
 
 ### Work
 
@@ -326,6 +340,8 @@ If an upgrade requires meaningful API migration or breaks existing ETL scripts, 
 
 **Target effort:** approximately 2–4 hours
 
+**Reasoning level:** Higher — requires uncertain defect triage, release-risk assessment, and disciplined scope decisions.
+
 ### Work
 
 Review open issues and select a deliberately small Release 1.3 set.
@@ -380,9 +396,11 @@ All other open issues deferred (see execution log for full list).
 
 ## Chunk 5 — Maven Build Fixes
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Moderate — failures require diagnosis, but changes are constrained to minimal Maven compatibility fixes.
 
 ### Work
 
@@ -402,9 +420,11 @@ A reliable Maven build in the documented release environment.
 
 ## Chunk 6 — Ant Build and Distribution Preservation
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — legacy test reporting, external documentation tools, bundled dependencies, and release packaging interact.
 
 ### Work
 
@@ -437,6 +457,8 @@ If an Ant target requires substantial rewriting, reconsider whether that target 
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Moderate — removal is bounded now that DTDDoc is verified, but distribution documentation must remain intact.
+
 ### Work
 
 Refactor `build-docs.xml` conservatively.
@@ -467,27 +489,12 @@ Do not unnecessarily remove Javadocs or DTD documentation required by the distri
 
 ### DTDDoc decision
 
-DTDDoc is not currently installed. Before deciding how to handle DTD documentation for Release 1.3:
+**Resolved:** DTDDoc 1.1.0 was downloaded from SourceForge and verified under Java 8. Its archive includes all required dependencies, and the historical Ant task successfully generates current HTML from `etl.dtd`.
 
-1. **First test** whether the historical DTDDoc workflow can be restored easily under Java 8.
-2. If it works with little effort, preserve the current DTDDoc workflow.
-3. Only consider fallback approaches if DTDDoc is genuinely difficult, unavailable, or unreliable with the selected release environment.
-
-Possible fallback approaches (do not implement yet):
-
-* Keep DTDDoc as a separate maintenance tool, but package checked-in generated DTD documentation during normal distribution builds.
-* Package only the corrected `etl.dtd` if regenerating HTML documentation proves disproportionately difficult.
-
-Note: Issue #29 changes `etl.dtd`, so any existing generated DTD HTML cannot be assumed current after that fix.
-
-**Do not** before the decision is made:
-* delete the `dtd` target
-* remove DTDDoc configuration
-* remove DTD HTML documentation from the project
-* copy website-generated DTD docs into the build without first verifying their source and freshness
-* modify `ant dist`
-* decouple `codereports`
-* implement any fallback approach
+* Keep DTDDoc as an external release tool; do not add it to Scriptella's runtime `lib/` directory.
+* Preserve the `dtd` target and its fail-fast `dtddoc.dir` validation.
+* Use `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` for release distribution builds.
+* Keep generated DTD HTML and `etl.dtd` in the binary distribution.
 
 ---
 
@@ -498,6 +505,8 @@ Note: Issue #29 changes `etl.dtd`, so any existing generated DTD HTML cannot be 
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — Maven, bundled JARs, samples, licenses, and compatibility must remain synchronized.
 
 ### Work
 
@@ -519,6 +528,8 @@ A consistent dependency set across Maven artifacts and the standalone distributi
 **Status:** ⬜ Not started
 
 **Target effort:** approximately one four-hour chunk per small issue
+
+**Reasoning level:** Higher — each issue begins with uncertain reproduction, root-cause analysis, and compatibility risk.
 
 ### Work per issue
 
@@ -543,6 +554,8 @@ If an issue expands beyond one or two chunks, pause and reconsider whether it be
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — foundational navigation, responsive layout, and reusable content patterns affect every migrated page.
 
 ### Work
 
@@ -612,6 +625,8 @@ A reusable HTML shell and stylesheet.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Higher — validates the website architecture across root, reference, and nested-page use cases before bulk migration.
+
 ### Pages
 
 * `index.html`
@@ -654,6 +669,8 @@ A validated site structure before full migration.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Lower — primarily repeatable migration into the already validated shell, with limited editorial decisions.
+
 ### Pages
 
 * `faq.html`
@@ -684,6 +701,8 @@ All high-value root pages migrated.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Moderate — mostly structured migration, with careful anchor and semantic-markup preservation.
+
 ### Suggested scope
 
 * document shell
@@ -707,6 +726,8 @@ All high-value root pages migrated.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Moderate — integration documentation needs accurate anchors, examples, and nested navigation.
+
 ### Suggested scope
 
 * remaining script syntax
@@ -721,6 +742,8 @@ All high-value root pages migrated.
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Moderate — broad technical content and deep links require judgment even though the shell is established.
 
 ### Suggested scope
 
@@ -741,6 +764,8 @@ The exact split may be changed based on page size and complexity.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Lower — bounded page conversion using established layout and URL-preservation rules.
+
 ### Pages
 
 * `reference/drivers.html`
@@ -760,6 +785,8 @@ The exact split may be changed based on page size and complexity.
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — requires distinguishing obsolete artifacts from compatibility-critical URLs, anchors, images, and generated docs.
 
 ### Work
 
@@ -805,6 +832,8 @@ A deployable website with no Forrest dependency.
 
 **Target effort:** approximately 2–4 hours
 
+**Reasoning level:** Moderate — public compatibility and maintenance claims must be accurate without overstating commitments.
+
 ### Work
 
 * replace “no longer actively developed”
@@ -832,6 +861,8 @@ Avoid claiming broad active feature development unless that commitment exists.
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 2–4 hours
+
+**Reasoning level:** Moderate — requires reconciling historical sources and presenting release-impact and upgrade information accurately.
 
 ### Work
 
@@ -863,6 +894,8 @@ A maintainable changelog independent of Forrest.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Higher — external repository requirements, credentials, signing, metadata, and fallback decisions are consequential and change over time.
+
 ### Work
 
 * verify current Maven Central publication requirements
@@ -887,6 +920,8 @@ A temporary GitHub-only release should be considered only as an explicit fallbac
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 4 hours
+
+**Reasoning level:** Higher — this is the main release gate and requires cross-checking artifacts, dependencies, licenses, and representative consumers.
 
 ### Work
 
@@ -922,6 +957,8 @@ A release-candidate artifact set and checklist.
 
 **Target effort:** approximately 4 hours
 
+**Reasoning level:** Lower — mostly bounded content and link updates once candidate artifact names and requirements are fixed.
+
 ### Work
 
 * add the 1.3 entry to `download.html`
@@ -942,6 +979,8 @@ A website ready for the final artifacts.
 **Status:** ⬜ Not started
 
 **Target effort:** approximately 2–4 hours
+
+**Reasoning level:** Higher — tagging and publication are externally visible, difficult to reverse, and require final verification across all release surfaces.
 
 ### Work
 
@@ -990,6 +1029,11 @@ Unless they become necessary blockers:
 * creating a broad new feature roadmap
 * promising long-term active feature development
 
+## Deferred migration follow-up
+
+* Replace the temporarily bundled Rhino JARs with a deterministic dependency-staging step after Release 1.3. The future step should use Maven dependency tooling to populate a generated build directory; it must not read hard-coded paths from a developer's local Maven repository.
+* Re-evaluate and test Scriptella on Java 21 after the Java 8 release baseline is stable, including the Rhino JavaScript engine aliases used by existing ETL scripts and tests.
+
 ---
 
 # Recommended Execution Order
@@ -998,8 +1042,8 @@ Unless they become necessary blockers:
 2. ✅ Supported release environment
 3. ✅ Dependency and bundled-library inventory
 4. ✅ Issue triage and scope freeze
-5. Maven build fixes
-6. Ant build and distribution preservation
+5. ✅ Maven build fixes
+6. ✅ Ant build and distribution preservation
 7. Forrest removal from build tooling
 8. Website shell
 9. Representative website pages

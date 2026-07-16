@@ -151,7 +151,14 @@
             <fileset dir="${tools}/build/tmp/junit-xml" includes="TEST-*.xml"/>
             <report todir="${tests.report.dir}"/>
         </junitreport>
-        <fail if="unit.tests.failed" message="JUnit test failed see ${tests.report.dir}"/>
+        <loadfile property="test.failures.found" srcFile="${tests.report.dir}/TESTS-TestSuites.xml">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.LineContainsRegExp">
+                    <param type="regexp" value='(errors|failures)="[1-9]'/>
+                </filterreader>
+            </filterchain>
+        </loadfile>
+        <fail message="JUnit test failed see ${tests.report.dir}" if="test.failures.found"/>
 
     </target>
 

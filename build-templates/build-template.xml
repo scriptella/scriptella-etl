@@ -83,7 +83,7 @@
         </copy>
         <mkdir dir="${tests.xml.report.dir}"/>
         <!--Executing junit-->
-        <junit fork="on" forkmode="once" errorproperty="unit.tests.failed" dir="${root.dir}">
+        <junit fork="on" forkmode="once" errorproperty="unit.tests.failed" failureproperty="unit.tests.failed" dir="${root.dir}">
             <classpath >
                 <path refid="test.classpath"/>
                 <pathelement location="${classes.dir}"/>
