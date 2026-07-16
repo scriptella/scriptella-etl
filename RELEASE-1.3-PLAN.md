@@ -564,7 +564,7 @@ The reported behavior is not reproducible under Java 8 with the release-baseline
 
 ## Chunk 10 — Modern HTML Shell and Stylesheet
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 
@@ -572,10 +572,16 @@ The reported behavior is not reproducible under Java 8 with the release-baseline
 
 ### Work
 
+Treat the legacy site as a source of content and link destinations, not as a
+visual or structural design reference. Establish a restrained dark
+developer-tool identity with near-black surfaces, light text, and a limited
+green accent. Keep the implementation framework-free and understandable.
+
 Create:
 
 * HTML5 page structure
 * one primary `style.css`
+* a compact SVG Scriptella wordmark for dark backgrounds
 * responsive header
 * simple primary navigation
 * content container
@@ -594,11 +600,10 @@ Create:
 
 Preserve:
 
-* Scriptella logo
 * favicon
 * CNAME
 * useful diagrams and images
-* similar general color palette
+* public URLs and important legacy anchors as pages are migrated
 
 Remove from the new shell:
 
@@ -613,20 +618,19 @@ Remove from the new shell:
 
 ### Recommended primary navigation
 
-* Home
-* Download
-* Tutorial
 * Documentation
-* Support
+* Tutorial
+* Drivers
+* GitHub
+* Download as the primary action
+
+The logo links to the homepage; a separate Home item is unnecessary.
 
 ### Secondary or footer links
 
 * Change History
 * License
-* GitHub
-* Drivers
-* API Documentation
-* DTD Documentation
+* Support
 
 ### Output
 
@@ -649,6 +653,8 @@ A reusable HTML shell and stylesheet.
 
 ### Work
 
+* redesign the homepage from scratch rather than preserving its legacy composition
+* explain what Scriptella is, show a real concise ETL example, summarize key capabilities, and provide obvious getting-started routes
 * convert Forrest-generated HTML to clean HTML5
 * use the shared stylesheet
 * preserve useful content
@@ -657,7 +663,7 @@ A reusable HTML shell and stylesheet.
 * preserve important URLs
 * preserve important anchors
 * validate nested relative paths
-* test desktop and narrow layouts
+* perform light markup, path, and narrow-layout checks; defer the detailed viewport matrix to Chunk 17
 
 ### Purpose
 
@@ -812,6 +818,10 @@ The exact split may be changed based on page size and complexity.
 * verify links from README
 * verify links from packaged documentation
 * check desktop and mobile layouts
+* manually review at approximately 1280px, 1024px, 768px, and 390px
+* verify that navigation wraps or stacks cleanly without JavaScript
+* verify that code blocks and tables scroll without page-wide overflow
+* verify visible keyboard focus states and readable contrast
 * remove:
 
   * `skin/`
