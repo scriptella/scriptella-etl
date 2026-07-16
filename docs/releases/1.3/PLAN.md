@@ -947,7 +947,7 @@ A temporary GitHub-only release should be considered only as an explicit fallbac
 
 ## Chunk 21 — Release Candidate Build
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 

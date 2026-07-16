@@ -1,0 +1,5 @@
+JavaBeans Activation Framework 1.1
+
+Activation 1.1 is licensed under the Common Development and Distribution
+License (CDDL), Version 1.0. The complete license text is included in
+activation.jar as META-INF/LICENSE.txt.

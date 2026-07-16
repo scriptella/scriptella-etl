@@ -751,3 +751,83 @@ release identity.
 
 These are external maintainer prerequisites, not source-code blockers. The
 project-side publication path is ready for the release-candidate phase.
+
+---
+
+## Chunk 21 — Release Candidate Build
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Candidate setup and scope freeze
+
+The candidate was built in the disposable `release-dir` worktree, detached at
+commit `d5ee34a`. Only the four reactor POM versions were changed from
+`1.3-SNAPSHOT` to `1.3`; those temporary version changes were not committed.
+Dependencies and issue scope are frozen except for release-blocking findings.
+
+The validated environment was Temurin Java 8u492, Maven 3.9.9, Ant 1.10.17,
+and the external DTDDoc 1.1.0 distribution.
+
+### Release-gate findings and fixes
+
+Archive inspection found that the Ant distribution patterns still referenced
+the obsolete `README` filename. The binary ZIP therefore omitted `README.md`,
+the source ZIP omitted the root release and legal documents, and the examples
+ZIP omitted the project license and notice. `build.xml` now packages:
+
+* `README.md`, `CHANGELOG.md`, `LICENSE`, and `NOTICE` in the binary ZIP;
+* the root documentation and legal files in the source ZIP;
+* `README.md`, `LICENSE`, and `NOTICE` in the examples ZIP.
+
+Bundled-dependency inspection also found stale Java EE example libraries:
+`activation.jar` reported 1.0.2 and `mail.jar` reported 1.3, while Maven had
+already frozen Activation 1.1 and JavaMail 1.4.1. The bundled JARs were replaced
+with the Maven-resolved 1.1 and 1.4.1 artifacts. Both contain the complete CDDL
+1.0 text under `META-INF/LICENSE.txt`; explicit companion license notes and
+entries in `lib/versions.properties` were added. No other dependency was
+changed.
+
+### Build and test validation
+
+| Check | Result |
+|-------|--------|
+| Java 8 `mvn clean install` at release version 1.3 | ✅ All four projects succeeded |
+| Maven tests | ✅ 302 passed (Core 149, Drivers 141, Tools 12) |
+| Java 8 `ant clean test` with Ant 1.10.17 | ✅ 302 passed |
+| `ant -Ddtddoc.dir=/path/to/DTDDoc clean dist` | ✅ Succeeded with DTDDoc 1.1.0 |
+| Ant Javadoc and DTD documentation | ✅ Generated and packaged |
+| Maven module/source/Javadoc/test artifacts | ✅ All expected artifacts present |
+| Ant all-in-one and three module JARs | ✅ Present; manifests report 1.3 |
+| JAR readability | ✅ All 14 Maven and Ant candidate JARs readable |
+| ZIP integrity | ✅ Binary, source, and examples archives passed `unzip -t` |
+| Required legal and documentation entries | ✅ Present in all applicable archives |
+| Bundled/sample/archive copy equality | ✅ All generated copies byte-identical to their inputs |
+| Stale JavaMail/Activation check | ✅ Manifests and hashes match Maven 1.4.1/1.1 artifacts |
+
+### Functional smoke tests
+
+* The launcher from the unpacked binary ZIP reported
+  `Scriptella ETL and Scripts Execution Tool. Version 1.3`.
+* A standalone text-driver ETL from the unpacked binary ZIP wrote and verified
+  its expected output.
+* The `csv/text` example from the unpacked examples ZIP ran successfully and
+  produced both expected output files.
+* A separate Maven consumer resolved `org.scriptella:scriptella-core:1.3` from
+  the local candidate installation, downloaded an uncached transitive
+  dependency from Maven Central, compiled, and passed its runtime class-loading
+  test.
+
+### Candidate artifact set
+
+| Artifact | Size | SHA-256 |
+|----------|------|---------|
+| `scriptella.jar` | 579 KB | `c5cc2e31584e422bcc400ba6b063f586a50caa22aeec1412b88bf61533000c16` |
+| `scriptella-1.3.zip` | 2.6 MB | `8a9d864e8774f35469b3de4d746dd9409e4eb025b9fed52bc9240414e114b3d3` |
+| `scriptella-1.3-src.zip` | 7.5 MB | `12e70925d3e798ee61be73a7b0bff1300c9f612445309720d78039f957bdae24` |
+| `scriptella-examples-1.3.zip` | 4.7 MB | `2201f23ca2e86650973e85710eff16e930a3f69355550fb7e31320c63417770d` |
+
+No Git tag was created, no Central deployment was uploaded, and nothing was
+published. The candidate passed the local release gate and is ready for Chunk
+22 website preparation.

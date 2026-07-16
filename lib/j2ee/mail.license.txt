@@ -1,0 +1,5 @@
+JavaMail 1.4.1
+
+JavaMail 1.4.1 is licensed under the Common Development and Distribution
+License (CDDL), Version 1.0. The complete license text is included in mail.jar
+as META-INF/LICENSE.txt.

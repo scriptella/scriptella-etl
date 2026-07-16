@@ -51,8 +51,10 @@ existing Maven modules, Ant-built all-in-one JAR, and distribution archives.
 * Reconciled Maven and standalone-distribution Velocity versions at 1.6.2 and
   added explicit distribution license material.
 * Added Rhino 1.7.10 and `rhino-js-engine` 1.7.10 for JavaScript execution.
-* Kept other runtime and integration dependencies unchanged to limit release
-  risk.
+* Aligned the examples distribution with the Maven-managed JavaMail 1.4.1 and
+  Activation 1.1 versions and added explicit license material.
+* Kept remaining runtime and integration dependencies unchanged to limit
+  release risk.
 
 #### Website and documentation
 
