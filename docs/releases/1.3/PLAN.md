@@ -1227,9 +1227,10 @@ with discoverable and indexable content.
   the PVRLabs line is an addition, not a replacement.
 * Do not add PVRLabs branding to generated Javadocs or DTD documentation.
 * Use the existing Scriptella site font (no separate logo font). Style
-  "PVR Labs" in the site's green accent color. See reference implementation
-  at `/Users/pvr/dev/prj/pvr/vercel/aibadger/index.html` (footer line with
-  `.footer-brand`, `.logo-accent`, `.logo-labs` classes and CSS).
+  "PVR Labs" in the site's green accent color with the following structure:
+  one inline link containing two `<span>` elements — the first for "PVR"
+  with the accent class, the second for "Labs" with the light text class,
+  separated by a letter-spacing gap of `0.1em` between them.
 
 #### SEO
 
