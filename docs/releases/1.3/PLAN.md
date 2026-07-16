@@ -1006,7 +1006,12 @@ A website ready for the final artifacts.
 
 ## Chunk 23 — Final Release
 
-**Status:** ⬜ Not started
+**Status:** ⏸️ Paused — awaiting Sonatype publisher-account recovery
+
+The maintainer contacted Central Support on 2026-07-16 to recover the locked
+legacy `ejboy` publisher account. Release work stops at the external-access
+gate until account access is restored and the `org.scriptella` namespace can
+be confirmed. No tag, upload, publication, or website deployment has occurred.
 
 **Target effort:** approximately 2–4 hours
 

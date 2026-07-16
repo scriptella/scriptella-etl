@@ -892,3 +892,35 @@ These names match the candidate archives validated in Chunk 21.
 * Push of `scriptella.github.io` to deploy GitHub Pages (and any merge to
   `master` per the website branch policy)
 * Adjusting the published release date string if publication is not 2026-07-16
+
+---
+
+## Chunk 23 — Final Release (paused at access gate)
+
+**2026-07-16**
+
+**Status:** ⏸️ Paused — awaiting Sonatype publisher-account recovery
+
+### Gate findings
+
+* Both `exp-v1.3` branches were pushed and verified to match their GitHub
+  remotes exactly.
+* GitHub authentication was restored, and the maintainer account has admin
+  access to both repositories.
+* The legacy OSSRH publisher username is `ejboy`. A March 1, 2024 Central Team
+  notice confirmed that its registered Gmail plus-address still delivers to a
+  mailbox controlled by the maintainer.
+* The legacy account was locked after the required password change was not
+  accepted and consecutive login attempts triggered the lockout.
+* The maintainer sent an account-recovery request from the controlled mailbox
+  to `central-support@sonatype.com` on 2026-07-16.
+
+### Resume condition
+
+Resume Chunk 23 only after Central Support restores access. Then confirm
+publisher access to the `org.scriptella` namespace, configure a private Portal
+token under Maven server ID `central`, make the durable release-signing key
+available, and repeat the runbook prerequisite checks.
+
+No release tag, Central deployment, GitHub Release, default-branch update, or
+website deployment was created or performed.
