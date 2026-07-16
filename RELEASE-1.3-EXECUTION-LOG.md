@@ -499,3 +499,49 @@ The representative pages in the separate `scriptella.github.io` repository now u
 | Obsolete UI, scripts, and PDF-link scan | ✅ None present in migrated pages |
 | CSS structure and whitespace | ✅ Balanced braces; `git diff --check` clean |
 | Narrow layout | ✅ Header wraps, documentation layout becomes single-column, and homepage grids collapse by 56rem |
+
+---
+
+## Website Branch and Publication Policy
+
+**2026-07-15**
+
+The two Release 1.3 repositories now use matching development branches:
+
+* `scriptella-etl/` — `exp-v1.3`
+* `scriptella.github.io/` — `exp-v1.3`
+
+The website modernization commits were preserved on `scriptella.github.io/exp-v1.3`. Local website `master` was repointed to `origin/master` at `fb0b99e`, the currently published site baseline. The website repository is not to be pushed or deployed yet. Publication remains an explicit final action after website cleanup and validation and the Release 1.3 artifacts are ready.
+
+---
+
+## Chunk 12 — Remaining Root Pages
+
+**2026-07-15**
+
+**Status:** ✅ Complete
+
+### Pages Migrated
+
+The remaining high-value root pages now use the shared HTML5 shell and stylesheet:
+
+* `faq.html`
+* `support.html`
+* `license.html`
+* `tutorial.html`
+* `changes.html`
+* `links.html`
+
+The generated `linkmap.html` page was removed because it was a Forrest navigation artifact with no remaining user value.
+
+### Changes
+
+* Removed Forrest markup and scripts, PDF links, StatCounter, font-size controls, and generated publication UI.
+* Preserved the public page URLs and important content anchors.
+* Converted code blocks, notes, and inline code to the shared modern styles.
+* Replaced changelog icon images with readable text labels.
+* Added dependency-free XML and SQL syntax highlighting for example snippets, including light- and dark-theme colors. Detection is conservative and preserves the original snippet text.
+
+### Repository State
+
+The completed website work is recorded through `1944b6b` on local branch `scriptella.github.io/exp-v1.3`. It has not been pushed or deployed.

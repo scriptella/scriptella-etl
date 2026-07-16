@@ -70,6 +70,9 @@ The reasoning level estimates how much ambiguity, compatibility judgment, and ri
 * No static-site generator.
 * No Apache Forrest.
 * No PDF page variants.
+* Develop the website on `exp-v1.3`, matching the `scriptella-etl` release branch.
+* Keep `scriptella.github.io/master` aligned with the currently published `origin/master` until the modernized site has completed validation and is intentionally deployed.
+* Do not push the website modernization work yet; publishing remains a separate Release 1.3 decision under A8.
 * Content should remain close to the original, with minor polish, simplification, and factual corrections.
 * Preserve the majority of useful existing URLs.
 * Preserve important deep-link anchors where practical.
@@ -684,7 +687,7 @@ A validated site structure before full migration.
 
 ## Chunk 12 — Remaining Root Pages
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 
