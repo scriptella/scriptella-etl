@@ -993,6 +993,17 @@ before the merge and deploy (Chunk 25).
 
 ---
 
+## Chunk 24A — Website Branding and SEO
+
+**Status:** Pending
+
+Adds consistent PVRLabs footer attribution, robots.txt, sitemap.xml, page
+metadata, canonical URLs, and social preview tags across all maintained
+content pages. Runs after StatCounter (Chunk 24) and before merge and
+deploy (Chunk 25).
+
+---
+
 ## Chunk 25 — Merge RC1 and Deploy Website
 
 **Status:** Pending

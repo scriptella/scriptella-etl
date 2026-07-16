@@ -1202,6 +1202,60 @@ website is merged and deployed (Chunk 25).
 
 ---
 
+## Chunk 24A — Website Branding and SEO
+
+**Status:** Pending
+
+**Target effort:** approximately 2–4 hours
+
+**Reasoning level:** Lower — bounded content and metadata changes with clear validation criteria.
+
+### Purpose
+
+Finalize the Scriptella website by adding consistent PVRLabs branding across
+all pages and completing the essential SEO setup so the modernized site ships
+with discoverable and indexable content.
+
+### Work
+
+#### Branding
+
+* Add a shared footer element with "Built by PVRLabs" attribution on every
+  maintained content page (root, `reference/`, `howto/`).
+* Keep the PVRLabs link pointing to `https://pvrlabs.xyz`.
+* Preserve the existing footer content (license, navigation, theme toggle);
+  the PVRLabs line is an addition, not a replacement.
+* Do not add PVRLabs branding to generated Javadocs or DTD documentation.
+
+#### SEO
+
+* Create `robots.txt` allowing all crawlers with the sitemap directive.
+* Create `sitemap.xml` listing all maintained content pages.
+* Verify every page has a unique, descriptive `<title>`.
+* Verify every page has a useful `<meta name="description">`.
+* Add `<link rel="canonical" href="...">` to every maintained page.
+* Add Open Graph `<meta property="og:...">` tags (title, description, type,
+  url, image) to every maintained page.
+* Add Twitter Card `<meta name="twitter:...">` tags (card, title, description)
+  to every maintained page.
+* Use `https://scriptella.org` as the canonical base URL.
+* Use the site logo or a representative image for social previews.
+
+#### Scope boundaries
+
+* Do not add client-side SEO analysis tools, trackers, or third-party scripts
+  beyond the tags listed above.
+* Do not create an RSS feed or JSON-LD structured data unless trivial.
+* Do not redesign page layouts or navigation.
+* Do not modify generated API or DTD documentation pages.
+
+### Placement
+
+Run this chunk after StatCounter restoration (Chunk 24) and before the
+website merge and deployment (Chunk 25).
+
+---
+
 ## Chunk 25 — Merge RC1 and Deploy Website
 
 **Status:** Pending
@@ -1947,6 +2001,7 @@ Chunks 23–29 execute in order:
 
 * **Chunk 23** — Revise RC1 website wording and release policy.
 * **Chunk 24** — Restore StatCounter tracking.
+* **Chunk 24A** — Website branding and SEO.
 * **Chunk 25** — Merge both `exp-v1.3` branches into `master` and deploy the RC1 website.
 * **Chunk 26** — Perform bounded JDK 17 feasibility.
 * **Chunk 27** — Implement and publish RC2 only if feasibility succeeds; otherwise defer JDK 17 to 1.4 and skip this chunk.
