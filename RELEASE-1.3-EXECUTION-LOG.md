@@ -633,3 +633,34 @@ Website changes are on local branch `scriptella.github.io/exp-v1.3` and have not
 
 The modernized site on `scriptella.github.io/exp-v1.3` has no Forrest dependency and is ready for later deployment decisions (Chunk 22 / A8). Not pushed.
 
+
+---
+
+## Chunk 18 — README and Status Wording
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### README (`scriptella-etl/README.md`)
+
+Replaced the “no longer actively developed” note with maintenance-oriented status wording aligned to the release plan:
+
+* Maintenance development has resumed; focused compatibility and bug-fix releases.
+* Release 1.3 establishes a modernized baseline; latest **published** release remains 1.2 until 1.3 is tagged.
+* Documented Java 8, Maven 3.6+, and Ant 1.10.17 (packaging) requirements.
+* Documented binary `java -jar scriptella.jar` usage, Maven coordinates (`org.scriptella`), and `mvn clean install` / optional Ant packaging.
+* HTTPS links to scriptella.org, GitHub issues/discussions/wiki, and support page.
+* Commercial contact retained without overstating feature-development commitments.
+
+### Website alignment (`scriptella.github.io`)
+
+* `support.html` — status lede, HTTPS community links, clearer commercial and issue-tracker wording.
+* `index.html` — “Latest published release” label plus short 1.3 maintenance note (without claiming 1.3 is available).
+* `download.html` — note that 1.3 is not published yet.
+
+### Out of scope / deferred
+
+* Full CHANGELOG (Chunk 19).
+* Claiming 1.3 download artifacts before publication (Chunks 21–23).
+
