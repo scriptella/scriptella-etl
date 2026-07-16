@@ -33,7 +33,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -59,34 +59,20 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/scriptella/scriptella-etl.git</connection>
-        <developerConnection>scm:git:git@github.com:scriptella/scriptella-etl.git</developerConnection>
+        <connection>scm:git:https://github.com/scriptella/scriptella-etl.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/scriptella/scriptella-etl.git</developerConnection>
         <url>https://github.com/scriptella/scriptella-etl/tree/master</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <issueManagement>
         <url>https://github.com/scriptella/scriptella-etl/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
-	<distributionManagement>
-		<!--
-		    See https://issues.sonatype.org/browse/OSSRH-51637 (previous OSSRH-413)
-		 -->
-		<repository>
-			<id>scriptella-releases</id>
-			<name>Scriptella Central Repository</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>scriptella-snapshots</id>
-			<name>Scriptella Central Development Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Override on local validation builds to create a bundle without uploading it. -->
+        <central.skipPublishing>false</central.skipPublishing>
     </properties>
 
     <dependencyManagement>
@@ -196,6 +182,18 @@
 
         <plugins>
             <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.11.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                    <skipPublishing>${central.skipPublishing}</skipPublishing>
+                    <deploymentName>Scriptella ${project.version}</deploymentName>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -251,12 +249,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0-M1</version>
+                <version>3.1.4</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.3.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <goals>deploy</goals>
@@ -385,7 +383,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>3.2.8</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

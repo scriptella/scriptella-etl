@@ -691,3 +691,63 @@ The 1.3 entry covers:
 Historical summaries for 1.2, 1.1, and 1.0 were carried forward from the
 Forrest status file, with a link to that file for older and more detailed
 history.
+
+---
+
+## Chunk 20 — Maven Publication Validation
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Current publication requirements
+
+OSSRH reached end of life on June 30, 2025. The POM's HTTP OSSRH release and
+snapshot endpoints are unusable. Sonatype's supported direct Maven path is the
+Central Publisher Portal plugin. Central still requires release versions,
+source and Javadoc JARs, complete POM metadata, detached OpenPGP signatures, and
+checksums. Published coordinates are immutable.
+
+### Changes
+
+* Replaced the retired OSSRH `distributionManagement` configuration with
+  `org.sonatype.central:central-publishing-maven-plugin:0.11.0`.
+* Kept `autoPublish=false`, requiring an explicit Portal approval after upload.
+* Added the `central.skipPublishing` property for safe no-upload validation.
+* Updated the Java-8-compatible publication plugins:
+  `maven-deploy-plugin` 3.1.4, `maven-release-plugin` 3.3.1, and
+  `maven-gpg-plugin` 3.2.8.
+* Changed the license and read-only SCM URLs to HTTPS and normalized the SCM
+  developer connection.
+* Added `RELEASE-PUBLISHING.md` with credential, namespace, signing, validation,
+  and guarded final-release instructions.
+
+### Local validation
+
+| Check | Result |
+|-------|--------|
+| Java 8 snapshot `mvn clean deploy -Dcentral.skipPublishing=true` | ✅ Passed; no upload |
+| Maven tests | ✅ 301 passed |
+| Source and Javadoc artifacts | ✅ Present for Core, Drivers, and Tools |
+| Effective POM metadata | ✅ All 4 projects retain name, description, URL, license, developers, and SCM |
+| Release-version publication lifecycle | ✅ Passed in disposable checkout; no upload |
+| `maven-release-plugin` 3.3.1 `release:prepare` dry run | ✅ All 17 phases passed; no commit, tag, or push |
+| Release JAR readability | ✅ 10 of 10 JARs readable |
+| Detached signatures | ✅ 14 of 14 verified using an isolated temporary test key |
+| Digest calculation | ✅ MD5, SHA-1, SHA-256, and SHA-512 computed for all 14 POM/JAR files |
+| Portal staging/upload | ⏳ Not attempted; no project token or namespace access available locally |
+
+GnuPG 2.5.21 was installed through Homebrew for signing validation. The
+temporary key was used only in an isolated `/private/tmp` keyring and is not a
+release identity.
+
+### Required operator setup before final publication
+
+* Confirm the migrated `org.scriptella` namespace in the Central Portal.
+* Generate a Portal user token and configure private Maven server ID `central`.
+* Select or generate a durable passphrase-protected release key, publish its
+  public key to a Central-supported key server, and make it available to
+  `gpg-agent`.
+
+These are external maintainer prerequisites, not source-code blockers. The
+project-side publication path is ready for the release-candidate phase.

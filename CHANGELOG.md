@@ -43,6 +43,8 @@ existing Maven modules, Ant-built all-in-one JAR, and distribution archives.
   continue to use the external DTDDoc 1.1.0 tool.
 * Updated the Maven compiler and Javadoc plugins where required for the release
   build; obsolete Cobertura execution was removed from the normal build path.
+* Migrated publication from the retired OSSRH service to the Sonatype Central
+  Publisher Portal, with manual approval retained before public release.
 
 #### Dependencies
 
