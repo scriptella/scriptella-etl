@@ -584,3 +584,52 @@ There were no other high-value nested content pages still on the Forrest layout.
 ### Repository State
 
 Website changes are on local branch `scriptella.github.io/exp-v1.3` and have not been pushed or deployed. Publication remains deferred to Chunk 17 cleanup and the final Release 1.3 deployment decision.
+
+---
+
+## Chunk 17 — Website Cleanup and Validation
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Validation
+
+| Check | Result |
+|-------|--------|
+| Content-page internal links (12 HTML pages) | ✅ No missing local targets |
+| Fragment links from content pages | ✅ All resolve (after Javadoc fragment fix) |
+| Major reference anchors (`INSTALLATION`, `BIND_VARIABLES`, `Ant+Integration`, `JDBC+Adapters`, `Command+Line+Execution`, `jmx`, `maven`, `inprocess`, `Performance+and+batching`, …) | ✅ Present |
+| Image paths on content pages | ✅ All resolve |
+| High-priority public URLs | ✅ All present |
+| Download URLs (GitHub release assets for 1.2 / sample 1.1) | ✅ HTTP 200 on HEAD |
+| Nested nav paths (root, `howto/`, `reference/`) | ✅ CSS, theme, logo, favicon paths correct |
+| CSS structure | ✅ Balanced braces; `:focus-visible`; `@media (max-width: 56rem)` stacks header/docs nav; `pre` / `.table-scroll` use `overflow-x: auto` |
+| README website links | ⏳ HTTP `scriptella.org` links remain; wording/HTTPS alignment deferred to Chunk 18 |
+| Generated `docs/api/` and `docs/dtd/` | ✅ Kept as-is (historical Javadoc internal quirks, missing `script.js`, and `#package_description` typos inside generated HTML are out of scope) |
+
+### Fixes during validation
+
+* Corrected content links from `#package_description` to `#package.description` to match Java 8 Javadoc anchors (`reference/drivers.html`, `faq.html`).
+
+### Removed
+
+* `skin/` (Forrest CSS, JS, images, i18n)
+* All PDF page variants (`*.pdf` at root, `howto/`, `reference/`)
+* `broken-links.xml`
+* Unused Forrest/legacy images: `add.jpg`, `fix.jpg`, `update.jpg`, `built-with-forrest-button.png`, `instruction_arrow.png`, `site-logo.png`, `pvr_labs_optimized.png`
+
+### Kept
+
+* Useful content images and diagrams
+* Logo SVGs, powered badge, RSS icon
+* `favicon.ico`, `CNAME`, `dtd/etl.dtd`
+* `changes.rss` (linked from `changes.html`)
+* Generated Javadocs and DTD docs
+* `templates/` for future page work
+* `style.css`, `theme.js`
+
+### Output
+
+The modernized site on `scriptella.github.io/exp-v1.3` has no Forrest dependency and is ready for later deployment decisions (Chunk 22 / A8). Not pushed.
+
