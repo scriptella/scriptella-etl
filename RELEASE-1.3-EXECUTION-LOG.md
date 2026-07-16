@@ -461,3 +461,41 @@ Reconsider only if a concrete failing ETL plus database/driver and expected/actu
 | Issue #20 JDBC/property-collision regression | ✅ Passed |
 | `mvn clean test` | ✅ 302 tests passed (Core 149, Drivers 141, Tools 12) |
 | `ant clean test` with Ant 1.10.17 | ✅ Passed |
+
+---
+
+## Chunk 11 — Representative Page Migration
+
+**2026-07-15**
+
+**Status:** ✅ Complete
+
+### Pages Migrated
+
+The representative pages in the separate `scriptella.github.io` repository now use clean HTML5 and the shared Chunk 10 stylesheet:
+
+* `index.html` — redesigned from scratch with a concise explanation, a real cross-database ETL example, capability summary, common uses, and clear routes to downloads, the tutorial, and reference material.
+* `download.html` — retained the published 1.2 and 1.1 binary, source, and examples links without presenting the unpublished 1.3 release as available.
+* `reference/index.html` — migrated the first substantial reference section: execution concepts, use cases, Java 8 requirements, installation, core ETL elements, and variable binding. The remaining integration and advanced-provider material stays in scope for Chunks 13 and 14.
+* `howto/initialize-database.html` — retained the database initialization workflow, diagrams, ETL, servlet-listener example, Spring example, and historical-document caveat.
+
+### Architecture and Compatibility
+
+* Applied the shared header, primary navigation, documentation sidebar, content shell, and footer at root and one-directory nesting depths.
+* Added reusable homepage hero, feature-card, route-card, figure, on-this-page, and compatibility-anchor styles to `style.css`.
+* Preserved the four public page URLs and useful legacy fragment targets in the migrated content, including `overview`, `usage`, `features`, `News`, `INSTALLATION`, `BIND_VARIABLES`, and the how-to section anchors.
+* Removed Forrest scripts and menus, publication strips, font-size controls, PDF links, StatCounter, legacy HTML 4 declarations, and generated footer UI from all four pages.
+* Kept the site framework-free and free of third-party assets. A small dependency-free `theme.js` now provides a persistent Light, Dark, or System color-theme control; templates include it for later migrations.
+* Added a light-background wordmark variant while keeping legacy documentation diagrams on explicit white surfaces in both themes.
+* Added a documentation directory to the reference landing page with direct routes to the driver/provider matrix, FAQ, API and DTD references, both how-to guides, support, license, and change history. Added FAQ, API Docs, and DTD Reference to the shared footer templates and all representative pages.
+
+### Validation
+
+| Check | Result |
+|-------|--------|
+| HTML5 parsing with Nokogiri HTML5 | ✅ No parser errors on all four pages |
+| Root and nested local paths | ✅ All referenced local pages, images, styles, and icons exist |
+| Local fragment links and duplicate IDs | ✅ All resolved; no duplicate IDs |
+| Obsolete UI, scripts, and PDF-link scan | ✅ None present in migrated pages |
+| CSS structure and whitespace | ✅ Balanced braces; `git diff --check` clean |
+| Narrow layout | ✅ Header wraps, documentation layout becomes single-column, and homepage grids collapse by 56rem |
