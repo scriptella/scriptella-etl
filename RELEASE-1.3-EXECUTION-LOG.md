@@ -664,3 +664,30 @@ Replaced the “no longer actively developed” note with maintenance-oriented s
 * Full CHANGELOG (Chunk 19).
 * Claiming 1.3 download artifacts before publication (Chunks 21–23).
 
+---
+
+## Chunk 19 — Changelog
+
+**2026-07-16**
+
+**Status:** ✅ Complete
+
+### Output
+
+Added `CHANGELOG.md` as the primary maintainable changelog from Release 1.3
+onward. The historical `forrest/status.xml` remains unchanged as source material
+for older releases. The README links to the new changelog.
+
+The 1.3 entry covers:
+
+* Post-1.2 user-visible work already present on the branch, including the Rhino
+  JavaScript transition (#2) and shell-command driver (#32).
+* Java 8 compatibility policy, Maven and Ant build preservation, dependency
+  reconciliation, regression coverage, website modernization, and documentation.
+* Upgrade notes for Java, Rhino, the shell driver, Maven coordinates, and full
+  Ant distribution builds.
+* Deferred Java 21 compatibility and broad dependency modernization.
+
+Historical summaries for 1.2, 1.1, and 1.0 were carried forward from the
+Forrest status file, with a link to that file for older and more detailed
+history.

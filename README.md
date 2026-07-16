@@ -73,6 +73,7 @@ ant clean jar
 
 ## Documentation
 
+* Release history and upgrade notes: [CHANGELOG.md](CHANGELOG.md)
 * Website and reference: [https://scriptella.org](https://scriptella.org)
 * Reference manual: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
