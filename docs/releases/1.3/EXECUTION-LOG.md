@@ -502,9 +502,13 @@ The representative pages in the separate `scriptella.github.io` repository now u
 
 ---
 
-## Website Branch and Publication Policy
+## Website Branch and Publication Policy (historical — superseded)
 
 **2026-07-15**
+
+*This policy is superseded by the Release Strategy Revision below. The
+modernized website may now be merged and deployed for RC1 before final
+Maven publication.*
 
 The two Release 1.3 repositories now use matching development branches:
 
@@ -581,9 +585,9 @@ There were no other high-value nested content pages still on the Forrest layout.
 | Nested relative paths for CSS, theme, logo, favicon | ✅ Match docs shell |
 | Generated API/DTD docs | ✅ Unchanged |
 
-### Repository State
+### Repository State (historical)
 
-Website changes are on local branch `scriptella.github.io/exp-v1.3` and have not been pushed or deployed. Publication remains deferred to Chunk 17 cleanup and the final Release 1.3 deployment decision.
+Website changes are on local branch `scriptella.github.io/exp-v1.3` and had not been pushed or deployed at this point. The deployment policy was subsequently revised — see the Release Strategy Revision below.
 
 ---
 
@@ -885,7 +889,10 @@ These names match the candidate archives validated in Chunk 21.
   summary and DTD index.
 * Homepage and download page content include the 1.3 announcement and asset names.
 
-### Still deferred to Chunk 23
+### Still deferred (historical - superseded)
+
+*The items below were deferred under the original policy. The Release Strategy
+Revision restructures this work across RC1, RC2, and final publication chunks.*
 
 * Final go/no-go and operator runbook for irreversible publication steps
 * Tagging, Maven Central upload/approval, GitHub Release asset upload
@@ -895,13 +902,13 @@ These names match the candidate archives validated in Chunk 21.
 
 ---
 
-## Chunk 23 — Final Release (paused at access gate)
+## Chunk 23 — Final Release (original — superseded by strategy revision)
 
 **2026-07-16**
 
-**Status:** ⏸️ Paused — awaiting Sonatype publisher-account recovery
+**Status:** ⏸️ Superseded — see Release Strategy Revision below
 
-### Gate findings
+### Gate findings (historical)
 
 * Both `exp-v1.3` branches were pushed and verified to match their GitHub
   remotes exactly.
@@ -915,12 +922,112 @@ These names match the candidate archives validated in Chunk 21.
 * The maintainer sent an account-recovery request from the controlled mailbox
   to `central-support@sonatype.com` on 2026-07-16.
 
-### Resume condition
+### Historical resume condition (superseded)
 
-Resume Chunk 23 only after Central Support restores access. Then confirm
-publisher access to the `org.scriptella` namespace, configure a private Portal
-token under Maven server ID `central`, make the durable release-signing key
-available, and repeat the runbook prerequisite checks.
+The original plan required Central Support to restore access before any
+default-branch merge, website deployment, or release action. That policy is
+replaced by the Release Strategy Revision below.
 
 No release tag, Central deployment, GitHub Release, default-branch update, or
-website deployment was created or performed.
+website deployment was created or performed under the original plan.
+
+---
+
+## Release Strategy Revision — RC1, JDK 17 Feasibility, and Optional RC2
+
+**2026-07-16**
+
+**Status:** Approved
+
+The completed Scriptella 1.3 modernization work will no longer remain blocked
+by Sonatype publisher-account recovery.
+
+The validated source and website branches will be prepared and merged into
+their respective default branches. The modernized website will be deployed
+with the current source baseline identified as Scriptella 1.3 RC1.
+
+RC1 is not the final Scriptella 1.3 release. Maven project versions remain at
+1.3-SNAPSHOT. No final scriptella-parent-1.3 tag, immutable Maven Central
+coordinates, or final GitHub Release will be created during RC1 publication.
+The website will not expose nonexistent final-release assets and will continue
+to identify Scriptella 1.2 as the latest generally available release.
+
+After RC1, JDK 17 compatibility will receive one bounded diagnosis chunk. If
+the root cause is understood and the complete implementation and validation
+fit within one additional focused chunk while retaining Java 8 compatibility,
+the result will become Scriptella 1.3 RC2.
+
+If the JDK 17 work requires broader dependency modernization, scripting
+architecture changes, substantial Ant restructuring, a higher Java baseline,
+or uncertain behavior changes, it will be deferred to Scriptella 1.4. Such a
+deferral will not block the final Scriptella 1.3 release.
+
+Sonatype access remains required for final signed Maven Central publication
+and the immutable 1.3 release, but it no longer blocks default-branch
+integration, RC publication, website deployment, or continued development.
+
+This strategy revision supersedes the earlier policy that publication must
+wait for Central account recovery. Historical Chunk 23 entries record what
+was believed at the time and are preserved as-is.
+
+---
+
+## Chunk 23 — RC1 Plan and Public-Wording Adjustment
+
+**Status:** ✅ Complete
+
+Applied the RC1 release strategy. Reviewed and corrected RC1 wording across
+all maintained website pages, README, CHANGELOG, and release-plan documents.
+Updated compatibility claims. Removed final-release asset links. No external
+actions (no merge, push, tag, deployment, or publication).
+
+---
+
+## Chunk 24 — Restore StatCounter Tracking
+
+**Status:** Pending
+
+Restores the StatCounter snippet from the currently published site into the
+modernized page structure. Runs after RC1 wording adjustment (Chunk 23) and
+before the merge and deploy (Chunk 25).
+
+---
+
+## Chunk 25 — Merge RC1 and Deploy Website
+
+**Status:** Pending
+
+Merges both `exp-v1.3` branches to `master` and deploys the RC1 website.
+
+---
+
+## Chunk 26 — JDK 17 Compatibility Feasibility
+
+**Status:** Pending after RC1
+
+Bounded diagnostic chunk to determine whether JDK 17 support fits within
+one additional implementation chunk.
+
+---
+
+## Chunk 27 — JDK 17 Compatibility and RC2 Validation
+
+**Status:** Conditional on Chunk 26 outcome
+
+Implement and validate JDK 17 compatibility, or defer to 1.4.
+
+---
+
+## Chunk 28 — Final Publication Readiness
+
+**Status:** Pending external access
+
+Prepare the selected RC baseline for final immutable 1.3 publication.
+
+---
+
+## Chunk 29 — Final Scriptella 1.3 Release
+
+**Status:** Pending
+
+Publish signed Maven artifacts, GitHub Release, and final website.

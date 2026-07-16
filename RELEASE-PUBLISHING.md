@@ -1,4 +1,25 @@
-# Maven Central publishing
+# Publication — RC and Final
+
+## RC publication
+
+Release-candidate publication uses the default branches and does not require
+Maven Central access.
+
+* Merge both `exp-v1.3` branches into `master`.
+* Deploy the website from `scriptella.github.io/master` with RC1 or RC2 wording.
+* POM versions remain `1.3-SNAPSHOT`.
+* Do not create the final `scriptella-parent-1.3` tag.
+* Do not publish to Maven Central.
+* Do not create a GitHub Release.
+* Do not expose final release asset links.
+* Scriptella 1.2 remains the latest generally available release.
+
+An optional source tag may use `scriptella-parent-1.3-rc1` or `scriptella-parent-1.3-rc2`.
+
+## Final publication
+
+Final publication requires Sonatype Central Portal access, a durable signing
+key, and produces immutable public artifacts.
 
 Release 1.3 publishes the Maven reactor through the Sonatype Central Publisher
 Portal. The legacy OSSRH service was retired on June 30, 2025, so its repository

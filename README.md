@@ -8,18 +8,19 @@ transformation language.
 ## Project status
 
 Maintenance development has resumed. Scriptella is maintained through focused
-compatibility and bug-fix releases. Release **1.3** establishes a modernized
-maintenance baseline (Java 8 target, preserved Maven/Ant packaging, and a
-plain HTML website).
+compatibility and bug-fix releases.
 
-The latest **published** release remains **1.2** (October 2019) until 1.3 is
-tagged and published. This repository tracks 1.3 work on the development branch.
+The current source baseline is **Scriptella 1.3 RC1** (Java 8 target,
+preserved Maven/Ant packaging, and a plain HTML website). Official final
+artifacts have not yet been published.
+
+The latest **published** release remains **1.2** (October 2019).
 
 ## Requirements
 
 | Component | Requirement |
 |-----------|-------------|
-| **Java** | Java **8** runtime and bytecode target (required baseline). Modern JDK compatibility (planned target: Java 21) is deferred until after the Java 8 baseline is stable. |
+| **Java** | Java **8** runtime and bytecode target (required baseline). JDK 17 compatibility will be evaluated after RC1; if bounded, it may become part of RC2. |
 | **Maven** | **3.6+** to build from source (tested with 3.9.x). Maven is the primary module build and test path. |
 | **Ant** | **1.10.17** is the documented environment for release packaging (`ant dist`, all-in-one JAR, distribution ZIPs). Other Ant versions may work but are not promised. |
 
@@ -56,9 +57,11 @@ the core module:
 </dependency>
 ```
 
-Drivers and tools modules follow the same version. Prefer the binary
-distribution or the all-in-one JAR when you need the full set of bundled
-providers without assembling modules yourself.
+Drivers and tools modules follow the same version. Release-candidate
+snapshots may be built locally; final 1.3 coordinates will be published
+after the release gate clears. Prefer the binary distribution or the
+all-in-one JAR when you need the full set of bundled providers without
+assembling modules yourself.
 
 ### Build from source
 
