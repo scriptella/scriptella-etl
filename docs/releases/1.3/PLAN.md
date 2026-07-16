@@ -1155,7 +1155,7 @@ Do not proceed if any page still presents 1.3 as a final generally available rel
 
 ## Chunk 24 — Restore StatCounter Tracking
 
-**Status:** Pending
+**Status:** ✅ Complete
 
 **Target effort:** approximately 1 hour
 
@@ -1166,6 +1166,19 @@ Do not proceed if any page still presents 1.3 as a final generally available rel
 Restore the existing StatCounter integration from the currently published
 `scriptella.github.io/master` site so traffic continues to be measured after
 the modernized site is deployed.
+
+### Completed work
+
+* Restored StatCounter project `10775960` with security ID `53eaed1c`.
+* Added one isolated, deferred HTTPS tracking block to all 12 maintained
+  content pages and both shared HTML templates.
+* Covered root pages and nested pages under `reference/` and `howto/`.
+* Left generated Javadocs and DTD documentation unchanged; restoring tracking
+  throughout those generated trees was intentionally excluded as non-trivial
+  generated-content churn.
+* Confirmed no maintained page contains a duplicate or obsolete project ID.
+* Browser-checked representative root, reference, and how-to pages; each
+  completed rendering with one tracker script and the expected account values.
 
 ### Work
 

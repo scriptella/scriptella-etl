@@ -985,11 +985,13 @@ actions (no merge, push, tag, deployment, or publication).
 
 ## Chunk 24 — Restore StatCounter Tracking
 
-**Status:** Pending
+**Status:** ✅ Complete
 
-Restores the StatCounter snippet from the currently published site into the
-modernized page structure. Runs after RC1 wording adjustment (Chunk 23) and
-before the merge and deploy (Chunk 25).
+Restored the existing StatCounter project configuration from the published
+site into all 12 maintained content pages and both shared templates. Used one
+deferred HTTPS loader per page, retained project `10775960` and security ID
+`53eaed1c`, and excluded generated Javadoc and DTD trees. Structural checks and
+browser previews of root, reference, and how-to pages passed.
 
 ---
 
