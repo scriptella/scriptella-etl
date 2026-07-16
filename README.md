@@ -67,7 +67,7 @@ providers without assembling modules yourself.
 mvn clean install
 
 # Optional: Ant packaging (requires Ant 1.10.17 and project-specific doc tools
-# for a full distribution build — see RELEASE-1.3-PLAN.md)
+# for a full distribution build — see docs/releases/1.3/PLAN.md)
 ant clean jar
 ```
 
