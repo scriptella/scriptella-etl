@@ -523,9 +523,9 @@ Do not unnecessarily remove Javadocs or DTD documentation required by the distri
 
 A consistent dependency set across Maven artifacts and the standalone distribution.
 
-## Chunk 9 and Later — Selected Bug Fixes
+## Chunk 9 — Selected Bug Fix: Issue #29
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately one four-hour chunk per small issue
 
@@ -544,6 +544,8 @@ A consistent dependency set across Maven artifacts and the standalone distributi
 ### Stop condition
 
 If an issue expands beyond one or two chunks, pause and reconsider whether it belongs in Release 1.3.
+
+Issue #20 remains a separate bounded investigation before website work begins.
 
 ---
 

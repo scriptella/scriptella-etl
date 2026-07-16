@@ -383,3 +383,38 @@ mvn clean install
 | Bundled/sample/archive Velocity JAR SHA-256 | ✅ Identical (`8b3d055e...c96c4e`) |
 
 An initial incremental Maven reactor run encountered failures in two core cancellation/JMX tests before reaching the Drivers module. A clean full build immediately passed all 300 tests; the focused Drivers run also passed all 141 tests. No Velocity-related failure was observed.
+
+---
+
+## Chunk 9 — Selected Bug Fix: Issue #29
+
+**2026-07-15 17:45**
+
+**Status:** ✅ Complete
+
+### Finding
+
+The reported DTD omission was not reproducible from any maintained source copy:
+
+- `core/src/conf/scriptella/dtd/etl.dtd` declares `script` as `(#PCDATA | include | dialect | onerror)*`.
+- Git history shows that declaration has allowed `include` since 2006.
+- The copies in `scriptella.github.io/dtd/etl.dtd` and `scriptella.github.io/docs/dtd/etl.dtd` contain the same declaration.
+- The Ant-generated distribution DTD is copied from the canonical core DTD.
+
+The historical report therefore most likely came from stale deployed or validator-cached DTD content. Changing the already-correct production declaration would add risk without fixing a reproducible defect.
+
+### Regression Coverage
+
+Added `Issue29DtdValidationTest` and a fixture matching the reported structure: an `include` in a `script` nested inside a `query`. The test uses a strict validating XML parser and the packaged Scriptella DTD, failing on warnings or validation errors. This protects both the declaration and resource packaging from regression.
+
+No changelog entry was added because runtime behavior and the canonical DTD did not change; the investigation and regression coverage are recorded here instead.
+
+### Verification (Java 8 — Temurin 1.8.0_492)
+
+| Check | Result |
+|-------|--------|
+| Strict issue #29 DTD regression test | ✅ Passed |
+| `mvn clean test` | ✅ 301 tests passed (Core 148, Drivers 141, Tools 12) |
+| `ant clean test` with Ant 1.10.17 | ✅ Passed |
+
+An incremental Core test run again exposed the pre-existing cancellation/JMX test-state sensitivity documented during Chunk 8. The clean full Maven run passed all 301 tests.
