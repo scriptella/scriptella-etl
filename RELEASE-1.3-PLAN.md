@@ -453,7 +453,7 @@ If an Ant target requires substantial rewriting, reconsider whether that target 
 
 ## Chunk 7 — Remove Forrest from Build Tooling
 
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 
 **Target effort:** approximately 4 hours
 
@@ -1044,7 +1044,7 @@ Unless they become necessary blockers:
 4. ✅ Issue triage and scope freeze
 5. ✅ Maven build fixes
 6. ✅ Ant build and distribution preservation
-7. Forrest removal from build tooling
+7. ✅ Forrest removal from build tooling
 8. Website shell
 9. Representative website pages
 10. Remaining website pages
