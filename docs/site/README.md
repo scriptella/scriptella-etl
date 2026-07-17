@@ -35,7 +35,9 @@ python3 docs/site/sync_generated_docs.py --build --dry-run
 ```
 
 Requires **Python 3.9+**, **rsync**, and (for `--build`) **Ant**. DTDDoc is
-used when present for a full docs rebuild.
+used when present for a full docs rebuild. Prefer **Java 8** for Javadoc so the
+output matches the frameset layout currently published on scriptella.org
+(`--build` tries to select a Java 8 `JAVA_HOME` automatically on macOS).
 
 | Flag / env | Purpose |
 |------------|---------|
@@ -44,6 +46,7 @@ used when present for a full docs rebuild.
 | `--site-dir` / `SITE_DIR` | Website checkout (default: sibling `scriptella.github.io`) |
 | `--dtddoc-dir` / `DTDDOC_DIR` | DTDDoc home for `--build` (default: sibling `DTDDoc`) |
 | `--ant` / `ANT` | Ant executable (default: `PATH` or sibling `apache-ant-1.10.17`) |
+| `--java-home` / `JAVA_HOME_8` | JDK for `--build` (default: Temurin 8 if installed) |
 
 `--build` runs `build-docs.xml` `codereports` when DTDDoc is available, or
 `javadoc` only when it is not (with a warning).
@@ -63,8 +66,8 @@ Copy uses `rsync --delete` so removed packages do not leave stale HTML on the si
 The script **refuses to sync** if a generated tree looks empty or mostly empty,
 so a failed Ant/Javadoc run cannot wipe the live website docs:
 
-* Required entry files must exist (API: `overview-summary.html`, `index.html`,
-  `stylesheet.css`, `package-list`; DTD: `intro.html`, `index.html`,
+* Required entry files must exist (API: overview + index + stylesheet/`resource-files`
+  + `package-list`/`element-list`; DTD: `intro.html`, `index.html`,
   `elementsIndex.html`).
 * Absolute floors: enough files / HTML pages / `package-summary.html` pages
   (well below a healthy full tree, but above an empty or partial build).

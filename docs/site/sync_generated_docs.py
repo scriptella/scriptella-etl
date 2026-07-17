@@ -35,11 +35,13 @@ MIN_DTD_HTML = 4
 # When the destination already looks healthy, source must not shrink drastically.
 MIN_SRC_VS_DEST_RATIO = 0.5
 
-API_REQUIRED_FILES = (
-    "overview-summary.html",
-    "index.html",
-    "stylesheet.css",
-    "package-list",
+# Required names (any one of each group). Supports Java 8 Javadoc layout
+# (stylesheet.css, package-list) and newer JDKs (resource-files/, element-list).
+API_REQUIRED_ANY_OF = (
+    ("overview-summary.html",),
+    ("index.html",),
+    ("stylesheet.css", "resource-files"),
+    ("package-list", "element-list"),
 )
 DTD_REQUIRED_FILES = (
     "intro.html",
@@ -71,6 +73,27 @@ def resolve_ant(root: Path, explicit: str | None) -> Path | None:
     sibling = root.parent / "apache-ant-1.10.17" / "bin" / "ant"
     if sibling.is_file() and os.access(sibling, os.X_OK):
         return sibling
+    return None
+
+
+def resolve_java_home(explicit: str | None = None) -> Path | None:
+    """Prefer Java 8 for stable Javadoc output matching scriptella.org."""
+    if explicit:
+        home = Path(explicit)
+        return home if home.is_dir() else None
+
+    jvm_root = Path("/Library/Java/JavaVirtualMachines")
+    if jvm_root.is_dir():
+        patterns = ("temurin-8.jdk", "jdk1.8.0_*", "zulu-8.jdk", "adoptopenjdk-8.jdk")
+        for pattern in patterns:
+            for match in sorted(jvm_root.glob(pattern)):
+                home = match / "Contents" / "Home"
+                if home.is_dir():
+                    return home
+
+    env = os.environ.get("JAVA_HOME")
+    if env and Path(env).is_dir():
+        return Path(env)
     return None
 
 
@@ -117,8 +140,25 @@ def count_files(root: Path) -> tuple[int, int, int]:
     return all_files, html_files, package_summaries
 
 
-def missing_required(root: Path, required: tuple[str, ...]) -> list[str]:
+def missing_required_files(root: Path, required: tuple[str, ...]) -> list[str]:
     return [name for name in required if not (root / name).is_file()]
+
+
+def missing_required_any_of(
+    root: Path, groups: tuple[tuple[str, ...], ...]
+) -> list[str]:
+    """Return a message per group where none of the alternatives exist."""
+    missing: list[str] = []
+    for group in groups:
+        ok = False
+        for name in group:
+            path = root / name
+            if path.is_file() or path.is_dir():
+                ok = True
+                break
+        if not ok:
+            missing.append(" or ".join(group))
+    return missing
 
 
 def sanity_check_tree(
@@ -126,7 +166,8 @@ def sanity_check_tree(
     src: Path,
     dest: Path,
     *,
-    required: tuple[str, ...],
+    required: tuple[str, ...] = (),
+    required_any_of: tuple[tuple[str, ...], ...] = (),
     min_files: int,
     min_html: int,
     min_package_summaries: int = 0,
@@ -138,13 +179,18 @@ def sanity_check_tree(
             "       refuse to sync so the website tree is not wiped."
         )
 
-    missing = missing_required(src, required)
+    missing = missing_required_files(src, required)
+    missing_groups = missing_required_any_of(src, required_any_of)
     src_files, src_html, src_pkgs = count_files(src)
     dest_files, dest_html, dest_pkgs = count_files(dest)
 
     problems: list[str] = []
     if missing:
         problems.append("missing required files: " + ", ".join(missing))
+    if missing_groups:
+        problems.append(
+            "missing required entries (need one of each): " + "; ".join(missing_groups)
+        )
     if src_files < min_files:
         problems.append(f"only {src_files} files (minimum {min_files})")
     if src_html < min_html:
@@ -243,32 +289,42 @@ def inject_statcounter(path: Path, *, dry_run: bool, display: str) -> str:
     return f"injected: {display}"
 
 
-def build_docs(root: Path, ant: Path, dtddoc: Path | None, *, dry_run: bool) -> None:
+def build_docs(
+    root: Path,
+    ant: Path,
+    dtddoc: Path | None,
+    *,
+    dry_run: bool,
+    java_home: Path | None,
+) -> None:
     build_file = root / "build-docs.xml"
+    env = os.environ.copy()
+    if java_home is not None:
+        env["JAVA_HOME"] = str(java_home)
+        env["PATH"] = str(java_home / "bin") + os.pathsep + env.get("PATH", "")
+        print(f"using JAVA_HOME={java_home}")
+
+    def ant_run(target: str, extra: list[str] | None = None) -> None:
+        cmd = [str(ant), "-f", str(build_file)]
+        if extra:
+            cmd.extend(extra)
+        cmd.append(target)
+        printable = " ".join(shlex_quote(c) for c in cmd)
+        if dry_run:
+            print(f"[dry-run] {printable}")
+            return
+        subprocess.run(cmd, check=True, cwd=str(root), env=env)
+
     if dtddoc is not None:
         print(f"regenerating Javadoc + DTD docs (DTDDoc: {dtddoc})")
-        run(
-            [
-                str(ant),
-                "-f",
-                str(build_file),
-                f"-Ddtddoc.dir={dtddoc}",
-                "codereports",
-            ],
-            dry_run=dry_run,
-            cwd=root,
-        )
+        ant_run("codereports", [f"-Ddtddoc.dir={dtddoc}"])
     else:
         print(
             "warning: DTDDoc not found; regenerating Javadoc only.\n"
             "         Pass --dtddoc-dir or set DTDDOC_DIR to include DTD docs.",
             file=sys.stderr,
         )
-        run(
-            [str(ant), "-f", str(build_file), "javadoc"],
-            dry_run=dry_run,
-            cwd=root,
-        )
+        ant_run("javadoc")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -305,6 +361,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Ant executable (default: PATH or sibling apache-ant-1.10.17)",
     )
+    parser.add_argument(
+        "--java-home",
+        default=None,
+        help="JAVA_HOME for --build (default: Java 8 if found, else env JAVA_HOME)",
+    )
     return parser.parse_args(argv)
 
 
@@ -339,7 +400,16 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit(
                 "error: Ant not found. Install Ant, put it on PATH, or pass --ant."
             )
-        build_docs(root, ant, dtddoc, dry_run=args.dry_run)
+        java_home = resolve_java_home(args.java_home or os.environ.get("JAVA_HOME_8"))
+        if java_home is None:
+            java_home = resolve_java_home(os.environ.get("JAVA_HOME"))
+        if java_home is None:
+            print(
+                "warning: no JAVA_HOME resolved; Ant will use its default JVM.\n"
+                "         Prefer Java 8 for Javadoc consistent with scriptella.org.",
+                file=sys.stderr,
+            )
+        build_docs(root, ant, dtddoc, dry_run=args.dry_run, java_home=java_home)
 
     api_src = root / "build" / "docs" / "api"
     dtd_src = root / "build" / "docs" / "dtd"
@@ -356,7 +426,7 @@ def main(argv: list[str] | None = None) -> int:
         "API",
         api_src,
         api_dest,
-        required=API_REQUIRED_FILES,
+        required_any_of=API_REQUIRED_ANY_OF,
         min_files=MIN_API_FILES,
         min_html=MIN_API_HTML,
         min_package_summaries=MIN_API_PACKAGE_SUMMARIES,

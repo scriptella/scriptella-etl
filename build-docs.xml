@@ -36,9 +36,10 @@
         </copy>
     </target>
 
+    <!-- Prefer running Ant under Java 8 so Javadoc matches the frameset layout on scriptella.org. -->
     <target name="javadoc" depends="clean">
         <mkdir dir="${javadoc.dest.dir}"/>
-        <javadoc destdir="${javadoc.dest.dir}" includenosourcepackages="true"
+        <javadoc destdir="${javadoc.dest.dir}" failonerror="true"
                  additionalparam="-Xdoclint:none --allow-script-in-comments"
                  use="true" windowtitle="Scriptella API Documentation">
             <classpath refid="class.path"/>
