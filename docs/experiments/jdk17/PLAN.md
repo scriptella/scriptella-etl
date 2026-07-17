@@ -2,7 +2,7 @@
 
 **Issue:** [#31](https://github.com/scriptella/scriptella-etl/issues/31)  
 **Branch:** `exp-jdk17`  
-**Status:** In progress — plan revised for technical scope only
+**Status:** Phase 1 complete — baseline frozen; Phase 2 not started
 
 ## 1. Goal and scope
 
@@ -50,10 +50,11 @@ Do **not** treat any of the above as making JDK 17 the **minimum** runtime. Pref
 | Platform | macOS (x86_64) — update if different |
 | JDK 17 | Eclipse Temurin 17.0.15 — `/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home` |
 | JDK 8 (regression) | Eclipse Temurin 1.8.0_492 — `/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home` |
-| Maven | record with `mvn -v` |
-| Ant | 1.10.17 (workspace `apache-ant-1.10.17/` if used) |
-| DTDDoc | workspace `DTDDoc/` if used for full `ant dist` |
-| Branch base | `master` at start of experiment |
+| Maven | **3.9.9** (IntelliJ bundled) — Java version reported by Maven: 17.0.15 |
+| Ant | 1.10.17 (workspace `apache-ant-1.10.17/` if used) — not used in Phase 1 |
+| DTDDoc | workspace `DTDDoc/` if used for full `ant dist` — not used in Phase 1 |
+| Branch base | `master` at start of experiment; Phase 1 run on `exp-jdk17` |
+| Platform detail | macOS 15.6.1, x86_64 |
 
 ```bash
 export JAVA_HOME=/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
@@ -64,72 +65,134 @@ mvn -v
 
 ---
 
-## 4. Preliminary findings
+## 4. Baseline findings (Phase 1 freeze)
 
-Recorded before production code changes. These are **not** certification of full JDK 17 support.
+Recorded on `exp-jdk17` with **no production code changes**. These are **not** certification of full JDK 17 support.
 
-### Commands already run
+### Environment used for freeze
 
-| Command | JDK | Result |
-|---------|-----|--------|
-| `mvn clean test` (reactor) | 8 | PASS |
-| `mvn -pl core test` | 17 | PASS |
-| `mvn -pl tools -am test` | 17 | PASS |
-| `mvn -pl drivers test` (full module) | 17 | FAIL — 141 tests, **9 errors**, all in `scriptella.driver.script.*` |
-| `mvn clean verify` | 17 | Not yet re-run on this branch (expected fail on drivers) |
-| `mvn clean deploy -Dcentral.skipPublishing=true` | 17 | Not yet run |
-| `ant clean test` / `ant jar` / `ant dist` | 17 | Not yet run |
-| Packaged `java -jar …` JavaScript smoke | 17 | Not yet run |
-| JDK 8 regression after candidate fixes | 8 | Not yet run |
+```text
+JAVA_HOME=/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
+java -version  → openjdk version "17.0.15" 2025-04-15 (Temurin-17.0.15+6)
+mvn -v         → Apache Maven 3.9.9; Java version 17.0.15; OS macOS 15.6.1 x86_64
+```
+
+### Commands run
+
+| Command | JDK | Exit / result |
+|---------|-----|----------------|
+| `mvn clean verify` | 17 | **BUILD FAILURE** (Maven reactor exit non-zero; drivers surefire failed) |
+| `mvn -pl drivers test` | 17 | **exit 1** — confirms drivers-only failure |
+| ScriptEngine SPI probe (Rhino 1.7.10 + rhino-js-engine 1.7.10 on classpath) | 17 | Rhino factory present; JS aliases null |
+| `mvn clean test` (reactor) | 8 | PASS (earlier session; not re-run in Phase 1) |
+| `mvn clean deploy -Dcentral.skipPublishing=true` | 17 | **Not run** (blocked until tests green or explicitly skipped) |
+| `ant clean test` / `ant jar` / `ant dist` | 17 | **Not run** (Phase 4) |
+| Packaged `java -jar …` JavaScript smoke | 17 | **Not run** (Phase 3/4) |
+| JDK 8 regression after candidate fixes | 8 | **Not run** |
+
+### Reactor summary (`mvn clean verify` on JDK 17)
+
+| Module | Result | Tests |
+|--------|--------|-------|
+| `scriptella-parent` | SUCCESS | — |
+| `scriptella-core` | SUCCESS | **149** run, 0 failures, 0 errors |
+| `scriptella-drivers` | **FAILURE** | **141** run, 0 failures, **9 errors** |
+| `scriptella-tools` | **SKIPPED** | (reactor stopped after drivers) |
+
+Total time ≈ 18s. Finished at 2026-07-16T17:20:36-07:00 (local).
+
+Bytecode note (incidental): a class under `core/target/classes` compiled during this JDK 17 build reports **major version 52** (Java 8), consistent with `source`/`target` 1.8. This is not a full preservation proof (no JDK 8 run in Phase 1).
 
 ### First concrete blocker: JavaScript engine name resolution
 
+All 9 errors share the same root:
+
 ```text
 scriptella.configuration.ConfigurationException:
-Specified language=js not supported.
-Available values are: [[JEXL, Jexl, jexl], [rhino-nonjdk, rhino]]
+Specified language=js not supported. Available values are: [[JEXL, Jexl, jexl], [rhino-nonjdk, rhino]]
 ```
 
-Failing tests observed so far:
+or the ETL-wrapped form:
 
-* `ScriptConnectionTest` (4)
-* `ScriptConnectionPerfTest` (2)
-* `ScriptDriverITest` (2)
-* `ScriptingQueryITest` (1)
+```text
+scriptella.execution.EtlExecutorException:
+Specified language=JavaScript not supported. Available values are: [[JEXL, Jexl, jexl], [rhino-nonjdk, rhino]]
+```
+
+Stack: `ScriptConnection.<init>` line 92 (`getEngineByName` returned null → `ConfigurationException`).
+
+| Test class | Errors | Requested language in failure |
+|------------|--------|-------------------------------|
+| `ScriptConnectionTest` | 4 of 5 | default / `js` |
+| `ScriptConnectionPerfTest` | 2 of 2 | default / `js` |
+| `ScriptDriverITest` | 2 of 2 | **`JavaScript`** (ETL config) |
+| `ScriptingQueryITest` | 1 of 1 | **`js`** (ETL config) |
+| `MissingQueryNextCallDetectorTest` | 0 | (no engine) |
+| `ParametersCallbackMapTest` | 0 | (no engine) |
 
 Mechanism:
 
 * On JDK 8, default `language=js` resolves to **Nashorn** (SPI names include `js`, `JavaScript`, `ECMAScript`, …).
 * On JDK 17, Nashorn is gone.
-* Bundled Rhino (`cat.inspiracio:rhino-js-engine:1.7.10` + Rhino 1.7.10) **executes correctly** under SPI names **`rhino`** and **`rhino-nonjdk` only**.
-* `ScriptConnection` defaults to `js` and does not fall back when that name is missing.
+* Bundled Rhino (`cat.inspiracio:rhino-js-engine:1.7.10` + Rhino 1.7.10) is on the Maven test classpath and **loads**, but SPI names are only **`rhino`** / **`rhino-nonjdk`**.
+* `ScriptConnection` defaults empty language to `js` and does not fall back when that name is missing.
 
-| Engine name | JDK 8 + Rhino JARs | JDK 17 + Rhino JARs |
-|-------------|--------------------|---------------------|
-| `js` / `JavaScript` | Nashorn | **null** |
-| `rhino` | Rhino | Rhino (`eval` OK) |
+### ScriptEngine SPI probe (JDK 17 + Rhino JARs)
 
-### Scope of preliminary module results
+```text
+factories=1
+class=com.sun.phobos.script.javascript.RhinoScriptEngineFactory
+  engine=Mozilla Rhino lang=ECMAScript names=[rhino-nonjdk, rhino]
 
-Preliminary module tests found **no failures outside the script-driver tests exercised so far**. Full reactor, deploy-skip packaging, mail scenarios, Ant packaging, and **packaged-runtime** validation remain **pending**. Do not treat the core/tools passes as full certification.
+getEngineByName(js)          => null
+getEngineByName(JS)          => null
+getEngineByName(javascript)  => null
+getEngineByName(JavaScript)  => null
+getEngineByName(ecmascript)  => null
+getEngineByName(ECMAScript)  => null
+getEngineByName(rhino)       => com.sun.phobos.script.javascript.RhinoScriptEngine
+getEngineByName(rhino-nonjdk)=> com.sun.phobos.script.javascript.RhinoScriptEngine
+getEngineByName(python)      => null
+```
+
+JEXL appears in Scriptella’s “available values” list via its own registration path during driver tests; it is not a substitute for JavaScript.
+
+### Janino and mail (reactor status only — no deep dive)
+
+Observed as **passing** within the failed drivers module run (errors only in script package):
+
+| Area | Tests observed | Result |
+|------|----------------|--------|
+| Janino | `JaninoBaseClassesTest` (2), `JaninoConnectionTest` (3), `JaninoGetNativeDbConnectionITest` (1), `JaninoPerfTest` (2) | all 0 failures / 0 errors |
+| Mail (`javax.mail`) | `MaiConnectionTest` (4), `MailDriverTest` (1) | all 0 failures / 0 errors |
+
+Other drivers that ran without errors in the same module include h2, hsqldb, csv, text, xpath, jexl, velocity, jndi, auto, spring, shell (shell out of investigation scope). **Tools module was not executed** because the reactor failed on drivers.
+
+### What Phase 1 does *not* certify
+
+* Full reactor green on JDK 17  
+* Maven deploy-skip packaging  
+* Tools / CLI launcher tests  
+* Packaged `scriptella.jar` JavaScript runtime  
+* Ant test / jar / dist  
+* Real JDK 8 regression after any fix  
 
 ### Packaging note (why Maven green ≠ distribution green)
 
-Maven can resolve `rhino-js-engine` on the test classpath. That does **not** prove that the Ant-built `scriptella.jar` or distribution ZIPs include Rhino where the launcher can load it on JDK 17. The top-level `build.xml` treats bundled libraries selectively; packaged-runtime smoke is required.
+Maven can resolve `rhino-js-engine` on the test classpath. That does **not** prove that the Ant-built `scriptella.jar` or distribution ZIPs include Rhino where the launcher can load it on JDK 17. The top-level `build.xml` treats bundled libraries selectively; packaged-runtime smoke remains Phase 3/4 work.
 
 ---
 
 ## 5. Phase 1 — Reproduce and freeze baseline
 
-Run under JDK 17 and record exact exit codes in the **Command log**.
+**Status: complete** (2026-07-16). No production code changes. No dependency upgrades. Ant not run.
 
-- [ ] `mvn clean verify`
-- [ ] Capture surefire detail for `scriptella.driver.script.*`
-- [ ] Optionally re-confirm ScriptEngine SPI names (Rhino probe) for the log
-- [ ] Note status of Janino and mail-related tests already included in the reactor (no deep dive yet)
+- [x] `mvn clean verify` under JDK 17
+- [x] Capture surefire detail for `scriptella.driver.script.*`
+- [x] Re-confirm ScriptEngine SPI names (Rhino probe) for the log
+- [x] Note status of Janino and mail-related tests already included in the reactor (no deep dive)
 
-**Do not** expand into dependency upgrades in this phase.  
-**Do not** block this phase on Ant or DTDDoc.
+**Frozen conclusion for Phase 2:** the only Maven test failures under full `mvn clean verify` on JDK 17 are the nine script-driver errors above; they are explained by missing Nashorn aliases and Rhino registering only as `rhino` / `rhino-nonjdk`.
 
 ---
 
@@ -270,41 +333,50 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 
 | When | Command | Result | Notes |
 |------|---------|--------|-------|
-| preliminary | `mvn -pl drivers test` | FAIL 9 errors | `language=js` vs Rhino SPI names only |
-| | `mvn clean verify` | | |
-| | `mvn clean deploy -Dcentral.skipPublishing=true` | | |
-| | `ant clean test` | | |
-| | `ant jar` | | |
-| | `ant dist` | | |
-| | `java -jar build/scriptella.jar …` (JS ETL) | | |
+| Phase 1 | `mvn clean verify` | **BUILD FAILURE** | parent SUCCESS; core SUCCESS (149 tests); drivers FAILURE (141 tests, 9 errors); tools SKIPPED |
+| Phase 1 | `mvn -pl drivers test` | **exit 1** | same 9 script errors |
+| Phase 1 | Rhino SPI probe (standalone) | Rhino only as `rhino`/`rhino-nonjdk` | JS aliases null |
+| | `mvn clean deploy -Dcentral.skipPublishing=true` | | Phase 3 |
+| | `ant clean test` | | Phase 4 |
+| | `ant jar` | | Phase 4 |
+| | `ant dist` | | Phase 4 |
+| | `java -jar build/scriptella.jar …` (JS ETL) | | Phase 3/4 |
 
 ### JDK 8 regression
 
 | When | Command | Result | Notes |
 |------|---------|--------|-------|
-| | `mvn clean verify` | | |
-| | class-file major version spot-check | | |
+| pre-Phase 1 (historical) | `mvn clean test` | PASS | full reactor before experiment fixes |
+| | `mvn clean verify` after Phase 2 | | required if change set exists |
+| Phase 1 incidental | `javap` major version on JDK 17-built core class | major 52 | syntax level only; not a runtime proof |
 | | packaged JS smoke if artifacts shared | | |
 
 ---
 
 ## 11. Findings log
 
-### F1 — Default `js` depends on Nashorn; Rhino available under other names
+### F1 — Default `js` / `JavaScript` depend on Nashorn; Rhino available under other names (frozen)
 
-* **Impact:** blocks green Maven drivers suite on JDK 17  
-* **Scope observed so far:** script driver tests only  
-* **Direction:** fixed alias list → try `rhino` only after primary lookup fails  
-* **JDK 8:** primary lookup still hits Nashorn for `js`; fallback unused for those names
+* **Impact:** blocks green Maven reactor on JDK 17 (`mvn clean verify` FAIL)  
+* **Scope in full verify:** only `scriptella.driver.script.*` (9 errors); core green; tools skipped due to reactor stop  
+* **Requested names that fail:** default→`js`, explicit `js`, explicit `JavaScript`  
+* **Direction for Phase 2:** fixed alias list → try `rhino` only after primary lookup fails  
+* **JDK 8 expectation:** primary lookup still hits Nashorn for those names; fallback unused when primary resolves
 
-### F2 — Module tests outside script package not yet fully certified
+### F2 — Janino and mail tests passed inside the failed drivers module run
 
-* Core/tools module tests passed under JDK 17 in a preliminary run  
-* Full reactor, deploy-skip, mail, Ant, and packaged-runtime remain pending
+* Janino: 8 tests across 4 classes, 0 failures/errors  
+* Mail: 5 tests across 2 classes, 0 failures/errors  
+* Not a substitute for packaged-runtime or SMTP end-to-end smoke
 
-### F3 — (open) Ant packaging / Javadoc tooling / Rhino inclusion in all-in-one JAR
+### F3 — Tools module not executed on JDK 17 in Phase 1
 
-### F4 — (open) Java 8 regression after candidate code changes
+* Reactor skipped `scriptella-tools` after drivers failure  
+* CLI launcher validation remains Phase 3
+
+### F4 — (open) Ant packaging / Javadoc tooling / Rhino inclusion in all-in-one JAR
+
+### F5 — (open) Java 8 regression after candidate code changes
 
 ---
 
