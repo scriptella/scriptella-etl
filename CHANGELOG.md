@@ -4,12 +4,10 @@ This file records user-visible changes to Scriptella. The deprecated historical
 status file (`forrest/status.xml`) is retained only as an archive of pre-1.3
 release notes; this is the primary changelog from Release 1.3 onward.
 
-## [1.3 RC1] — 2026-07-16
+## [1.3] — 2026-07-17
 
-Release 1.3 RC1 establishes a maintainable Java 8 baseline while preserving
-the existing Maven modules, Ant-built all-in-one JAR, and distribution
-archives. Official final 1.3 artifacts have not yet been published; 1.2
-remains the latest generally available release.
+Release 1.3 establishes a maintainable Java 8 baseline while preserving the
+existing Maven modules, Ant-built all-in-one JAR, and distribution archives.
 
 ### Added
 
@@ -84,11 +82,8 @@ remains the latest generally available release.
 
 ### Deferred and known limitations
 
-* JDK 17 compatibility is evaluated as a bounded feasibility decision after RC1.
-  If the diagnosis and implementation fit within the two-chunk boundary, it may
-  become part of an RC2 release. Otherwise, it is deferred to Scriptella 1.4.
-* Java 21 compatibility is future work after JDK 17 unless later planning
-  changes that target.
+* JDK 17 compatibility is deferred to Scriptella 1.4. Java 21 compatibility is
+  future work after JDK 17 unless later planning changes that target.
 * Broad Spring, JavaMail/Jakarta, reporting-plugin, and other dependency
   upgrades remain deferred.
 * Issue [#20] remains deferred unless a concrete failing ETL and database/driver
@@ -122,7 +117,7 @@ For changes before 1.0 and additional historical detail, see
 [#20]: https://github.com/scriptella/scriptella-etl/issues/20
 [#29]: https://github.com/scriptella/scriptella-etl/issues/29
 [#32]: https://github.com/scriptella/scriptella-etl/issues/32
-[1.3 RC1]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3-rc1
+[1.3]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3
 [1.2]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.2
 [1.1]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.1
 [1.0]: https://github.com/scriptella/scriptella-etl/releases/tag/1.0
