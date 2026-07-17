@@ -89,6 +89,7 @@ sibling repository [`scriptella.github.io`](https://github.com/scriptella/script
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
+* Release procedure: [docs/releases/RELEASE-RUNBOOK.md](docs/releases/RELEASE-RUNBOOK.md)
 * Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
 
 Packaged documentation may also appear under `docs/` in distribution archives.
