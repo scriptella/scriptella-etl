@@ -1,8 +1,8 @@
 # Changelog
 
-This file records user-visible changes to Scriptella. The historical Forrest
-status file (`forrest/status.xml`) is retained as source material for older
-releases, but this is the primary changelog from Release 1.3 onward.
+This file records user-visible changes to Scriptella. The deprecated historical
+status file (`forrest/status.xml`) is retained only as an archive of pre-1.3
+release notes; this is the primary changelog from Release 1.3 onward.
 
 ## [1.3 RC1] — 2026-07-16
 

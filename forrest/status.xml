@@ -13,6 +13,11 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+
+ DEPRECATED: Historical pre-1.3 release notes only. Apache Forrest is no
+ longer used; this file is not generated or consumed by the build. For current
+ changes, see CHANGELOG.md at the repository root. Do not add new releases
+ here.
 -->
 <!DOCTYPE status PUBLIC "-//APACHE//DTD Status V1.3//EN"
         "http://forrest.apache.org/dtd/status-v13.dtd">

@@ -42,8 +42,8 @@
     <fileset id="src.zip.fileset" dir="${basedir}"
              includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**
                        *.xml **/pom.xml *.properties README.md CHANGELOG.md RELEASE-PUBLISHING.md
-                       LICENSE NOTICE forrest/**"
-             excludes="samples/lib/** custom*.properties forrest/build/**"/>
+                       LICENSE NOTICE forrest/status.xml"
+             excludes="samples/lib/** custom*.properties"/>
     <property name="src.zip.includes" value=""/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
     <tstamp/>
