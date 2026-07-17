@@ -10,9 +10,9 @@ transformation language.
 Maintenance development has resumed. Scriptella is maintained through focused
 compatibility and bug-fix releases.
 
-The current source baseline is **Scriptella 1.3 RC1** (Java 8 target,
-preserved Maven/Ant packaging, and a plain HTML website). Official final
-artifacts have not yet been published.
+The current source baseline is **Scriptella 1.3 RC1** (Java 8 target and
+preserved Maven/Ant packaging). Official final artifacts have not yet been
+published.
 
 The latest **published** release remains **1.2** (October 2019).
 
@@ -69,19 +69,27 @@ assembling modules yourself.
 # Module build and tests (primary path)
 mvn clean install
 
-# Optional: Ant packaging (requires Ant 1.10.17 and project-specific doc tools
-# for a full distribution build — see docs/releases/1.3/PLAN.md)
+# Optional: Ant packaging (Ant 1.10.17 for release dist / all-in-one JAR)
 ant clean jar
 ```
 
+## Website
+
+The public site is **[scriptella.org](https://scriptella.org)**, served from the
+sibling repository [`scriptella.github.io`](https://github.com/scriptella/scriptella.github.io).
+
+* Maintained pages (tutorial, reference, FAQ, …) are edited directly in that repo.
+* Generated **API** and **DTD** docs are produced here (`build-docs.xml`) and
+  published with [`docs/site/sync_generated_docs.py`](docs/site/sync_generated_docs.py).
+  See [`docs/site/README.md`](docs/site/README.md).
+
 ## Documentation
 
-* Release history and upgrade notes: [CHANGELOG.md](CHANGELOG.md)
-* Maven Central release procedure: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
-* Website and reference: [https://scriptella.org](https://scriptella.org)
-* Reference manual: [https://scriptella.org/reference/](https://scriptella.org/reference/)
+* Website: [https://scriptella.org](https://scriptella.org)
+* Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
-* Developer notes: [GitHub wiki](https://github.com/scriptella/scriptella-etl/wiki)
+* Release history: [CHANGELOG.md](CHANGELOG.md)
+* Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
 
 Packaged documentation may also appear under `docs/` in distribution archives.
 

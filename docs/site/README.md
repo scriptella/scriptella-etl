@@ -18,7 +18,10 @@ refreshed by this tooling.
 ```
 
 The sync script resolves the product root as the parent of `docs/`, then expects
-`scriptella.github.io` as a sibling of `scriptella-etl`.
+`scriptella.github.io` as a sibling of `scriptella-etl`. It **exits with an
+error** if that directory is missing, is not a directory, or does not look like
+the site repo (no `index.html` / `CNAME` / `docs/` / `.git`). It will not create
+the website checkout.
 
 ## Usage
 

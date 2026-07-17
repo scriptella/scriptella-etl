@@ -59,6 +59,38 @@ def default_site_dir(root: Path) -> Path:
     return root.parent / "scriptella.github.io"
 
 
+def require_site_dir(site: Path) -> None:
+    """Fail clearly if the website checkout is missing or does not look usable."""
+    if not site.exists():
+        raise SystemExit(
+            f"error: website directory does not exist: {site}\n"
+            "\n"
+            "       Expected a checkout of scriptella.github.io (usually a sibling of\n"
+            "       scriptella-etl). This script will not create that directory.\n"
+            "\n"
+            "       Fix:\n"
+            "         git clone https://github.com/scriptella/scriptella.github.io.git \\\n"
+            f"           {site}\n"
+            "       Or pass an existing checkout with --site-dir / set SITE_DIR."
+        )
+    if not site.is_dir():
+        raise SystemExit(
+            f"error: website path exists but is not a directory: {site}\n"
+            "       Pass a directory checkout of scriptella.github.io via --site-dir."
+        )
+
+    # Avoid publishing into a random empty folder that only happens to share the name.
+    markers = ("index.html", "CNAME", "docs", ".git")
+    if not any((site / name).exists() for name in markers):
+        raise SystemExit(
+            f"error: website directory does not look like scriptella.github.io: {site}\n"
+            "\n"
+            "       Expected at least one of: index.html, CNAME, docs/, .git/\n"
+            "       Clone the real site repo (or point --site-dir at it). Refusing to\n"
+            "       create or populate an unrelated directory."
+        )
+
+
 def default_dtddoc_dir(root: Path) -> Path | None:
     candidate = root.parent / "DTDDoc"
     return candidate if candidate.is_dir() else None
@@ -111,10 +143,21 @@ def shlex_quote(value: str) -> str:
     return value
 
 
-def rsync_tree(src: Path, dest: Path, *, dry_run: bool) -> None:
+def rsync_tree(src: Path, dest: Path, *, site: Path, dry_run: bool) -> None:
+    """Rsync into dest under an existing website checkout (never create the site root)."""
     if not shutil.which("rsync"):
         raise SystemExit("error: rsync is required")
-    dest.mkdir(parents=True, exist_ok=True)
+    try:
+        dest.resolve().relative_to(site.resolve())
+    except ValueError as exc:
+        raise SystemExit(
+            f"error: refusing to sync outside the website directory:\n"
+            f"         dest={dest}\n"
+            f"         site={site}"
+        ) from exc
+    if not dry_run:
+        # Create docs/api or docs/dtd under the existing site only.
+        dest.mkdir(parents=True, exist_ok=True)
     run(
         ["rsync", "-a", "--delete", f"{src}/", f"{dest}/"],
         dry_run=dry_run,
@@ -372,7 +415,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     root = product_root()
-    site = (args.site_dir or Path(os.environ.get("SITE_DIR", default_site_dir(root)))).resolve()
+    # Keep a clear absolute path in errors even when the directory is missing.
+    if args.site_dir is not None:
+        site = Path(args.site_dir).expanduser()
+    elif os.environ.get("SITE_DIR"):
+        site = Path(os.environ["SITE_DIR"]).expanduser()
+    else:
+        site = default_site_dir(root)
+    if not site.is_absolute():
+        site = Path.cwd() / site
+    site = site.resolve() if site.exists() else site.absolute()
+
     dtddoc_env = os.environ.get("DTDDOC_DIR")
     dtddoc = args.dtddoc_dir
     if dtddoc is None and dtddoc_env:
@@ -382,12 +435,8 @@ def main(argv: list[str] | None = None) -> int:
     elif not dtddoc.is_dir():
         raise SystemExit(f"error: DTDDoc directory not found: {dtddoc}")
 
-    if not site.is_dir():
-        raise SystemExit(
-            f"error: website checkout not found: {site}\n"
-            "       clone scriptella.github.io as a sibling of scriptella-etl, "
-            "or pass --site-dir / set SITE_DIR."
-        )
+    # Hard-fail before build, rsync, or any writes.
+    require_site_dir(site)
 
     print(f"product:  {root}")
     print(f"site:     {site}")
@@ -441,15 +490,22 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     print(f"syncing API docs -> {api_dest}")
-    rsync_tree(api_src, api_dest, dry_run=args.dry_run)
+    rsync_tree(api_src, api_dest, site=site, dry_run=args.dry_run)
 
     print(f"syncing DTD docs -> {dtd_dest}")
-    rsync_tree(dtd_src, dtd_dest, dry_run=args.dry_run)
+    rsync_tree(dtd_src, dtd_dest, site=site, dry_run=args.dry_run)
 
     print(f"copying etl.dtd -> {etl_dtd_dest}")
     if args.dry_run:
         print(f"[dry-run] cp {etl_dtd_src} {etl_dtd_dest}")
     else:
+        try:
+            etl_dtd_dest.resolve().relative_to(site.resolve())
+        except ValueError as exc:
+            raise SystemExit(
+                f"error: refusing to write etl.dtd outside the website directory: "
+                f"{etl_dtd_dest}"
+            ) from exc
         etl_dtd_dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(etl_dtd_src, etl_dtd_dest)
 
