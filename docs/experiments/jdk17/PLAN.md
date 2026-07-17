@@ -2,42 +2,48 @@
 
 **Issue:** [#31](https://github.com/scriptella/scriptella-etl/issues/31)  
 **Branch:** `exp-jdk17`  
-**Status:** In progress — plan and baseline established  
-**Parent context:** Release 1.3 closed JDK 17 work for RC2; this branch is groundwork for a merge/defer decision (RC2 vs 1.4).
+**Status:** In progress — plan revised for technical scope only
 
-## Goal
+## 1. Goal and scope
 
-Determine the **smallest practical set of changes** required to compile, test, package, and run Scriptella on **JDK 17**, while preferring to **preserve Java 8 source and bytecode**.
+This branch investigates the **smallest practical set of changes** required to **build, test, package, and run** Scriptella on **JDK 17**.
 
-This is an experiment, not a commitment to merge into 1.3 RC2.
+**Release assignment is outside the scope of this experiment.** This ticket produces a technical JDK 17 result only; whether and when that result is adopted in a release is decided elsewhere.
 
-## Decision rule (from #31)
+### Meanings of “JDK 17 support” (define and validate separately)
 
-Merge into RC2 only if:
+| Meaning | What success looks like |
+|---------|-------------------------|
+| **Build with JDK 17** | Maven reactor compiles and tests under a JDK 17 `JAVA_HOME` |
+| **Run on JDK 17** | CLI and drivers execute under a JDK 17 runtime |
+| **Generate artifacts with JDK 17** | Normal Maven packaging/deploy-skip and (separately) Ant packaging produce usable outputs |
+| **Preserve Java 8 where practical** | Source/target remain 1.8; artifacts still run on a real JDK 8; representative class-file major versions stay Java 8 |
+| **Ant packaging path** | Recorded as its own result: tests, all-in-one JAR, and distributions — distinct from ordinary Maven/runtime compatibility |
 
-* work fits roughly **one or two focused implementation chunks**, and
-* no broad dependency or architecture migration is required.
+Do **not** treat any of the above as making JDK 17 the **minimum** runtime. Prefer keeping Java 8 as the supported baseline bytecode and runtime target unless a blocker forces a different conclusion (which would be reported as a limitation, not a release decision).
 
-Otherwise: keep `exp-jdk17` as groundwork for **Scriptella 1.4** and close #31 with that recommendation.
+### Primary vs secondary validation order
 
-## Preferred outcome
-
-* Java 8 remains the source and bytecode baseline (`source`/`target` 1.8).
-* Scriptella builds, tests, and runs on JDK 17 (classpath model; no module-info rewrite).
-* Existing ETL behavior is unchanged where possible.
-* JavaScript defaults and common aliases (`js`, `JavaScript`, …) still resolve (via Rhino when Nashorn is absent).
-* Maven remains the primary path; Ant packaging remains valid after Maven is green.
-
-## Non-goals
-
-* Shell driver (#32) — already available; out of scope for this investigation.
-* Broad dependency upgrades (Spring, Jakarta Mail, H2/HSQLDB modernization, etc.) unless a JDK 17 blocker forces them.
-* Raising the minimum supported Java version.
-* Full Java 21/24 certification (note residual risk only).
+1. **Maven first** — reactor build, tests, artifact generation.  
+2. **Runtime smoke** on JDK 17, including packaged JAR if available.  
+3. **Ant path** after Maven is understood — required to **record**, not required to block the initial JavaScript investigation.  
+4. **Java 8 regression** once a candidate change set exists.
 
 ---
 
-## Environment (record as you run)
+## 2. Non-goals
+
+* Deciding which release receives JDK 17 work.
+* Shell driver (#32) — already available; out of scope here.
+* Broad dependency upgrades (Spring, Jakarta Mail, H2/HSQLDB modernization, etc.) unless a concrete JDK 17 blocker forces a minimal dependency change.
+* Raising the minimum supported Java version as a product policy change.
+* Full Java 21/24 certification (mention only if encountered as residual risk).
+* Replacing Rhino or redesigning the scripting SPI unless the minimal alias fix is insufficient.
+* Module-path / `module-info` migration.
+
+---
+
+## 3. Environment
 
 | Item | Value |
 |------|--------|
@@ -46,173 +52,8 @@ Otherwise: keep `exp-jdk17` as groundwork for **Scriptella 1.4** and close #31 w
 | JDK 8 (regression) | Eclipse Temurin 1.8.0_492 — `/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home` |
 | Maven | record with `mvn -v` |
 | Ant | 1.10.17 (workspace `apache-ant-1.10.17/` if used) |
-| DTDDoc | workspace `DTDDoc/` if used for `ant dist` |
-| Branch base | `master` @ start of experiment |
-
-Export for commands:
-
-```bash
-export JAVA_HOME=/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
-export PATH="$JAVA_HOME/bin:$PATH"
-```
-
----
-
-## Preliminary baseline (pre-fix probe)
-
-Recorded before production code changes on this branch. Useful so the experiment does not rediscover the same facts.
-
-### Commands already run
-
-| Command | JDK | Result |
-|---------|-----|--------|
-| `mvn clean test` (reactor) | 8 | **PASS** |
-| `mvn -pl core test` | 17 | **PASS** |
-| `mvn -pl tools -am test` | 17 | **PASS** |
-| `mvn -pl drivers test` (full module) | 17 | **FAIL** — 141 tests, **9 errors**, all in `scriptella.driver.script.*` |
-| `mvn clean verify` (ticket initial) | 17 | **Not yet re-run on branch** (expected fail on drivers) |
-| `mvn clean deploy -Dcentral.skipPublishing=true` | 17 | **Not yet run** |
-| `ant clean test` / `ant dist` | 17 | **Not yet run** |
-
-### Failure detail (script driver only)
-
-```text
-scriptella.configuration.ConfigurationException:
-Specified language=js not supported.
-Available values are: [[JEXL, Jexl, jexl], [rhino-nonjdk, rhino]]
-```
-
-Failing tests:
-
-* `ScriptConnectionTest` (4)
-* `ScriptConnectionPerfTest` (2)
-* `ScriptDriverITest` (2)
-* `ScriptingQueryITest` (1)
-
-Root cause:
-
-* On JDK 8, default `language=js` resolves to **Nashorn**.
-* On JDK 17, Nashorn is gone.
-* Bundled Rhino (`cat.inspiracio:rhino-js-engine:1.7.10` + Rhino 1.7.10) **works**, but SPI names are only **`rhino`** / **`rhino-nonjdk`**, not `js` / `JavaScript`.
-* `ScriptConnection` defaults to `js` and does not fall back to Rhino.
-
-Probe summary:
-
-| Engine name | JDK 8 + Rhino JARs | JDK 17 + Rhino JARs |
-|-------------|--------------------|---------------------|
-| `js` / `JavaScript` | Nashorn | **null** |
-| `rhino` | Rhino | Rhino (eval OK) |
-
-Non-script areas that already looked healthy under Maven tests on JDK 17: core ETL/JDBC, Janino, Spring 1.2 path, CSV/text, tools launcher.
-
----
-
-## Work plan
-
-### Phase 0 — Branch and tracking  ✅
-
-- [x] Create `exp-jdk17` from current `master`
-- [x] Add this plan document
-- [ ] Push `exp-jdk17` to `origin`
-- [ ] Comment on #31 with branch link and plan path
-
-### Phase 1 — Reproduce and freeze baseline  (diagnostic)
-
-Run and paste exact exit codes into **Command log** below.
-
-- [ ] `JAVA_HOME=…/jdk17 mvn clean verify`
-- [ ] Focused surefire reports for `scriptella.driver.script.*`
-- [ ] Optional smoke: ScriptEngine SPI names (Rhino probe) for the record
-- [ ] Confirm Janino tests green when script tests are excluded or after fix
-- [ ] Confirm mail driver unit/integration tests present and status on JDK 17
-
-**Stop condition:** Do not expand into dependency upgrades during this phase.
-
-### Phase 2 — Minimal script-engine fix  (implementation candidate)
-
-Cheapest fix (preferred):
-
-1. In `drivers/.../script/ScriptConnection.java`, when `getEngineByName(lang)` returns null for common JS aliases (`js`, `javascript`, `JavaScript`, `ECMAScript`, case variants as needed), fall back to **`rhino`**.
-2. Keep default language presentation as JavaScript/ECMAScript for users.
-3. Do **not** raise `source`/`target` above 1.8.
-4. Add focused tests for alias resolution that pass on both JDK 8 and 17.
-
-Allowed if needed and still localized:
-
-* Explicit registration of Rhino factory when SPI discovery is incomplete
-* Align Ant `lib/` Rhino packaging only if distribution smoke fails (Maven already has the dependency)
-
-**Out of scope unless forced:**
-
-* Replacing Rhino
-* Redesigning the scripting SPI
-* Module-path / `module-info` work
-
-### Phase 3 — Ticket validation matrix
-
-After Phase 2 (or documenting why Phase 2 is insufficient):
-
-| Check | JDK 17 | JDK 8 (if merge candidate) |
-|-------|--------|----------------------------|
-| `mvn clean verify` | | |
-| `mvn clean deploy -Dcentral.skipPublishing=true` | | |
-| JavaScript / Rhino ETL (default `js` + explicit `rhino`) | | |
-| Janino compile + generated class load | | |
-| Mail driver scenario (or unit tests) | | |
-| JDBC representative ETL / existing integration tests | | |
-| Command-line launcher (`tools` tests / jar smoke) | | |
-| Javadoc attachment / site plugin path used by deploy | | |
-| `ant clean test` | | |
-| `ant dist` (with DTDDoc if full dist required) | | |
-| Bytecode still Java 8 (`javap -verbose` sample class) | | |
-
-### Phase 4 — Decision and publish findings
-
-- [ ] Summarize minimal diffs (file list + intent)
-- [ ] List remaining blockers and effort
-- [ ] Explicit Java 8 compatibility assessment
-- [ ] Recommendation:
-
-  * **Merge bounded changes for 1.3 RC2**, or  
-  * **Retain branch as 1.4 groundwork**
-
-- [ ] Push branch (even if incomplete)
-- [ ] Close or update #31 with the decision
-
----
-
-## Candidate production touch points
-
-| Area | Likely file(s) | Notes |
-|------|----------------|-------|
-| JS alias fallback | `drivers/src/java/scriptella/driver/script/ScriptConnection.java` | Primary fix |
-| Tests | `drivers/src/test/scriptella/driver/script/*` | Alias + default language |
-| Docs / upgrade notes | `CHANGELOG.md`, maybe README | Only if merge candidate |
-| Ant lib consistency | `lib/rhino*.jar`, `lib/versions.properties` | Only if dist diverges from Maven |
-| Parent POM | `pom.xml` | Avoid unless javadoc/deploy forced |
-
-Shell driver is **not** in scope.
-
----
-
-## Effort estimate (hypothesis)
-
-| Track | Estimate | Confidence |
-|-------|----------|------------|
-| Alias fallback + dual-JDK Maven green | ~0.5–1 day | High (root cause known) |
-| + deploy skip-publish + launcher/JDBC/JS/Janino/mail smoke | +0.5 day | Medium |
-| + Ant test/dist on JDK 17 | +0.5 day | Medium (untested) |
-| Forced broad dep/Javadoc/module work | multi-day+ | Would trigger **defer to 1.4** |
-
-Hypothesis going into implementation: **mergeable for RC2 under the decision rule**, if Phase 3 stays clean after the script-alias fix. Revisit if Ant/Javadoc/deploy uncover unrelated blockers.
-
----
-
-## Command log
-
-Fill in as the experiment proceeds.
-
-### JDK 17
+| DTDDoc | workspace `DTDDoc/` if used for full `ant dist` |
+| Branch base | `master` at start of experiment |
 
 ```bash
 export JAVA_HOME=/Users/pvr/Library/Java/JavaVirtualMachines/temurin-17.0.15/Contents/Home
@@ -221,56 +62,285 @@ java -version
 mvn -v
 ```
 
+---
+
+## 4. Preliminary findings
+
+Recorded before production code changes. These are **not** certification of full JDK 17 support.
+
+### Commands already run
+
+| Command | JDK | Result |
+|---------|-----|--------|
+| `mvn clean test` (reactor) | 8 | PASS |
+| `mvn -pl core test` | 17 | PASS |
+| `mvn -pl tools -am test` | 17 | PASS |
+| `mvn -pl drivers test` (full module) | 17 | FAIL — 141 tests, **9 errors**, all in `scriptella.driver.script.*` |
+| `mvn clean verify` | 17 | Not yet re-run on this branch (expected fail on drivers) |
+| `mvn clean deploy -Dcentral.skipPublishing=true` | 17 | Not yet run |
+| `ant clean test` / `ant jar` / `ant dist` | 17 | Not yet run |
+| Packaged `java -jar …` JavaScript smoke | 17 | Not yet run |
+| JDK 8 regression after candidate fixes | 8 | Not yet run |
+
+### First concrete blocker: JavaScript engine name resolution
+
+```text
+scriptella.configuration.ConfigurationException:
+Specified language=js not supported.
+Available values are: [[JEXL, Jexl, jexl], [rhino-nonjdk, rhino]]
+```
+
+Failing tests observed so far:
+
+* `ScriptConnectionTest` (4)
+* `ScriptConnectionPerfTest` (2)
+* `ScriptDriverITest` (2)
+* `ScriptingQueryITest` (1)
+
+Mechanism:
+
+* On JDK 8, default `language=js` resolves to **Nashorn** (SPI names include `js`, `JavaScript`, `ECMAScript`, …).
+* On JDK 17, Nashorn is gone.
+* Bundled Rhino (`cat.inspiracio:rhino-js-engine:1.7.10` + Rhino 1.7.10) **executes correctly** under SPI names **`rhino`** and **`rhino-nonjdk` only**.
+* `ScriptConnection` defaults to `js` and does not fall back when that name is missing.
+
+| Engine name | JDK 8 + Rhino JARs | JDK 17 + Rhino JARs |
+|-------------|--------------------|---------------------|
+| `js` / `JavaScript` | Nashorn | **null** |
+| `rhino` | Rhino | Rhino (`eval` OK) |
+
+### Scope of preliminary module results
+
+Preliminary module tests found **no failures outside the script-driver tests exercised so far**. Full reactor, deploy-skip packaging, mail scenarios, Ant packaging, and **packaged-runtime** validation remain **pending**. Do not treat the core/tools passes as full certification.
+
+### Packaging note (why Maven green ≠ distribution green)
+
+Maven can resolve `rhino-js-engine` on the test classpath. That does **not** prove that the Ant-built `scriptella.jar` or distribution ZIPs include Rhino where the launcher can load it on JDK 17. The top-level `build.xml` treats bundled libraries selectively; packaged-runtime smoke is required.
+
+---
+
+## 5. Phase 1 — Reproduce and freeze baseline
+
+Run under JDK 17 and record exact exit codes in the **Command log**.
+
+- [ ] `mvn clean verify`
+- [ ] Capture surefire detail for `scriptella.driver.script.*`
+- [ ] Optionally re-confirm ScriptEngine SPI names (Rhino probe) for the log
+- [ ] Note status of Janino and mail-related tests already included in the reactor (no deep dive yet)
+
+**Do not** expand into dependency upgrades in this phase.  
+**Do not** block this phase on Ant or DTDDoc.
+
+---
+
+## 6. Phase 2 — Minimal JavaScript compatibility change
+
+### Behavioral contract
+
+Implement only what is needed for common JavaScript usage without Nashorn:
+
+1. **Honor the requested engine name first** via normal `ScriptEngineManager` lookup.
+2. **Only if** lookup fails **and** the requested name is a **common JavaScript alias**, try **`rhino`**.
+3. **`language="rhino"`** (and existing Rhino SPI names such as `rhino-nonjdk` if requested explicitly) must continue to work via normal lookup.
+4. **Unknown non-JavaScript** language names must still fail with `ConfigurationException`.
+5. On **JDK 8**, `js` (and other aliases still provided by Nashorn) must continue to select **Nashorn** — the fallback must not run when the primary name already resolves. Do not intentionally change that policy in this experiment.
+
+### Aliases eligible for Rhino fallback
+
+Use a fixed set aligned with historical Nashorn / public JS naming and current defaults (do not invent open-ended “case variants as needed”):
+
+| Requested name (exact, as given by connection property after empty-default) | Fallback when lookup fails |
+|----------------------------------------------------------------------------|----------------------------|
+| *(empty / omitted)* → treated as `js` (existing default) | `rhino` |
+| `js` | `rhino` |
+| `JS` | `rhino` |
+| `javascript` | `rhino` |
+| `JavaScript` | `rhino` |
+| `ecmascript` | `rhino` |
+| `ECMAScript` | `rhino` |
+
+Names **not** in this set must **not** fall back (e.g. `nusuchlanguage`, `python`, typos).  
+Do **not** map arbitrary strings case-insensitively beyond the rows above.
+
+Implementation home (expected):  
+`drivers/src/java/scriptella/driver/script/ScriptConnection.java`
+
+Keep:
+
+```xml
+<source>1.8</source>
+<target>1.8</target>
+```
+
+unless a later phase proves that is insufficient (then record as a limitation; consider `--release 8` only if it can be introduced without disrupting the JDK 8 build path).
+
+### Focused engine-compatibility tests (required)
+
+Add or extend tests so the **fallback itself** is regression-covered. Prefer extending existing surfaces (`ScriptConnectionTest`, `ScriptDriverITest`, `ScriptingQueryITest`) rather than a large new suite.
+
+Required coverage:
+
+| Case | Expectation |
+|------|-------------|
+| Omitted language | Defaults successfully (resolves an engine) |
+| `language="js"` | Succeeds on JDK 17 (via Rhino fallback when Nashorn absent) |
+| `language="JavaScript"` | Succeeds (alias in the fixed table) |
+| `language="rhino"` | Succeeds (direct SPI name) |
+| Unrelated invalid engine | Still throws `ConfigurationException` |
+| Dialect reporting | Remains sensible (e.g. language name still meaningful for JS/Rhino) |
+| Existing behavioral surface | Bindings, Java method calls, query callbacks, numeric results, `print`, and error propagation still work (covered primarily by existing tests once default/`js` resolve again) |
+
+Where dual-JDK assertions are awkward in one process, document that full proof is: **same suite green on JDK 8 and JDK 17**.
+
+---
+
+## 7. Phase 3 — Maven and runtime validation (JDK 17)
+
+After Phase 2 (or after documenting why it is insufficient):
+
+- [ ] `mvn clean verify`
+- [ ] `mvn clean deploy -Dcentral.skipPublishing=true`
+- [ ] Representative **JDBC** path (existing integration tests or sample)
+- [ ] **JavaScript / Rhino** (default `js`, explicit `JavaScript`, explicit `rhino`)
+- [ ] **Janino** compilation and generated class loading (existing tests + any focused smoke)
+- [ ] **Mail** driver using explicit `javax.mail` (tests and/or sample; record gaps if SMTP not available)
+- [ ] **Command-line launcher** scenarios already covered by tools tests, plus any needed manual smoke
+- [ ] Javadoc / attached javadoc artifacts as produced by the normal Maven packaging path used above
+
+### Packaged-runtime JavaScript check (required)
+
+Maven test success is not enough. After an artifact that contains the launcher is available (Maven shaded/all-in-one if produced, or Ant `jar` once built in Phase 4):
+
+```bash
+java -jar build/scriptella.jar <javascript-etl-file>
+```
+
+Also:
+
+- [ ] Inspect the distribution / all-in-one layout for Rhino (and JSR-223 adapter) JARs or embedding where the launcher can load them on JDK 17.
+- [ ] Record whether JS works from the **packaged** artifact without relying on the Maven reactor classpath.
+
+If Maven does not produce the same all-in-one JAR as Ant, note that and complete this check against the Ant-built JAR in Phase 4.
+
+---
+
+## 8. Phase 4 — Ant / package validation (JDK 17)
+
+Run and record even if outcomes differ from Maven. Ant must not block Phase 1–2 diagnosis, but the **final experiment result must include Ant outcomes**.
+
+```bash
+ant clean test
+ant jar
+ant dist   # with DTDDoc prerequisites documented if required
+```
+
+Classify each Ant result separately:
+
+| Outcome label | Meaning |
+|---------------|---------|
+| **Supported** | Works under documented JDK 17 + Ant environment |
+| **Supported with prerequisites** | Works only with external tools/paths (e.g. DTDDoc) |
+| **Blocked by legacy documentation tooling** | Runtime/JAR OK but docs/dist step fails for DTDDoc/Javadoc tooling reasons |
+| **Not required for ordinary runtime compatibility** | Dist/docs gap does not prevent running Scriptella from jar/classes on JDK 17 |
+
+Also record:
+
+- [ ] Contents of Ant-built `scriptella.jar` / ZIP regarding Rhino
+- [ ] `java -jar build/scriptella.jar <javascript-etl-file>` if not already done in Phase 3
+
+---
+
+## 9. Java 8 preservation (when a change set exists)
+
+`source`/`target` 1.8 only controls class-file **syntax level**. Code compiled on JDK 17 can still call APIs introduced after Java 8 unless care is taken.
+
+Require:
+
+- [ ] **Run** the resulting artifacts / full `mvn clean verify` on a **real JDK 8**
+- [ ] Check **representative class-file major versions** (e.g. `javap -verbose` on a few produced classes; major 52 = Java 8)
+- [ ] Consider **`--release 8`** only if it can be introduced without disrupting the existing JDK 8 build path; optional, not the first lever
+
+For this experiment, an actual **JDK 8 regression run is the primary proof** of preserved Java 8 compatibility.
+
+---
+
+## 10. Command log
+
+### JDK 17
+
 | When | Command | Result | Notes |
 |------|---------|--------|-------|
-| baseline | `mvn -pl drivers test` | FAIL 9 errors | language=js vs rhino names |
+| preliminary | `mvn -pl drivers test` | FAIL 9 errors | `language=js` vs Rhino SPI names only |
 | | `mvn clean verify` | | |
 | | `mvn clean deploy -Dcentral.skipPublishing=true` | | |
 | | `ant clean test` | | |
-| | `ant -Ddtddoc.dir=… clean dist` | | |
+| | `ant jar` | | |
+| | `ant dist` | | |
+| | `java -jar build/scriptella.jar …` (JS ETL) | | |
 
-### JDK 8 regression (merge candidate only)
+### JDK 8 regression
 
 | When | Command | Result | Notes |
 |------|---------|--------|-------|
 | | `mvn clean verify` | | |
-| | `ant clean test` | | |
+| | class-file major version spot-check | | |
+| | packaged JS smoke if artifacts shared | | |
 
 ---
 
-## Findings log
+## 11. Findings log
 
-### F1 — JavaScript default alias depends on Nashorn (2026-07-16)
+### F1 — Default `js` depends on Nashorn; Rhino available under other names
 
-* **Severity:** blocks green Maven suite on JDK 17  
-* **Scope:** script driver only  
-* **Fix direction:** map JS aliases → Rhino when Nashorn absent  
-* **Java 8 impact:** low if fallback is only used when primary name fails (JDK 8 still prefers Nashorn for `js` unless policy changes to prefer Rhino)
+* **Impact:** blocks green Maven drivers suite on JDK 17  
+* **Scope observed so far:** script driver tests only  
+* **Direction:** fixed alias list → try `rhino` only after primary lookup fails  
+* **JDK 8:** primary lookup still hits Nashorn for `js`; fallback unused for those names
 
-### F2 — Core, tools, non-script drivers largely OK on JDK 17
+### F2 — Module tests outside script package not yet fully certified
 
-* Preliminary probe: core PASS, tools PASS; Janino/Spring/CSV/text exercised without failure outside script package  
-* Re-confirm after Phase 2 with full `mvn clean verify`
+* Core/tools module tests passed under JDK 17 in a preliminary run  
+* Full reactor, deploy-skip, mail, Ant, and packaged-runtime remain pending
 
-### F3 — (open) Ant packaging / Javadoc / Central-skip deploy on JDK 17
+### F3 — (open) Ant packaging / Javadoc tooling / Rhino inclusion in all-in-one JAR
 
-* Not yet executed on this branch
+### F4 — (open) Java 8 regression after candidate code changes
 
 ---
 
-## Final recommendation
+## 12. Technical outcome and remaining limitations
 
-_To be filled at end of experiment._
+_Fill at end of experiment. No release-placement recommendation._
 
 ```text
-[ ] Merge bounded changes for 1.3 RC2
-[ ] Retain exp-jdk17 as groundwork for Scriptella 1.4
+JDK 17 status: supported / partially supported / blocked
+
+Validated:
+- [ ] Maven build and tests
+- [ ] Maven artifact generation (including deploy -Dcentral.skipPublishing=true)
+- [ ] CLI runtime
+- [ ] JavaScript driver (Maven classpath)
+- [ ] JavaScript driver (packaged scriptella.jar)
+- [ ] Janino driver
+- [ ] Mail driver
+- [ ] Ant tests
+- [ ] Ant packaged JAR
+- [ ] Ant distribution
+- [ ] Java 8 regression (real JDK 8 run + class-file major check)
+
+Minimal changes:
+- ...
+
+Remaining limitations:
+- ...
+
+Java 8 compatibility:
+- preserved / not preserved / not fully verified
+
+Follow-up technical issues:
+- ...
 ```
 
-**Rationale:** _(fill in)_
+### Working hypothesis (not an effort estimate)
 
-**Minimal change set:** _(file list)_
-
-**Java 8 preserved?** _(yes/no + how verified)_
-
-**Remaining work if deferred:** _(bullets)_
+Initial hypothesis: the known Maven test failure appears **localized to JavaScript engine alias resolution**. This must be **re-evaluated** after full Maven, packaged-runtime, and Ant validation.
