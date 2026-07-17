@@ -88,6 +88,76 @@ public class ScriptConnectionTest extends AbstractTestCase {
         }
     }
 
+    /**
+     * Omitted language defaults to JavaScript aliases and must resolve an engine
+     * (Nashorn on JDK 8, Rhino fallback when those SPI names are absent).
+     */
+    public void testDefaultLanguageResolvesEngine() {
+        Connection c = newConnection();
+        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        c.close();
+    }
+
+    /**
+     * Explicit language=js must resolve on JDK 17 without Nashorn.
+     */
+    public void testLanguageJs() {
+        Connection c = newConnectionWithLanguage("js");
+        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        c.close();
+    }
+
+    /**
+     * Explicit language=JavaScript (as used by integration ETLs) must resolve.
+     */
+    public void testLanguageJavaScript() {
+        Connection c = newConnectionWithLanguage("JavaScript");
+        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        c.close();
+    }
+
+    /**
+     * Explicit language=rhino must use the Rhino SPI name without needing alias fallback.
+     */
+    public void testLanguageRhino() {
+        Connection c = newConnectionWithLanguage("rhino");
+        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        c.close();
+    }
+
+    /**
+     * Unrelated invalid engine names must still fail and must not fall back to Rhino.
+     */
+    public void testInvalidLanguageStillFails() {
+        try {
+            newConnectionWithLanguage("python");
+            fail("ConfigurationException expected for unknown language");
+        } catch (ConfigurationException e) {
+            assertTrue(String.valueOf(e.getMessage()).contains("python"));
+        }
+    }
+
+    /**
+     * Fixed alias set used for Rhino fallback (exact names only).
+     */
+    public void testJavaScriptAliasSet() {
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("js"));
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("JS"));
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("javascript"));
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("JavaScript"));
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("ecmascript"));
+        assertTrue(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("ECMAScript"));
+        assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("rhino"));
+        assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("python"));
+        assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("Javascript")); // not in fixed set
+        assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("jscript"));
+    }
+
+    static ScriptConnection newConnectionWithLanguage(String language) {
+        return new ScriptConnection(new MockConnectionParameters(
+                Collections.singletonMap(ScriptConnection.LANGUAGE, language), null));
+    }
+
     public void testExecuteQuery() {
         Resource r = new StringResource("i=0;a=a0;s='test';while (i < 10) {i=i+1;query.next();}");
         IndexedQueryCallback callback = new IndexedQueryCallback() {

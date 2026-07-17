@@ -2,7 +2,7 @@
 
 **Issue:** [#31](https://github.com/scriptella/scriptella-etl/issues/31)  
 **Branch:** `exp-jdk17`  
-**Status:** Phase 1 complete — baseline frozen; Phase 2 not started
+**Status:** Phase 2 complete — JS alias → Rhino fallback; Maven green on JDK 17 and JDK 8
 
 ## 1. Goal and scope
 
@@ -198,6 +198,26 @@ Maven can resolve `rhino-js-engine` on the test classpath. That does **not** pro
 
 ## 6. Phase 2 — Minimal JavaScript compatibility change
 
+**Status: complete** (implementation on `exp-jdk17`).
+
+### Implementation
+
+| File | Change |
+|------|--------|
+| `drivers/src/java/scriptella/driver/script/ScriptConnection.java` | `resolveScriptEngine`: primary SPI lookup, then fixed JS-alias → `rhino` fallback |
+| `drivers/src/test/scriptella/driver/script/ScriptConnectionTest.java` | Default/`js`/`JavaScript`/`rhino`/invalid language + fixed alias-set tests |
+
+No new dependencies or JARs. No change to `source`/`target` 1.8.
+
+### Phase 2 validation
+
+| Command | JDK | Result |
+|---------|-----|--------|
+| `mvn clean verify` | 17 | **BUILD SUCCESS** (core 149, drivers 147, tools 12) |
+| `mvn clean verify` | 8 | **BUILD SUCCESS** (core 149, drivers 147, tools 12) |
+
+Note: one intermediate JDK 8 full run hit flaky JMX/cancellation pollution in `CancellationTest` / `JmxEtlManagerITest` (core, unrelated to script driver). Immediate re-run of full `mvn clean verify` on JDK 8 was green.
+
 ### Behavioral contract
 
 Implement only what is needed for common JavaScript usage without Nashorn:
@@ -336,6 +356,7 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 | Phase 1 | `mvn clean verify` | **BUILD FAILURE** | parent SUCCESS; core SUCCESS (149 tests); drivers FAILURE (141 tests, 9 errors); tools SKIPPED |
 | Phase 1 | `mvn -pl drivers test` | **exit 1** | same 9 script errors |
 | Phase 1 | Rhino SPI probe (standalone) | Rhino only as `rhino`/`rhino-nonjdk` | JS aliases null |
+| Phase 2 | `mvn clean verify` | **BUILD SUCCESS** | core 149, drivers 147 (+alias tests), tools 12 |
 | | `mvn clean deploy -Dcentral.skipPublishing=true` | | Phase 3 |
 | | `ant clean test` | | Phase 4 |
 | | `ant jar` | | Phase 4 |
@@ -347,7 +368,7 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 | When | Command | Result | Notes |
 |------|---------|--------|-------|
 | pre-Phase 1 (historical) | `mvn clean test` | PASS | full reactor before experiment fixes |
-| | `mvn clean verify` after Phase 2 | | required if change set exists |
+| Phase 2 | `mvn clean verify` | **BUILD SUCCESS** | core 149, drivers 147, tools 12 (after one flaky JMX cancel run) |
 | Phase 1 incidental | `javap` major version on JDK 17-built core class | major 52 | syntax level only; not a runtime proof |
 | | packaged JS smoke if artifacts shared | | |
 
@@ -355,13 +376,12 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 
 ## 11. Findings log
 
-### F1 — Default `js` / `JavaScript` depend on Nashorn; Rhino available under other names (frozen)
+### F1 — Default `js` / `JavaScript` depend on Nashorn; Rhino available under other names (**addressed in Phase 2**)
 
-* **Impact:** blocks green Maven reactor on JDK 17 (`mvn clean verify` FAIL)  
-* **Scope in full verify:** only `scriptella.driver.script.*` (9 errors); core green; tools skipped due to reactor stop  
-* **Requested names that fail:** default→`js`, explicit `js`, explicit `JavaScript`  
-* **Direction for Phase 2:** fixed alias list → try `rhino` only after primary lookup fails  
-* **JDK 8 expectation:** primary lookup still hits Nashorn for those names; fallback unused when primary resolves
+* **Impact (Phase 1):** blocked green Maven reactor on JDK 17  
+* **Fix:** `ScriptConnection.resolveScriptEngine` — primary SPI lookup, then fixed JS aliases → `rhino`  
+* **Validation:** `mvn clean verify` SUCCESS on JDK 17 and JDK 8  
+* **JDK 8:** primary lookup still hits Nashorn for `js` when present; fallback only if primary returns null
 
 ### F2 — Janino and mail tests passed inside the failed drivers module run
 

@@ -40,9 +40,13 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -71,6 +75,31 @@ public class ScriptConnection extends AbstractConnection {
      */
     static final String ENCODING = "encoding";
 
+    /**
+     * Default language when the connection property is omitted (historical JavaScript default).
+     */
+    static final String DEFAULT_LANGUAGE = "js";
+
+    /**
+     * SPI name tried when a common JavaScript alias is not registered (for example when Nashorn is absent).
+     * Primary lookup always runs first so JDK 8 continues to select Nashorn for {@code js} when present.
+     */
+    static final String RHINO_FALLBACK_LANGUAGE = "rhino";
+
+    /**
+     * Exact language names that may fall back to {@link #RHINO_FALLBACK_LANGUAGE} when primary SPI lookup fails.
+     * Empty/omitted language is normalized to {@link #DEFAULT_LANGUAGE} before lookup.
+     * Do not treat this as case-insensitive matching beyond the explicit entries.
+     */
+    private static final Set<String> JAVASCRIPT_ALIASES_FOR_RHINO_FALLBACK = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "js",
+                    "JS",
+                    "javascript",
+                    "JavaScript",
+                    "ecmascript",
+                    "ECMAScript")));
+
 
     /**
      * Instantiates a new connection to JSR 223 scripting engine.
@@ -83,10 +112,10 @@ public class ScriptConnection extends AbstractConnection {
         ScriptEngineManager scriptEngineManager = new ScriptEngineManager(ScriptConnection.class.getClassLoader());
         if (StringUtils.isEmpty(lang)) { //JavaScript is used by default
             LOG.fine("Script language was not specified. JavaScript is default.");
-            lang = "js";
+            lang = DEFAULT_LANGUAGE;
         }
 
-        ScriptEngine engine = scriptEngineManager.getEngineByName(lang);
+        ScriptEngine engine = resolveScriptEngine(scriptEngineManager, lang);
         if (engine == null) {
             throw new ConfigurationException("Specified " + LANGUAGE + "=" + lang + " not supported. Available values are: " +
                     getAvailableEngines(scriptEngineManager));
@@ -113,6 +142,39 @@ public class ScriptConnection extends AbstractConnection {
         encoding = parameters.getCharsetProperty(ENCODING);
         ScriptEngineFactory f = engine.getFactory();
         setDialectIdentifier(new DialectIdentifier(f.getLanguageName(), f.getLanguageVersion()));
+    }
+
+    /**
+     * Resolves a {@link ScriptEngine} for the requested language name.
+     * <p>
+     * Lookup order:
+     * <ol>
+     * <li>Honor the requested name via normal {@link ScriptEngineManager} SPI lookup.</li>
+     * <li>Only if that fails and the name is a fixed common JavaScript alias, try {@link #RHINO_FALLBACK_LANGUAGE}.</li>
+     * </ol>
+     * Unknown non-JavaScript names never fall back. Explicit {@code language=rhino} uses step 1 only.
+     *
+     * @param manager script engine manager.
+     * @param lang    requested language name (already defaulted if empty).
+     * @return engine instance or {@code null} if none could be resolved.
+     */
+    static ScriptEngine resolveScriptEngine(ScriptEngineManager manager, String lang) {
+        ScriptEngine engine = manager.getEngineByName(lang);
+        if (engine == null && isJavaScriptAliasEligibleForRhinoFallback(lang)) {
+            engine = manager.getEngineByName(RHINO_FALLBACK_LANGUAGE);
+            if (engine != null) {
+                LOG.fine("Specified language=" + lang + " is not registered; using Rhino fallback.");
+            }
+        }
+        return engine;
+    }
+
+    /**
+     * @param lang requested language name after empty-default handling.
+     * @return {@code true} if a failed primary lookup may try Rhino.
+     */
+    static boolean isJavaScriptAliasEligibleForRhinoFallback(String lang) {
+        return JAVASCRIPT_ALIASES_FOR_RHINO_FALLBACK.contains(lang);
     }
 
     /**
