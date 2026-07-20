@@ -39,10 +39,33 @@ The binary ZIP includes `scriptella.jar`. Run an ETL file:
 java -jar scriptella.jar path/to/file.etl.xml
 ```
 
-Add JDBC drivers and other provider JARs to the classpath as needed (for example
-with `-cp` / the `classpath` connection attribute). See the
+Add JDBC drivers and other provider JARs with the connection `classpath`
+attribute as needed. See the
 [tutorial](https://scriptella.org/tutorial.html) and
 [reference](https://scriptella.org/reference/).
+
+### The basic pattern
+
+Scriptella selects rows from one connection and runs a script against another.
+For example, this copies each selected customer to a target database:
+
+```xml
+<query connection-id="source">
+    SELECT id, email FROM customers
+    <script connection-id="target">
+        INSERT INTO customers (id, email) VALUES (?id, ?email)
+    </script>
+</query>
+```
+
+`?id` and `?email` refer to values in the current source row.
+
+### First migration
+
+For a complete MySQL-to-PostgreSQL migration example, including JDBC driver
+setup and verification, see [docs/first-migration.md](docs/first-migration.md).
+The [tutorial](https://scriptella.org/tutorial.html) has additional database
+and file integration examples.
 
 ### Maven coordinates
 
@@ -71,16 +94,6 @@ mvn clean install
 ant clean jar
 ```
 
-## Website
-
-The public site is **[scriptella.org](https://scriptella.org)**, served from the
-sibling repository [`scriptella.github.io`](https://github.com/scriptella/scriptella.github.io).
-
-* Maintained pages (tutorial, reference, FAQ, …) are edited directly in that repo.
-* Generated **API** and **DTD** docs are produced here (`build-docs.xml`) and
-  published with [`docs/site/sync_generated_docs.py`](docs/site/sync_generated_docs.py).
-  See [`docs/site/README.md`](docs/site/README.md).
-
 ## Documentation
 
 * Website: [https://scriptella.org](https://scriptella.org)
@@ -89,6 +102,7 @@ sibling repository [`scriptella.github.io`](https://github.com/scriptella/script
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Release procedure: [docs/releases/RELEASE-RUNBOOK.md](docs/releases/RELEASE-RUNBOOK.md)
 * Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
+* Generated website docs (maintainers): [docs/site/README.md](docs/site/README.md)
 
 Packaged documentation may also appear under `docs/` in distribution archives.
 
