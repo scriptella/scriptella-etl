@@ -1,14 +1,11 @@
 # Scriptella
 
-Open source ETL (Extract-Transform-Load) and script execution tool written in Java.
-Its primary focus is simplicity: use SQL or another scripting language suited to
-the data source, with XML providing orchestration rather than a proprietary
-transformation language.
+Scriptella is an open-source, Java-based ETL (Extract-Transform-Load) tool for
+moving and transforming data between databases, files, and other systems. Use
+SQL or another language suited to each data source, while a small XML file
+orchestrates the workflow instead of a proprietary transformation language.
 
 ## Project status
-
-Maintenance development has resumed. Scriptella is maintained through focused
-compatibility and bug-fix releases.
 
 The latest release is **Scriptella 1.3** (Java 8 target and preserved
 Maven/Ant packaging), published on July 17, 2026.
@@ -133,8 +130,7 @@ Packaged documentation may also appear under `docs/` in distribution archives.
 
 * **Bugs and features:** [GitHub Issues](https://github.com/scriptella/scriptella-etl/issues)
 * **Discussion:** [GitHub Discussions](https://github.com/scriptella/scriptella-etl/discussions)
-* **Website support page:** [https://scriptella.org/support.html](https://scriptella.org/support.html)
-* **Commercial inquiries:** [scriptella@gmail.com](mailto:scriptella@gmail.com)
+* **Support:** [scriptella.org/support.html](https://scriptella.org/support.html); commercial inquiries: [scriptella@gmail.com](mailto:scriptella@gmail.com)
 
 Pull requests and well-scoped issue reports for compatibility, correctness, and
 maintenance work are welcome. Broad feature development is not currently the
