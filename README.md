@@ -17,11 +17,9 @@ and Maven Central.
 
 | Component | Requirement |
 |-----------|-------------|
-| **Java** | Java **8** runtime and bytecode target (required baseline). JDK 17 compatibility is deferred to Scriptella 1.4. |
-| **Maven** | **3.6+** to build from source (tested with 3.9.x). Maven is the primary module build and test path. |
-| **Ant** | **1.10.17** is the documented environment for release packaging (`ant dist`, all-in-one JAR, distribution ZIPs). Other Ant versions may work but are not promised. |
-
-Scriptella is pure Java and should run on any platform with a compatible JDK.
+| **Java** | Java **8** |
+| **Maven** | **3.6+** to build from source |
+| **Ant** | **1.10.17** for release packaging only |
 
 ## Getting Scriptella
 
