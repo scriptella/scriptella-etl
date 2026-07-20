@@ -44,26 +44,49 @@ attribute as needed. See the
 [tutorial](https://scriptella.org/tutorial.html) and
 [reference](https://scriptella.org/reference/).
 
-### The basic pattern
+### Quick start
 
-Scriptella selects rows from one connection and runs a script against another.
-For example, this copies each selected customer to a target database:
+Create `people.csv` next to `scriptella.jar`:
 
-```xml
-<query connection-id="source">
-    SELECT id, email FROM customers
-    <script connection-id="target">
-        INSERT INTO customers (id, email) VALUES (?id, ?email)
-    </script>
-</query>
+```csv
+id,name
+1,Ada
+2,Grace
 ```
 
-`?id` and `?email` refer to values in the current source row.
+Then create `csv-to-sql.etl.xml` in the same directory:
+
+```xml
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
+<etl>
+    <connection id="input" driver="csv" url="people.csv"/>
+    <connection id="output" driver="text" url="load.sql"/>
+
+    <query connection-id="input">
+        <script connection-id="output">
+            INSERT INTO people (id, name) VALUES ($id, '$name');
+        </script>
+    </query>
+</etl>
+```
+
+Run it from that directory:
+
+```bash
+java -jar scriptella.jar csv-to-sql.etl.xml
+cat load.sql
+```
+
+The generated `load.sql` contains one `INSERT` statement per CSV row. The CSV
+driver reads the header row, so `$id` and `$name` refer to those columns. No
+database or JDBC driver is required.
 
 ### First migration
 
-For a complete MySQL-to-PostgreSQL migration example, including JDBC driver
-setup and verification, see [docs/first-migration.md](docs/first-migration.md).
+The real power comes from nesting a target `<script>` inside a source `<query>`
+to transform or copy each row. For a complete MySQL-to-PostgreSQL example that
+writes directly to a database with JDBC parameter binding, see
+[docs/first-migration.md](docs/first-migration.md).
 The [tutorial](https://scriptella.org/tutorial.html) has additional database
 and file integration examples.
 
