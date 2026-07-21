@@ -82,19 +82,20 @@ On failure the script exits non-zero and does not run `rsync`.
 ## StatCounter injection (subset only)
 
 After copy, the same project snippet used on maintained pages is injected into a
-**small allowlist** of generated HTML files (not every class page):
+**three-page allowlist** of generated HTML files (not every class page):
 
 * `docs/api/overview-summary.html` — API hub / default content frame
-* `docs/api/**/package-summary.html` — package-level browsing (~43 packages)
 * `docs/dtd/intro.html` — DTD hub
 * `docs/dtd/elementsIndex.html` — element index
-* `docs/dtd/**/etl.dtd.html` — DTD source documentation page
 
-Skipped: frameset chrome (`index.html`, `*-frame.html`), class/type pages,
-`package-tree` / `package-use`, and other secondary generated pages.
+Skipped: frameset chrome (`index.html`, `*-frame.html`), package summaries,
+class/type pages, detailed DTD reference pages, `package-tree` / `package-use`,
+and other secondary generated pages.
 
 Injection is idempotent (marker comment) and applied only under the website
-tree, never into distribution `build/docs` consumed by the product zip.
+tree, never into distribution `build/docs` consumed by the product zip. Each
+live sync first removes the marker-delimited block from all generated HTML, so
+pages removed from the allowlist stop being tracked immediately.
 
 ## After a successful sync
 

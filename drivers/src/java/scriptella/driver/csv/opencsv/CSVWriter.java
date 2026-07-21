@@ -121,8 +121,8 @@ public class CSVWriter implements Closeable {
      *            the delimiter to use for separating entries
      * @param quotechar
      *            the character to use for quoted elements
-     * @param escapechar
-     *            the character to use for escaping
+     * @param lineEnd
+     *            the line feed terminator to use
      */
     public CSVWriter(Writer writer, char separator, char quotechar, String lineEnd) {
     	this(writer, separator, quotechar, DEFAULT_ESCAPE_CHARACTER, lineEnd);

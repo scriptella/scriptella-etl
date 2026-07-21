@@ -285,17 +285,15 @@ def sanity_check_tree(
 
 
 def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
-    """Hub + package-summary + DTD entry pages only (not every class page)."""
+    """The three generated documentation entry points worth tracking."""
     targets: list[Path] = []
     overview = api_dest / "overview-summary.html"
     if overview.is_file():
         targets.append(overview)
-    targets.extend(sorted(api_dest.rglob("package-summary.html")))
     for name in ("intro.html", "elementsIndex.html"):
         path = dtd_dest / name
         if path.is_file():
             targets.append(path)
-    targets.extend(sorted(dtd_dest.rglob("etl.dtd.html")))
     # Stable unique order
     seen: set[Path] = set()
     unique: list[Path] = []
@@ -305,6 +303,28 @@ def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
             seen.add(resolved)
             unique.append(path)
     return unique
+
+
+def remove_statcounter(path: Path, *, dry_run: bool, display: str) -> str | None:
+    """Remove this publisher's marker-delimited StatCounter block, if present."""
+    text = path.read_text(encoding="utf-8", errors="surrogateescape")
+    start = text.find("<!-- " + STATCOUNTER_MARKER + " -->")
+    if start < 0:
+        return None
+    end = text.find("<!-- End StatCounter -->", start)
+    if end < 0:
+        return f"skip (unterminated block): {display}"
+    end += len("<!-- End StatCounter -->")
+    if end < len(text) and text[end] == "\n":
+        end += 1
+    if dry_run:
+        return f"would remove: {display}"
+    path.write_text(
+        text[:start] + text[end:],
+        encoding="utf-8",
+        errors="surrogateescape",
+    )
+    return f"removed: {display}"
 
 
 def relative_display(path: Path, root: Path) -> str:
@@ -513,6 +533,22 @@ def main(argv: list[str] | None = None) -> int:
     scan_api = api_src if args.dry_run else api_dest
     scan_dtd = dtd_src if args.dry_run else dtd_dest
     targets = track_targets(scan_api, scan_dtd)
+
+    # Remove old publisher-owned blocks before reinjecting the intentionally tiny
+    # allowlist. This prevents previously tracked package pages from remaining
+    # counted after the policy changes.
+    if not args.dry_run:
+        print("removing StatCounter from generated pages outside the allowlist")
+        removed = 0
+        for root in (api_dest, dtd_dest):
+            for page in sorted(root.rglob("*.html")):
+                result = remove_statcounter(
+                    page, dry_run=False, display=relative_display(page, site)
+                )
+                if result is not None:
+                    print(f"  {result}")
+                    removed += 1
+        print(f"removed page targets: {removed}")
 
     print("injecting StatCounter into allowlisted generated pages")
     if not targets:
