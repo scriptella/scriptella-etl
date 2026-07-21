@@ -79,11 +79,23 @@ so a failed Ant/Javadoc run cannot wipe the live website docs:
 
 On failure the script exits non-zero and does not run `rsync`.
 
+## StatCounter projects
+
+Scriptella uses two separate StatCounter projects so generated documentation
+traffic does not consume the maintained website's visit allowance:
+
+| Project | ID | Covers |
+| --- | --- | --- |
+| Scriptella website | `10775960` | Maintained pages in `scriptella.github.io` |
+| Scriptella API documentation | `13337472` | The generated API/DTD allowlist below |
+
 ## StatCounter injection (subset only)
 
-After copy, the same project snippet used on maintained pages is injected into a
-**two-page allowlist** of generated HTML files (not every class page):
+After copy, the separate Scriptella API documentation StatCounter project is
+injected into a **three-page allowlist** of generated HTML files (not every class
+page). The maintained website continues to use its own project:
 
+* `docs/api/overview-summary.html` — API hub / default content frame
 * `docs/dtd/intro.html` — DTD hub
 * `docs/dtd/elementsIndex.html` — element index
 

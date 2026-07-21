@@ -13,15 +13,20 @@ import subprocess
 import sys
 from pathlib import Path
 
-STATCOUNTER_MARKER = "StatCounter: existing Scriptella project configuration"
-STATCOUNTER_SNIPPET = """  <!-- StatCounter: existing Scriptella project configuration -->
-  <script>
-    var sc_project = 10775960;
-    var sc_invisible = 1;
-    var sc_security = "53eaed1c";
+STATCOUNTER_MARKER = "StatCounter: Scriptella API documentation project"
+LEGACY_STATCOUNTER_MARKER = "StatCounter: existing Scriptella project configuration"
+STATCOUNTER_END_MARKER = "<!-- End of Statcounter Code -->"
+LEGACY_STATCOUNTER_END_MARKER = "<!-- End StatCounter -->"
+STATCOUNTER_SNIPPET = """  <!-- StatCounter: Scriptella API documentation project -->
+  <script type="text/javascript">
+    var sc_project=13337472;
+    var sc_invisible=1;
+    var sc_security="d3157fa4";
   </script>
-  <script defer src="https://secure.statcounter.com/counter/counter.js"></script>
-  <!-- End StatCounter -->
+  <script type="text/javascript"
+  src="https://www.statcounter.com/counter/counter.js" async></script>
+  <noscript><div class="statcounter"><a title="Web Analytics Made Easy - Statcounter" href="https://statcounter.com/" target="_blank"><img class="statcounter" src="https://c.statcounter.com/13337472/0/d3157fa4/1/" alt="Web Analytics Made Easy - Statcounter" referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+  <!-- End of Statcounter Code -->
 """
 
 # Refuse to rsync --delete if the generated tree looks empty or thin.
@@ -285,8 +290,11 @@ def sanity_check_tree(
 
 
 def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
-    """The generated DTD entry points worth tracking."""
+    """The generated API and DTD entry points worth tracking."""
     targets: list[Path] = []
+    overview = api_dest / "overview-summary.html"
+    if overview.is_file():
+        targets.append(overview)
     for name in ("intro.html", "elementsIndex.html"):
         path = dtd_dest / name
         if path.is_file():
@@ -305,13 +313,23 @@ def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
 def remove_statcounter(path: Path, *, dry_run: bool, display: str) -> str | None:
     """Remove this publisher's marker-delimited StatCounter block, if present."""
     text = path.read_text(encoding="utf-8", errors="surrogateescape")
-    start = text.find("<!-- " + STATCOUNTER_MARKER + " -->")
+    markers = (
+        ("<!-- " + STATCOUNTER_MARKER + " -->", STATCOUNTER_END_MARKER),
+        ("<!-- " + LEGACY_STATCOUNTER_MARKER + " -->", LEGACY_STATCOUNTER_END_MARKER),
+    )
+    start = -1
+    end_marker = ""
+    for marker, candidate_end_marker in markers:
+        start = text.find(marker)
+        if start >= 0:
+            end_marker = candidate_end_marker
+            break
     if start < 0:
         return None
-    end = text.find("<!-- End StatCounter -->", start)
+    end = text.find(end_marker, start)
     if end < 0:
         return f"skip (unterminated block): {display}"
-    end += len("<!-- End StatCounter -->")
+    end += len(end_marker)
     if end < len(text) and text[end] == "\n":
         end += 1
     if dry_run:
