@@ -82,13 +82,12 @@ On failure the script exits non-zero and does not run `rsync`.
 ## StatCounter injection (subset only)
 
 After copy, the same project snippet used on maintained pages is injected into a
-**three-page allowlist** of generated HTML files (not every class page):
+**two-page allowlist** of generated HTML files (not every class page):
 
-* `docs/api/overview-summary.html` — API hub / default content frame
 * `docs/dtd/intro.html` — DTD hub
 * `docs/dtd/elementsIndex.html` — element index
 
-Skipped: frameset chrome (`index.html`, `*-frame.html`), package summaries,
+Skipped: API frameset chrome and content (`docs/api/**`), package summaries,
 class/type pages, detailed DTD reference pages, `package-tree` / `package-use`,
 and other secondary generated pages.
 

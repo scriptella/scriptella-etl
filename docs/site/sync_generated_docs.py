@@ -285,11 +285,8 @@ def sanity_check_tree(
 
 
 def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
-    """The three generated documentation entry points worth tracking."""
+    """The generated DTD entry points worth tracking."""
     targets: list[Path] = []
-    overview = api_dest / "overview-summary.html"
-    if overview.is_file():
-        targets.append(overview)
     for name in ("intro.html", "elementsIndex.html"):
         path = dtd_dest / name
         if path.is_file():
