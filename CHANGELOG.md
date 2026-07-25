@@ -8,13 +8,16 @@ release notes; this is the primary changelog from Release 1.3 onward.
 
 ### Changed
 
-#### Dependencies (partial)
+* **Java 17** is now the build baseline (requires JDK 17).
+* **JavaScript** upgraded to Rhino 1.9.1 (`org.mozilla:rhino-engine`). Auto-fallback
+  to Rhino on JDK 17 when Nashorn is absent.
+* **Janino** → 3.1.12, **JavaMail** → `com.sun.mail:javax.mail:1.6.2`,
+  **Activation** → 1.1.1, **Ant** → 1.10.17, **Commons Logging** → 1.2.
 
-* Upgraded optional Janino to **3.1.12** (with matching `commons-compiler`).
-* Upgraded optional JavaMail to **`com.sun.mail:javax.mail:1.6.2`** and
-  Activation to **1.1.1** (API package remains `javax.mail`).
-* Upgraded the tools-module Ant compile dependency to **1.10.17**.
-* Upgraded Commons Logging to **1.2** (embedded with JEXL in the all-in-one JAR).
+### Upgrade notes
+
+* JDK 17 required for building. JavaScript automatically routes to Rhino on JDK 17.
+  Maven consumers using JS must add `org.mozilla:rhino-engine` / `org.mozilla:rhino` explicitly.
 
 ## [1.3] — 2026-07-17
 
@@ -129,6 +132,7 @@ For changes before 1.0 and additional historical detail, see
 [#20]: https://github.com/scriptella/scriptella-etl/issues/20
 [#29]: https://github.com/scriptella/scriptella-etl/issues/29
 [#32]: https://github.com/scriptella/scriptella-etl/issues/32
+[1.4]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4
 [1.3]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3
 [1.2]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.2
 [1.1]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.1
