@@ -549,6 +549,36 @@ Confirm:
 * The full JEXL regression suite passes on JDK 17.
 * `git diff --check` is clean.
 
+### Deferred review findings (no implementation retained)
+
+The JEXL 3.6.4 upgrade was explored and then reverted before acceptance. The
+repository remains on JEXL 2.0.1. No source-rewriting or legacy-script adapter
+is part of the product.
+
+The exploration established these points for a future, separately reviewed
+chunk:
+
+* Commons JEXL 3 requires a Java integration migration from
+  `org.apache.commons.jexl2` to `org.apache.commons.jexl3`; Apache does not
+  provide a general JEXL 2-to-3 source translator.
+* A trial adapter that rewrote identifiers such as `var`, `let`, and `const`
+  and intercepted dotted parameter lookup was rejected as an unsafe,
+  undocumented semantic change. It must not be reintroduced without an
+  explicit compatibility proposal.
+* The migration exposed existing Scriptella assumptions that need a decision:
+  `var` is used as a property name in `core/src/test/scriptella/PropertiesTest.xml`,
+  dotted properties such as `url.prefix` are evaluated as flat Scriptella
+  parameters, and `file + var` is covered by
+  `core/src/test/scriptella/jdbc/ParametersParserTest.java`.
+* The future chunk must choose between an explicit user-script migration and a
+  narrowly defined, opt-in compatibility layer; define diagnostics and a
+  migration guide; characterize affected samples; and test the choice on JDK
+  17. It must also separately review JEXL 3.6.4 engine permissions/features
+  and the Commons Logging dependency.
+
+Do not mark Chunk 4 complete until that proposal is reviewed and its decision
+is implemented and validated.
+
 ## Chunk 5 — Refresh Remaining Dependencies for JDK 17
 
 **Status:** Pending
