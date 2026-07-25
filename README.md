@@ -117,6 +117,7 @@ ant clean jar
 * Website: [https://scriptella.org](https://scriptella.org)
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
+* Agent usage contract and templates: [docs/agent-usage.md](docs/agent-usage.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Release procedure: [docs/releases/RELEASE-RUNBOOK.md](docs/releases/RELEASE-RUNBOOK.md)
 * Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
