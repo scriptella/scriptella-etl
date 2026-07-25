@@ -8,9 +8,6 @@
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
-        <!-- Rhino JARs — committed in lib/; TODO: replace with a Maven dependency copy script -->
-        <pathelement location="${basedir}/../lib/rhino-js-engine.jar"/>
-        <pathelement location="${basedir}/../lib/rhino.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>
@@ -20,6 +17,9 @@
         <pathelement location="${basedir}/../lib/h2.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/junit.jar"/>
+        <!-- Optional JavaScript provider: test-only, never packaged by the Ant build. -->
+        <pathelement location="${basedir}/../lib/rhino-engine.jar"/>
+        <pathelement location="${basedir}/../lib/rhino.jar"/>
     </path>
     <import file="../build-templates/build-template.xml"/>
 

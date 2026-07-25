@@ -63,11 +63,12 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- https://github.com/scriptella/scriptella-etl/issues/2
-        We are using javax.script adapter for Rhino provided by https://www.inspiracio.cat -->
+        <!-- Optional JavaScript provider used only by the script-driver tests.
+             Consumers that use JavaScript add this dependency explicitly. -->
         <dependency>
-                <groupId>cat.inspiracio</groupId>
-            <artifactId>rhino-js-engine</artifactId>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino-engine</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

@@ -297,16 +297,82 @@ negative tests listed by this plan.
 
 ## Chunk 3 — Implement the Optional JavaScript Contract
 
-**Status:** Pending
+**Status:** In progress — bundled-distribution revision pending
 
 **Reasoning level:** Moderate
 
-### Packaging decision
+The first implementation checkpoint adopted official Mozilla Rhino 1.9.1 in
+test scope. Maven no longer publishes a Rhino dependency from the drivers
+module, and the Ant test path uses matching `rhino-engine` and `rhino` JARs
+with the complete MPL 2.0 text.
 
-Implement the optional-provider model selected in Chunk 2. Keep the base
-distribution free of Rhino, keep JEXL operational out of the box, and make
-the Unix and Windows launchers the documented way to add provider JARs under
-`lib/`.
+The Unix and Windows launchers now build their application classpath from
+`lib/*.jar` with quoted distribution paths and complete argument forwarding.
+The Unix launcher was exercised from the unpacked binary distribution on
+Temurin 17.0.15. The Windows batch contract was checked in the assembled
+artifact for `lib` discovery and `%*` forwarding; native Windows execution
+remains part of the broader Chunk 5 platform matrix.
+
+Missing-provider errors for the fixed JavaScript aliases now include the
+requested language, discovered engines, supported coordinates, distribution
+launcher layout, the `java -jar` limitation, and the embedded-classloader
+rule. Unrelated engine names retain the generic error.
+
+Validation used Maven 3.9.9, Ant 1.10.17, DTDDoc 1.1.0, and Temurin 17.0.15
+on macOS 15.6.1:
+
+* `mvn -pl drivers -am test` passed 149 core and 150 driver tests;
+* `ant clean test` passed the core, drivers, and tools suites;
+* `ant -Ddtddoc.dir=... test-distribution` built both archives and passed
+  separate-JVM JEXL, missing-provider, optional-Rhino alias, nested
+  JavaScript, unknown-language, archive-content, and SPI-content checks;
+* Maven dependency inspection showed `rhino-engine:1.9.1` and transitive
+  `rhino:1.9.1` only in test scope;
+* `git diff --check` passed.
+
+### Revised packaging decision
+
+Maintainer direction on July 25, 2026 revised the distribution portion of the
+Chunk 2 decision. JavaScript is sufficiently common that the downloaded
+Scriptella distributions should support it out of the box. This section
+supersedes Chunk 2 wherever that chunk says release archives must omit Rhino;
+the Maven-consumer and engine-discovery classloader decisions remain intact.
+
+Bundle the official `rhino-engine` and `rhino` 1.9.1 JARs as separate files
+under `lib/` in the binary and examples distributions. Do not shade their
+classes into `scriptella.jar` or merge their service-provider entry into
+Scriptella's own metadata.
+
+Add `lib/rhino-engine.jar` and `lib/rhino.jar` to the all-in-one JAR manifest
+classpath so both the existing `java -jar scriptella.jar ...` command and the
+Unix and Windows launchers support JavaScript in an intact unpacked
+distribution. A copied `scriptella.jar` without its sibling `lib/` directory
+does not carry Rhino with it.
+
+Keep Rhino in test scope for Maven. Applications assembled from Maven modules
+must continue to request `org.mozilla:rhino-engine:1.9.1` explicitly rather
+than receiving JavaScript transitively from `scriptella-drivers`.
+
+### Remaining work
+
+1. Include the two matching Rhino JARs under `lib/` in the binary and examples
+   archives without duplicating their classes or service metadata.
+2. Add the two relative Rhino entries to the all-in-one JAR's manifest
+   `Class-Path`; do not add them to module JAR manifests.
+3. Add distribution-visible MPL 2.0 attribution and a source-availability
+   notice pointing to the exact 1.9.1 source artifacts. Preserve Scriptella's
+   Apache 2.0 licensing and do not imply that Rhino is Apache-licensed.
+4. Update the script-driver documentation and missing-provider remedy for the
+   bundled layout. A missing provider in a distribution should advise users to
+   restore the complete archive; Maven and embedded users should receive the
+   coordinates and application-classloader guidance.
+5. Replace the current archive-absence assertions with exact-content checks
+   for both JARs, their versions, license, source notice, and provider entry.
+6. Exercise JavaScript through `java -jar`, the Unix launcher, and the Windows
+   launcher where the platform matrix permits. Retain separate-JVM JEXL,
+   alias, nested/sub-ETL, missing-provider, and unrelated-language coverage.
+7. Re-run Maven, Ant, distribution, archive, SPI, license, and source-archive
+   validation on the Java 17 baseline.
 
 ### Required behavior
 
@@ -314,29 +380,29 @@ From the unmodified binary distribution on JDK 17:
 
 * launcher startup works;
 * representative JDBC and JEXL ETLs work;
-* no Rhino classes, JARs, service entries, or notices are present;
-* a JavaScript connection fails clearly because no provider is installed;
-* no private checkout path or developer-local Maven repository is required.
-
-After placing matching Rhino 1.9.1 engine and runtime JARs under `lib/`:
-
-* the Unix and Windows launchers discover the provider;
+* exactly the supported Rhino engine and runtime JARs, MPL license, and source
+  notice are present under `lib/`;
+* JavaScript works through `java -jar`, `bin/scriptella.sh`, and
+  `bin/scriptella.bat`;
 * JavaScript works when the language is omitted;
 * `language=js`, `language=JavaScript`, and `language=rhino` work;
 * nested or sub-ETL JavaScript execution works;
-* unrelated invalid languages still fail without a Rhino fallback.
+* unrelated invalid languages still fail without a Rhino fallback;
+* no private checkout path or developer-local Maven repository is required.
 
 ### Missing-provider diagnostics
 
-When JavaScript is requested without an installed provider, report:
+When JavaScript is requested without an installed provider, such as from a
+Maven application that omitted the optional dependency or an incomplete
+distribution, report:
 
 * the requested `language` value;
 * the engines and aliases actually discovered;
-* that JavaScript requires an external JSR-223 provider on JDK 17;
+* that JavaScript requires the Rhino JSR-223 provider on JDK 17;
 * the supported coordinates
   `org.mozilla:rhino-engine:1.9.1` and `org.mozilla:rhino:1.9.1`;
-* for distribution users, that both JARs belong under `lib/` and execution
-  must use `bin/scriptella.sh` or `bin/scriptella.bat`, not plain `java -jar`;
+* for distribution users, that the official archive bundles both JARs under
+  `lib/` and they should restore the complete distribution;
 * for embedded users, that the provider must be visible to the same
   application classloader as Scriptella's script driver.
 
@@ -366,23 +432,29 @@ Rhino versions, and dependencies present only in a developer checkout.
 
 Add automated artifact-level coverage where practical:
 
-* prove Rhino is absent from the base binary and examples archives;
+* prove exactly the selected Rhino JARs, license, and source notice are present
+  in the binary and examples archives;
+* prove `scriptella.jar` does not embed Rhino classes or merge its provider
+  file;
 * launch the assembled distribution in a separate JVM;
 * prove bundled JEXL execution from the unmodified distribution;
 * prove the actionable missing-JavaScript-provider diagnostic;
-* install Rhino under `lib/` and execute representative JavaScript ETLs
-  through the supported launcher command;
+* execute representative JavaScript ETLs through `java -jar` and the
+  supported launcher commands;
 * prove the generic negative case for an unknown engine name.
 
 ### Exit criteria
 
-* The base distribution works without a JavaScript engine on JDK 17.
-* Missing-provider diagnostics are actionable and tested.
-* The optional Rhino launcher contract works on JDK 17.
-* Maven and Ant dependency sets agree.
-* Binary and examples artifacts do not contain Rhino.
-* License and notice material is complete wherever Rhino remains for tests.
-* The supported launcher command is stable enough to document publicly.
+* [x] Missing-provider diagnostics are actionable and tested.
+* [x] Maven and Ant dependency sets agree.
+* [x] Unix and Windows launchers construct their classpaths from `lib/*.jar`.
+* [ ] The binary and examples distributions bundle exactly Rhino 1.9.1.
+* [ ] `java -jar` and the distribution launchers discover bundled Rhino.
+* [ ] JEXL and JavaScript work out of the box on JDK 17.
+* [ ] Rhino's MPL license and exact source-availability notice are complete.
+* [ ] Artifact tests prove the bundled layout and absence of embedded or
+  duplicated Rhino content.
+* [ ] The supported commands are stable enough to document publicly.
 
 ## Chunk 4 — Upgrade Bundled JEXL to 3.6.4
 

@@ -13,23 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Scriptella launcher script for Linux.
+# Scriptella launcher script for Unix-like systems.
 
-BIN_DIR=`dirname $0`
-CUR_DIR=`pwd`
-if [ "x$SCRIPTELLA_HOME" = "x" ]; then
-    SCRIPTELLA_HOME=`cd $BIN_DIR/..; pwd`       # goes one level up
+if [ -z "$SCRIPTELLA_HOME" ]; then
+    SCRIPTELLA_HOME=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 fi
 
-if [ "x$SCRIPTELLA_JAVA_OPTS" = "x" ]; then
+if [ -z "$SCRIPTELLA_JAVA_OPTS" ]; then
     _SCRIPTELLA_JAVA_OPTS="$JAVA_OPTS"
 else
     _SCRIPTELLA_JAVA_OPTS="$SCRIPTELLA_JAVA_OPTS"
 fi
 
 _SCRIPTELLA_CP=""
-for _arg in $SCRIPTELLA_HOME/lib/*.jar; do
-	_SCRIPTELLA_CP=$_SCRIPTELLA_CP:$_arg
+for _arg in "$SCRIPTELLA_HOME"/lib/*.jar; do
+    [ -f "$_arg" ] || continue
+    if [ -z "$_SCRIPTELLA_CP" ]; then
+        _SCRIPTELLA_CP="$_arg"
+    else
+        _SCRIPTELLA_CP="$_SCRIPTELLA_CP:$_arg"
+    fi
 done
 
 
@@ -43,5 +46,5 @@ if [ -z "$JAVACMD" ]; then                      # true if string's length is zer
     JAVACMD="java"
 fi
 
-$JAVACMD "$_SCRIPTELLA_JAVA_OPTS" -classpath $_SCRIPTELLA_CP scriptella.tools.launcher.EtlLauncher "$@"
-
+exec "$JAVACMD" $_SCRIPTELLA_JAVA_OPTS -classpath "$_SCRIPTELLA_CP" \
+    scriptella.tools.launcher.EtlLauncher "$@"

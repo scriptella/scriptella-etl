@@ -2,11 +2,9 @@
 <h1>Scriptella bridge for the JSR 223: Scripting for the Java Platform.</h1>
 Allows usage of <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a> compatible scripting languages in
 ETL &lt;query&gt; and &lt;script&gt; elements.
-<p>The driver relies on  <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">javax.script</a> package from Java SE 6.
-The default language expected by the driver is JavaScript which is bundled with JRE.</p>
-
-<p><b>Important:</b> See <a href="#nashorn_notes">Nashorn JavaScript engine notes</a>
-</p>
+<p>The driver uses the Java SE <code>javax.script</code> API. The default
+language name is JavaScript, but Scriptella does not bundle a JavaScript
+engine. JEXL remains available out of the box.</p>
 <h2>General information</h2>
 <table>
     <tr>
@@ -17,7 +15,7 @@ The default language expected by the driver is JavaScript which is bundled with 
     If url is not specified console (<code>System.in/out</code>) is used.</td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td><b>Java SE 6</b> is required. Additional dependencies are specific to a scripting language.</td>
+        <td><b>Runtime dependencies:</b></td><td>Additional dependencies are specific to a scripting language.</td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -64,12 +62,17 @@ should be used to produce a result set:</p>
 </pre>
 See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
 </code>
-<h2><a name="nashorn_notes">JDK 8 Nashorn JavaScript Engine notes<a></h2>
-Due to Nashorn being <a href="https://openjdk.java.net/jeps/335">deprecated in JDK11</a> and its incompatibilities with Scriptella,
-please use <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino">Rhino</a>
-with javax.script adapter (language=rhino in connection properties).
-<br>If you use Maven, add cat.inspiracion:rhino-js-engine dependency.
-<br>Jars can be found in the <a href="https://github.com/scriptella/scriptella-etl/tree/master/lib">lib directory</a> of the Github repository.
+<h2><a name="javascript_provider">Optional JavaScript provider</a></h2>
+<p>On JDK 17, JavaScript requires an external JSR-223 provider. The supported
+provider is Mozilla Rhino 1.9.1. Maven applications add
+<code>org.mozilla:rhino-engine:1.9.1</code>, which brings the matching
+<code>org.mozilla:rhino:1.9.1</code> runtime.</p>
+<p>Distribution users place both JARs under <code>lib/</code> and run
+<code>bin/scriptella.sh</code> or <code>bin/scriptella.bat</code>. Plain
+<code>java -jar</code> does not load optional JARs from that directory.
+Embedded applications must make the provider visible to the same application
+classloader as Scriptella's script driver. A script connection's
+<code>classpath</code> attribute is not used for JSR-223 provider discovery.</p>
 
 <p>Example of the connection declaration:
 <pre>
@@ -77,7 +80,10 @@ with javax.script adapter (language=rhino in connection properties).
         language=rhino
     &lt;/connection&gt;
 </pre>
-For more details see <a href="https://github.com/scriptella/scriptella-etl/issues/2">GitHub Issue</a>
+The aliases <code>js</code>, <code>JS</code>, <code>javascript</code>,
+<code>JavaScript</code>, <code>ecmascript</code>, and
+<code>ECMAScript</code> also use Rhino when their primary engine lookup
+does not resolve another provider.
 <a name="examples"></a>
 <h2>Examples</h2>
 The following query executes a child script 10 times. As the result of execution 10 records

@@ -59,6 +59,8 @@ import java.util.logging.Logger;
  */
 public class ScriptConnection extends AbstractConnection {
     private static final Logger LOG = Logger.getLogger(ScriptConnection.class.getName());
+    private static final String RHINO_ENGINE_COORDINATE = "org.mozilla:rhino-engine:1.9.1";
+    private static final String RHINO_RUNTIME_COORDINATE = "org.mozilla:rhino:1.9.1";
     private Map<Resource, CompiledScript> cache;
     private ScriptEngineWrapper engineWrapper;
     private String encoding;
@@ -116,8 +118,7 @@ public class ScriptConnection extends AbstractConnection {
 
         ScriptEngine engine = resolveScriptEngine(scriptEngineManager, lang);
         if (engine == null) {
-            throw new ConfigurationException("Specified " + LANGUAGE + "=" + lang + " not supported. Available values are: " +
-                    getAvailableEngines(scriptEngineManager));
+            throw new ConfigurationException(unsupportedLanguageMessage(scriptEngineManager, lang));
         }
         engineWrapper = new ScriptEngineWrapper(engine);
         LOG.fine("Script engine selected: " + engine.getFactory().getEngineName());
@@ -174,6 +175,25 @@ public class ScriptConnection extends AbstractConnection {
      */
     static boolean isJavaScriptAliasEligibleForRhinoFallback(String lang) {
         return JAVASCRIPT_ALIASES_FOR_RHINO_FALLBACK.contains(lang);
+    }
+
+    /**
+     * Builds the unsupported-language diagnostic. JavaScript aliases receive
+     * the optional-provider installation contract; arbitrary names retain the
+     * concise generic error.
+     */
+    static String unsupportedLanguageMessage(ScriptEngineManager manager, String lang) {
+        String message = "Specified " + LANGUAGE + "=" + lang
+                + " not supported. Available values are: " + getAvailableEngines(manager);
+        if (!isJavaScriptAliasEligibleForRhinoFallback(lang)) {
+            return message;
+        }
+        return message + ". JavaScript requires an external JSR-223 provider on JDK 17. "
+                + "Add " + RHINO_ENGINE_COORDINATE + " and " + RHINO_RUNTIME_COORDINATE + ". "
+                + "Distribution users: place both JARs under lib/ and run bin/scriptella.sh "
+                + "or bin/scriptella.bat; plain java -jar cannot load them. "
+                + "Embedded users: the provider must be visible to the same application "
+                + "classloader as Scriptella's script driver.";
     }
 
     /**

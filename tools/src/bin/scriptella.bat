@@ -22,25 +22,25 @@ exit /b 1;
 @setlocal ENABLEDELAYEDEXPANSION
 
 rem ----- use the location of this script to infer $SCRIPTELLA_HOME -------
-if "%SCRIPTELLA_HOME%" == "" set SCRIPTELLA_HOME=%~dp0\..
+if "%SCRIPTELLA_HOME%" == "" set "SCRIPTELLA_HOME=%~dp0\.."
 
 rem ----- set the current working dir as the CUR_DIR variable  ----
 set CUR_DIR=%CD%
 
-@cd /d %~dp0..\lib
-set _SCRIPTELLA_CP=
-@for %%i in (*.jar) do set _SCRIPTELLA_CP=!_SCRIPTELLA_CP!;%%~fi
-@cd /d %cur_dir%
+@cd /d "%SCRIPTELLA_HOME%\lib"
+set "_SCRIPTELLA_CP="
+@for %%i in (*.jar) do set "_SCRIPTELLA_CP=!_SCRIPTELLA_CP!;%%~fi"
+@cd /d "%CUR_DIR%"
 
 rem ---- define java cmd. Use JAVACMD to specify java.exe location and VM options
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-if "%JAVACMD%" == "" set JAVACMD=%JAVA_HOME%\bin\java.exe
-set _SCRIPTELLA_JAVA_OPTS=%SCRIPTELLA_JAVA_OPTS%
-if "%_SCRIPTELLA_JAVA_OPTS%" == "" set _SCRIPTELLA_JAVA_OPTS=%JAVA_OPTS% 
+if "%JAVACMD%" == "" set "JAVACMD=%JAVA_HOME%\bin\java.exe"
+set "_SCRIPTELLA_JAVA_OPTS=%SCRIPTELLA_JAVA_OPTS%"
+if "%_SCRIPTELLA_JAVA_OPTS%" == "" set "_SCRIPTELLA_JAVA_OPTS=%JAVA_OPTS%"
 
 :noJavaHome
-if "%JAVACMD%" == "" set JAVACMD=java.exe
+if "%JAVACMD%" == "" set "JAVACMD=java.exe"
 
 rem ---- run scriptella
-%JAVACMD% %_SCRIPTELLA_JAVA_OPTS% -cp %_SCRIPTELLA_CP% scriptella.tools.launcher.EtlLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVACMD%" %_SCRIPTELLA_JAVA_OPTS% -cp "%_SCRIPTELLA_CP%" scriptella.tools.launcher.EtlLauncher %*

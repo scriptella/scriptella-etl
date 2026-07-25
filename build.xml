@@ -90,9 +90,14 @@
         </jar>
         <!-- Update samples libs -->
         <copy todir="${basedir}/samples/lib">
-            <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
+            <fileset dir="${lib.dir}"
+                     excludes="spring.* h2.* lucene* rhino*.jar rhino*.license.txt"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
+        <delete>
+            <fileset dir="${basedir}/samples/lib"
+                     includes="rhino*.jar rhino*.license.txt"/>
+        </delete>
     </target>
 
     <target name="zip" depends="jar">
@@ -134,6 +139,17 @@
 
     <target name="dist" depends="zip, srczip, examples">
         <description>Prepares binary and src distribution</description>
+    </target>
+
+    <target name="test-distribution" depends="zip, examples">
+        <description>Tests the optional JavaScript contract against assembled distributions</description>
+        <exec executable="sh" failonerror="true">
+            <arg value="${tools}/src/test/distribution/optional-javascript-contract.sh"/>
+            <arg value="${build.dir}/${zip.name}"/>
+            <arg value="${build.dir}/${examples.zip.name}"/>
+            <arg value="${lib.dir}/rhino-engine.jar"/>
+            <arg value="${lib.dir}/rhino.jar"/>
+        </exec>
     </target>
 
     <target name="test">

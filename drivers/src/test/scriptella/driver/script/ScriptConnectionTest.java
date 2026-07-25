@@ -79,9 +79,9 @@ public class ScriptConnectionTest extends AbstractTestCase {
      * Tests various configuration options.
      */
     public void testConfiguration() {
-        //JavaScript(ECMAScript) should be used by default
+        //JavaScript should be used by default
         Connection c = new Driver().connect(new MockConnectionParameters());
-        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        assertEquals("javascript", c.getDialectIdentifier().getName());
         //now tests wrong name
         try {
             new Driver().connect(new MockConnectionParameters(
@@ -98,7 +98,7 @@ public class ScriptConnectionTest extends AbstractTestCase {
      */
     public void testDefaultLanguageResolvesEngine() {
         Connection c = newConnection();
-        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        assertEquals("javascript", c.getDialectIdentifier().getName());
         c.close();
     }
 
@@ -107,7 +107,7 @@ public class ScriptConnectionTest extends AbstractTestCase {
      */
     public void testLanguageJs() {
         Connection c = newConnectionWithLanguage("js");
-        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        assertEquals("javascript", c.getDialectIdentifier().getName());
         c.close();
     }
 
@@ -116,7 +116,7 @@ public class ScriptConnectionTest extends AbstractTestCase {
      */
     public void testLanguageJavaScript() {
         Connection c = newConnectionWithLanguage("JavaScript");
-        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        assertEquals("javascript", c.getDialectIdentifier().getName());
         c.close();
     }
 
@@ -125,7 +125,7 @@ public class ScriptConnectionTest extends AbstractTestCase {
      */
     public void testLanguageRhino() {
         Connection c = newConnectionWithLanguage("rhino");
-        assertEquals("ECMAScript", c.getDialectIdentifier().getName());
+        assertEquals("javascript", c.getDialectIdentifier().getName());
         c.close();
     }
 
@@ -139,6 +139,33 @@ public class ScriptConnectionTest extends AbstractTestCase {
         } catch (ConfigurationException e) {
             assertTrue(String.valueOf(e.getMessage()).contains("python"));
         }
+    }
+
+    public void testMissingJavaScriptProviderDiagnostic() {
+        ScriptEngineManager manager = new ScriptEngineManager() {
+            @Override
+            public List<javax.script.ScriptEngineFactory> getEngineFactories() {
+                return Collections.emptyList();
+            }
+        };
+        String message = ScriptConnection.unsupportedLanguageMessage(manager, "js");
+        assertTrue(message.contains("language=js"));
+        assertTrue(message.contains("Available values are: []"));
+        assertTrue(message.contains("external JSR-223 provider on JDK 17"));
+        assertTrue(message.contains("org.mozilla:rhino-engine:1.9.1"));
+        assertTrue(message.contains("org.mozilla:rhino:1.9.1"));
+        assertTrue(message.contains("lib/"));
+        assertTrue(message.contains("bin/scriptella.sh"));
+        assertTrue(message.contains("bin/scriptella.bat"));
+        assertTrue(message.contains("plain java -jar"));
+        assertTrue(message.contains("same application classloader"));
+    }
+
+    public void testUnknownLanguageDiagnosticDoesNotRecommendRhino() {
+        String message = ScriptConnection.unsupportedLanguageMessage(new ScriptEngineManager(), "python");
+        assertTrue(message.contains("language=python"));
+        assertFalse(message.contains("org.mozilla"));
+        assertFalse(message.contains("bin/scriptella"));
     }
 
     /**

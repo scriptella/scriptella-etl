@@ -140,11 +140,15 @@
                 <artifactId>h2</artifactId>
                 <version>1.1.116</version>
             </dependency>
-            <!-- https://github.com/scriptella/scriptella-etl/issues/2 -->
             <dependency>
-                <groupId>cat.inspiracio</groupId>
-                <artifactId>rhino-js-engine</artifactId>
-                <version>1.7.10</version>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>1.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino-engine</artifactId>
+                <version>1.9.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
