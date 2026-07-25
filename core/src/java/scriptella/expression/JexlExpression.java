@@ -15,9 +15,11 @@
  */
 package scriptella.expression;
 
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.parser.TokenMgrError;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlFeatures;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import scriptella.core.EtlVariable;
 import scriptella.spi.ParametersCallback;
 
@@ -31,7 +33,7 @@ import java.util.Map;
  * @version 1.0
  */
 public final class JexlExpression extends Expression {
-    private org.apache.commons.jexl2.Expression expression;
+    private org.apache.commons.jexl3.JexlExpression expression;
     private static final JexlEngine jexlEngine = newJexlEngine();
 
     protected JexlExpression(String expression) throws ParseException {
@@ -40,8 +42,6 @@ public final class JexlExpression extends Expression {
         try {
             this.expression = jexlEngine.createExpression(expression);
         } catch (Exception e) {
-            throw new ParseException(e.getMessage(), e);
-        } catch (TokenMgrError e) {
             throw new ParseException(e.getMessage(), e);
         }
     }
@@ -64,14 +64,24 @@ public final class JexlExpression extends Expression {
      * @return instance of JexlEngine.
      */
     public static JexlEngine newJexlEngine() {
-        JexlEngine je = new JexlEngine();
         Map<String, Object> fMap = new HashMap<String, Object>();
         EtlVariable etl = new EtlVariable();
         fMap.put("date", etl.getDate());
         fMap.put("text", etl.getText());
         fMap.put("class", etl.getClazz());
-        je.setFunctions(fMap);
-        return je;
+        return new JexlBuilder()
+                .permissions(JexlPermissions.UNRESTRICTED)
+                .features(JexlFeatures.createDefault())
+                .namespaces(fMap)
+                .strict(false)
+                .silent(false)
+                .safe(true)
+                .antish(true)
+                .lexical(false)
+                .lexicalShade(false)
+                .cancellable(false)
+                .debug(true)
+                .create();
     }
 
     /**
@@ -98,6 +108,7 @@ public final class JexlExpression extends Expression {
             //variable is always present, otherwise JEXL will log warnings and throws errors internally
             return true;
         }
+
     }
 
 }

@@ -2,14 +2,14 @@
 <etl>
     <properties>
         #a,b and foo
-        var=1
-        b=$var|$var|$var|${var}|${var}|${var}
+        value=1
+        b=$value|$value|$value|${value}|${value}|${value}
         <include href="PropertiesTest.properties"/>
-        url.prefix=jdbc:hsqldb:mem
+        urlPrefix=jdbc:hsqldb:mem
         dbname=propertiestest
         driver=org.hsqldb.jdbcDriver
         #url should be substituted
-        url=${url.prefix}:$dbname
+        url=${urlPrefix}:$dbname
         user=sa
         password=
     </properties>

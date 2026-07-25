@@ -49,9 +49,9 @@ public class PropertiesTest extends AbstractTestCase {
         //check substituted properties in a context
         assertEquals("1", ctx.getParameter("a"));
         assertEquals("bar", ctx.getParameter("foo"));
-        assertEquals("1", ctx.getParameter("var"));
+        assertEquals("1", ctx.getParameter("value"));
         assertEquals("1|1|1|1|1|1", ctx.getParameter("b"));
-        assertEquals("jdbc:hsqldb:mem", ctx.getParameter("url.prefix"));
+        assertEquals("jdbc:hsqldb:mem", ctx.getParameter("urlPrefix"));
         assertEquals("propertiestest", ctx.getParameter("dbname"));
         assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
         assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
@@ -59,10 +59,10 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("sa", ctx.getParameter("user"));
         assertEquals("", ctx.getParameter("password"));
         Map<String,String> extra = new HashMap<String, String>();
-        extra.put("var", "2");
+        extra.put("value", "2");
         se = prepareExecutor(extra);
         se.execute();
-        assertEquals("2", ctx.getParameter("var"));
+        assertEquals("2", ctx.getParameter("value"));
         assertEquals("2|2|2|2|2|2", ctx.getParameter("b"));
     }
 

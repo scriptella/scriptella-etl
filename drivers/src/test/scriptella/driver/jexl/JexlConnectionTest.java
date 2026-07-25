@@ -24,6 +24,8 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests for {@link JexlConnection}.
@@ -58,6 +60,20 @@ public class JexlConnectionTest extends AbstractTestCase {
         };
         jc.executeQuery(r, MockParametersCallbacks.fromMap(Collections.singletonMap("a0", 5)), callback);
 
+    }
+
+    public void testAssignmentsConditionalsLoopsAndExternalMethods() {
+        v = null;
+        Resource r = new StringResource(
+                "total=0; for (item : items) { if (item > 1) { total=total+item; } }; obj.setValue(total)");
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("items", new int[]{1, 2, 3});
+        parameters.put("obj", this);
+
+        JexlConnection jc = new JexlConnection(new MockConnectionParameters());
+        jc.executeScript(r, MockParametersCallbacks.fromMap(parameters));
+
+        assertEquals(5, ((Number) v).intValue());
     }
 
 }
