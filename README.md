@@ -13,13 +13,16 @@ Maven/Ant packaging), published on July 17, 2026.
 Scriptella 1.3 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3)
 and Maven Central.
 
+The `master` branch is the development line for **Scriptella 1.4**. See
+[What's coming in the next version](docs/next-version.md) for its current
+status, compatibility changes, and planned modernization work.
+
 ## Requirements
 
-| Component | Requirement |
-|-----------|-------------|
-| **Java** | Java **8** |
-| **Maven** | **3.6+** to build from source |
-| **Ant** | **1.10.17** for release packaging only |
+| Version | Java | Build tools |
+| --- | --- | --- |
+| **Scriptella 1.3 release** | Java **8** | Maven **3.6+**; Ant **1.10.17** for release packaging |
+| **`master` (`1.4-SNAPSHOT`)** | Java **17** | Maven **3.6+**; Ant **1.10.17** for release packaging |
 
 ## Getting Scriptella
 
@@ -104,6 +107,8 @@ providers without assembling modules yourself.
 
 ### Build from source
 
+Current `master` must be built with JDK 17:
+
 ```bash
 # Module build and tests (primary path)
 mvn clean install
@@ -118,6 +123,7 @@ ant clean jar
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
 * Agent usage contract and templates: [docs/agent-usage.md](docs/agent-usage.md)
+* Next version: [docs/next-version.md](docs/next-version.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Release procedure: [docs/releases/RELEASE-RUNBOOK.md](docs/releases/RELEASE-RUNBOOK.md)
 * Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
