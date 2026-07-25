@@ -16,21 +16,21 @@ release notes; this is the primary changelog from Release 1.3 onward.
   Commons JEXL stays on **2.0.1** for 1.4 (2.1.1 rejected: `var`/`return`
   become reserved words and break existing `${var}` scripts).
 
-### Removed (planned for 1.4)
+### Removed
 
 * **ODBC / JDBC-ODBC bridge adapter** (`driver="odbc"`,
-  `sun.jdbc.odbc.JdbcOdbcDriver`) — removed with the Java 17 baseline; the
-  bridge has not existed in the JDK since Java 8. Use Scriptella 1.3 only if
-  you still depend on that adapter, or a maintained third-party JDBC driver
-  with a normal JDBC connection.
-* **HSQLDB 1.8** as the bundled test/sample database (replacement TBD; see
-  release plan Chunk 6).
+  `sun.jdbc.odbc.JdbcOdbcDriver`) and the `samples/odbc` example — the JDK
+  bridge has not existed since Java 8 and cannot work on the Java 17 baseline.
+  Use Scriptella 1.3 only if you still depend on that adapter, or a maintained
+  third-party JDBC driver with a normal JDBC connection / `GenericDriver`.
+* **HSQLDB 1.8** as the bundled test/sample database (planned; replacement TBD;
+  see release plan Chunk 6).
 
 ### Upgrade notes
 
 * JDK 17 required for building. JavaScript automatically routes to Rhino on JDK 17.
   Maven consumers using JS must add `org.mozilla:rhino-engine` / `org.mozilla:rhino` explicitly.
-* ODBC users: see Removed above; there is no Scriptella `odbc` driver in 1.4.
+* ODBC users: there is no Scriptella `odbc` driver in 1.4.
 
 ## [1.3] — 2026-07-17
 

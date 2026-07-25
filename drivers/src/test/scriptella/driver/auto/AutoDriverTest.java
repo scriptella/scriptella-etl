@@ -67,9 +67,9 @@ public class AutoDriverTest extends AbstractTestCase {
             //OK
         }
 
-        //Test case insensitive matching
-        expectedDriver = "odbc";
-        d.connect(new MockConnectionParameters(null, "jdbc:ODbC:...."));
+        //Test case insensitive matching (URLs are lower-cased before pattern match)
+        expectedDriver = "h2";
+        d.connect(new MockConnectionParameters(null, "jdbc:H2:....."));
         assertNull(expectedDriver);
 
     }

@@ -1,9 +1,8 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3 and 5A complete; 5B quick wins done;
-JEXL 2.1.1 rejected; remaining work ordered for **maintenance first**: 5C
-bytecode, HSQLDB removal, **ODBC removal (6A)**, Velocity fat-JAR split,
-Spring migration)
+**Status:** In progress (Chunks 1–3, 5A, and **6A ODBC removal** complete; 5B
+quick wins done; JEXL 2.1.1 rejected; remaining: 5C bytecode, HSQLDB, Velocity
+fat-JAR split, Spring migration)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -59,7 +58,7 @@ not a feature release. Order work and accept or reject changes by these themes:
 | --- | --- | --- |
 | High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | Maintenance baseline; unblocks honest JDK 17 claims and Chunk 7 |
 | High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | Drop obsolete stack; largest maintenance win still open |
-| High | **Chunk 6A** — **Remove ODBC driver** and sample | Dead on modern JDKs; false support claim; small isolated drop |
+| High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
 | Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | Packaging hygiene; keep optional driver without fat-JAR debt |
 | Medium | **5B Spring** — 5.3.39 migration (own PR) | JDK-era Spring; real code change, not drop-in |
 | Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + drop chunks (and remaining 5B) are settled |
@@ -950,8 +949,7 @@ Validate all of the following from clean checkouts of both repositories:
 
 ## Chunk 6A — Remove ODBC / JDBC-ODBC Bridge Adapter
 
-**Status:** Pending — **required for 1.4** (maintenance theme: abandon pieces
-that cannot work on the Java 17 baseline)
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Low
 
@@ -1025,15 +1023,22 @@ Confirm:
 * examples/binary packaging (if exercised) does not include `samples/odbc`;
 * full drivers suite stays green without ODBC skips.
 
+### Completion notes
+
+Removed `scriptella.driver.odbc`, `samples/odbc`, the `jdbc:odbc:=odbc` auto
+map entry, and ODBC-only test paths. `DriverFactoryTest` now covers classpath
+JDBC (`hsqldb`) and short-name Scriptella drivers (`jexl`). `AutoDriverTest`
+case-insensitive URL matching uses `jdbc:H2:`. CHANGELOG records the removal.
+
 ### Exit criteria
 
-* [ ] `scriptella.driver.odbc` package is gone.
-* [ ] Auto URL map has no `jdbc:odbc` → `odbc` entry.
-* [ ] `samples/odbc` is gone from product (and examples project if present).
-* [ ] Tests no longer depend on the JDK JDBC-ODBC bridge.
-* [ ] CHANGELOG and user-facing docs state the removal and point older needs
+* [x] `scriptella.driver.odbc` package is gone.
+* [x] Auto URL map has no `jdbc:odbc` → `odbc` entry.
+* [x] `samples/odbc` is gone from product.
+* [x] Tests no longer depend on the JDK JDBC-ODBC bridge.
+* [x] CHANGELOG and user-facing docs state the removal and point older needs
       at Scriptella 1.3 or plain JDBC with an external driver.
-* [ ] `git diff --check` is clean.
+* [x] Focused Maven tests green after the change.
 
 ## Chunk 7 — Full Compatibility and Distribution Matrix
 

@@ -16,8 +16,8 @@
 package scriptella.core;
 
 import scriptella.AbstractTestCase;
-
-import java.util.logging.Logger;
+import scriptella.jdbc.GenericDriver;
+import scriptella.spi.ScriptellaDriver;
 
 /**
  * Tests for {@link scriptella.core.DriverFactory}.
@@ -26,37 +26,26 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class DriverFactoryTest extends AbstractTestCase {
-    private static final Logger logger = Logger.getLogger(DriverFactoryTest.class.getName());
-    public static final String SUN_JDBC_ODBC_JDBC_ODBC_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
-    private static boolean skipJdbcOdbc;
-
-    static {
-        try {
-            Class.forName(SUN_JDBC_ODBC_JDBC_ODBC_DRIVER);
-        } catch (ClassNotFoundException e) {
-            skipJdbcOdbc = true;
-            logger.warning(SUN_JDBC_ODBC_JDBC_ODBC_DRIVER + " not available starting from JDK8 - skipping related tests");
-        }
-    }
 
     /**
-     * Tests correct handling of drivers in bootstrap classpath.
-     */
-    public void testGetBootstrapDriver() throws ClassNotFoundException {
-        if (!skipJdbcOdbc) {
-            //JDBC-ODBC
-            DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", null);
-        }
-    }
-
-    /**
-     * Tests correct handling of drivers in classpath(e.g. lib directory).
+     * Tests correct handling of JDBC drivers on the test classpath (e.g. lib directory).
+     * <p>Historical coverage of {@code sun.jdbc.odbc.JdbcOdbcDriver} was removed with
+     * Chunk 6A — the JDK JDBC-ODBC bridge is not available on modern JDKs.
      */
     public void testClassPathDriver() throws ClassNotFoundException {
-        DriverFactory.getDriver("org.hsqldb.jdbcDriver", getClass().getClassLoader());
-        if (!skipJdbcOdbc) {
-            //Bootstrap classes should also be loaded using the classloader scriptella jars.
-            DriverFactory.getDriver("sun.jdbc.odbc.JdbcOdbcDriver", getClass().getClassLoader());
-        }
+        ScriptellaDriver driver = DriverFactory.getDriver(
+                "org.hsqldb.jdbcDriver", getClass().getClassLoader());
+        assertNotNull(driver);
+        assertTrue(driver instanceof GenericDriver);
+    }
+
+    /**
+     * Full class names of {@link scriptella.spi.ScriptellaDriver} implementations load directly.
+     */
+    public void testScriptellaDriverClassName() throws ClassNotFoundException {
+        ScriptellaDriver driver = DriverFactory.getDriver(
+                GenericDriver.class.getName(), getClass().getClassLoader());
+        assertNotNull(driver);
+        assertTrue(driver instanceof GenericDriver);
     }
 }

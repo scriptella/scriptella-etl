@@ -19,8 +19,8 @@ Scriptella is actually built and run. Features are secondary.
   fat `velocity-dep.jar` goes away in favor of explicit JARs.
 * **Drop** stacks that are no longer relevant — notably **HSQLDB 1.8**, which
   will be removed from tests, samples, and distributions (replacement TBD,
-  H2 is a candidate), and the **ODBC / JDBC-ODBC bridge adapter**, which
-  cannot work after the JDK removed `sun.jdbc.odbc` (Java 8+).
+  H2 is a candidate). The **ODBC / JDBC-ODBC bridge adapter** has already
+  been removed (Chunk 6A).
 * **Do not** force library bumps that break existing scripts without a
   deliberate migration (e.g. Commons JEXL stays on **2.0.1** after a failed
   2.1.1 trial).
@@ -70,8 +70,7 @@ is complete; see
    (plan Chunk 5C);
 2. **remove HSQLDB 1.8 entirely** after validating a Java 17-compatible
    replacement for tests and examples (plan Chunk 6);
-3. **remove the ODBC driver** and sample (plan Chunk 6A) — JDBC-ODBC bridge
-   is gone from modern JDKs;
+3. ~~**remove the ODBC driver** and sample (Chunk 6A)~~ — **done**;
 4. Velocity **1.7** with **explicit JARs** (drop fat `velocity-dep.jar`); keep
    the optional Velocity driver for existing report ETLs;
 5. Spring Framework **5.3.x** with a small Scriptella migration for the removed
