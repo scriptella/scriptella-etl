@@ -8,6 +8,23 @@ There is no committed 1.4 release date yet. This page summarizes the intended
 user-visible direction and will be updated as work is completed. It is not a
 release announcement or compatibility promise for an unreleased snapshot.
 
+## Themes
+
+1.4 prioritizes **project maintainability and modernization**: a current Java
+baseline, fewer obsolete dependencies, and packaging that matches how
+Scriptella is actually built and run. Features are secondary.
+
+* **Keep** optional drivers that still serve real (even if niche) users when a
+  small hygiene fix is enough — e.g. Velocity reports stay supported, but the
+  fat `velocity-dep.jar` goes away in favor of explicit JARs.
+* **Drop** stacks that are no longer relevant — notably **HSQLDB 1.8**, which
+  will be removed from tests, samples, and distributions (replacement TBD,
+  H2 is a candidate), and the **ODBC / JDBC-ODBC bridge adapter**, which
+  cannot work after the JDK removed `sun.jdbc.odbc` (Java 8+).
+* **Do not** force library bumps that break existing scripts without a
+  deliberate migration (e.g. Commons JEXL stays on **2.0.1** after a failed
+  2.1.1 trial).
+
 ## Java 17 baseline
 
 Scriptella 1.4 requires Java 17 for building and running and will produce Java
@@ -32,7 +49,7 @@ upgrading every library to its newest major version. Chunk 5A impact analysis
 is complete; see
 [chunk-5a-dependency-impact.md](releases/1.4/chunk-5a-dependency-impact.md).
 
-**Completed quick wins (Chunk 5B partial):**
+**Completed (Chunk 5B partial):**
 
 * Janino **3.1.12** (with matching commons-compiler)
 * JavaMail **`com.sun.mail:javax.mail:1.6.2`** and Activation **1.1.1**
@@ -40,22 +57,29 @@ is complete; see
 * Ant **1.10.17** for the tools module Maven dependency
 * Commons Logging **1.2** (embedded for JEXL)
 
-**Still planned:**
+**Rejected for 1.4 after trial:**
 
-* raise Maven and Ant compiles to **`release=17`** / class-file major **61**
-  (plan Chunk 5C);
-* a conservative Commons JEXL **2.1.1** candidate on the existing 2.x line
-  (JEXL 3.6.4 is deferred to a later release; see issue #45);
-* Velocity **1.7** with explicit transitive JARs instead of `velocity-dep.jar`;
-* Spring Framework **5.3.x** with a small Scriptella migration for the removed
-  `SingletonBeanFactoryLocator` API;
-* removing the obsolete HSQLDB 1.8 dependency after validating a suitable
-  Java 17-compatible replacement; and
-* reconciling Maven, Ant, the all-in-one JAR, examples, licenses, and
-  distribution archives so they contain consistent dependency versions.
+* Commons JEXL **2.1.1** — 2.1 introduces `var` and `return` as reserved
+  words, so identifiers like `${var}` fail to parse. Stay on **2.0.1**.
+  JEXL 3.6.4 remains deferred (issue #45) and would need the same keyword
+  and migration analysis.
 
-These remaining targets are subject to Chunk 5B completion and review. If a
-proposed upgrade requires a larger behavior or API migration, it will be
+**Still planned (maintenance-first order):**
+
+1. raise Maven and Ant compiles to **`release=17`** / class-file major **61**
+   (plan Chunk 5C);
+2. **remove HSQLDB 1.8 entirely** after validating a Java 17-compatible
+   replacement for tests and examples (plan Chunk 6);
+3. **remove the ODBC driver** and sample (plan Chunk 6A) — JDBC-ODBC bridge
+   is gone from modern JDKs;
+4. Velocity **1.7** with **explicit JARs** (drop fat `velocity-dep.jar`); keep
+   the optional Velocity driver for existing report ETLs;
+5. Spring Framework **5.3.x** with a small Scriptella migration for the removed
+   `SingletonBeanFactoryLocator` API;
+6. reconciling Maven, Ant, the all-in-one JAR, examples, licenses, and
+   distribution archives so they contain consistent dependency versions.
+
+If a proposed upgrade requires a larger behavior or API migration, it will be
 reconsidered and documented rather than introduced silently.
 
 ## Compatibility and release validation

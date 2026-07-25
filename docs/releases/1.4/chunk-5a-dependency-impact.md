@@ -248,11 +248,12 @@ Replacing `velocity-dep.jar` with `velocity.jar` + explicit transitive JARs is
 the main work. Confirm runtime needs for Scriptella’s evaluate-only path; do
 not ship provided-scope curiosities (servlet-api, ant, logkit) in distributions.
 
-**Recommendation: implement**
+**Recommendation: implement** (confirmed July 25, 2026)
 
-API-compatible 1.6.2 → 1.7 with packaging modernization. Run
-`VelocityConnectionTest` and `VelocityScriptTest`. Document that Velocity 2.x
-is out of scope (LogChute/SLF4J migration).
+API-compatible 1.6.2 → 1.7 with packaging modernization. **Primary goal is
+maintenance:** eliminate the fat `velocity-dep.jar` and pin explicit JARs.
+Keep the optional Velocity driver for niche report ETLs; do not invest in
+Velocity 2.x. Run `VelocityConnectionTest` and `VelocityScriptTest`.
 
 ---
 
@@ -304,6 +305,17 @@ compatibility decision. JEXL 3.6.4 remains out of scope (issue #45).
 **Recommendation: implement** after characterization suite stays green on a
 local trial in 5B. If any behavioral delta appears, stop and document rather
 than rewriting expectations.
+
+### 5B trial result (July 25, 2026): reject 2.1.1
+
+A local pin to 2.1.1 failed characterization immediately. Compared to 2.0.1,
+the 2.1 parser adds reserved words **`var`** and **`return`**. Scriptella’s
+existing `var` parameter/expression usage (and likely user ETLs) no longer
+parse as identifiers. Failures included
+`JexlExpressionContractTest`, `PropertiesTest`, and `ParametersParserTest`.
+
+Per the 5B rule, expectations were not rewritten. Scriptella 1.4 remains on
+**2.0.1**. Document this rejection for JEXL 3 planning (issue #45).
 
 ---
 
@@ -407,7 +419,7 @@ keep them green (or obtain an explicit behavior exception).
 | JavaMail | `javax.mail:mail:1.4.1` | **`com.sun.mail:javax.mail:1.6.2`** + activation **1.1.1** | Low | **Done** (July 25, 2026) |
 | Velocity | 1.6.2 / `velocity-dep.jar` | **1.7** + Collections **3.2.2** + Lang **2.6** (no fat JAR) | Low–medium (packaging) | **Remaining** |
 | Ant (Maven tools) | 1.7.1 | **1.10.17** | Low | **Done** (July 25, 2026) |
-| Commons JEXL | 2.0.1 | **2.1.1** | Low–medium (engine) | **Remaining** with full suite |
+| Commons JEXL | 2.0.1 | **2.1.1** | Low–medium (engine) | **Rejected** (July 25, 2026) — stay on 2.0.1 (`var`/`return` keywords) |
 | Commons Logging | 1.0.4 | **1.2** | Low | **Done** (July 25, 2026) |
 | Spring 6/7, Jakarta Mail, Velocity 2, JEXL 3 | — | — | Out of scope | **Reject** for 1.4 |
 | Spring 4.3.x as final pin | — | — | Unsupported Java 17 story | **Reject** as 1.4 target |
@@ -418,7 +430,7 @@ keep them green (or obtain an explicit behavior exception).
 2. Janino 3.1.12 — **done**
 3. JavaMail 1.6.2 + Activation 1.1.1 — **done**
 4. Ant 1.10.17 — **done**
-5. Commons Logging pin — **done**; Commons JEXL 2.1.1 — **remaining**
+5. Commons Logging pin — **done**; Commons JEXL 2.1.1 — **rejected** (stay 2.0.1)
 6. Velocity 1.7 + split transitive JARs — **remaining**
 7. Spring 5.3.39 migration (own PR if preferred) — **remaining**
 

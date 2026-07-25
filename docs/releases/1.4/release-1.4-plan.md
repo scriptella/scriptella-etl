@@ -1,7 +1,9 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3 and 5A complete; 5B quick wins done;
-Chunk 5C pending for Java 17 bytecode)
+JEXL 2.1.1 rejected; remaining work ordered for **maintenance first**: 5C
+bytecode, HSQLDB removal, **ODBC removal (6A)**, Velocity fat-JAR split,
+Spring migration)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -22,6 +24,49 @@ document.
 
 No compatibility promise, release candidate, tag, publication, or website
 deployment is authorized by this plan alone.
+
+## Release themes and priorities (July 25, 2026)
+
+Scriptella 1.4 is primarily a **maintainability and modernization** release,
+not a feature release. Order work and accept or reject changes by these themes:
+
+1. **Improved project maintenance first.** Prefer changes that make the tree
+   easier to build, test, package, and understand on a current JDK: one
+   dependency graph for Maven and Ant, no fat JARs, no obsolete test-only
+   stacks, explicit compiler baseline, and honest optional-driver contracts.
+2. **Modernization.** Java 17 baseline and bytecode, current enough libraries
+   for that baseline, and distribution layouts that match real runtime needs.
+3. **Abandon pieces that are no longer relevant.** Drop or hard-replace
+   dead weight rather than carrying it “because it was always there.”
+   **HSQLDB 1.8 must be removed entirely** from product, tests, samples, and
+   distributions (Chunk 6); it is not a runtime requirement of Scriptella.
+   The **ODBC / JDBC-ODBC bridge adapter** must be removed entirely (Chunk 6A):
+   `sun.jdbc.odbc.JdbcOdbcDriver` was removed from the JDK in Java 8 and
+   cannot work on the 1.4 Java 17 baseline.
+4. **Preserve working optional drivers when a small hygiene fix is enough.**
+   Do not spend large migrations on optional surface area that is not
+   strategic. Example: keep the Velocity driver for the few consumers that
+   still use it, but **eliminate `velocity-dep.jar`** and pin explicit JARs
+   (Velocity 1.7 + Collections + Lang). Do not invest in Velocity 2.x unless
+   product priority changes later.
+5. **Do not rewrite user contracts only to force a library bump.** JEXL 2.1.1
+   was rejected because `var`/`return` became reserved words; stay on 2.0.1
+   for 1.4. JEXL 3 remains a separate future decision (issue #45).
+
+### Priority order for remaining work
+
+| Priority | Work | Why |
+| --- | --- | --- |
+| High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | Maintenance baseline; unblocks honest JDK 17 claims and Chunk 7 |
+| High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | Drop obsolete stack; largest maintenance win still open |
+| High | **Chunk 6A** — **Remove ODBC driver** and sample | Dead on modern JDKs; false support claim; small isolated drop |
+| Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | Packaging hygiene; keep optional driver without fat-JAR debt |
+| Medium | **5B Spring** — 5.3.39 migration (own PR) | JDK-era Spring; real code change, not drop-in |
+| Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + drop chunks (and remaining 5B) are settled |
+
+Within 5B, Velocity packaging comes before Spring because it is smaller and
+purely maintenance-oriented; Spring remains required for 1.4 if the Spring
+driver is kept, but it is a larger migration.
 
 ## Current baseline
 
@@ -615,9 +660,9 @@ Maven Central.
 | Spring driver | `org.springframework:spring:1.2` | Spring Framework **5.3.39** split modules | **Remaining — implement with migration** |
 | Janino driver | `janino:3.1.0` | `janino:3.1.12` + `commons-compiler:3.1.12` | **Done** (July 25, 2026) |
 | Mail driver | `javax.mail:mail:1.4.1` + Activation 1.1 | `com.sun.mail:javax.mail:1.6.2` + `javax.activation:activation:1.1.1` | **Done** (July 25, 2026) |
-| Velocity driver | 1.6.2 / `velocity-dep.jar` | `velocity:1.7` + Collections **3.2.2** + Lang **2.6** | **Remaining** (split fat JAR) |
+| Velocity driver | 1.6.2 / `velocity-dep.jar` | `velocity:1.7` + Collections **3.2.2** + Lang **2.6** | **Remaining** — keep driver; **must drop fat JAR** |
 | User-facing Ant | `ant:1.7.1` | Ant **1.10.17** | **Done** (July 25, 2026) |
-| Commons JEXL | 2.0.1 | **2.1.1** (not JEXL 3) | **Remaining** with full suite |
+| Commons JEXL | 2.0.1 | **2.1.1** (not JEXL 3) | **Rejected** (July 25, 2026) — stay on 2.0.1 |
 | Commons Logging | 1.0.4 | **1.2** | **Done** (July 25, 2026) |
 
 Rejected for 1.4: Spring 6/7, Jakarta Mail, Velocity 2.x, JEXL 3.x, Spring 4.3
@@ -653,7 +698,7 @@ sample libraries from earlier incomplete reverts.
 
 ## Chunk 5B — Implement Approved Dependency Upgrades
 
-**Status:** In progress (quick wins complete July 25, 2026)
+**Status:** In progress (quick wins complete; JEXL 2.1.1 rejected July 25, 2026)
 
 This is the implementation stage. Execute only the candidates approved by the
 impact analysis in [chunk-5a-dependency-impact.md](chunk-5a-dependency-impact.md).
@@ -677,12 +722,44 @@ licenses, `versions.properties`, and `samples/lib` (via `ant jar` prune/refresh)
 passed (154 core + 162 driver + 14 tools tests). Ant 1.10.17 —
 `ant clean test` and `ant jar` passed; `samples/lib` refreshed from `lib/`.
 
+### Commons JEXL 2.1.1 rejected (July 25, 2026)
+
+Local trial of `org.apache.commons:commons-jexl:2.1.1` failed characterization
+without any Scriptella source changes. JEXL 2.1 adds **`var`** and
+**`return`** as reserved words (absent from 2.0.1). Existing Scriptella usage
+of `var` as a property/parameter name therefore fails to parse:
+
+* `JexlExpressionContractTest.testParameterLookupAndConcatenation` —
+  `file + var`
+* `PropertiesTest` — property `var=1` and `${var}` / `$var` expansion
+* `ParametersParserTest.testInvalid` — same `file + var` pattern
+
+Representative error:
+
+```text
+org.apache.commons.jexl2.JexlException$Parsing: ... parsing error in 'var'
+Caused by: org.apache.commons.jexl2.parser.ParseException: parse error
+  at ...Parser.DeclareVar
+```
+
+**Decision:** keep **Commons JEXL 2.0.1** for Scriptella 1.4. Do not rewrite
+tests or user-facing identifier contracts to force the upgrade. JEXL 3 (issue
+#45) remains a separate future decision and must account for the same keyword
+break plus the package migration.
+
+Maven pin, `lib/commons-jexl.jar`, and `versions.properties` remain at **2.0.1**.
+
 ### Remaining 5B work
 
-1. Commons JEXL **2.1.1** (full expression suite; stop on behavioral deltas).
-2. Velocity **1.7** with split transitive JARs (drop `velocity-dep.jar`).
-3. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
+1. Velocity **1.7** with split transitive JARs (**drop `velocity-dep.jar`**).
+   Keep the optional Velocity driver for existing report ETLs; the goal is
+   maintenance (explicit deps, no fat JAR), not a template-engine rewrite.
+   Velocity 2.x stays out of scope.
+2. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
    holder; split modules). Prefer a dedicated PR.
+
+See also **Release themes and priorities**: HSQLDB removal (Chunk 6) and
+Java 17 bytecode (Chunk 5C) outrank remaining 5B for overall maintainability.
 
 ### Implementation rules
 
@@ -801,16 +878,19 @@ Confirm:
 
 ## Chunk 6 — Remove HSQLDB and Refresh Database Examples
 
-**Status:** Pending
+**Status:** Pending — **required for 1.4** (maintenance theme: abandon
+obsolete stacks; HSQLDB must not ship or anchor tests/examples)
 
 **Reasoning level:** Higher
 
 HSQLDB 1.8.0.10 is used throughout the Scriptella test harness, Ant classpaths,
 and committed examples, but it is not a core Scriptella runtime requirement.
-Remove it from the 1.4 dependency and distribution system rather than carrying
-forward another legacy embedded database. Keep the replacement open until a
-compatibility spike compares the available Java 17-compatible embedded
-databases and their licenses; H2 is a candidate, not a decision in this plan.
+**Drop it entirely** from the 1.4 dependency and distribution system rather
+than carrying forward another legacy embedded database. Keep the replacement
+open until a compatibility spike compares the available Java 17-compatible
+embedded databases and their licenses; H2 is a candidate, not a decision in
+this plan. Partial removal is not success: no HSQLDB JARs, coordinates,
+licenses, sample URLs, or docs may remain in product or examples checkouts.
 
 This chunk covers both the `scriptella-etl` repository and the separate
 `scriptella-examples` project. Updating only the product checkout would leave
@@ -867,6 +947,93 @@ Validate all of the following from clean checkouts of both repositories:
   names, and packaging rules.
 * The full Java 17 test and example matrix passes.
 * `git diff --check` is clean in both repositories.
+
+## Chunk 6A — Remove ODBC / JDBC-ODBC Bridge Adapter
+
+**Status:** Pending — **required for 1.4** (maintenance theme: abandon pieces
+that cannot work on the Java 17 baseline)
+
+**Reasoning level:** Low
+
+Scriptella’s `odbc` driver is a thin wrapper around
+`sun.jdbc.odbc.JdbcOdbcDriver` (the historical Sun JDBC-ODBC bridge). That
+bridge was **removed from the JDK in Java 8**. On the Scriptella 1.4 baseline
+(Java 17) the adapter cannot function; keeping it advertises support that is
+false and adds tests, samples, and auto-driver mappings for a dead path.
+
+**Decision:** remove the ODBC adapter entirely from 1.4. Do not replace it
+with a third-party ODBC bridge in this release. Users who need Access/ODBC
+data should use a maintained JDBC driver (or external tooling) and
+`GenericDriver` / an explicit JDBC driver class — outside this adapter.
+
+Users who still require the historical `odbc` alias must remain on
+**Scriptella 1.3** (or supply their own bridge JAR and a plain JDBC
+connection without the removed Scriptella driver name).
+
+### Scope inventory (product checkout)
+
+| Area | Location |
+| --- | --- |
+| Driver implementation | `drivers/src/java/scriptella/driver/odbc/` (`Driver.java`, `package.html`) |
+| Auto URL mapping | `drivers/src/conf/scriptella/driver/auto/url.properties` (`jdbc:odbc:=odbc`) |
+| Sample | `samples/odbc/` (`etl.xml`, `build.xml`, `readme.txt`) |
+| Core tests | `core/.../DriverFactoryTest` (JDBC-ODBC skip/load paths) |
+| Drivers tests | `drivers/.../auto/AutoDriverTest` (expects driver name `odbc`) |
+| Cross-docs | e.g. `drivers/.../janino/package.html` reference to ODBC sample |
+| Historical notes | `forrest/status.xml` (archive only; no need to rewrite history) |
+
+Also check `scriptella-examples` and any distribution packaging lists that
+copy `samples/odbc` into the examples ZIP. Remove or replace those entries
+in the same change window so published examples do not ship a dead sample.
+
+### Work
+
+1. Delete the `scriptella.driver.odbc` package (source and package docs).
+2. Remove the `jdbc:odbc:` → `odbc` entry from auto-driver `url.properties`.
+3. Remove `samples/odbc` and any Ant/dist rules that package that sample.
+4. Update or delete tests that load `sun.jdbc.odbc.JdbcOdbcDriver` or assert
+   the `odbc` Scriptella driver name (`DriverFactoryTest`, `AutoDriverTest`).
+   Prefer deleting ODBC-only assertions over leaving permanent skip flags.
+5. Fix remaining in-tree docs that present ODBC as a supported Scriptella
+   driver or point at the ODBC sample as a working example.
+6. Record a **CHANGELOG** “Removed” entry: ODBC / JDBC-ODBC bridge adapter
+   dropped; not usable on modern JDKs; 1.3 retains the old driver for
+   historical checkouts only.
+7. Confirm no SPI, service loader, or driver discovery table still lists
+   `odbc` as a built-in name (aside from intentional historical changelog).
+
+### Out of scope
+
+* Implementing a new Access/ODBC integration.
+* Bundling a third-party JDBC-ODBC bridge.
+* Changing generic JDBC URL handling for non-`odbc` drivers.
+* HSQLDB removal (Chunk 6) or other database work.
+
+### Validation
+
+```bash
+mvn -pl core,drivers -am clean test
+# after Ant is available in the environment:
+ant clean test
+```
+
+Confirm:
+
+* no compile references to `scriptella.driver.odbc` or
+  `sun.jdbc.odbc.JdbcOdbcDriver` remain in production or test source;
+* auto-driver resolution no longer maps `jdbc:odbc:`;
+* examples/binary packaging (if exercised) does not include `samples/odbc`;
+* full drivers suite stays green without ODBC skips.
+
+### Exit criteria
+
+* [ ] `scriptella.driver.odbc` package is gone.
+* [ ] Auto URL map has no `jdbc:odbc` → `odbc` entry.
+* [ ] `samples/odbc` is gone from product (and examples project if present).
+* [ ] Tests no longer depend on the JDK JDBC-ODBC bridge.
+* [ ] CHANGELOG and user-facing docs state the removal and point older needs
+      at Scriptella 1.3 or plain JDBC with an external driver.
+* [ ] `git diff --check` is clean.
 
 ## Chunk 7 — Full Compatibility and Distribution Matrix
 

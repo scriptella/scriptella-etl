@@ -25,12 +25,18 @@ import java.util.Map;
 
 /**
  * Characterization of the JEXL expression contracts used by Scriptella.
- * <p>Chunk 5A dependency upgrades (JEXL 2.1.1 candidate) must keep these green.
+ * <p>Chunk 5A/5B dependency upgrades must keep these green. The JEXL 2.1.1
+ * candidate was rejected because it treats {@code var} (and {@code return}) as
+ * reserved words, breaking identifier use of {@code var} proven below.
  *
  * @author Scriptella Project Team
  */
 public class JexlExpressionContractTest extends AbstractTestCase {
 
+    /**
+     * Pins that {@code var} remains a legal identifier (JEXL 2.0.1).
+     * JEXL 2.1+ reserves {@code var} for local declarations and fails parse.
+     */
     public void testParameterLookupAndConcatenation() {
         Object value = Expression.compile("file + var").evaluate(MockParametersCallbacks.SIMPLE);
         assertEquals("*file**var*", value);
