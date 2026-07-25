@@ -1,6 +1,8 @@
 <project name="scriptella-tools" default="jar">
     <path id="classpath">
         <pathelement location="${basedir}/../core/build/tmp/classes"/>
+        <!-- Ant task sources compile against the running Ant (ant.home). -->
+        <pathelement location="${ant.home}/lib/ant.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>

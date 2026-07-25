@@ -8,7 +8,9 @@ release notes; this is the primary changelog from Release 1.3 onward.
 
 ### Changed
 
-* **Java 17** is now the build baseline (requires JDK 17).
+* **Java 17** is the build and runtime baseline; Maven and Ant compile with
+  **`release=17`** (class-file major version **61**). Scriptella 1.3 remains
+  for Java 8.
 * **JavaScript** upgraded to Rhino 1.9.1 (`org.mozilla:rhino-engine`). Auto-fallback
   to Rhino on JDK 17 when Nashorn is absent.
 * **Janino** → 3.1.12, **JavaMail** → `com.sun.mail:javax.mail:1.6.2`,

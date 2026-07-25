@@ -1,8 +1,8 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, 5A, and **6A ODBC removal** complete; 5B
-quick wins done; JEXL 2.1.1 rejected; remaining: 5C bytecode, HSQLDB, Velocity
-fat-JAR split, Spring migration)
+**Status:** In progress (Chunks 1–3, 5A, **5C**, and **6A** complete; 5B
+quick wins done; JEXL 2.1.1 rejected; remaining: HSQLDB, Velocity fat-JAR
+split, Spring migration)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -56,7 +56,7 @@ not a feature release. Order work and accept or reject changes by these themes:
 
 | Priority | Work | Why |
 | --- | --- | --- |
-| High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | Maintenance baseline; unblocks honest JDK 17 claims and Chunk 7 |
+| High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | **Done** (July 25, 2026) |
 | High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | Drop obsolete stack; largest maintenance win still open |
 | High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
 | Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | Packaging hygiene; keep optional driver without fat-JAR debt |
@@ -789,29 +789,22 @@ unreviewed breaking behavior.
 
 ## Chunk 5C — Raise Maven and Ant Builds to Java 17
 
-**Status:** Pending
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Moderate
 
 Chunk 2 decided that Scriptella 1.4 requires Java 17 and publishes Java 17
-bytecode. Runtime and packaging work for JDK 17 has largely landed, but the
-**compiler baseline is still the 1.3 Java 8 setting**. Building on a modern
-JDK currently produces class-file major version 52 and Ant/`javac` warnings
-about obsolete `-source 8` / `-target 1.8` and a missing bootstrap classpath.
+bytecode. This chunk applies that contract to every production compile path.
 
-This chunk applies the Chunk 2 contract to every production compile path. It
-is independent of the remaining dependency upgrades in Chunk 5B and should
-complete before Chunk 7’s full matrix (which requires major version 61).
+### Applied baseline
 
-### Current state (gap)
-
-| Path | Today | Required |
-| --- | --- | --- |
-| Maven `maven-compiler-plugin` | `source`/`target` **1.8** | `release` **17** |
-| Ant `build-templates/build-template.xml` `javac` | `source="1.8"` `target="1.8"` | `release="17"` (or equivalent) |
-| Produced bytecode | major **52** (Java 8) | major **61** (Java 17) |
-| PMD / other `targetJdk` settings that still say 1.8 | **1.8** | **17** where they describe the product baseline |
-| Public docs / migration notes | may still imply 8 in places | Java 17 min; point older JDKs to Scriptella 1.3 |
+| Path | Setting |
+| --- | --- |
+| Maven `maven-compiler-plugin` | `<release>17</release>` |
+| Ant `build-templates/build-template.xml` `javac` | `release="17"` + `includeantruntime="false"` (main + test) |
+| Coverage Ant path (`coverage.xml`) | same `release="17"` |
+| PMD reporting `targetJdk` | **17** |
+| Produced bytecode | major **61** (Java 17) |
 
 ### Work
 
@@ -866,14 +859,29 @@ Confirm:
 * Ant no longer warns about unset `includeantruntime` on updated tasks;
 * tests remain green on JDK 17.
 
+### Completion notes (July 25, 2026)
+
+* Maven: `maven-compiler-plugin` **3.13.0** with `<release>17</release>`; PMD
+  `targetJdk` **17**.
+* Ant: `build-templates/build-template.xml` and `coverage.xml` use
+  `release="17"` and `includeantruntime="false"`.
+* Tools Ant build: after `includeantruntime="false"`, `tools/build.xml`
+  must declare `${ant.home}/lib/ant.jar` on the compile classpath (Ant task
+  sources need `Task` / `BuildException`; do not re-enable ant-runtime
+  leakage on other modules).
+* Validation: Temurin **17.0.20**, Maven 3.8.1, Ant **1.10.17** (installed under
+  the parent directory `../ant` → `apache-ant-1.10.17`):
+  * `mvn -pl core,drivers,tools -am clean test` SUCCESS
+  * `ant clean test` SUCCESS; `ant jar` SUCCESS
+  * class major **61** on module outputs and all-in-one `scriptella.jar`
+
 ### Exit criteria
 
-* [ ] Maven and Ant production compiles use **release 17**.
-* [ ] Published/build class files are major version **61**.
-* [ ] `mvn clean test` and `ant clean test` pass on JDK 17.
-* [ ] Stale 1.8 product-baseline settings in the build are gone or explicitly
-  justified.
-* [ ] Chunk 7 may assert major 61 without a known compiler gap.
+* [x] Maven and Ant production compiles use **release 17**.
+* [x] Published/build class files are major version **61** (Maven + Ant verified).
+* [x] `mvn clean test` and `ant clean test` pass on JDK 17.
+* [x] Stale 1.8 product-baseline settings in the build are gone.
+* [x] Chunk 7 may assert major 61 without a known compiler gap.
 
 ## Chunk 6 — Remove HSQLDB and Refresh Database Examples
 

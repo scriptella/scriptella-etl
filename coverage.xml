@@ -86,9 +86,11 @@
         <mkdir dir="${classes}"/>
         <mkdir dir="${testclasses}"/>
         <javac srcdir="core/src/java;drivers/src/java;tools/src/java"
-               destdir="${classes}" debug="on" debuglevel="lines,vars,source" classpathref="classpath"/>
+               destdir="${classes}" debug="on" debuglevel="lines,vars,source"
+               release="17" includeantruntime="false" classpathref="classpath"/>
         <javac srcdir="core/src/test;drivers/src/test;tools/src/test"
-               destdir="${testclasses}" debug="on" debuglevel="lines,vars,source">
+               destdir="${testclasses}" debug="on" debuglevel="lines,vars,source"
+               release="17" includeantruntime="false">
             <classpath refid="classpath"/>
             <classpath location="${classes}"/>
         </javac>

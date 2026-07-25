@@ -50,7 +50,8 @@
 
     <target name="compile" depends="init">
         <javac srcdir="${java.dir}" destdir="${classes.dir}" classpathref="classpath"
-               debug="on" debuglevel="lines,vars,source" target="1.8" source="1.8"/>
+               debug="on" debuglevel="lines,vars,source"
+               release="17" includeantruntime="false"/>
     </target>
 
     <target name="resources" if="resources_present" depends="init">
@@ -72,7 +73,8 @@
     <target name="test" depends="compile, resources" description="Runs module tests and produce XML report">
         <mkdir dir="${tests.tmp.dir}"/>
         <javac srcdir="${test.dir}" destdir="${tests.tmp.dir}"
-               debug="on" debuglevel="lines,vars,source">
+               debug="on" debuglevel="lines,vars,source"
+               release="17" includeantruntime="false">
             <classpath>
                 <path refid="test.classpath"/>
                 <pathelement location="${classes.dir}"/>

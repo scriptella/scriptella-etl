@@ -27,11 +27,10 @@ Scriptella is actually built and run. Features are secondary.
 
 ## Java 17 baseline
 
-Scriptella 1.4 requires Java 17 for building and running and will produce Java
-17 bytecode (class-file major version 61). Runtime and packaging work for JDK
-17 is largely on `master` (scripting, Rhino, distribution layout). Applying
-`release=17` to the Maven and Ant compilers is still tracked as plan Chunk
-**5C**; until that lands, snapshot builds may still emit Java 8 bytecode.
+Scriptella 1.4 requires Java 17 for building and running and produces Java 17
+bytecode (class-file major version **61**). Maven and Ant compile with
+**`release=17`** (plan Chunk **5C** complete). Runtime packaging for JDK 17
+(scripting, Rhino, distribution layout) is also on `master`.
 
 JavaScript execution now uses the official Mozilla Rhino 1.9.1 JSR-223
 provider. The binary and examples distributions include the matching
@@ -66,8 +65,8 @@ is complete; see
 
 **Still planned (maintenance-first order):**
 
-1. raise Maven and Ant compiles to **`release=17`** / class-file major **61**
-   (plan Chunk 5C);
+1. ~~raise Maven and Ant compiles to **`release=17`** / class-file major **61**
+   (Chunk 5C)~~ — **done**;
 2. **remove HSQLDB 1.8 entirely** after validating a Java 17-compatible
    replacement for tests and examples (plan Chunk 6);
 3. ~~**remove the ODBC driver** and sample (Chunk 6A)~~ — **done**;
