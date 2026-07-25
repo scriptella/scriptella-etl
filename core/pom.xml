@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-jexl3</artifactId>
+            <artifactId>commons-jexl</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

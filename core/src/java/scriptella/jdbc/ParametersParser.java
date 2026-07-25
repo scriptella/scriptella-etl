@@ -69,8 +69,6 @@ public class ParametersParser {
                 return Lobs.newBlob(u);
             } catch (Expression.ParseException e) {
                 //If parsing fails try to evaluate the whole expression not the file reference
-            } catch (Expression.EvaluationException e) {
-                //If evaluation fails it may be an expression that only starts with the file prefix
             }
         } else if (expression.startsWith("textfile ")) {
             //now checking the syntax
@@ -82,8 +80,6 @@ public class ParametersParser {
                 return Lobs.newClob(new InputStreamReader(u.openStream()));
             } catch (Expression.ParseException e) {
                 //If parsing fails try to evaluate the whole expression not the file reference
-            } catch (Expression.EvaluationException e) {
-                //If evaluation fails it may be an expression that only starts with the textfile prefix
             } catch (IOException e) {
                 throw new JdbcException("Failed to open reader for expression " + expression, e);
             }

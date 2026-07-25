@@ -7,8 +7,6 @@ binary_zip=$1
 examples_zip=$2
 rhino_engine_jar=$3
 rhino_runtime_jar=$4
-jexl_jar=$5
-commons_logging_jar=$6
 
 fail() {
     echo "bundled JavaScript contract failed: $*" >&2
@@ -19,8 +17,7 @@ assert_contains() {
     grep -F "$2" "$1" >/dev/null || fail "$1 does not contain: $2"
 }
 
-for required_file in "$binary_zip" "$examples_zip" "$rhino_engine_jar" \
-        "$rhino_runtime_jar" "$jexl_jar" "$commons_logging_jar"; do
+for required_file in "$binary_zip" "$examples_zip" "$rhino_engine_jar" "$rhino_runtime_jar"; do
     [ -f "$required_file" ] || fail "missing required file: $required_file"
 done
 
@@ -74,42 +71,8 @@ assert_rhino_bundle() {
         || fail "$bundle_lib/rhino-engine.jar has an unexpected JSR-223 provider"
 }
 
-assert_jexl_bundle() {
-    bundle_lib=$1
-    [ -d "$bundle_lib" ] || fail "missing library directory: $bundle_lib"
-
-    find "$bundle_lib" -maxdepth 1 -type f -name 'commons-jexl*.jar' -exec basename {} \; \
-        | sort >"$work_dir/actual-jexl-jars.txt"
-    echo "commons-jexl3.jar" >"$work_dir/expected-jexl-jars.txt"
-    cmp "$work_dir/expected-jexl-jars.txt" "$work_dir/actual-jexl-jars.txt" >/dev/null \
-        || fail "$bundle_lib does not contain exactly the supported JEXL JAR"
-
-    cmp "$jexl_jar" "$bundle_lib/commons-jexl3.jar" >/dev/null \
-        || fail "$bundle_lib/commons-jexl3.jar does not match the selected artifact"
-    cmp "$commons_logging_jar" "$bundle_lib/commons-logging.jar" >/dev/null \
-        || fail "$bundle_lib/commons-logging.jar does not match the selected artifact"
-
-    for metadata in commons-jexl3.license.txt commons-jexl.notice.txt \
-            commons-logging.license.txt commons-logging.notice.txt; do
-        [ -f "$bundle_lib/$metadata" ] || fail "$bundle_lib has no $metadata"
-    done
-    assert_contains "$bundle_lib/commons-jexl3.license.txt" "Apache License"
-    assert_contains "$bundle_lib/commons-jexl.notice.txt" "Apache Commons JEXL"
-    assert_contains "$bundle_lib/commons-logging.license.txt" "Apache License"
-    assert_contains "$bundle_lib/commons-logging.notice.txt" "Apache Commons Logging"
-
-    unzip -p "$bundle_lib/commons-jexl3.jar" META-INF/MANIFEST.MF \
-        | tr -d '\r' >"$work_dir/jexl-manifest.txt"
-    unzip -p "$bundle_lib/commons-logging.jar" META-INF/MANIFEST.MF \
-        | tr -d '\r' >"$work_dir/commons-logging-manifest.txt"
-    assert_contains "$work_dir/jexl-manifest.txt" "Implementation-Version: 3.6.4"
-    assert_contains "$work_dir/commons-logging-manifest.txt" "Implementation-Version: 1.4.0"
-}
-
 assert_rhino_bundle "$dist_dir/lib"
 assert_rhino_bundle "$examples_dir/lib"
-assert_jexl_bundle "$dist_dir/lib"
-assert_jexl_bundle "$examples_dir/lib"
 
 main_jar="$dist_dir/scriptella.jar"
 [ -f "$main_jar" ] || fail "binary distribution has no scriptella.jar"
@@ -119,21 +82,6 @@ fi
 if unzip -p "$main_jar" META-INF/services/javax.script.ScriptEngineFactory \
         | grep -F 'org.mozilla.javascript' >/dev/null; then
     fail "scriptella.jar registers Rhino"
-fi
-jar tf "$main_jar" >"$work_dir/scriptella-jar-contents.txt"
-grep -F 'org/apache/commons/jexl3/JexlEngine.class' \
-    "$work_dir/scriptella-jar-contents.txt" >/dev/null \
-    || fail "scriptella.jar does not embed JEXL 3"
-if grep -F 'org/apache/commons/jexl2/' "$work_dir/scriptella-jar-contents.txt" >/dev/null; then
-    fail "scriptella.jar embeds JEXL 2 classes"
-fi
-unzip -p "$main_jar" META-INF/services/javax.script.ScriptEngineFactory \
-    >"$work_dir/scriptella-script-engine-providers.txt"
-assert_contains "$work_dir/scriptella-script-engine-providers.txt" \
-    'org.apache.commons.jexl3.scripting.JexlScriptEngineFactory'
-if grep -F 'org.apache.commons.jexl2' \
-        "$work_dir/scriptella-script-engine-providers.txt" >/dev/null; then
-    fail "scriptella.jar registers a JEXL 2 script engine"
 fi
 unzip -p "$main_jar" META-INF/MANIFEST.MF | tr -d '\r' >"$work_dir/scriptella-manifest.txt"
 assert_contains "$work_dir/scriptella-manifest.txt" \
@@ -147,16 +95,11 @@ cat >"$work_dir/jexl.etl.xml" <<'EOF'
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
     <connection id="jexl" driver="jexl"/>
-    <script connection-id="jexl">
-        answer = 6 * 7;
-        class:forName('java.lang.System').out.println(
-            answer == 42 ? 'JEXL3_OK' : 'JEXL3_BAD');
-    </script>
+    <script connection-id="jexl">answer = 6 * 7;</script>
 </etl>
 EOF
 java -jar "$main_jar" "$work_dir/jexl.etl.xml" \
     >"$work_dir/jexl.out" 2>&1 || fail "bundled JEXL ETL failed through java -jar"
-assert_contains "$work_dir/jexl.out" "JEXL3_OK"
 
 mv "$dist_dir/lib/rhino-engine.jar" "$work_dir/rhino-engine.jar"
 mv "$dist_dir/lib/rhino.jar" "$work_dir/rhino.jar"

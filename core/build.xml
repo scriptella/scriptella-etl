@@ -1,6 +1,6 @@
 <project name="scriptella-core" default="jar">
     <path id="classpath">
-        <pathelement location="${basedir}/../lib/commons-jexl3.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
     </path>
     <path id="test.classpath">
         <path refid="classpath"/>

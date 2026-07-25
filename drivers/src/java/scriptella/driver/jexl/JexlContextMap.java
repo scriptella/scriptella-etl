@@ -15,17 +15,17 @@
  */
 package scriptella.driver.jexl;
 
-import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl2.JexlContext;
 import scriptella.driver.script.ParametersCallbackMap;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 /**
- * Mutable {@link org.apache.commons.jexl3.JexlContext} implementation for
+ * Mutable {@link org.apache.commons.jexl2.JexlContext} implementation for
  * integration into Scriptella execution environment.
  * This class allows local variables to be set via {@link #set(String, Object)} method.
  * <br>{@link #get(String)} allows reading variables.
- * <p><b>Important:</b> This class is used instead of {@link org.apache.commons.jexl3.MapContext} because
+ * <p><b>Important:</b> This class is used instead of {@link org.apache.commons.jexl2.MapContext} because
  * due to parameters model limitations and performance reasons {@link #has(String)} method should always return true.
  *
  * @author Fyodor Kupolov

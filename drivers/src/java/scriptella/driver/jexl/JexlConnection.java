@@ -15,8 +15,8 @@
  */
 package scriptella.driver.jexl;
 
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.Script;
 import scriptella.driver.script.MissingQueryNextCallDetector;
 import scriptella.driver.script.ParametersCallbackMap;
 import scriptella.expression.JexlExpression;
@@ -40,8 +40,8 @@ import java.util.Map;
  * @version 1.0
  */
 public class JexlConnection extends AbstractConnection {
-    private Map<Resource, JexlScript> cache = new IdentityHashMap<Resource, JexlScript>();
-    //Use the same factory method as in JexlExpression to share functions etc.
+    private Map<Resource, Script> cache = new IdentityHashMap<Resource, Script>();
+    //Use the same factory method as in JexlExpression to share functions etc. 
     private static final JexlEngine jexlEngine = JexlExpression.newJexlEngine();
 
     /**
@@ -67,7 +67,7 @@ public class JexlConnection extends AbstractConnection {
 
 
     private void run(Resource resource, JexlContextMap ctx) {
-        JexlScript script = cache.get(resource);
+        Script script = cache.get(resource);
         if (script == null) {
             String s;
             try {

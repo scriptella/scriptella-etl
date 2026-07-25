@@ -64,11 +64,11 @@ public class ParametersParserTest extends TestCase {
         try {
             p.evaluate("file + 'text'", MockParametersCallbacks.NULL);
         } catch (Expression.EvaluationException e) {
-            assertNotNull(e.getCause());
+            assertTrue(e.getCause() instanceof NullPointerException);
         }
         //not a file reference, just an expression starting with file prefix
-        final Object o = p.evaluate("file + value", MockParametersCallbacks.SIMPLE);
-        assertEquals("*file**value*",o);
+        final Object o = p.evaluate("file + var", MockParametersCallbacks.SIMPLE);
+        assertEquals("*file**var*",o);
 
 
 

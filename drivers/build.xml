@@ -5,7 +5,7 @@
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/janino-commons-compiler.jar"/>
         <pathelement location="${basedir}/../lib/spring.jar"/>
-        <pathelement location="${basedir}/../lib/commons-jexl3.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>
     </path>
@@ -15,7 +15,7 @@
         <pathelement location="${basedir}/../lib/commons-logging.jar"/>
         <pathelement location="${basedir}/../lib/hsqldb.jar"/>
         <pathelement location="${basedir}/../lib/h2.jar"/>
-        <pathelement location="${basedir}/../lib/commons-jexl3.jar"/>
+        <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/junit.jar"/>
         <!-- Optional JavaScript provider: test-only, never packaged by the Ant build. -->
         <pathelement location="${basedir}/../lib/rhino-engine.jar"/>

@@ -80,7 +80,7 @@
             <fileset dir="${core}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${tools}/build/tmp/classes" excludes="META-INF/*"/>
             <fileset dir="${drivers}/build/tmp/classes" excludes="META-INF/*"/>
-            <zipfileset src="${lib.dir}/commons-jexl3.jar" excludes="META-INF/*"/>
+            <zipfileset src="${lib.dir}/commons-jexl.jar" excludes="META-INF/*"/>
             <zipfileset src="${lib.dir}/commons-logging.jar"
                         excludes="META-INF/* **/NoOpLog* **/SimpleLog* **/LogSource*"/>
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
@@ -90,8 +90,6 @@
             </manifest>
         </jar>
         <!-- Update samples libs -->
-        <delete file="${basedir}/samples/lib/commons-jexl.jar" failonerror="no"/>
-        <delete file="${basedir}/samples/lib/commons-jexl.license.txt" failonerror="no"/>
         <copy todir="${basedir}/samples/lib">
             <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>
@@ -109,7 +107,7 @@
             <fileset dir="${tools}/src/java" includes="**/*.java"/>
         </zip>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt commons-*.notice.txt" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt" prefix="${product.name}/lib"/>
             <zipfileset dir="${lib.dir}"
                         includes="rhino-engine.jar rhino.jar rhino.license.txt rhino.source.txt"
                         prefix="${product.name}/lib"/>
@@ -150,8 +148,6 @@
             <arg value="${build.dir}/${examples.zip.name}"/>
             <arg value="${lib.dir}/rhino-engine.jar"/>
             <arg value="${lib.dir}/rhino.jar"/>
-            <arg value="${lib.dir}/commons-jexl3.jar"/>
-            <arg value="${lib.dir}/commons-logging.jar"/>
         </exec>
     </target>
 

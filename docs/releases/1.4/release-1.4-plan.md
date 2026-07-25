@@ -465,7 +465,7 @@ Add automated artifact-level coverage where practical:
 
 ## Chunk 4 — Upgrade Bundled JEXL to 3.6.4
 
-**Status:** Complete (July 25, 2026)
+**Status:** Pending
 
 **Reasoning level:** Higher
 
@@ -473,11 +473,6 @@ This is a follow-on dependency-modernization chunk. Do not mix it into the
 Chunk 3 JDK 17 and optional-provider implementation review. Start it after
 that work is stable so JDK migration failures and JEXL behavior changes remain
 distinguishable.
-
-**Scope note:** This implementation applies the 3.6.4 dependency and API
-upgrade only. It does not invent a source-rewriting or legacy-script adapter.
-Whether Scriptella 1.4 should provide such an adapter, or require users to
-migrate affected scripts, remains an open compatibility decision.
 
 ### Dependency decision
 
@@ -547,43 +542,12 @@ Confirm:
 
 ### Exit criteria
 
-* [x] JEXL 3.6.4 is the only bundled JEXL version.
-* [x] Existing Scriptella expression and JEXL-driver behavior is characterized;
-  known incompatible in-repository fixtures are migrated explicitly and the
-  legacy-script policy is tracked as an open issue.
-* [x] Maven, Ant, all-in-one, binary, and examples dependency sets agree.
-* [x] The full JEXL regression suite passes on JDK 17.
-* [x] `git diff --check` is clean.
-
-### Implementation record
-
-The direct JEXL API surface now uses Commons JEXL 3.6.4 and an explicitly
-configured shared `JexlEngine`. Maven, Ant, the all-in-one JAR, binary
-distribution, and examples all use the same JEXL 3 and Commons Logging
-artifacts; stale JEXL 2 classes, coordinates, service metadata, and license
-filenames are removed. Characterization and regression coverage includes
-expressions, scripts, callbacks, namespaces, nested parameters, concurrency,
-and representative distribution smoke tests. Existing in-repository fixtures
-that relied on JEXL 2 dotted-name resolution are migrated explicitly rather
-than hidden behind a source transformation.
-
-Validation completed on July 25, 2026 with:
-
-* `mvn -pl drivers -am test` (153 core tests, 151 driver tests);
-* `../apache-ant-1.10.17/bin/ant clean test`;
-* `../apache-ant-1.10.17/bin/ant -Ddtddoc.dir=../DTDDoc test-distribution`;
-* `git diff --check` and shell syntax validation.
-
-### Open issue: legacy-script migration policy
-
-Before release 1.4 is finalized, decide whether legacy JEXL 2-era Scriptella
-files receive a narrowly specified compatibility adapter or require an
-explicit script migration. The issue must inventory real affected constructs
-(including reserved identifiers and dotted parameters), define diagnostics and
-examples, and include compatibility tests before any adapter is approved. Do
-not add source rewriting as an implicit implementation detail. A future JEXL
-3.7/security-policy exploration remains separate, and the remaining Windows
-launcher matrix belongs to the existing Chunk 7 validation scope.
+* JEXL 3.6.4 is the only bundled JEXL version.
+* Existing Scriptella expression and JEXL-driver behavior is characterized
+  and preserved, or any approved incompatibility has a migration note.
+* Maven, Ant, all-in-one, binary, and examples dependency sets agree.
+* The full JEXL regression suite passes on JDK 17.
+* `git diff --check` is clean.
 
 ## Chunk 5 — Refresh Remaining Dependencies for JDK 17
 
