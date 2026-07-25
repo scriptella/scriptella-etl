@@ -314,7 +314,7 @@ quoted distribution paths and complete argument forwarding. The Unix
 launcher was exercised from the unpacked binary distribution on Temurin
 17.0.15. The Windows batch contract was checked in the assembled artifact for
 `lib` discovery and `%*` forwarding; native Windows execution remains part of
-the broader Chunk 5 platform matrix.
+the broader Chunk 6 platform matrix.
 
 Missing-provider errors for the fixed JavaScript aliases now include the
 requested language, discovered engines, supported coordinates, complete
@@ -454,7 +454,7 @@ Add automated artifact-level coverage where practical:
 * [x] Unix and Windows launchers construct their classpaths from `lib/*.jar`.
 * [x] The binary and examples distributions bundle exactly Rhino 1.9.1.
 * [x] `java -jar` and the Unix distribution launcher discover bundled Rhino;
-  the Windows launcher contract is assembled and awaits the Chunk 5 native
+  the Windows launcher contract is assembled and awaits the Chunk 6 native
   Windows matrix.
 * [x] JEXL and JavaScript work out of the box on JDK 17.
 * [x] Rhino's MPL license and exact source-availability notice are complete.
@@ -548,7 +548,76 @@ Confirm:
 * The full JEXL regression suite passes on JDK 17.
 * `git diff --check` is clean.
 
-## Chunk 5 — Full Compatibility and Distribution Matrix
+## Chunk 5 — Remove HSQLDB and Refresh Database Examples
+
+**Status:** Pending
+
+**Reasoning level:** Higher
+
+HSQLDB 1.8.0.10 is used throughout the Scriptella test harness, Ant classpaths,
+and committed examples, but it is not a core Scriptella runtime requirement.
+Remove it from the 1.4 dependency and distribution system rather than carrying
+forward another legacy embedded database. Keep the replacement open until a
+compatibility spike compares the available Java 17-compatible embedded
+databases and their licenses; H2 is a candidate, not a decision in this plan.
+
+This chunk covers both the `scriptella-etl` repository and the separate
+`scriptella-examples` project. Updating only the product checkout would leave
+the published examples and their build instructions inconsistent.
+
+### Work
+
+1. Inventory every HSQLDB reference in Maven, Ant, committed `lib/`, tests,
+   samples, generated archive inputs, documentation, and launcher commands.
+2. Run a small compatibility spike against one or more replacement databases.
+   Record the selected coordinates and exact version only after checking Java
+   17 support, SQL behavior, JDBC driver naming, shutdown semantics, licensing,
+   archive size, and maintenance status.
+3. Replace HSQLDB in the Scriptella core, drivers, and tools test suites,
+   including JDBC, Spring, launcher, template, transaction, and nested-query
+   coverage. Preserve test intent; do not merely change expected failures to
+   obtain a green build.
+4. Update the separate `scriptella-examples` checkout in the same change
+   window: sample ETLs, Ant builds, properties, README material, database
+   driver names, URLs, initialization scripts, and any generated example
+   archives.
+5. Remove HSQLDB coordinates, JARs, licenses, version properties, classpath
+   entries, and stale `org.hsqldb` references from both repositories and their
+   release packaging.
+6. Add characterization coverage for SQL and lifecycle differences discovered
+   during the migration, especially shutdown, identity columns, aliases,
+   generated keys, transactions, file databases, and text-table samples.
+
+### Compatibility and packaging validation
+
+Validate all of the following from clean checkouts of both repositories:
+
+* Maven and Ant tests pass without HSQLDB on any classpath;
+* the selected replacement works on the Java 17 baseline;
+* Spring, mail, Janino, JDBC, and template examples that use a database still
+  execute with the replacement;
+* binary and examples archives contain no HSQLDB JAR, license, coordinate, or
+  provider-specific classpath instruction;
+* the replacement's license and source/notice material are complete wherever
+  it is redistributed;
+* no private checkout path or developer-local Maven repository is needed;
+* the separate `scriptella-examples` project builds and its documented samples
+  run against the same database choice.
+
+### Exit criteria
+
+* HSQLDB is absent from Maven, Ant, source, tests, samples, and release
+  archives in both repositories.
+* The replacement database and version are explicitly recorded with their
+  compatibility and licensing rationale.
+* Existing database-backed regression and example behavior is preserved, or
+  approved differences have migration notes.
+* Scriptella and `scriptella-examples` use matching coordinates, URLs, driver
+  names, and packaging rules.
+* The full Java 17 test and example matrix passes.
+* `git diff --check` is clean in both repositories.
+
+## Chunk 6 — Full Compatibility and Distribution Matrix
 
 **Status:** Pending
 
@@ -622,7 +691,7 @@ unit tests for standalone or distribution claims.
 * No known packaging caveat contradicts the intended public compatibility
   statement.
 
-## Chunk 6 — Documentation and Adoption
+## Chunk 7 — Documentation and Adoption
 
 **Status:** Pending
 
