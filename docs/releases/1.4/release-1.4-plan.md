@@ -463,20 +463,29 @@ Add automated artifact-level coverage where practical:
   duplicated Rhino content.
 * [x] The supported commands are stable enough to document publicly.
 
-## Chunk 4 — Upgrade Bundled JEXL to 3.6.4
+## Chunk 4 — JEXL 3.6.4 Upgrade (Deferred)
 
-**Status:** Pending
+**Status:** Out of scope for 1.4
 
 **Reasoning level:** Higher
 
-This is a follow-on dependency-modernization chunk. Do not mix it into the
-Chunk 3 JDK 17 and optional-provider implementation review. Start it after
-that work is stable so JDK migration failures and JEXL behavior changes remain
-distinguishable.
+Do not implement the JEXL 3.6.4 upgrade as part of the 1.4 plan. The proposed
+upgrade was explored and reverted because the compatibility policy was not
+decided and an invented source-rewriting adapter was not acceptable.
+
+Track the exploration and future proposal in GitHub issue
+[#45](https://github.com/scriptella/scriptella-etl/issues/45). A later release
+may decide between explicit user-script migration and a narrowly scoped,
+reviewed compatibility layer.
+
+As part of the general dependency refresh, the conservative interim target is
+Commons JEXL **2.1.1**, the latest release in the JEXL 2 branch. Treat that as
+a candidate only: it still requires impact analysis and must not be upgraded
+automatically if characterization finds breaking behavior.
 
 ### Dependency decision
 
-Replace Commons JEXL 2.0.1 with
+The deferred JEXL 3 proposal would replace Commons JEXL 2.0.1 with
 `org.apache.commons:commons-jexl3:3.6.4`.
 
 JEXL 2.0.1 dates from 2010 and is the central embedded expression dependency.
@@ -547,7 +556,7 @@ Confirm:
   and preserved, or any approved incompatibility has a migration note.
 * Maven, Ant, all-in-one, binary, and examples dependency sets agree.
 * The full JEXL regression suite passes on JDK 17.
-* `git diff --check` is clean.
+* `git diff --check` is clean when this deferred work is eventually implemented.
 
 ### Deferred review findings (no implementation retained)
 
@@ -579,20 +588,23 @@ chunk:
 Do not mark Chunk 4 complete until that proposal is reviewed and its decision
 is implemented and validated.
 
-## Chunk 5 — Refresh Remaining Dependencies for JDK 17
+## Chunk 5A — Analyze Impact of Remaining Dependency Upgrades
 
 **Status:** Pending
 
 **Reasoning level:** Moderate
 
-This is a compatibility refresh, not a latest-version campaign. Select the
-smallest practical upgrade that gives each retained library a credible,
-tested JDK 17 path while preserving Scriptella's existing public APIs,
-configuration formats, and optional-driver behavior.
+This is the analysis stage of the dependency refresh. It is not an
+implementation authorization and must not change dependency versions. Select
+the smallest practical candidate that could give each retained library a
+credible, tested JDK 17 path while preserving Scriptella's existing public
+APIs, configuration formats, and optional-driver behavior.
 
-Implement this after the JEXL upgrade so its Commons Logging requirement is
-known. Keep each library change reviewable and bisectable; do not combine all
-version changes into one uncharacterized dependency replacement.
+There are explicitly two dependency-refresh chunks: this impact analysis,
+followed by Chunk 5B, the separately approved implementation. Agents must not
+perform an upgrade during analysis. An upgrade may proceed only when it is
+shown to be straightforward and free of breaking changes; otherwise it needs
+an explicit proposal and approval.
 
 ### Proposed dependency baseline
 
@@ -603,7 +615,8 @@ version changes into one uncharacterized dependency replacement.
 | Mail driver | `javax.mail:mail:1.4.1` and Activation 1.1 | `com.sun.mail:javax.mail:1.6.2` and `javax.activation:activation:1.1.1` | Keeps the `javax.mail` source API and avoids a Jakarta package rename while replacing the pre-Java-8 implementation with the final JavaMail line. |
 | Velocity driver | `org.apache.velocity:velocity:1.6.2` / `velocity-dep.jar` | `org.apache.velocity:velocity:1.7` with explicit patched 1.x transitive dependencies | Last 1.x release and the smallest API-compatible step. Do not retain an opaque `velocity-dep.jar`; use separate, versioned dependencies and at least Commons Collections 3.2.2 and Commons Lang 2.6. |
 | User-facing Ant integration | `org.apache.ant:ant:1.7.1` in Maven | Ant `1.10.17` | Matches the JDK 17 Ant line already used for release validation without changing Scriptella's Ant task API. |
-| Commons Logging | `1.0.4` | Version required by the approved JEXL 3.6.4 graph | Chunk 4 currently implies Commons Logging 1.4.0. Pin one version across Maven, Ant, and the embedded JAR; do not add a second logging bridge beside Spring's `spring-jcl`. |
+| Commons JEXL | `2.0.1` | `2.1.1` candidate; JEXL 3.6.4 is out of scope | 2.1.1 is the latest JEXL 2 release and is a conservative candidate. Confirm behavior before changing it. |
+| Commons Logging | `1.0.4` | To be selected after dependency-graph analysis | Pin one version across Maven, Ant, and embedded artifacts; do not add a second logging bridge beside Spring's `spring-jcl`. |
 
 Before implementation, verify that each exact artifact is still available
 from Maven Central and record its license and transitive graph. A newer patch
@@ -611,44 +624,25 @@ within the same listed line may be selected if it is a drop-in security or
 JDK fix; changing a listed major or namespace requires an explicit plan
 update.
 
-### Work
+### Analysis work
 
-1. Add focused characterization tests for each optional driver before changing
-   its dependencies. Preserve existing connection properties, aliases,
-   template behavior, callbacks, exception wrapping, and resource lifecycle.
-2. Replace the obsolete monolithic Spring artifact with the smallest split
-   module set. Expect `spring-context` for production and `spring-jdbc` for
-   the existing datasource tests; let Maven resolve their matching core
-   modules rather than copying an arbitrary subset.
-3. Prove the legacy Spring XML, `EtlExecutorBean`, batch execution, autostart,
-   bean-factory context propagation, and `DriverManagerDataSource` tests on
-   JDK 17. Do not redesign the Spring integration unless a removed API makes
-   the 5.3 target impossible.
-4. Upgrade both Janino JARs together. Exercise inline Java compilation,
-   imports, parameters, return values, access to native JDBC connections,
-   compilation diagnostics, and repeated execution on JDK 17.
-5. Move mail to the final `javax.mail` implementation without changing
-   Scriptella's public imports to `jakarta.mail`. Test plain text, multipart
-   content, attachments, address parsing, session properties, and transport
-   error reporting without requiring a live external mail service.
-6. Replace `velocity-dep.jar` with the normal Velocity 1.7 artifact and
-   explicit transitive JARs. Preserve the current JUL logging adapter,
-   parameter lookup, local assignment, escaping, macros, output encoding,
-   flush behavior, and representative `.vm` samples.
-7. Align the Ant API dependency with 1.10.17 and run the Scriptella Ant task
-   from a clean consumer build, not only from this checkout.
-8. Reconcile `pom.xml`, module POMs, committed `lib/`, `samples/lib/`,
-   `versions.properties`, Ant classpaths, distribution inclusions, licenses,
-   notices, and source-availability material. Use descriptive JAR names when
-   a framework now consists of multiple artifacts.
-9. Inspect Maven and assembled-artifact dependency graphs for duplicate
-   classes, mixed Spring or Janino versions, obsolete mail/activation JARs,
-   the old Velocity dependency bundle, and competing Commons Logging
-   implementations.
+1. Add focused characterization tests for each candidate library before any
+   implementation. Record public APIs, configuration formats, callbacks,
+   exception wrapping, resource lifecycle, and representative samples.
+2. Verify exact candidate versions, Java 17 support, licenses, notices,
+   transitive graphs, and artifact availability from authoritative sources.
+3. Analyze Spring, Janino, mail, Velocity, Ant, Commons Logging, and the
+   Commons JEXL 2.1.1 candidate independently. Identify removed APIs,
+   namespace changes, default changes, packaging changes, and behavioral risk.
+4. Inspect Maven and assembled-artifact graphs for duplicate classes, mixed
+   versions, obsolete bundled JARs, and competing logging implementations.
+5. Produce a compatibility matrix and a written recommendation for each
+   candidate: implement, defer, or reject. Any non-straightforward change
+   must become its own reviewed proposal.
 
 ### Scope boundaries
 
-This chunk does not:
+This analysis does not:
 
 * move Spring to 6.x or 7.x;
 * rename `javax.mail` APIs to `jakarta.mail`;
@@ -656,35 +650,64 @@ This chunk does not:
 * migrate the JUnit 3 test suite or modernize Maven reporting plugins;
 * revisit the JEXL, Rhino, HSQLDB, or H2 decisions owned by Chunks 2–4 and 6.
 
-If Spring 5.3.39, Velocity 1.7, or JavaMail 1.6.2 cannot pass the JDK 17
-characterization tests without invasive work, stop and split that library
-into a separately approved migration. Do not silently jump to a new major
-line or weaken the tests.
+If a candidate cannot pass characterization without invasive work, stop and
+split that library into a separately approved migration. Do not silently jump
+to a new major line, weaken tests, or perform the upgrade during analysis.
 
 ### Validation
 
-On JDK 17:
+The analysis must produce focused characterization results, dependency trees,
+packaging inventories, and the compatibility matrix on JDK 17. It does not
+require changing the dependency set.
 
-```bash
-mvn clean verify
-ant clean test
-ant -Ddtddoc.dir=/path/to/DTDDoc test-distribution
-```
-
-Additionally run focused Spring, Janino, mail, Velocity, and Ant-consumer
-tests after each individual upgrade. Inspect `mvn dependency:tree`, the
-committed JAR manifests, and both assembled archives.
+Inspect `mvn dependency:tree`, committed JAR manifests, and both assembled
+archives for the current and candidate graphs.
 
 ### Exit criteria
 
-* Every retained library in the table runs its representative Scriptella
-  behavior on JDK 17.
-* Maven and Ant use the same exact versions and complete transitive graphs.
-* No superseded monolithic or bundled dependency JAR remains.
-* Optional driver dependencies remain optional for Maven consumers.
-* Distribution contents, versions, licenses, notices, and documentation agree.
-* Any compatibility difference is approved and has a migration note.
-* `git diff --check` is clean.
+* Characterization coverage and a compatibility matrix exist for every
+  candidate.
+* Each candidate has an explicit implement/defer/reject recommendation.
+* No dependency version or production packaging change was made merely as
+  part of analysis.
+* Any compatibility difference has an owner, approval path, and migration
+  note before implementation.
+
+## Chunk 5B — Implement Approved Dependency Upgrades
+
+**Status:** Pending; blocked on Chunk 5A review
+
+This is the implementation stage. Execute only the candidates approved by the
+impact analysis. Work one library at a time, keep each change bisectable, and
+do not automatically upgrade a library when characterization shows a breaking
+API, behavior, namespace, security, or packaging change.
+
+### Implementation rules
+
+1. Implement only a candidate with a reviewed recommendation that it is
+   straightforward and non-breaking, or with a separately approved migration
+   proposal.
+2. For Commons JEXL, consider only the 2.1.1 minor-line candidate in this
+   plan. Do not implement the JEXL 3.6.4 migration here; it belongs to GitHub
+   issue #45 and a future release decision.
+3. Preserve the focused characterization tests and add regression tests for
+   every observed compatibility boundary. Never change expected results only
+   to make a build green.
+4. Reconcile Maven, Ant, `lib/`, `samples/lib/`, version properties,
+   distributions, licenses, notices, and dependency graphs after each
+   approved upgrade.
+5. Stop and return to analysis if an upgrade reveals a breaking change that
+   was not covered by the approved proposal.
+
+### Validation and exit criteria
+
+On JDK 17, run `mvn clean verify`, `ant clean test`, and
+`ant -Ddtddoc.dir=/path/to/DTDDoc test-distribution`, plus focused tests for
+each changed library and a clean consumer Ant build. Confirm Maven and Ant
+resolve the same exact graph, optional dependencies remain optional, and
+archives contain complete version/license/notice material. Mark this chunk
+complete only when every implemented change is approved, tested, and has no
+unreviewed breaking behavior.
 
 ## Chunk 6 — Remove HSQLDB and Refresh Database Examples
 
