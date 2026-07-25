@@ -26,6 +26,8 @@ import scriptella.spi.MockParametersCallbacks;
 import scriptella.spi.ParametersCallback;
 import scriptella.spi.Resource;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Tests for {@link ScriptConnection}.
@@ -151,6 +155,29 @@ public class ScriptConnectionTest extends AbstractTestCase {
         assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("python"));
         assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("Javascript")); // not in fixed set
         assertFalse(ScriptConnection.isJavaScriptAliasEligibleForRhinoFallback("jscript"));
+    }
+
+    /**
+     * A registered primary engine must win without consulting the Rhino fallback.
+     */
+    public void testPrimaryEngineWinsOverRhinoFallback() {
+        final ScriptEngine primary = new ScriptEngineManager(ScriptConnection.class.getClassLoader())
+                .getEngineByName(ScriptConnection.RHINO_FALLBACK_LANGUAGE);
+        assertNotNull(primary);
+        final List<String> lookups = new ArrayList<String>();
+        ScriptEngineManager manager = new ScriptEngineManager() {
+            @Override
+            public ScriptEngine getEngineByName(String shortName) {
+                lookups.add(shortName);
+                if ("js".equals(shortName)) {
+                    return primary;
+                }
+                throw new AssertionError("Unexpected fallback lookup: " + shortName);
+            }
+        };
+
+        assertSame(primary, ScriptConnection.resolveScriptEngine(manager, "js"));
+        assertEquals(Collections.singletonList("js"), lookups);
     }
 
     static ScriptConnection newConnectionWithLanguage(String language) {

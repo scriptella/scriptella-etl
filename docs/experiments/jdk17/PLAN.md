@@ -1,14 +1,25 @@
 # Experiment: JDK 17 Build and Runtime Compatibility
 
-**Issue:** [#31](https://github.com/scriptella/scriptella-etl/issues/31)  
-**Branch:** `exp-jdk17`  
-**Status:** Phases 1–4 complete — technical outcome recorded (partially supported)
+**Issue:** [#31](https://github.com/scriptella/scriptella-etl/issues/31)
+**Original branch:** `exp-jdk17`
+**Imported branch:** `issue-31-jdk17`
+**Release workstream:** [Scriptella 1.4 plan](../../releases/1.4/release-1.4-plan.md) and [#44](https://github.com/scriptella/scriptella-etl/issues/44)
+**Status:** Experiment complete; focused implementation imported for Scriptella 1.4
+
+This document preserves the experiment and its historical results. On July
+25, 2026, its five commits were replayed in order onto `issue-31-jdk17`, based
+on `fe0790b`. Commands, paths, version strings, and failures explicitly
+described as historical below remain evidence from the original experiment;
+the refreshed branch uses `1.4-SNAPSHOT`.
 
 ## 1. Goal and scope
 
 This branch investigates the **smallest practical set of changes** required to **build, test, package, and run** Scriptella on **JDK 17**.
 
-**Release assignment is outside the scope of this experiment.** This ticket produces a technical JDK 17 result only; whether and when that result is adopted in a release is decided elsewhere.
+Release assignment was outside the scope of the original experiment. The
+follow-up implementation is now assigned to the Scriptella 1.4 workstream,
+where the Java baseline, Rhino version, and packaged-runtime contract still
+require explicit decisions.
 
 ### Meanings of “JDK 17 support” (define and validate separately)
 
@@ -24,9 +35,9 @@ Do **not** treat any of the above as making JDK 17 the **minimum** runtime. Pref
 
 ### Primary vs secondary validation order
 
-1. **Maven first** — reactor build, tests, artifact generation.  
-2. **Runtime smoke** on JDK 17, including packaged JAR if available.  
-3. **Ant path** after Maven is understood — required to **record**, not required to block the initial JavaScript investigation.  
+1. **Maven first** — reactor build, tests, artifact generation.
+2. **Runtime smoke** on JDK 17, including packaged JAR if available.
+3. **Ant path** after Maven is understood — required to **record**, not required to block the initial JavaScript investigation.
 4. **Java 8 regression** once a candidate change set exists.
 
 ---
@@ -53,7 +64,7 @@ Do **not** treat any of the above as making JDK 17 the **minimum** runtime. Pref
 | Maven | **3.9.9** (IntelliJ bundled) — Java version reported by Maven: 17.0.15 |
 | Ant | 1.10.17 (workspace `apache-ant-1.10.17/` if used) — not used in Phase 1 |
 | DTDDoc | workspace `DTDDoc/` if used for full `ant dist` — not used in Phase 1 |
-| Branch base | `master` at start of experiment; Phase 1 run on `exp-jdk17` |
+| Branch base | Historical Phase 1 on `exp-jdk17`; refreshed import on `issue-31-jdk17` at `fe0790b` |
 | Platform detail | macOS 15.6.1, x86_64 |
 
 ```bash
@@ -62,6 +73,42 @@ export PATH="$JAVA_HOME/bin:$PATH"
 java -version
 mvn -v
 ```
+
+### Scriptella 1.4 refresh
+
+Current `master` already contains commit `4164709`, which added
+`drivers/src/java/scriptella/driver/package-info.java` and fixed the Ant
+Javadoc empty-package failure found by the experiment. The July 25 trial merge
+onto product commit `36a6bef` passed Maven on JDK 8 and 17 and passed Ant test
+and distribution builds on JDK 17, including populated API documentation.
+
+The Rhino packaging and script-driver classloader findings remain unresolved.
+They are carried forward into the 1.4 plan and must not be mistaken for a
+complete JDK 17 support claim.
+
+### Fresh import validation
+
+On July 25, 2026, the refreshed branch was tested with Maven 3.9.9 on macOS
+15.6.1 (x86_64):
+
+```bash
+mvn -pl drivers -am \
+  -Dtest=ScriptConnectionTest,ScriptConnectionPerfTest,ScriptDriverITest,ScriptingQueryITest,ScriptellaDriverITest \
+  -DfailIfNoTests=false test
+```
+
+The parent POM's configured `**/*Test` selector takes precedence over the
+command-line selector, so this ran the broader core and drivers suites.
+
+| JDK | Result |
+|-----|--------|
+| Temurin 17.0.15 | **BUILD SUCCESS** — core 149, drivers 148 |
+| Temurin 8u492 | **BUILD SUCCESS** — core 149, drivers 148; Nashorn remained the primary engine |
+
+The refreshed `ScriptConnectionTest` includes a direct lookup-order test that
+fails if Rhino is consulted after a registered primary engine resolves.
+`ScriptellaDriverITest` covers nested/sub-ETL execution whose child ETLs use
+the script driver.
 
 ---
 
@@ -170,12 +217,12 @@ Other drivers that ran without errors in the same module include h2, hsqldb, csv
 
 ### What Phase 1 does *not* certify
 
-* Full reactor green on JDK 17  
-* Maven deploy-skip packaging  
-* Tools / CLI launcher tests  
-* Packaged `scriptella.jar` JavaScript runtime  
-* Ant test / jar / dist  
-* Real JDK 8 regression after any fix  
+* Full reactor green on JDK 17
+* Maven deploy-skip packaging
+* Tools / CLI launcher tests
+* Packaged `scriptella.jar` JavaScript runtime
+* Ant test / jar / dist
+* Real JDK 8 regression after any fix
 
 ### Packaging note (why Maven green ≠ distribution green)
 
@@ -198,7 +245,8 @@ Maven can resolve `rhino-js-engine` on the test classpath. That does **not** pro
 
 ## 6. Phase 2 — Minimal JavaScript compatibility change
 
-**Status: complete** (implementation on `exp-jdk17`).
+**Status: complete** (original implementation on `exp-jdk17`; imported onto
+`issue-31-jdk17`).
 
 ### Implementation
 
@@ -242,10 +290,10 @@ Use a fixed set aligned with historical Nashorn / public JS naming and current d
 | `ecmascript` | `rhino` |
 | `ECMAScript` | `rhino` |
 
-Names **not** in this set must **not** fall back (e.g. `nusuchlanguage`, `python`, typos).  
+Names **not** in this set must **not** fall back (e.g. `nusuchlanguage`, `python`, typos).
 Do **not** map arbitrary strings case-insensitively beyond the rows above.
 
-Implementation home (expected):  
+Implementation home (expected):
 `drivers/src/java/scriptella/driver/script/ScriptConnection.java`
 
 Keep:
@@ -289,18 +337,20 @@ Where dual-JDK assertions are awkward in one process, document that full proof i
 - [x] **JavaScript / Rhino** — Maven tests (default/`js`/`JavaScript`/`rhino`); packaged runtime documented below
 - [x] **Janino** — Maven tests green; packaged CLI with Janino on classpath: **success**
 - [x] **Mail** — Maven unit tests green (`MaiConnectionTest` 4, `MailDriverTest` 1); no live SMTP end-to-end
-- [x] **Command-line launcher** — tools tests green; `java -jar build/scriptella.jar -version` → `1.3-SNAPSHOT`
+- [x] **Command-line launcher** — tools tests green; historical experiment artifact reported `1.3-SNAPSHOT`
 - [x] **Javadoc (Maven)** — `-javadoc.jar` attached and installed for core/drivers/tools
 
 Maven does **not** produce the all-in-one `scriptella.jar`. That artifact comes from Ant (Phase 4 / below).
 
 ### Maven deploy-skip artifacts (local install)
 
-Produced under `~/.m2/repository/org/scriptella/*/1.3-SNAPSHOT/`:
+Historical experiment artifacts were produced under
+`~/.m2/repository/org/scriptella/*/1.3-SNAPSHOT/`. The refreshed branch uses
+`1.4-SNAPSHOT`.
 
-* module JARs, `-sources.jar`, `-javadoc.jar` for core, drivers, tools  
-* core also installs `-tests.jar`  
-* parent POM  
+* module JARs, `-sources.jar`, `-javadoc.jar` for core, drivers, tools
+* core also installs `-tests.jar`
+* parent POM
 
 ### Packaged-runtime JavaScript (Ant-built `build/scriptella.jar`)
 
@@ -341,7 +391,7 @@ ant -Ddtddoc.dir=/Users/pvr/dev/prj/scriptella/DTDDoc clean dist
 |---------|---------------|-------|
 | `ant clean test` | **Supported** | **308** tests, 0 failures, 0 errors (`BUILD SUCCESSFUL`) |
 | `ant jar` | **Supported** | Produces `build/scriptella.jar` (+ module JARs); copies selected `lib/*` including Rhino into `samples/lib` |
-| `ant dist` (with DTDDoc) | **Supported with prerequisites** (+ docs caveat) | Requires `dtddoc.dir`. DTDDoc 1.1.0 **succeeds**. Binary/src/examples ZIPs produced. **Ant Javadoc** step reports `error: No source files for package scriptella.driver` (JDK 17 `javadoc`); `docs/api` in the binary ZIP is **empty**. Dist still exits **BUILD SUCCESSFUL**. |
+| `ant dist` (with DTDDoc) | **Historical experiment result: supported with a docs caveat** | Requires `dtddoc.dir`. DTDDoc 1.1.0 succeeded and archives were produced, but the original branch lacked the later Javadoc fix, so `docs/api` was empty. Current `master` resolves this. |
 
 ### Rhino in Ant packaging (confirmed)
 
@@ -354,7 +404,12 @@ ant -Ddtddoc.dir=/Users/pvr/dev/prj/scriptella/DTDDoc clean dist
 
 ### Ant Javadoc note
 
-`build-docs.xml` uses `packageset` over `drivers/src/java`, which includes empty parent package `scriptella.driver`. JDK 17 Javadoc treats “No source files for package …” as a hard error; the Ant task still allowed the dist target to complete with empty API docs. **Maven** Javadoc jars on JDK 17 were fine.
+The original branch lacked a source file for the parent package
+`scriptella.driver`, so JDK 17 Javadoc reported “No source files for package”
+and the Ant distribution contained empty API docs. Commit `4164709`, already
+present on the refreshed base, added the missing `package-info.java`. Fresh
+trial-merge validation produced populated API documentation. Maven Javadoc
+JARs were unaffected.
 
 ---
 
@@ -364,8 +419,8 @@ ant -Ddtddoc.dir=/Users/pvr/dev/prj/scriptella/DTDDoc clean dist
 
 Require:
 
-- [ ] **Run** the resulting artifacts / full `mvn clean verify` on a **real JDK 8**
-- [ ] Check **representative class-file major versions** (e.g. `javap -verbose` on a few produced classes; major 52 = Java 8)
+- [x] **Run** the resulting artifacts / full `mvn clean verify` on a **real JDK 8**
+- [x] Check **representative class-file major versions** (e.g. `javap -verbose` on a few produced classes; major 52 = Java 8)
 - [ ] Consider **`--release 8`** only if it can be introduced without disrupting the existing JDK 8 build path; optional, not the first lever
 
 For this experiment, an actual **JDK 8 regression run is the primary proof** of preserved Java 8 compatibility.
@@ -389,7 +444,7 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 | Phase 3 | `java -cp scriptella.jar:rhino… EtlLauncher` JS ETL | **success** | default / JavaScript / rhino |
 | Phase 3 | JDBC / Janino packaged smokes | **success** | see Phase 3 |
 | Phase 4 | `ant clean test` | **BUILD SUCCESSFUL** | 308 tests, 0 fail/err |
-| Phase 4 | `ant -Ddtddoc.dir=… clean dist` | **BUILD SUCCESSFUL** | DTDDoc OK; Ant Javadoc API empty (error logged) |
+| Original Phase 4 | `ant -Ddtddoc.dir=… clean dist` | **BUILD SUCCESSFUL** | DTDDoc OK; Ant Javadoc API empty on the old branch; fixed on current `master` |
 
 ### JDK 8 regression
 
@@ -406,20 +461,20 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 
 ### F1 — Default `js` / `JavaScript` depend on Nashorn; Rhino available under other names (**addressed in Phase 2**)
 
-* **Impact (Phase 1):** blocked green Maven reactor on JDK 17  
-* **Fix:** `ScriptConnection.resolveScriptEngine` — primary SPI lookup, then fixed JS aliases → `rhino`  
-* **Validation:** `mvn clean verify` SUCCESS on JDK 17 and JDK 8  
+* **Impact (Phase 1):** blocked green Maven reactor on JDK 17
+* **Fix:** `ScriptConnection.resolveScriptEngine` — primary SPI lookup, then fixed JS aliases → `rhino`
+* **Validation:** `mvn clean verify` SUCCESS on JDK 17 and JDK 8
 * **JDK 8:** primary lookup still hits Nashorn for `js` when present; fallback only if primary returns null
 
 ### F2 — Janino and mail tests passed inside the failed drivers module run
 
-* Janino: 8 tests across 4 classes, 0 failures/errors  
-* Mail: 5 tests across 2 classes, 0 failures/errors  
+* Janino: 8 tests across 4 classes, 0 failures/errors
+* Mail: 5 tests across 2 classes, 0 failures/errors
 * Not a substitute for packaged-runtime or SMTP end-to-end smoke
 
 ### F3 — Tools module not executed on JDK 17 in Phase 1
 
-* Reactor skipped `scriptella-tools` after drivers failure  
+* Reactor skipped `scriptella-tools` after drivers failure
 * CLI launcher validation remains Phase 3
 
 ### F4 — Packaged all-in-one JAR does not embed Rhino; binary ZIP omits Rhino from `lib/`
@@ -428,10 +483,11 @@ For this experiment, an actual **JDK 8 regression run is the primary proof** of 
 * Working pattern: put Rhino JARs on the **application** classpath (not connection classpath alone; not `-Xbootclasspath/a` with `-jar` on JDK 17)
 * Historical docs that recommend `-Xbootclasspath/a` with `-jar` are **unsafe for Rhino on JDK 17**
 
-### F5 — Ant Javadoc on JDK 17 fails for empty `scriptella.driver` package; dist still succeeds with empty `docs/api`
+### F5 — Ant Javadoc failure for empty `scriptella.driver` package (**resolved on current master**)
 
-* DTDDoc path works with `dtddoc.dir`
-* Maven Javadoc attachment on JDK 17 works
+* The original branch produced empty Ant API docs while still completing `dist`
+* Commit `4164709` added `scriptella.driver/package-info.java`
+* The refreshed base produces populated Ant API docs; Maven Javadoc attachment also works
 
 ### F6 — Java 8 regression after Phase 2 change set
 
@@ -455,7 +511,7 @@ Validated:
 - [x] Mail driver (Maven unit tests; no live SMTP)
 - [x] Ant tests (308 / 0 / 0)
 - [x] Ant packaged JAR (builds; Rhino not embedded)
-- [x] Ant distribution (builds with DTDDoc; API javadocs empty under Ant on JDK 17)
+- [x] Ant distribution (builds with DTDDoc; API Javadocs populated on the refreshed base)
 - [x] Java 8 regression (real JDK 8 mvn clean verify + major version 52)
 
 Minimal changes:
@@ -467,7 +523,6 @@ Remaining limitations:
 - All-in-one JAR / binary ZIP do not ship Rhino; pure java -jar JS broken on JDK 17
 - connection classpath does not feed ScriptEngineManager for the script driver
 - -Xbootclasspath/a + -jar unsuitable for Rhino SPI on JDK 17
-- Ant Javadoc (docs/api) empty on JDK 17 due to empty package scriptella.driver
 - Mail: no live SMTP validation in this experiment
 - Binary dist lib/ layout still omits rhino even though samples/lib receives it
 
@@ -478,7 +533,6 @@ Follow-up technical issues:
 - Consider embedding Rhino (+ SPI) in scriptella.jar and/or shipping rhino*.jar in binary dist lib/
 - Adjust launcher docs: prefer -cp over -jar when extra engines are required; fix bootclasspath guidance for modern JDKs
 - Optionally teach ScriptConnection/ScriptEngineManager to use the connection ClassLoader for SPI discovery
-- Fix Ant build-docs.xml / packageset so JDK 17 Javadoc does not fail on empty scriptella.driver
 ```
 
 ### Working hypothesis (updated)

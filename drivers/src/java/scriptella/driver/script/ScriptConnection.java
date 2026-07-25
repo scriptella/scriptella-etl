@@ -100,7 +100,6 @@ public class ScriptConnection extends AbstractConnection {
                     "ecmascript",
                     "ECMAScript")));
 
-
     /**
      * Instantiates a new connection to JSR 223 scripting engine.
      *

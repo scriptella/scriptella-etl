@@ -117,9 +117,20 @@ new JDK API make that baseline decision implicitly.
 
 ## Chunk 1 — Import and Refresh the Experiment
 
-**Status:** Ready
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Moderate
+
+The five `exp-jdk17` commits were replayed in order onto
+`issue-31-jdk17`, based on `fe0790b`. The experiment record was refreshed for
+the `1.4-SNAPSHOT` context, linked to this plan and issue #44, and updated to
+show that current `master` resolves the historical Ant Javadoc failure. The
+Rhino packaging and classloader findings remain open for Chunks 2 and 3.
+
+Fresh core and drivers suites passed on Temurin 8u492 and Temurin 17.0.15 with
+Maven 3.9.9 (149 core tests and 148 driver tests on each JDK). The refreshed
+test suite directly proves that a registered primary engine wins without a
+Rhino fallback lookup and includes nested/sub-ETL JavaScript coverage.
 
 ### Work
 
