@@ -1,6 +1,7 @@
 # Release 1.4 Plan
 
-**Status:** Initial planning
+**Status:** In progress (Chunks 1–3 and 5A complete; 5B quick wins done;
+Chunk 5C pending for Java 17 bytecode)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -206,6 +207,10 @@ The implementation and validation contract is:
 * test newer LTS JDKs separately when they are added to the support claim;
 * allow dependency and build-plugin upgrades to require Java 17, but do not
   raise the baseline beyond 17 incidentally.
+
+**Note:** Chunk 2 recorded this decision. As of the Chunk 5B quick wins,
+Maven and Ant still compile with `source`/`target` 1.8 (class-file major 52).
+Applying `release=17` and major-version 61 is **Chunk 5C**.
 
 Public documentation must state the minimum runtime, bytecode target, tested
 JDKs, supported build JDKs, and release-packaging JDK separately. The
@@ -590,97 +595,94 @@ is implemented and validated.
 
 ## Chunk 5A — Analyze Impact of Remaining Dependency Upgrades
 
-**Status:** Pending
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Moderate
 
-This is the analysis stage of the dependency refresh. It is not an
-implementation authorization and must not change dependency versions. Select
-the smallest practical candidate that could give each retained library a
-credible, tested JDK 17 path while preserving Scriptella's existing public
-APIs, configuration formats, and optional-driver behavior.
+**Analysis record:**
+[chunk-5a-dependency-impact.md](chunk-5a-dependency-impact.md)
 
-There are explicitly two dependency-refresh chunks: this impact analysis,
-followed by Chunk 5B, the separately approved implementation. Agents must not
-perform an upgrade during analysis. An upgrade may proceed only when it is
-shown to be straightforward and free of breaking changes; otherwise it needs
-an explicit proposal and approval.
+Impact analysis finished without changing dependency versions or production
+packaging. Characterization contract tests were added for JEXL expressions,
+Spring BeanFactory association, Janino compilation, Velocity evaluate/LogSystem,
+mail formatting, and Ant task APIs. All candidate coordinates were verified on
+Maven Central.
 
-### Proposed dependency baseline
+### Approved target baseline (for Chunk 5B)
 
-| Area | Current | 1.4 target | Rationale |
+| Area | Baseline at 5A | 1.4 target | 5B action |
 | --- | --- | --- | --- |
-| Spring driver | `org.springframework:spring:1.2` | Spring Framework `5.3.39`, using only the required split modules | Last `javax`-based Spring generation, explicitly supports JDK 17, and retains the legacy bean-factory APIs used by Scriptella. Spring 6 or 7 would add a Jakarta and removed-API migration that is not required for 1.4. |
-| Janino driver | `org.codehaus.janino:janino:3.1.0` | `janino:3.1.12` plus matching `commons-compiler:3.1.12` | Patch-line upgrade with the same ScriptEvaluator API and newer compiler/JDK fixes. |
-| Mail driver | `javax.mail:mail:1.4.1` and Activation 1.1 | `com.sun.mail:javax.mail:1.6.2` and `javax.activation:activation:1.1.1` | Keeps the `javax.mail` source API and avoids a Jakarta package rename while replacing the pre-Java-8 implementation with the final JavaMail line. |
-| Velocity driver | `org.apache.velocity:velocity:1.6.2` / `velocity-dep.jar` | `org.apache.velocity:velocity:1.7` with explicit patched 1.x transitive dependencies | Last 1.x release and the smallest API-compatible step. Do not retain an opaque `velocity-dep.jar`; use separate, versioned dependencies and at least Commons Collections 3.2.2 and Commons Lang 2.6. |
-| User-facing Ant integration | `org.apache.ant:ant:1.7.1` in Maven | Ant `1.10.17` | Matches the JDK 17 Ant line already used for release validation without changing Scriptella's Ant task API. |
-| Commons JEXL | `2.0.1` | `2.1.1` candidate; JEXL 3.6.4 is out of scope | 2.1.1 is the latest JEXL 2 release and is a conservative candidate. Confirm behavior before changing it. |
-| Commons Logging | `1.0.4` | To be selected after dependency-graph analysis | Pin one version across Maven, Ant, and embedded artifacts; do not add a second logging bridge beside Spring's `spring-jcl`. |
+| Spring driver | `org.springframework:spring:1.2` | Spring Framework **5.3.39** split modules | **Remaining — implement with migration** |
+| Janino driver | `janino:3.1.0` | `janino:3.1.12` + `commons-compiler:3.1.12` | **Done** (July 25, 2026) |
+| Mail driver | `javax.mail:mail:1.4.1` + Activation 1.1 | `com.sun.mail:javax.mail:1.6.2` + `javax.activation:activation:1.1.1` | **Done** (July 25, 2026) |
+| Velocity driver | 1.6.2 / `velocity-dep.jar` | `velocity:1.7` + Collections **3.2.2** + Lang **2.6** | **Remaining** (split fat JAR) |
+| User-facing Ant | `ant:1.7.1` | Ant **1.10.17** | **Done** (July 25, 2026) |
+| Commons JEXL | 2.0.1 | **2.1.1** (not JEXL 3) | **Remaining** with full suite |
+| Commons Logging | 1.0.4 | **1.2** | **Done** (July 25, 2026) |
 
-Before implementation, verify that each exact artifact is still available
-from Maven Central and record its license and transitive graph. A newer patch
-within the same listed line may be selected if it is a drop-in security or
-JDK fix; changing a listed major or namespace requires an explicit plan
-update.
+Rejected for 1.4: Spring 6/7, Jakarta Mail, Velocity 2.x, JEXL 3.x, Spring 4.3
+as the final pin.
 
-### Analysis work
+### Key Spring finding
 
-1. Add focused characterization tests for each candidate library before any
-   implementation. Record public APIs, configuration formats, callbacks,
-   exception wrapping, resource lifecycle, and representative samples.
-2. Verify exact candidate versions, Java 17 support, licenses, notices,
-   transitive graphs, and artifact availability from authoritative sources.
-3. Analyze Spring, Janino, mail, Velocity, Ant, Commons Logging, and the
-   Commons JEXL 2.1.1 candidate independently. Identify removed APIs,
-   namespace changes, default changes, packaging changes, and behavioral risk.
-4. Inspect Maven and assembled-artifact graphs for duplicate classes, mixed
-   versions, obsolete bundled JARs, and competing logging implementations.
-5. Produce a compatibility matrix and a written recommendation for each
-   candidate: implement, defer, or reject. Any non-straightforward change
-   must become its own reviewed proposal.
+`EtlExecutorBean.getGlobalThreadLocal()` depends on
+`org.springframework.beans.factory.access.SingletonBeanFactoryLocator`, which
+exists in Spring 4.3 and is **absent** in Spring 5.3.39. A drop-in Spring 5
+upgrade is not possible. 5B must replace that locator with a Scriptella-owned
+JVM-global `ThreadLocal<BeanFactory>` (or equivalent) while preserving bug
+#4648 behavior, then adopt split Spring 5.3.39 modules
+(`spring-core` / `spring-beans` / `spring-context` / `spring-jdbc` +
+`spring-jcl`).
 
-### Scope boundaries
+### Hygiene for 5B
 
-This analysis does not:
-
-* move Spring to 6.x or 7.x;
-* rename `javax.mail` APIs to `jakarta.mail`;
-* port Velocity to 2.x;
-* migrate the JUnit 3 test suite or modernize Maven reporting plugins;
-* revisit the JEXL, Rhino, HSQLDB, or H2 decisions owned by Chunks 2–4 and 6.
-
-If a candidate cannot pass characterization without invasive work, stop and
-split that library into a separately approved migration. Do not silently jump
-to a new major line, weaken tests, or perform the upgrade during analysis.
-
-### Validation
-
-The analysis must produce focused characterization results, dependency trees,
-packaging inventories, and the compatibility matrix on JDK 17. It does not
-require changing the dependency set.
-
-Inspect `mvn dependency:tree`, committed JAR manifests, and both assembled
-archives for the current and candidate graphs.
+`ant jar` now prunes `samples/lib` before refreshing from `lib/` (keeps
+samples-only `readme.txt`). Re-run `jar` if a working tree still has stale
+sample libraries from earlier incomplete reverts.
 
 ### Exit criteria
 
-* Characterization coverage and a compatibility matrix exist for every
+* [x] Characterization coverage and a compatibility matrix exist for every
   candidate.
-* Each candidate has an explicit implement/defer/reject recommendation.
-* No dependency version or production packaging change was made merely as
+* [x] Each candidate has an explicit implement / implement-with-migration /
+  reject recommendation.
+* [x] No dependency version or production packaging change was made merely as
   part of analysis.
-* Any compatibility difference has an owner, approval path, and migration
-  note before implementation.
+* [x] The Spring compatibility difference has an owner path and migration note
+  before implementation.
 
 ## Chunk 5B — Implement Approved Dependency Upgrades
 
-**Status:** Pending; blocked on Chunk 5A review
+**Status:** In progress (quick wins complete July 25, 2026)
 
 This is the implementation stage. Execute only the candidates approved by the
-impact analysis. Work one library at a time, keep each change bisectable, and
-do not automatically upgrade a library when characterization shows a breaking
+impact analysis in [chunk-5a-dependency-impact.md](chunk-5a-dependency-impact.md).
+Work one library at a time, keep each change bisectable, and do not
+automatically upgrade a library when characterization shows a breaking
 API, behavior, namespace, security, or packaging change.
+
+### Quick wins completed (July 25, 2026)
+
+Implemented the four drop-in upgrades and reconciled Maven, Ant `lib/`,
+licenses, `versions.properties`, and `samples/lib` (via `ant jar` prune/refresh):
+
+| Library | Change | Notes |
+| --- | --- | --- |
+| Janino | 3.1.0 → **3.1.12** (+ commons-compiler 3.1.12) | `CodeCompiler` calls `setExtendedClass`. On 3.1.12, `ScriptEvaluator` no longer extends `ClassBodyEvaluator`, so the deprecated `setExtendedType` alias (still on `IClassBodyEvaluator`) is not visible on `ScriptEvaluator`. |
+| JavaMail | `javax.mail:mail:1.4.1` → **`com.sun.mail:javax.mail:1.6.2`** | Activation **1.1.1**; package remains `javax.mail` |
+| Ant (tools) | 1.7.1 → **1.10.17** | Maven compile dependency only |
+| Commons Logging | 1.0.4 → **1.2** | Embedded into `scriptella.jar` for JEXL |
+
+**Validation:** Temurin 17, Maven 3.9.x — `mvn -pl core,drivers,tools -am clean test`
+passed (154 core + 162 driver + 14 tools tests). Ant 1.10.17 —
+`ant clean test` and `ant jar` passed; `samples/lib` refreshed from `lib/`.
+
+### Remaining 5B work
+
+1. Commons JEXL **2.1.1** (full expression suite; stop on behavioral deltas).
+2. Velocity **1.7** with split transitive JARs (drop `velocity-dep.jar`).
+3. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
+   holder; split modules). Prefer a dedicated PR.
 
 ### Implementation rules
 
@@ -708,6 +710,94 @@ resolve the same exact graph, optional dependencies remain optional, and
 archives contain complete version/license/notice material. Mark this chunk
 complete only when every implemented change is approved, tested, and has no
 unreviewed breaking behavior.
+
+## Chunk 5C — Raise Maven and Ant Builds to Java 17
+
+**Status:** Pending
+
+**Reasoning level:** Moderate
+
+Chunk 2 decided that Scriptella 1.4 requires Java 17 and publishes Java 17
+bytecode. Runtime and packaging work for JDK 17 has largely landed, but the
+**compiler baseline is still the 1.3 Java 8 setting**. Building on a modern
+JDK currently produces class-file major version 52 and Ant/`javac` warnings
+about obsolete `-source 8` / `-target 1.8` and a missing bootstrap classpath.
+
+This chunk applies the Chunk 2 contract to every production compile path. It
+is independent of the remaining dependency upgrades in Chunk 5B and should
+complete before Chunk 7’s full matrix (which requires major version 61).
+
+### Current state (gap)
+
+| Path | Today | Required |
+| --- | --- | --- |
+| Maven `maven-compiler-plugin` | `source`/`target` **1.8** | `release` **17** |
+| Ant `build-templates/build-template.xml` `javac` | `source="1.8"` `target="1.8"` | `release="17"` (or equivalent) |
+| Produced bytecode | major **52** (Java 8) | major **61** (Java 17) |
+| PMD / other `targetJdk` settings that still say 1.8 | **1.8** | **17** where they describe the product baseline |
+| Public docs / migration notes | may still imply 8 in places | Java 17 min; point older JDKs to Scriptella 1.3 |
+
+### Work
+
+1. Maven: set `maven-compiler-plugin` to `<release>17</release>` (prefer
+   `release` over separate `source`/`target`). Drop obsolete 1.8-only options.
+2. Ant: update every production `javac` in `build-templates/build-template.xml`
+   (and any other Ant files that set 1.8) to compile with **release 17**. Prefer
+   the Ant `javac` `release` attribute so the bootstrap classpath is set
+   correctly on modern JDKs.
+3. Set `includeantruntime="false"` on those `javac` tasks so Ant’s own jars
+   are not on the compile classpath (repeatable builds; removes the Ant warning).
+4. Align auxiliary tool configs that hard-code the product JDK (for example
+   PMD `targetJdk` in `pom.xml`) with **17**.
+5. Confirm produced classes from both `mvn clean compile` and `ant jar` are
+   major version **61** (spot-check representative classes in core, drivers,
+   tools, and the all-in-one JAR).
+6. Run full Maven and Ant test suites on JDK 17 after the switch.
+7. Update maintainer-facing notes as needed so they do not claim Java 8
+   bytecode for 1.4 snapshots. User-facing README/CHANGELOG wording may wait
+   for Chunk 8 if a short unreleased changelog note is already enough.
+
+### Scope boundaries
+
+This chunk does **not**:
+
+* raise the baseline past 17;
+* migrate the JUnit 3 suite or modernize reporting plugins solely for this
+  change;
+* finish remaining Chunk 5B dependency upgrades;
+* authorize a release candidate or close issue #31.
+
+If some optional or test-only path must stay on an older bytecode level, stop
+and document an explicit exception rather than leaving silent 1.8 defaults.
+
+### Validation
+
+On Temurin 17 (or equivalent):
+
+```bash
+mvn clean test
+# confirm class major version 61, e.g. on core and drivers outputs
+ant clean test
+ant jar
+# confirm all-in-one and module JARs contain major 61 classes
+```
+
+Confirm:
+
+* no remaining production `source`/`target` 1.8 (or 8) compile settings for
+  Scriptella modules;
+* `javac` no longer warns about obsolete source/target 8 for those tasks;
+* Ant no longer warns about unset `includeantruntime` on updated tasks;
+* tests remain green on JDK 17.
+
+### Exit criteria
+
+* [ ] Maven and Ant production compiles use **release 17**.
+* [ ] Published/build class files are major version **61**.
+* [ ] `mvn clean test` and `ant clean test` pass on JDK 17.
+* [ ] Stale 1.8 product-baseline settings in the build are gone or explicitly
+  justified.
+* [ ] Chunk 7 may assert major 61 without a known compiler gap.
 
 ## Chunk 6 — Remove HSQLDB and Refresh Database Examples
 
@@ -785,6 +875,8 @@ Validate all of the following from clean checkouts of both repositories:
 **Reasoning level:** Higher
 
 Run from a clean checkout after all approved JDK and dependency changes.
+Chunk **5C** must be complete so bytecode is already major version 61 before
+this matrix is treated as release evidence.
 
 ### Maven
 
@@ -801,7 +893,7 @@ Confirm:
 * source, binary, Javadoc, and test artifacts are produced as expected;
 * the published dependency graph does not impose Rhino on consumers;
 * a separate consumer that adds `rhino-engine:1.9.1` discovers Rhino;
-* compiled bytecode has class-file major version 61;
+* compiled bytecode has class-file major version 61 (Chunk 5C);
 * compilation is constrained to the Java 17 API.
 
 ### Ant

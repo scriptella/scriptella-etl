@@ -1,5 +1,6 @@
-JavaMail 1.4.1
+JavaMail (com.sun.mail:javax.mail) 1.6.2
 
-JavaMail 1.4.1 is licensed under the Common Development and Distribution
-License (CDDL), Version 1.0. The complete license text is included in mail.jar
-as META-INF/LICENSE.txt.
+JavaMail 1.6.2 is dual-licensed under the Common Development and Distribution
+License (CDDL), Version 1.1, and the GNU General Public License (GPL), Version 2
+with Classpath Exception. The complete license text is included in mail.jar as
+META-INF/LICENSE.txt.

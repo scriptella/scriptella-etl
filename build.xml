@@ -89,8 +89,12 @@
                 <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar"/>
             </manifest>
         </jar>
-        <!-- Update samples libs -->
-        <copy todir="${basedir}/samples/lib">
+        <!-- Refresh samples/lib from lib/, pruning leftovers (e.g. reverted upgrades).
+             Keep samples-only files such as readme.txt. -->
+        <delete includeemptydirs="true" failonerror="no">
+            <fileset dir="${basedir}/samples/lib" excludes="readme.txt"/>
+        </delete>
+        <copy todir="${basedir}/samples/lib" overwrite="true">
             <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>

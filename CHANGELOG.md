@@ -4,6 +4,18 @@ This file records user-visible changes to Scriptella. The deprecated historical
 status file (`forrest/status.xml`) is retained only as an archive of pre-1.3
 release notes; this is the primary changelog from Release 1.3 onward.
 
+## [1.4] — unreleased
+
+### Changed
+
+#### Dependencies (partial)
+
+* Upgraded optional Janino to **3.1.12** (with matching `commons-compiler`).
+* Upgraded optional JavaMail to **`com.sun.mail:javax.mail:1.6.2`** and
+  Activation to **1.1.1** (API package remains `javax.mail`).
+* Upgraded the tools-module Ant compile dependency to **1.10.17**.
+* Upgraded Commons Logging to **1.2** (embedded with JEXL in the all-in-one JAR).
+
 ## [1.3] — 2026-07-17
 
 Release 1.3 establishes a maintainable Java 8 baseline while preserving the

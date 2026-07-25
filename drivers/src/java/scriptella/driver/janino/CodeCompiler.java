@@ -59,7 +59,7 @@ final class CodeCompiler {
             evaluator.setThrownExceptions(THROWN_EXCEPTIONS);
             evaluator.setParentClassLoader(getClass().getClassLoader());
             Class<?> type = query ? JaninoQuery.class : JaninoScript.class;
-            evaluator.setExtendedType(type);
+            evaluator.setExtendedClass(type);
             evaluator.setStaticMethod(false);
             evaluator.setMethodName("execute");
             evaluator.setClassName(type.getName() + "_Generated");
