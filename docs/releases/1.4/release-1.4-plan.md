@@ -14,8 +14,9 @@ experimental branch has produced a bounded implementation and a concrete list
 of remaining packaging and runtime issues.
 
 Issue #44 also covers test isolation, launcher path handling, dependency
-modernization, and release-process hardening. Those workstreams remain in
-scope for 1.4 but are not yet decomposed into chunks in this document.
+modernization, and release-process hardening. The JEXL upgrade is now
+decomposed as a later chunk; the other workstreams remain in scope for 1.4
+but are not yet decomposed in this document.
 
 No compatibility promise, release candidate, tag, publication, or website
 deployment is authorized by this plan alone.
@@ -23,8 +24,8 @@ deployment is authorized by this plan alone.
 ## Current baseline
 
 * `master` is the 1.4 development line and uses version `1.4-SNAPSHOT`.
-* Scriptella 1.3 retains its documented Java 8 baseline. Do not revise the
-  published 1.3 compatibility claim.
+* Scriptella 1.3 remains the recommended line for users who require a JDK
+  older than 17. Do not revise its published Java 8 compatibility claim.
 * The `exp-jdk17` branch contains the investigation record, JavaScript alias
   fallback, and focused tests from issue #31.
 * The experiment was based on an older `master`. Rebase or otherwise replay
@@ -72,8 +73,10 @@ Consequently:
 * The historical `-Xbootclasspath/a` pattern is not a suitable Rhino
   JSR-223 solution on modern modular JDKs.
 
-Do not describe Scriptella 1.4 as supporting JavaScript on JDK 17 until the
-packaged-runtime contract is selected, implemented, documented, and tested.
+This is an optional script-driver limitation, not a blocker for core
+Scriptella operation: JEXL remains embedded and requires no external
+JavaScript engine. Do not describe JavaScript as bundled on JDK 17; document
+and test the optional Rhino classpath contract instead.
 
 ---
 
@@ -86,13 +89,10 @@ The preferred outcome is:
 * Scriptella builds, tests, packages, and runs on JDK 17.
 * Existing ETL behavior and scripting aliases remain compatible.
 * Maven consumers, the Ant workflow, the all-in-one JAR, the binary
-  distribution, and the examples distribution have an explicit and tested
-  JavaScript classpath contract.
-* The Java baseline decision is deliberate. Either:
-  * retain Java 8 source, bytecode, and runtime compatibility while adding
-    JDK 17 support; or
-  * make Java 17 the minimum for 1.4 and document the migration and its
-    consequences.
+  distribution, and the examples distribution have an explicit distinction
+  between bundled JEXL support and optional JSR-223 engines.
+* Java 17 is the minimum build and runtime baseline for Scriptella 1.4.
+  Scriptella 1.3 remains available for older JDKs.
 
 Do not let incidental compiler behavior, a dependency upgrade, or use of a
 new JDK API make that baseline decision implicitly.
@@ -182,95 +182,167 @@ registered primary engine wins over the Rhino fallback.
 
 ## Chunk 2 — Decide the Java and Rhino Baselines
 
-**Status:** Pending
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Higher
 
-This chunk is part of the dependency and compatibility audit required by
-issue #44. Do not finalize packaging around an obsolete dependency set.
+This chunk selected Java 17 and separated Scriptella's bundled JEXL
+capability from optional JavaScript support. It also fixed the Rhino and
+engine-discovery contract that Chunk 3 must implement.
 
-### Java baseline decision
+### Java baseline decision: require Java 17
 
-Compare these policies:
+Scriptella 1.4 requires Java 17 for building and running and publishes Java 17
+bytecode. Users who require Java 8 or Java 11 should remain on Scriptella 1.3.
+This is an intentional release-boundary compatibility break, not an
+incidental result of a compiler or dependency upgrade.
 
-1. Java 8 remains the minimum, Java 8 bytecode is retained, and builds and
-   runtime behavior are supported on both Java 8 and Java 17.
-2. Java 17 becomes the minimum build and runtime baseline for Scriptella 1.4.
+The implementation and validation contract is:
 
-Record:
+* compile with `release=17` in Maven and Ant;
+* publish class-file major version 61;
+* run the full Maven, Ant, packaging, and runtime matrix on JDK 17;
+* test newer LTS JDKs separately when they are added to the support claim;
+* allow dependency and build-plugin upgrades to require Java 17, but do not
+  raise the baseline beyond 17 incidentally.
 
-* user and integration compatibility impact;
-* compiler source, target, or `--release` configuration;
-* CI and release environment impact;
-* Maven and Ant behavior;
-* dependency and plugin constraints;
-* documentation and migration requirements.
+Public documentation must state the minimum runtime, bytecode target, tested
+JDKs, supported build JDKs, and release-packaging JDK separately. The
+migration note must direct older-JDK users to Scriptella 1.3.
 
-The plan currently prefers retaining Java 8 compatibility if it remains
-bounded and does not prevent supported dependency upgrades. That preference
-is not the final decision.
+### Rhino and JSR-223 decision: optional Mozilla Rhino 1.9.1
 
-### Rhino and JSR-223 decision
+Use the matching official Mozilla artifacts:
 
-Inventory and select:
+* `org.mozilla:rhino:1.9.1`
+* `org.mozilla:rhino-engine:1.9.1`
 
-* the supported Rhino version;
-* the matching `rhino-js-engine` provider;
-* Maven scopes and transitive dependencies;
-* committed JARs in `lib/` and `samples/lib/`;
-* license and notice files;
-* service-provider entries and engine aliases;
-* compatibility with each selected Java runtime.
+This replaces `cat.inspiracio:rhino-js-engine:1.7.10` and its transitive Rhino
+1.7.10 runtime. Mozilla now publishes the JSR-223 provider alongside Rhino,
+so Scriptella no longer needs the third-party adapter or its separate BSD
+license.
 
-Also determine whether the script driver should continue using
-`ScriptConnection.class.getClassLoader()` or support provider discovery
-through a connection, application, or context classloader. Any classloader
-change requires tests for isolation, discovery order, duplicate engines, and
-failure behavior.
+The official 1.9.1 provider uses Java 11 bytecode and runs on the Java 17
+baseline. Its release is preferred over the Java-8-compatible 1.7.15.1 line
+because Scriptella 1.4 no longer needs the older bytecode constraint.
+
+The provider registers
+`org.mozilla.javascript.engine.RhinoScriptEngineFactory` through
+`META-INF/services/javax.script.ScriptEngineFactory` and advertises
+`rhino`, `Rhino`, `javascript`, and `JavaScript`. It does not advertise `js`,
+`JS`, `ecmascript`, or `ECMAScript`, so the fixed Scriptella alias fallback
+remains required when Rhino is installed.
+
+JEXL remains embedded in `scriptella.jar` and is Scriptella's bundled
+expression and lightweight scripting option. The generic JSR-223 script
+driver remains available, but JavaScript is not required for core execution.
+Existing ETLs that choose `driver=script` with JavaScript must add a supported
+engine.
+
+In Maven, keep `rhino-engine` and its transitive `rhino` runtime out of the
+published drivers dependency graph; use them in test scope. Maven consumers
+that need JavaScript add `org.mozilla:rhino-engine:1.9.1` explicitly.
+
+The Ant test path may retain the exact selected JARs under `lib/`, with
+complete MPL 2.0 license and applicable notice material. Do not copy them to
+the base binary or examples distributions merely because tests use them.
+
+### Packaging contract
+
+The base Scriptella distribution does not bundle Rhino. Do not embed or shade
+Rhino into `scriptella.jar`, add it to the manifest classpath, copy it into
+the binary or examples archives, or merge its provider file into Scriptella's
+service metadata.
+
+The supported layouts are:
+
+* Plain `java -jar scriptella.jar ...` supports the bundled functionality,
+  including JEXL, without a JavaScript provider.
+* Maven consumers add `org.mozilla:rhino-engine:1.9.1` when they use the
+  JavaScript script driver.
+* Distribution users place matching `rhino-engine` and `rhino` JARs in
+  `lib/` and use the Unix or Windows launcher, which loads `lib/*.jar`.
+* An explicit application classpath with both Rhino JARs and Scriptella's
+  launcher main class is also supported.
+* Plain `java -jar` is not the optional-provider command because the JVM
+  ignores an external `-classpath` when `-jar` is used.
+
+Missing Rhino must not affect non-JavaScript ETLs. A JavaScript ETL without an
+installed provider must fail with a clear unsupported-language message and
+the available engines.
+
+### Engine-discovery classloader contract
+
+For 1.4, retain `ScriptConnection.class.getClassLoader()` as the loader passed
+to `ScriptEngineManager`. The supported Maven, launcher, and explicit
+classpath layouts make an optional provider visible to that application
+loader.
+
+The script connection's `classpath` attribute is not a supported
+JSR-223-provider path, and 1.4 will not switch discovery to the thread context
+classloader or add a multi-loader search. Embedded consumers that supply a
+different engine must put its provider and dependencies on the same loader as
+Scriptella's script driver. This bounded rule preserves discovery order and
+failure behavior and avoids introducing duplicate-engine and isolation
+semantics into the JDK 17 compatibility fix. A broader plugin-style discovery
+model requires a separate design and the isolation, ordering, duplicate, and
+negative tests listed by this plan.
 
 ### Exit criteria
 
-* The Java baseline is explicitly approved and documented.
-* The Rhino coordinates and license treatment are approved.
-* The intended engine-discovery classloader contract is explicit.
-* Maven, Ant, standalone, and examples packaging requirements are known.
+* [x] The Java baseline is explicitly approved and documented.
+* [x] The Rhino coordinates and license treatment are approved.
+* [x] The intended engine-discovery classloader contract is explicit.
+* [x] Maven, Ant, standalone, and examples packaging requirements are known.
 
-## Chunk 3 — Implement Packaged JavaScript Runtime Support
+## Chunk 3 — Implement the Optional JavaScript Contract
 
 **Status:** Pending
 
-**Reasoning level:** Higher
+**Reasoning level:** Moderate
 
 ### Packaging decision
 
-Select one supported standalone model after a small prototype:
-
-1. Embed Rhino classes and the Rhino JSR-223 provider in the all-in-one JAR,
-   deliberately merging service metadata and including required notices.
-2. Ship Rhino as separate binary-distribution libraries and make the launcher
-   load them through a documented mechanism, such as an appropriate manifest
-   classpath or distribution launcher script.
-3. Support both forms only if maintaining both has a concrete user benefit
-   and low ongoing cost.
-
-Simply placing Rhino JARs next to `scriptella.jar` is insufficient for
-`java -jar`; the selected design must prove that the runtime actually loads
-the provider.
+Implement the optional-provider model selected in Chunk 2. Keep the base
+distribution free of Rhino, keep JEXL operational out of the box, and make
+the Unix and Windows launchers the documented way to add provider JARs under
+`lib/`.
 
 ### Required behavior
 
-From the unpacked binary distribution on JDK 17:
+From the unmodified binary distribution on JDK 17:
 
 * launcher startup works;
-* a non-script ETL works;
-* JavaScript works when the language is omitted;
-* `language=js`, `language=JavaScript`, and `language=rhino` work;
-* invalid languages report the available engines and fail clearly;
-* nested or sub-ETL JavaScript execution works;
+* representative JDBC and JEXL ETLs work;
+* no Rhino classes, JARs, service entries, or notices are present;
+* a JavaScript connection fails clearly because no provider is installed;
 * no private checkout path or developer-local Maven repository is required.
 
-If Java 8 remains supported, repeat the same packaged smokes there and verify
-that adding Rhino does not unexpectedly replace Nashorn for primary aliases.
+After placing matching Rhino 1.9.1 engine and runtime JARs under `lib/`:
+
+* the Unix and Windows launchers discover the provider;
+* JavaScript works when the language is omitted;
+* `language=js`, `language=JavaScript`, and `language=rhino` work;
+* nested or sub-ETL JavaScript execution works;
+* unrelated invalid languages still fail without a Rhino fallback.
+
+### Missing-provider diagnostics
+
+When JavaScript is requested without an installed provider, report:
+
+* the requested `language` value;
+* the engines and aliases actually discovered;
+* that JavaScript requires an external JSR-223 provider on JDK 17;
+* the supported coordinates
+  `org.mozilla:rhino-engine:1.9.1` and `org.mozilla:rhino:1.9.1`;
+* for distribution users, that both JARs belong under `lib/` and execution
+  must use `bin/scriptella.sh` or `bin/scriptella.bat`, not plain `java -jar`;
+* for embedded users, that the provider must be visible to the same
+  application classloader as Scriptella's script driver.
+
+Do not print this Rhino-specific remedy for arbitrary misspellings or
+non-JavaScript engine names. Those failures should retain the concise generic
+unsupported-language diagnostic.
 
 ### Artifacts to reconcile
 
@@ -294,22 +366,111 @@ Rhino versions, and dependencies present only in a developer checkout.
 
 Add automated artifact-level coverage where practical:
 
-* inspect expected archive entries;
-* inspect the final service-provider file;
+* prove Rhino is absent from the base binary and examples archives;
 * launch the assembled distribution in a separate JVM;
-* execute representative JavaScript ETLs through the supported public
-  launcher command;
-* prove the negative case for an unknown engine name.
+* prove bundled JEXL execution from the unmodified distribution;
+* prove the actionable missing-JavaScript-provider diagnostic;
+* install Rhino under `lib/` and execute representative JavaScript ETLs
+  through the supported launcher command;
+* prove the generic negative case for an unknown engine name.
 
 ### Exit criteria
 
-* The standalone JavaScript contract works on JDK 17.
+* The base distribution works without a JavaScript engine on JDK 17.
+* Missing-provider diagnostics are actionable and tested.
+* The optional Rhino launcher contract works on JDK 17.
 * Maven and Ant dependency sets agree.
-* Binary and examples artifacts contain exactly the intended dependencies.
-* License and notice material is complete.
+* Binary and examples artifacts do not contain Rhino.
+* License and notice material is complete wherever Rhino remains for tests.
 * The supported launcher command is stable enough to document publicly.
 
-## Chunk 4 — Full Compatibility and Distribution Matrix
+## Chunk 4 — Upgrade Bundled JEXL to 3.6.4
+
+**Status:** Pending
+
+**Reasoning level:** Higher
+
+This is a follow-on dependency-modernization chunk. Do not mix it into the
+Chunk 3 JDK 17 and optional-provider implementation review. Start it after
+that work is stable so JDK migration failures and JEXL behavior changes remain
+distinguishable.
+
+### Dependency decision
+
+Replace Commons JEXL 2.0.1 with
+`org.apache.commons:commons-jexl3:3.6.4`.
+
+JEXL 2.0.1 dates from 2010 and is the central embedded expression dependency.
+The last 2.x release is 2.1.1; there is no 2.2.x line. A move only to 2.1.1
+would minimize source changes but would leave Scriptella on an obsolete major
+line for another release.
+
+Version 3.6.4 is selected instead of 3.7.0 for Scriptella 1.4 because 3.7.0
+changes default permissions and language features in ways that can reject
+existing scripts at parse time. The 3.6.4 target modernizes JEXL without
+combining that migration with the new 3.7 security-default policy. A future
+release may adopt the stricter defaults deliberately.
+
+### Work
+
+1. Update Maven dependency management and module dependencies from
+   `commons-jexl` to `commons-jexl3`.
+2. Replace the committed Ant JAR and reconcile its version, license, notice,
+   and transitive Commons Logging requirements.
+3. Port Scriptella's small direct API surface from
+   `org.apache.commons.jexl2` to `org.apache.commons.jexl3`, including:
+   * `JexlExpression`;
+   * `JexlConnection`;
+   * `JexlContextMap`.
+4. Construct the shared engine through `JexlBuilder` with explicit options.
+   Do not rely on version-dependent defaults for strictness, silence,
+   permissions, side effects, lexical scoping, or ant-style variables.
+5. Preserve Scriptella's existing trusted-ETL behavior unless a change is
+   separately approved and documented.
+6. Remove all JEXL 2 classes, coordinates, service metadata, and stale license
+   material from Maven, Ant, the all-in-one JAR, binary archives, and examples.
+
+### Compatibility coverage
+
+At minimum test:
+
+* `${...}` expression evaluation;
+* missing and null variables;
+* numeric coercion, comparison, concatenation, and division;
+* dotted or ant-style variable names used by Scriptella;
+* `date:`, `text:`, and `class:` namespaces;
+* JEXL scripts with assignments, conditionals, loops, and `query.next()`;
+* calls to external callback objects and static methods;
+* nested ETL parameter propagation;
+* concurrent use of the shared engine;
+* all existing JEXL integration tests and representative samples.
+
+Add focused characterization tests before changing an existing behavior whose
+current contract is not obvious. Treat expression or script differences as
+compatibility decisions, not as test expectations to update automatically.
+
+### Packaging validation
+
+Confirm:
+
+* Maven and Ant resolve the same JEXL 3.6.4 dependency graph;
+* `scriptella.jar` contains JEXL 3 classes and no JEXL 2 classes;
+* service-provider metadata names only providers that exist in the artifact;
+* binary and examples archives contain the intended JEXL version and complete
+  license/notice material;
+* representative JEXL ETLs work through `java -jar` and the distribution
+  launchers on JDK 17.
+
+### Exit criteria
+
+* JEXL 3.6.4 is the only bundled JEXL version.
+* Existing Scriptella expression and JEXL-driver behavior is characterized
+  and preserved, or any approved incompatibility has a migration note.
+* Maven, Ant, all-in-one, binary, and examples dependency sets agree.
+* The full JEXL regression suite passes on JDK 17.
+* `git diff --check` is clean.
+
+## Chunk 5 — Full Compatibility and Distribution Matrix
 
 **Status:** Pending
 
@@ -319,7 +480,7 @@ Run from a clean checkout after all approved JDK and dependency changes.
 
 ### Maven
 
-On every supported build JDK:
+On JDK 17:
 
 ```bash
 mvn clean verify
@@ -330,16 +491,14 @@ Confirm:
 
 * all reactor tests pass;
 * source, binary, Javadoc, and test artifacts are produced as expected;
-* module consumers discover Rhino using normal Maven dependencies;
-* compiled bytecode matches the selected Java baseline;
-* no class accidentally references APIs newer than the retained minimum.
-
-If Java 8 bytecode is retained, use an appropriate API-level check in addition
-to sampling class-file major version 52.
+* the published dependency graph does not impose Rhino on consumers;
+* a separate consumer that adds `rhino-engine:1.9.1` discovers Rhino;
+* compiled bytecode has class-file major version 61;
+* compilation is constrained to the Java 17 API.
 
 ### Ant
 
-On every supported Ant build JDK:
+On JDK 17:
 
 ```bash
 ant clean test
@@ -350,7 +509,7 @@ ant -Ddtddoc.dir=/path/to/DTDDoc clean dist
 Confirm:
 
 * tests fail the build when failures occur;
-* the all-in-one JAR has the intended engine providers;
+* the all-in-one JAR registers JEXL and does not contain Rhino;
 * binary, source, and examples archives are readable;
 * generated API and DTD documentation is populated;
 * archive paths, versions, licenses, and dependency copies are correct.
@@ -364,9 +523,11 @@ Test at least:
 
 * command-line `-version` and help;
 * representative JDBC ETL;
-* JavaScript ETL for every supported alias;
-* Rhino JavaScript from an unpacked binary distribution;
-* nested or sub-ETL JavaScript execution;
+* JEXL ETL from the unmodified distribution;
+* missing-provider diagnostics for a JavaScript ETL;
+* optional Rhino JavaScript for every supported alias after adding the two
+  provider JARs under `lib/`;
+* nested or sub-ETL JavaScript execution with optional Rhino installed;
 * Janino ETL;
 * mail driver unit/integration coverage selected by issue #44;
 * examples archive execution;
@@ -383,7 +544,7 @@ unit tests for standalone or distribution claims.
 * No known packaging caveat contradicts the intended public compatibility
   statement.
 
-## Chunk 5 — Documentation and Adoption
+## Chunk 6 — Documentation and Adoption
 
 **Status:** Pending
 
@@ -420,8 +581,8 @@ Remove or replace modern-JDK guidance that depends on
 Close issue #31 only after:
 
 * its experiment has been adopted or deliberately superseded;
-* the packaged JavaScript limitation is fixed or explicitly excluded from the
-  approved support claim;
+* the optional JavaScript contract and missing-provider diagnostic are
+  documented and validated;
 * the final validation matrix is linked;
 * remaining modernization work has named follow-up ownership under issue #44
   or a narrower issue.
@@ -440,10 +601,10 @@ The JDK 17 implementation is ready for `master` when:
 * it is based on current `master`;
 * the Java and Rhino baseline decisions are recorded;
 * the alias and discovery behavior has focused regression coverage;
-* the packaged-runtime design is implemented;
+* the optional-provider design and diagnostics are implemented;
 * Maven and Ant dependencies and licenses are reconciled;
-* the dual-JDK or selected-JDK validation matrix passes;
-* unpacked-distribution JavaScript smokes pass;
+* the JDK 17 validation matrix passes;
+* unmodified-distribution JEXL and optional-provider JavaScript smokes pass;
 * documentation does not overstate support;
 * the review diff is clean and contains no stale experimental conclusions.
 
@@ -451,15 +612,17 @@ Small preparatory changes may merge earlier when independently useful and
 fully tested. Each such merge must leave issue #31 open and must not claim
 complete JDK 17 support.
 
+The JEXL 3.6.4 upgrade is intentionally a separate follow-on change and does
+not block merging an otherwise complete JDK 17 implementation. The final 1.4
+distribution matrix runs only after both changes are integrated.
+
 ## Stop and reassess conditions
 
 Pause the work and update issue #44 if:
 
-* retaining Java 8 blocks required supported dependency upgrades;
 * scripting provider discovery requires a broad classloader redesign;
-* embedding Rhino creates unacceptable duplicate-class, SPI, licensing, or
-  security problems;
-* Maven and Ant distributions cannot share a coherent dependency model;
+* keeping Rhino out of release artifacts makes the supported optional-provider
+  workflow impractical;
 * existing ETL behavior becomes uncertain;
 * the release must support materially different standalone launch models;
 * the compatibility scope expands beyond a bounded 1.4 workstream.
@@ -474,7 +637,8 @@ The completed workstream should produce:
 * an explicit Java baseline decision;
 * supported JDK 17 build, runtime, and packaging behavior;
 * preserved and tested JavaScript aliases;
-* a working Rhino strategy for Maven, Ant, standalone, and examples users;
+* bundled JEXL operation plus an actionable optional Rhino strategy;
+* a separately reviewed upgrade to Commons JEXL 3.6.4;
 * reconciled dependencies, SPI metadata, and licenses;
 * a repeatable compatibility matrix;
 * accurate public and maintainer documentation;
