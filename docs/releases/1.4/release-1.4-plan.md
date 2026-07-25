@@ -297,26 +297,29 @@ negative tests listed by this plan.
 
 ## Chunk 3 — Implement the Optional JavaScript Contract
 
-**Status:** In progress — bundled-distribution revision pending
+**Status:** Complete (July 25, 2026)
 
 **Reasoning level:** Moderate
 
-The first implementation checkpoint adopted official Mozilla Rhino 1.9.1 in
-test scope. Maven no longer publishes a Rhino dependency from the drivers
-module, and the Ant test path uses matching `rhino-engine` and `rhino` JARs
-with the complete MPL 2.0 text.
+The implementation adopted official Mozilla Rhino 1.9.1 in test scope for
+Maven and bundled the matching `rhino-engine` and `rhino` JARs as separate
+files in the binary and examples distributions. Maven no longer publishes a
+Rhino dependency from the drivers module. The distributions include the
+complete MPL 2.0 text and an exact source-artifact availability notice.
 
-The Unix and Windows launchers now build their application classpath from
-`lib/*.jar` with quoted distribution paths and complete argument forwarding.
-The Unix launcher was exercised from the unpacked binary distribution on
-Temurin 17.0.15. The Windows batch contract was checked in the assembled
-artifact for `lib` discovery and `%*` forwarding; native Windows execution
-remains part of the broader Chunk 5 platform matrix.
+The all-in-one JAR manifest names `lib/rhino-engine.jar` and `lib/rhino.jar`,
+so an intact distribution supports JavaScript through `java -jar`. The Unix
+and Windows launchers build their application classpath from `lib/*.jar` with
+quoted distribution paths and complete argument forwarding. The Unix
+launcher was exercised from the unpacked binary distribution on Temurin
+17.0.15. The Windows batch contract was checked in the assembled artifact for
+`lib` discovery and `%*` forwarding; native Windows execution remains part of
+the broader Chunk 5 platform matrix.
 
 Missing-provider errors for the fixed JavaScript aliases now include the
-requested language, discovered engines, supported coordinates, distribution
-launcher layout, the `java -jar` limitation, and the embedded-classloader
-rule. Unrelated engine names retain the generic error.
+requested language, discovered engines, supported coordinates, complete
+distribution restoration guidance, and the embedded-classloader rule.
+Unrelated engine names retain the generic error.
 
 Validation used Maven 3.9.9, Ant 1.10.17, DTDDoc 1.1.0, and Temurin 17.0.15
 on macOS 15.6.1:
@@ -324,8 +327,9 @@ on macOS 15.6.1:
 * `mvn -pl drivers -am test` passed 149 core and 150 driver tests;
 * `ant clean test` passed the core, drivers, and tools suites;
 * `ant -Ddtddoc.dir=... test-distribution` built both archives and passed
-  separate-JVM JEXL, missing-provider, optional-Rhino alias, nested
-  JavaScript, unknown-language, archive-content, and SPI-content checks;
+  separate-JVM JEXL, missing-provider, bundled-Rhino alias, nested JavaScript,
+  unknown-language, archive-content, manifest, license, source-notice,
+  version, and SPI-content checks;
 * Maven dependency inspection showed `rhino-engine:1.9.1` and transitive
   `rhino:1.9.1` only in test scope;
 * `git diff --check` passed.
@@ -353,25 +357,25 @@ Keep Rhino in test scope for Maven. Applications assembled from Maven modules
 must continue to request `org.mozilla:rhino-engine:1.9.1` explicitly rather
 than receiving JavaScript transitively from `scriptella-drivers`.
 
-### Remaining work
+### Completed work
 
-1. Include the two matching Rhino JARs under `lib/` in the binary and examples
+1. Included the two matching Rhino JARs under `lib/` in the binary and examples
    archives without duplicating their classes or service metadata.
-2. Add the two relative Rhino entries to the all-in-one JAR's manifest
-   `Class-Path`; do not add them to module JAR manifests.
-3. Add distribution-visible MPL 2.0 attribution and a source-availability
-   notice pointing to the exact 1.9.1 source artifacts. Preserve Scriptella's
-   Apache 2.0 licensing and do not imply that Rhino is Apache-licensed.
-4. Update the script-driver documentation and missing-provider remedy for the
-   bundled layout. A missing provider in a distribution should advise users to
-   restore the complete archive; Maven and embedded users should receive the
+2. Added the two relative Rhino entries to the all-in-one JAR's manifest
+   `Class-Path` without adding them to module JAR manifests.
+3. Added distribution-visible MPL 2.0 attribution and a source-availability
+   notice pointing to the exact 1.9.1 source artifacts while preserving
+   Scriptella's Apache 2.0 licensing.
+4. Updated the script-driver documentation and missing-provider remedy for the
+   bundled layout. A missing provider in a distribution advises users to
+   restore the complete archive; Maven and embedded users receive the
    coordinates and application-classloader guidance.
-5. Replace the current archive-absence assertions with exact-content checks
+5. Replaced the archive-absence assertions with exact-content checks
    for both JARs, their versions, license, source notice, and provider entry.
-6. Exercise JavaScript through `java -jar`, the Unix launcher, and the Windows
-   launcher where the platform matrix permits. Retain separate-JVM JEXL,
+6. Exercised JavaScript through `java -jar` and the Unix launcher, and checked
+   the Windows launcher contract. The artifact test retains separate-JVM JEXL,
    alias, nested/sub-ETL, missing-provider, and unrelated-language coverage.
-7. Re-run Maven, Ant, distribution, archive, SPI, license, and source-archive
+7. Re-ran Maven, Ant, distribution, archive, SPI, license, and source-archive
    validation on the Java 17 baseline.
 
 ### Required behavior
@@ -448,13 +452,15 @@ Add automated artifact-level coverage where practical:
 * [x] Missing-provider diagnostics are actionable and tested.
 * [x] Maven and Ant dependency sets agree.
 * [x] Unix and Windows launchers construct their classpaths from `lib/*.jar`.
-* [ ] The binary and examples distributions bundle exactly Rhino 1.9.1.
-* [ ] `java -jar` and the distribution launchers discover bundled Rhino.
-* [ ] JEXL and JavaScript work out of the box on JDK 17.
-* [ ] Rhino's MPL license and exact source-availability notice are complete.
-* [ ] Artifact tests prove the bundled layout and absence of embedded or
+* [x] The binary and examples distributions bundle exactly Rhino 1.9.1.
+* [x] `java -jar` and the Unix distribution launcher discover bundled Rhino;
+  the Windows launcher contract is assembled and awaits the Chunk 5 native
+  Windows matrix.
+* [x] JEXL and JavaScript work out of the box on JDK 17.
+* [x] Rhino's MPL license and exact source-availability notice are complete.
+* [x] Artifact tests prove the bundled layout and absence of embedded or
   duplicated Rhino content.
-* [ ] The supported commands are stable enough to document publicly.
+* [x] The supported commands are stable enough to document publicly.
 
 ## Chunk 4 — Upgrade Bundled JEXL to 3.6.4
 

@@ -1,0 +1,15 @@
+Mozilla Rhino 1.9.1 Source Availability
+========================================
+
+The Scriptella binary and examples distributions include the following
+Mozilla Rhino 1.9.1 artifacts under the Mozilla Public License, version 2.0:
+
+* org.mozilla:rhino-engine:1.9.1
+* org.mozilla:rhino:1.9.1
+
+The exact corresponding source artifacts are available from Maven Central:
+
+https://repo1.maven.org/maven2/org/mozilla/rhino-engine/1.9.1/rhino-engine-1.9.1-sources.jar
+https://repo1.maven.org/maven2/org/mozilla/rhino/1.9.1/rhino-1.9.1-sources.jar
+
+The complete MPL 2.0 license text is provided in rhino.license.txt.

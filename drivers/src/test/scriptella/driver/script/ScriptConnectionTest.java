@@ -151,13 +151,11 @@ public class ScriptConnectionTest extends AbstractTestCase {
         String message = ScriptConnection.unsupportedLanguageMessage(manager, "js");
         assertTrue(message.contains("language=js"));
         assertTrue(message.contains("Available values are: []"));
-        assertTrue(message.contains("external JSR-223 provider on JDK 17"));
+        assertTrue(message.contains("Rhino JSR-223 provider on JDK 17"));
         assertTrue(message.contains("org.mozilla:rhino-engine:1.9.1"));
         assertTrue(message.contains("org.mozilla:rhino:1.9.1"));
-        assertTrue(message.contains("lib/"));
-        assertTrue(message.contains("bin/scriptella.sh"));
-        assertTrue(message.contains("bin/scriptella.bat"));
-        assertTrue(message.contains("plain java -jar"));
+        assertTrue(message.contains("Official Scriptella distributions bundle both JARs under lib/"));
+        assertTrue(message.contains("restore the complete distribution"));
         assertTrue(message.contains("same application classloader"));
     }
 

@@ -188,10 +188,10 @@ public class ScriptConnection extends AbstractConnection {
         if (!isJavaScriptAliasEligibleForRhinoFallback(lang)) {
             return message;
         }
-        return message + ". JavaScript requires an external JSR-223 provider on JDK 17. "
+        return message + ". JavaScript requires the Rhino JSR-223 provider on JDK 17. "
                 + "Add " + RHINO_ENGINE_COORDINATE + " and " + RHINO_RUNTIME_COORDINATE + ". "
-                + "Distribution users: place both JARs under lib/ and run bin/scriptella.sh "
-                + "or bin/scriptella.bat; plain java -jar cannot load them. "
+                + "Official Scriptella distributions bundle both JARs under lib/; restore the "
+                + "complete distribution if either file is missing. "
                 + "Embedded users: the provider must be visible to the same application "
                 + "classloader as Scriptella's script driver.";
     }

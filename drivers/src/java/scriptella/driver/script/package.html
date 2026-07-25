@@ -3,8 +3,8 @@
 Allows usage of <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a> compatible scripting languages in
 ETL &lt;query&gt; and &lt;script&gt; elements.
 <p>The driver uses the Java SE <code>javax.script</code> API. The default
-language name is JavaScript, but Scriptella does not bundle a JavaScript
-engine. JEXL remains available out of the box.</p>
+language name is JavaScript. Scriptella distributions bundle Mozilla Rhino;
+JEXL also remains available out of the box.</p>
 <h2>General information</h2>
 <table>
     <tr>
@@ -62,16 +62,17 @@ should be used to produce a result set:</p>
 </pre>
 See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
 </code>
-<h2><a name="javascript_provider">Optional JavaScript provider</a></h2>
-<p>On JDK 17, JavaScript requires an external JSR-223 provider. The supported
-provider is Mozilla Rhino 1.9.1. Maven applications add
+<h2><a name="javascript_provider">JavaScript provider</a></h2>
+<p>On JDK 17, JavaScript requires a JSR-223 provider. Scriptella's binary and
+examples distributions include Mozilla Rhino 1.9.1 as separate
+<code>lib/rhino-engine.jar</code> and <code>lib/rhino.jar</code> files.
+Keep the distribution intact when using <code>java -jar scriptella.jar</code>,
+<code>bin/scriptella.sh</code>, or <code>bin/scriptella.bat</code>.</p>
+<p>Maven applications add
 <code>org.mozilla:rhino-engine:1.9.1</code>, which brings the matching
 <code>org.mozilla:rhino:1.9.1</code> runtime.</p>
-<p>Distribution users place both JARs under <code>lib/</code> and run
-<code>bin/scriptella.sh</code> or <code>bin/scriptella.bat</code>. Plain
-<code>java -jar</code> does not load optional JARs from that directory.
-Embedded applications must make the provider visible to the same application
-classloader as Scriptella's script driver. A script connection's
+<p>Embedded applications must make the provider visible to the same
+application classloader as Scriptella's script driver. A script connection's
 <code>classpath</code> attribute is not used for JSR-223 provider discovery.</p>
 
 <p>Example of the connection declaration:

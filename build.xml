@@ -86,18 +86,14 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
+                <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar"/>
             </manifest>
         </jar>
         <!-- Update samples libs -->
         <copy todir="${basedir}/samples/lib">
-            <fileset dir="${lib.dir}"
-                     excludes="spring.* h2.* lucene* rhino*.jar rhino*.license.txt"/>
+            <fileset dir="${lib.dir}" excludes="spring.* h2.* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
-        <delete>
-            <fileset dir="${basedir}/samples/lib"
-                     includes="rhino*.jar rhino*.license.txt"/>
-        </delete>
     </target>
 
     <target name="zip" depends="jar">
@@ -112,6 +108,9 @@
         </zip>
         <zip destfile="${build.dir}/${zip.name}">
             <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}"
+                        includes="rhino-engine.jar rhino.jar rhino.license.txt rhino.source.txt"
+                        prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
             <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
