@@ -8,3 +8,4 @@ tools/target/
 samples/lib/
 *.zip
 *.log
+/custom.build.properties
