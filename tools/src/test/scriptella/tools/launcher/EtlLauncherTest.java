@@ -16,6 +16,7 @@
 package scriptella.tools.launcher;
 
 import scriptella.DBTestCase;
+import scriptella.core.SystemException;
 import scriptella.execution.EtlExecutorException;
 import scriptella.tools.template.TemplateManagerTest;
 import scriptella.util.IOUtils;
@@ -23,8 +24,10 @@ import scriptella.util.IOUtils;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,15 +70,207 @@ public class EtlLauncherTest extends DBTestCase {
     }
 
     public void testNoEtlFile() {
-        EtlLauncher etlLauncher = new EtlLauncher() {
+        CapturingLauncher etlLauncher = new CapturingLauncher() {
             @Override
             protected boolean isFile(File file) {
                 return false;
             }
         };
         assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND, etlLauncher.launch(new String[]{}));
+        String err = etlLauncher.errText();
+        assertTrue(err.contains("ETL file etl.xml was not found."));
+        assertTrue(err.contains("Run with --help for usage."));
+    }
 
+    public void testExplicitMissingFileHasNoDefaultHint() {
+        CapturingLauncher etlLauncher = new CapturingLauncher() {
+            @Override
+            protected boolean isFile(File file) {
+                return false;
+            }
 
+            @Override
+            public void execute(final File file) {
+                fail("ETL must not execute when file is missing");
+            }
+        };
+        assertEquals(EtlLauncher.ErrorCode.FILE_NOT_FOUND,
+                etlLauncher.launch(new String[]{"missing.etl.xml"}));
+        String err = etlLauncher.errText();
+        assertTrue(err.contains("ETL file"));
+        assertTrue(err.contains("was not found"));
+        assertFalse(err.contains("Run with --help for usage."));
+    }
+
+    public void testHelpOptions() {
+        CapturingLauncher launcher = new CapturingLauncher();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"--help"}));
+        String help = launcher.outText();
+        assertTrue(help.contains("Scriptella ETL"));
+        assertTrue(help.contains("ETL"));
+        assertTrue(help.contains("databases"));
+        assertTrue(help.contains("files"));
+        assertTrue(help.contains("SQL"));
+        assertTrue(help.contains("--help"));
+        assertTrue(help.contains("--version"));
+        assertTrue(help.contains("--debug"));
+        assertTrue(help.contains("--quiet"));
+        assertTrue(help.contains("--no-stat"));
+        assertTrue(help.contains("--no-jmx"));
+        assertTrue(help.contains("--template"));
+        assertFalse(help.toLowerCase().contains("agent"));
+        assertFalse(help.toLowerCase().contains(" ai"));
+        assertFalse(help.toLowerCase().contains("artificial intelligence"));
+
+        launcher.reset();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-h"}));
+        assertTrue(launcher.outText().contains("Scriptella ETL"));
+
+        launcher.reset();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-help"}));
+        assertTrue(launcher.outText().contains("Scriptella ETL"));
+    }
+
+    public void testVersionOptions() {
+        CapturingLauncher launcher = new CapturingLauncher();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"--version"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-v"}));
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-version"}));
+    }
+
+    public void testCanonicalAndLegacyOptionsRecognized() {
+        final boolean[] nostat = {false};
+        final boolean[] nojmx = {false};
+        final boolean[] executed = {false};
+        final boolean[] templateInvoked = {false};
+
+        EtlLauncher launcher = new EtlLauncher() {
+            @Override
+            public void setNoStat(boolean suppressStatistics) {
+                nostat[0] = suppressStatistics;
+            }
+
+            @Override
+            public void setNoJmx(boolean noJmx) {
+                nojmx[0] = noJmx;
+            }
+
+            @Override
+            protected boolean isFile(File file) {
+                return true;
+            }
+
+            @Override
+            public void execute(File file) {
+                executed[0] = true;
+            }
+
+            @Override
+            protected ErrorCode template(List<String> args) {
+                templateInvoked[0] = true;
+                return ErrorCode.OK;
+            }
+        };
+
+        assertEquals(EtlLauncher.ErrorCode.OK,
+                launcher.launch(new String[]{"--debug", "--quiet", "--no-stat", "--no-jmx", "etl.xml"}));
+        assertTrue(nostat[0]);
+        assertTrue(nojmx[0]);
+        assertTrue(executed[0]);
+
+        nostat[0] = false;
+        nojmx[0] = false;
+        executed[0] = false;
+        assertEquals(EtlLauncher.ErrorCode.OK,
+                launcher.launch(new String[]{"-debug", "-quiet", "-nostat", "-nojmx", "etl.xml"}));
+        assertTrue(nostat[0]);
+        assertTrue(nojmx[0]);
+        assertTrue(executed[0]);
+
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"--template"}));
+        assertTrue(templateInvoked[0]);
+        templateInvoked[0] = false;
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-template"}));
+        assertTrue(templateInvoked[0]);
+    }
+
+    public void testPrefixOptionsRejected() {
+        final boolean[] executed = {false};
+        CapturingLauncher launcher = new CapturingLauncher() {
+            @Override
+            protected boolean isFile(File file) {
+                return true;
+            }
+
+            @Override
+            public void execute(File file) {
+                executed[0] = true;
+            }
+        };
+
+        String[] prefixes = {"-hello", "-quietly", "-version-extra", "-debugX", "-templateX", "-nostatX"};
+        for (String option : prefixes) {
+            executed[0] = false;
+            launcher.reset();
+            assertEquals("Expected unrecognized for " + option,
+                    EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                    launcher.launch(new String[]{option, "etl.xml"}));
+            assertTrue(launcher.errText().contains("Unrecognized option " + option));
+            assertEquals("", launcher.outText());
+            assertFalse("ETL must not run for " + option, executed[0]);
+        }
+    }
+
+    public void testUnknownOptionDoesNotExecute() {
+        final List<String> files = new ArrayList<String>();
+        CapturingLauncher launcher = new CapturingLauncher() {
+            @Override
+            protected boolean isFile(File file) {
+                return true;
+            }
+
+            @Override
+            public void execute(File file) {
+                files.add(file.getName());
+            }
+        };
+        assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                launcher.launch(new String[]{"etl.xml", "--unknown"}));
+        assertTrue(files.isEmpty());
+        assertTrue(launcher.errText().contains("Unrecognized option --unknown"));
+    }
+
+    public void testMultiFileExecutionAndExitCodes() {
+        final List<String> files = new ArrayList<String>();
+        final boolean[] failSecond = {false};
+
+        EtlLauncher launcher = new EtlLauncher() {
+            @Override
+            protected boolean isFile(File file) {
+                return file.getName().indexOf("_nofile_") < 0;
+            }
+
+            @Override
+            public void execute(File file) throws EtlExecutorException {
+                files.add(file.getName());
+                if (failSecond[0] && files.size() == 2) {
+                    // SystemException is treated as a normal ETL failure, not a possible bug.
+                    throw new EtlExecutorException(new SystemException("forced failure"));
+                }
+            }
+        };
+
+        assertEquals(EtlLauncher.ErrorCode.OK,
+                launcher.launch(new String[]{"one.etl.xml", "two.etl.xml"}));
+        assertEquals(2, files.size());
+        assertEquals("one.etl.xml", files.get(0));
+        assertEquals("two.etl.xml", files.get(1));
+
+        files.clear();
+        failSecond[0] = true;
+        assertEquals(EtlLauncher.ErrorCode.FAILED,
+                launcher.launch(new String[]{"one.etl.xml", "two.etl.xml"}));
+        assertEquals(2, files.size());
     }
 
     public void testFile() {
@@ -159,6 +354,43 @@ public class EtlLauncherTest extends DBTestCase {
         // otherwise assume we run inside IDE/Maven with current directory set to root project
         String basedir = System.getProperty("basedir");
         return basedir != null ? new File(basedir).getAbsolutePath() + '/' : "tools/";
+    }
+
+    /**
+     * Launcher that captures stdout/stderr for assertions.
+     */
+    private static class CapturingLauncher extends EtlLauncher {
+        private final ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+        private final ByteArrayOutputStream errBuf = new ByteArrayOutputStream();
+        private final PrintStream out = new PrintStream(outBuf);
+        private final PrintStream err = new PrintStream(errBuf);
+
+        @Override
+        protected PrintStream getOut() {
+            return out;
+        }
+
+        @Override
+        protected PrintStream getErr() {
+            return err;
+        }
+
+        void reset() {
+            out.flush();
+            err.flush();
+            outBuf.reset();
+            errBuf.reset();
+        }
+
+        String outText() {
+            out.flush();
+            return outBuf.toString();
+        }
+
+        String errText() {
+            err.flush();
+            return errBuf.toString();
+        }
     }
 
 }

@@ -55,8 +55,6 @@ import java.util.logging.Logger;
  */
 public class EtlLauncher {
     private static final Logger LOG = Logger.getLogger(EtlLauncher.class.getName());
-    private static final PrintStream out = System.out;
-    private static final PrintStream err = System.err;
 
     /**
      * Error codes returned by the launcher.
@@ -111,6 +109,20 @@ public class EtlLauncher {
     }
 
     /**
+     * Stream used for launcher messages. Overridable in tests.
+     */
+    protected PrintStream getOut() {
+        return System.out;
+    }
+
+    /**
+     * Stream used for launcher errors. Overridable in tests.
+     */
+    protected PrintStream getErr() {
+        return System.err;
+    }
+
+    /**
      *
      * @param suppressStatistics true if statistics must be suppressed.
      * @see scriptella.execution.EtlExecutor#setSuppressStatistics(boolean)
@@ -143,53 +155,59 @@ public class EtlLauncher {
         boolean failed = false;
         List<File> files = new ArrayList<File>();
         ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Execution Progress");
+        boolean defaultFile = false;
 
         try {
             List<String> arguments = new ArrayList<String>(Arrays.asList(args));
             while (!arguments.isEmpty()) {
                 String arg = arguments.get(0);
                 arguments.remove(0);
-                if (arg.startsWith("-h")) {
+                if (isHelpOption(arg)) {
                     printUsage();
                     return ErrorCode.OK;
                 }
-                if (arg.startsWith("-d")) {
+                if (isDebugOption(arg)) {
                     h.setLevel(Level.FINE);
                     continue;
                 }
-                if (arg.startsWith("-q")) {
+                if (isQuietOption(arg)) {
                     h.setLevel(Level.WARNING);
                     continue;
                 }
-                if (arg.startsWith("-v")) {
+                if (isVersionOption(arg)) {
                     printVersion();
                     return ErrorCode.OK;
                 }
-                if (arg.startsWith("-t")) {
+                if (isTemplateOption(arg)) {
                     return template(arguments);
                 }
-                if (arg.startsWith("-nostat")) {
+                if (isNoStatOption(arg)) {
                     setNoStat(true);
                     continue;
                 }
-                if (arg.startsWith("-nojmx")) {
+                if (isNoJmxOption(arg)) {
                     setNoJmx(true);
                     continue;
-				}
+                }
                 if (arg.startsWith("-")) {
-                    err.println("Unrecognized option " + arg);
+                    getErr().println("Unrecognized option " + arg);
                     return ErrorCode.UNRECOGNIZED_OPTION;
                 }
-                if (!arg.startsWith("-")) {
-                    files.add(resolveFile(null, arg));
-                }
+                files.add(resolveFile(null, arg));
             }
 
             if (files.isEmpty()) { //adding default name if no files specified
+                defaultFile = true;
                 files.add(resolveFile(null, null));
             }
         } catch (FileNotFoundException e) {
-            err.println(e.getMessage());
+            if (defaultFile) {
+                getErr().println("ETL file " + DEFAULT_FILE_NAME + " was not found.");
+                getErr().println();
+                getErr().println("Run with --help for usage.");
+            } else {
+                getErr().println(e.getMessage());
+            }
             return ErrorCode.FILE_NOT_FOUND;
         }
 
@@ -212,9 +230,9 @@ public class EtlLauncher {
                     LOG.log(Level.SEVERE, new BugReport(e).toString());
                 } else if (h.getLevel().intValue() < Level.INFO.intValue()) {
                     //Print stack trace of exception in debug mode
-                    err.println("---------------Debug Stack Trace-----------------");
+                    getErr().println("---------------Debug Stack Trace-----------------");
                     Throwable t = e.getCause() == null ? e : e.getCause();
-                    t.printStackTrace();
+                    t.printStackTrace(getErr());
                 }
             }
         }
@@ -223,26 +241,72 @@ public class EtlLauncher {
         return failed ? ErrorCode.FAILED : ErrorCode.OK;
     }
 
+    private static boolean isHelpOption(String arg) {
+        return "-h".equals(arg) || "--help".equals(arg) || "-help".equals(arg);
+    }
+
+    private static boolean isDebugOption(String arg) {
+        return "-d".equals(arg) || "--debug".equals(arg) || "-debug".equals(arg);
+    }
+
+    private static boolean isQuietOption(String arg) {
+        return "-q".equals(arg) || "--quiet".equals(arg) || "-quiet".equals(arg);
+    }
+
+    private static boolean isVersionOption(String arg) {
+        return "-v".equals(arg) || "--version".equals(arg) || "-version".equals(arg);
+    }
+
+    private static boolean isTemplateOption(String arg) {
+        return "-t".equals(arg) || "--template".equals(arg) || "-template".equals(arg);
+    }
+
+    private static boolean isNoStatOption(String arg) {
+        return "--no-stat".equals(arg) || "-nostat".equals(arg);
+    }
+
+    private static boolean isNoJmxOption(String arg) {
+        return "--no-jmx".equals(arg) || "-nojmx".equals(arg);
+    }
+
     protected void printVersion() {
         String v = AbstractScriptellaDriver.getScriptellaVersion();
         String p = AbstractScriptellaDriver.getScriptellaTitle();
         if (p != null && v != null) {
-            out.println(p + " Version " + v);
+            getOut().println(p + " Version " + v);
         } else {
-            out.println("Scriptella version information unavailable");
+            getOut().println("Scriptella version information unavailable");
         }
     }
 
     protected void printUsage() {
-        out.println("scriptella [-options] [<file 1> ... <file N>]");
+        PrintStream out = getOut();
+        out.println("Scriptella ETL");
+        out.println();
+        out.println("A lightweight tool for moving and transforming data between databases,");
+        out.println("files, and other systems using SQL and other scripting languages.");
+        out.println();
+        out.println("Usage:");
+        out.println("  java -jar scriptella.jar [options] [<etl-file>...]");
+        out.println();
+        out.println("If no ETL file is specified, Scriptella runs etl.xml from the current directory.");
+        out.println();
+        out.println("Examples:");
+        out.println("  java -jar scriptella.jar load.etl.xml");
+        out.println("  java -jar scriptella.jar -q --no-jmx load.etl.xml");
+        out.println("  java -Dinput.file=data.csv -jar scriptella.jar load.etl.xml");
+        out.println();
         out.println("Options:");
-        out.println("  -help,     -h        display help ");
-        out.println("  -debug,    -d        print debugging information");
-        out.println("  -quiet,    -q        be extra quiet");
-        out.println("  -version,  -v        print version");
-        out.println("  -nostat              Suppress statistics collecting. Improves performance");
-        out.println("  -nojmx               Suppress JMX MBean registration");
-        out.println("  -template, -t        creates an etl.xml template file in the current directory");
+        out.println("  -h, --help             Show this help");
+        out.println("  -v, --version          Show version information");
+        out.println("  -d, --debug            Enable debug logging");
+        out.println("  -q, --quiet            Suppress informational output");
+        out.println("      --no-stat          Disable execution statistics");
+        out.println("      --no-jmx           Disable JMX registration");
+        out.println("  -t, --template [name]  Create an ETL template in the current directory");
+        out.println();
+        out.println("Documentation:");
+        out.println("  https://scriptella.org/");
     }
 
     protected ErrorCode template(List<String> args) {
