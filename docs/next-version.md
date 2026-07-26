@@ -80,6 +80,18 @@ is complete; see
 If a proposed upgrade requires a larger behavior or API migration, it will be
 reconsidered and documented rather than introduced silently.
 
+## CLI modernisation
+
+The launcher now accepts canonical double-dash options (`--help`, `--debug`,
+`--quiet`, `--version`, `--no-stat`, `--no-jmx`, `--template`) in addition to
+the legacy single-dash forms. Unrecognised options are rejected with exit code 3
+and a clear error message; prefix matching is no longer supported. The
+CLI contract doc (`docs/cli-usage.md`) has been
+updated for the new option set, exit codes, and missing-file behaviour.
+
+Existing scripts using single-dash option names will continue to work.
+New scripts should prefer the double-dash forms for clarity.
+
 ## Compatibility and release validation
 
 Before release, the complete Maven, Ant, packaging, launcher, example, and
