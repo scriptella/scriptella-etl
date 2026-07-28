@@ -7,6 +7,12 @@ Maintained HTML (tutorial, reference, support, …) is edited directly in the
 website repo. Only the generated trees under `docs/api/` and `docs/dtd/` are
 refreshed by this tooling.
 
+The published website currently contains the **Scriptella 1.3** documentation.
+When using `--build` to regenerate those trees, run this tool from a 1.3
+checkout or worktree and use Java 8. The current `master` checkout is the
+Scriptella 1.4 development line and requires JDK 17; do not use its generated
+output to refresh the published 1.3 documentation.
+
 ## Layout assumptions
 
 ```text
@@ -38,9 +44,11 @@ python3 docs/site/sync_generated_docs.py --build --dry-run
 ```
 
 Requires **Python 3.9+**, **rsync**, and (for `--build`) **Ant**. DTDDoc is
-used when present for a full docs rebuild. Prefer **Java 8** for Javadoc so the
-output matches the frameset layout currently published on scriptella.org
-(`--build` tries to select a Java 8 `JAVA_HOME` automatically on macOS).
+used when present for a full docs rebuild. For a 1.3 docs rebuild, prefer
+**Java 8** for Javadoc so the output matches the frameset layout currently
+published on scriptella.org (`--build` tries to select a Java 8 `JAVA_HOME`
+automatically on macOS). Current `master` requires JDK 17 and should only be
+used for a future 1.4 documentation publication.
 
 | Flag / env | Purpose |
 |------------|---------|

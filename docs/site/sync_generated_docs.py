@@ -2,6 +2,10 @@
 """Publish generated Javadoc / DTDDoc into a sibling scriptella.github.io tree.
 
 See docs/site/README.md for layout, options, and the StatCounter allowlist.
+
+The published website currently contains Scriptella 1.3 documentation. Use a
+1.3 checkout/worktree with Java 8 for --build; the current master/1.4 line
+requires JDK 17 and must not be used to refresh the published 1.3 trees.
 """
 
 from __future__ import annotations
@@ -114,7 +118,7 @@ def resolve_ant(root: Path, explicit: str | None) -> Path | None:
 
 
 def resolve_java_home(explicit: str | None = None) -> Path | None:
-    """Prefer Java 8 for stable Javadoc output matching scriptella.org."""
+    """Prefer Java 8 for rebuilding the published Scriptella 1.3 Javadoc."""
     if explicit:
         home = Path(explicit)
         return home if home.is_dir() else None
@@ -442,7 +446,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--java-home",
         default=None,
-        help="JAVA_HOME for --build (default: Java 8 if found, else env JAVA_HOME)",
+        help="JAVA_HOME for --build (1.3 docs: Java 8 if found, else env JAVA_HOME)",
     )
     return parser.parse_args(argv)
 
@@ -490,7 +494,7 @@ def main(argv: list[str] | None = None) -> int:
         if java_home is None:
             print(
                 "warning: no JAVA_HOME resolved; Ant will use its default JVM.\n"
-                "         Prefer Java 8 for Javadoc consistent with scriptella.org.",
+                "         Use Java 8 when rebuilding the published 1.3 Javadoc.",
                 file=sys.stderr,
             )
         build_docs(root, ant, dtddoc, dry_run=args.dry_run, java_home=java_home)

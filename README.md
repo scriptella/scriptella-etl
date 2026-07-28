@@ -125,9 +125,7 @@ ant clean jar
 * Command-line usage contract and automation templates: [docs/cli-usage.md](docs/cli-usage.md)
 * Next version: [docs/next-version.md](docs/next-version.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
-* Release procedure: [docs/releases/RELEASE-RUNBOOK.md](docs/releases/RELEASE-RUNBOOK.md)
-* Maven Central publishing: [RELEASE-PUBLISHING.md](RELEASE-PUBLISHING.md)
-* Generated website docs (maintainers): [docs/site/README.md](docs/site/README.md)
+* Maintainer guide: [docs/MAINTAINING.md](docs/MAINTAINING.md)
 
 Packaged documentation may also appear under `docs/` in distribution archives.
 
