@@ -1,7 +1,7 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, and **6A** complete;
-Chunk 7 matrix and Chunk 8 release documentation/RC remain)
+**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
+complete; Chunk 8 release documentation/RC remains)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1071,13 +1071,38 @@ case-insensitive URL matching uses `jdbc:H2:`. CHANGELOG records the removal.
 
 ## Chunk 7 — Full Compatibility and Distribution Matrix
 
-**Status:** Pending
+**Status:** Complete (July 30, 2026; Temurin 17.0.15 and 21.0.10 validation)
 
 **Reasoning level:** Higher
 
 Run from a clean checkout after all approved JDK and dependency changes.
 Chunk **5C** must be complete so bytecode is already major version 61 before
 this matrix is treated as release evidence.
+
+### Validation record (July 30, 2026)
+
+The matrix was run on macOS 15.6.1 (x86_64) with Temurin 17.0.15 and
+21.0.10, Maven 3.9.9, Ant 1.10.17, and DTDDoc 1.1.0:
+
+* `mvn clean verify` passed on both JDKs: core 154 tests, drivers 161 tests,
+  and tools 21 tests; source, binary, test, and Javadoc artifacts were
+  produced.
+* `mvn deploy -Dcentral.skipPublishing=true` passed on both JDKs for all four
+  reactor modules and skipped Central publication.
+* `ant clean test` passed; `ant jar` passed; and
+  `ant -Ddtddoc.dir=/Users/pvr/dev/prj/scriptella/DTDDoc clean dist` passed.
+* The assembled `scriptella.jar` is major version 61, embeds JEXL, does not
+  embed or register Rhino, and declares the optional Rhino JARs in its
+  manifest class path. Binary, source, and examples ZIPs were readable, and
+  generated API/DTD documentation was populated.
+* `tools/src/test/distribution/optional-runtime-distribution-test.sh` passed
+  against the fresh binary and examples ZIPs, covering standalone JEXL,
+  missing-provider diagnostics, Rhino aliases and nested execution, launcher
+  execution, split Velocity dependencies, and the packaged primes example.
+
+The build's explicit `release=17` target and class-file major 61 were verified
+on both JDKs. The artifact-level optional-runtime contract also passed with
+JDK 17 selected through jenv.
 
 ### Maven
 
