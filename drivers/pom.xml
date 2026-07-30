@@ -67,6 +67,16 @@
             <artifactId>velocity</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Optional JavaScript provider used only by the script-driver tests.
              Consumers that use JavaScript add this dependency explicitly. -->

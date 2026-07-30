@@ -1,5 +1,5 @@
 #!/bin/sh
-# Artifact-level smoke test for Scriptella's bundled JavaScript provider contract.
+# Artifact-level smoke test for Scriptella's optional runtime contracts.
 
 set -eu
 
@@ -9,7 +9,7 @@ rhino_engine_jar=$3
 rhino_runtime_jar=$4
 
 fail() {
-    echo "bundled JavaScript contract failed: $*" >&2
+    echo "optional runtime contract failed: $*" >&2
     exit 1
 }
 
@@ -21,7 +21,7 @@ for required_file in "$binary_zip" "$examples_zip" "$rhino_engine_jar" "$rhino_r
     [ -f "$required_file" ] || fail "missing required file: $required_file"
 done
 
-work_dir=$(mktemp -d "${TMPDIR:-/tmp}/scriptella-js-contract.XXXXXX")
+work_dir=$(mktemp -d "${TMPDIR:-/tmp}/scriptella-runtime-contract.XXXXXX")
 trap 'rm -rf "$work_dir"' EXIT HUP INT TERM
 
 mkdir "$work_dir/binary" "$work_dir/examples"
@@ -73,6 +73,43 @@ assert_rhino_bundle() {
 
 assert_rhino_bundle "$dist_dir/lib"
 assert_rhino_bundle "$examples_dir/lib"
+
+assert_velocity_dependencies() {
+    bundle_lib=$1
+    [ -d "$bundle_lib" ] || fail "missing library directory: $bundle_lib"
+
+    for artifact in commons-collections commons-lang; do
+        [ -f "$bundle_lib/$artifact.jar" ] \
+            || fail "$bundle_lib has no $artifact.jar"
+        [ -f "$bundle_lib/$artifact.license.txt" ] \
+            || fail "$bundle_lib has no $artifact license"
+    done
+}
+
+assert_velocity_dependencies "$examples_dir/lib"
+[ ! -f "$dist_dir/lib/velocity.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles velocity.jar"
+[ ! -f "$dist_dir/lib/commons-collections.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles commons-collections.jar"
+[ ! -f "$dist_dir/lib/commons-lang.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles commons-lang.jar"
+[ -f "$examples_dir/lib/velocity.jar" ] \
+    || fail "$examples_dir/lib has no velocity.jar"
+[ -f "$examples_dir/lib/velocity.license.txt" ] \
+    || fail "$examples_dir/lib has no Velocity license"
+
+assert_jar_version() {
+    jar_file=$1
+    expected_version=$2
+    manifest_file="$work_dir/$(basename "$jar_file").manifest.txt"
+    unzip -p "$jar_file" META-INF/MANIFEST.MF \
+        | tr -d '\r' >"$manifest_file"
+    assert_contains "$manifest_file" "Implementation-Version: $expected_version"
+}
+
+assert_jar_version "$examples_dir/lib/velocity.jar" "1.7"
+assert_jar_version "$examples_dir/lib/commons-collections.jar" "3.2.2"
+assert_jar_version "$examples_dir/lib/commons-lang.jar" "2.6"
 
 main_jar="$dist_dir/scriptella.jar"
 [ -f "$main_jar" ] || fail "binary distribution has no scriptella.jar"
@@ -170,6 +207,18 @@ java -jar "$main_jar" "$work_dir/javascript-nested.etl.xml" \
 assert_contains "$work_dir/javascript-nested.out" 'NESTED_0'
 assert_contains "$work_dir/javascript-nested.out" 'NESTED_1'
 
+for template in header.vm footer.vm; do
+    [ -f "$examples_dir/primes/$template" ] \
+        || fail "packaged primes sample has no $template"
+done
+(
+    cd "$examples_dir/primes"
+    java -jar ../lib/scriptella.jar etl.xml \
+        >"$work_dir/primes.out" 2>&1
+) || fail "packaged primes ETL failed with split Velocity dependencies"
+[ -s "$examples_dir/primes/report.html" ] \
+    || fail "packaged primes ETL did not create its Velocity report"
+
 cat >"$work_dir/unknown-language.etl.xml" <<'EOF'
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
@@ -186,4 +235,4 @@ if grep -F 'org.mozilla:' "$work_dir/unknown-language.out" >/dev/null; then
     fail "unknown-language diagnostic recommends Rhino"
 fi
 
-echo "Bundled JavaScript distribution contract passed."
+echo "Optional runtime distribution contract passed."

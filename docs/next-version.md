@@ -54,6 +54,8 @@ is complete; see
   (still the `javax.mail` API)
 * Ant **1.10.17** for the tools module Maven dependency
 * Commons Logging **1.2** (embedded for JEXL)
+* Velocity **1.7** with explicit Commons Collections **3.2.2** and Commons
+  Lang **2.6** JARs; the fat `velocity-dep.jar` has been removed
 
 **Rejected for 1.4 after trial:**
 
@@ -69,8 +71,9 @@ is complete; see
 2. ~~**remove HSQLDB 1.8 entirely** and replace it in tests and examples with
    H2 **2.4.240** (Chunk 6)~~ — **done**;
 3. ~~**remove the ODBC driver** and sample (Chunk 6A)~~ — **done**;
-4. Velocity **1.7** with **explicit JARs** (drop fat `velocity-dep.jar`); keep
-   the optional Velocity driver for existing report ETLs;
+4. ~~Velocity **1.7** with **explicit JARs** (drop fat
+   `velocity-dep.jar`)~~ — **done**; the optional Velocity driver remains
+   available for existing report ETLs;
 5. Spring Framework **5.3.x** with a small Scriptella migration for the removed
    `SingletonBeanFactoryLocator` API;
 6. reconciling Maven, Ant, the all-in-one JAR, examples, licenses, and

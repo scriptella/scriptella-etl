@@ -31,14 +31,33 @@ import java.util.logging.Logger;
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Velocity", "1.4");
     static final Logger LOG = Logger.getLogger(Driver.class.getName());
+    private static final String[][] DEPENDENCIES = {
+            {"org.apache.velocity.VelocityContext", "velocity.jar"},
+            {"org.apache.commons.collections.ExtendedProperties", "commons-collections.jar"},
+            {"org.apache.commons.lang.StringUtils", "commons-lang.jar"}
+    };
 
 
     public Driver() {
-        try { //Check if velocity is on classpath
-            Class.forName("org.apache.velocity.VelocityContext");
-        } catch (ClassNotFoundException e) {
-            throw new VelocityProviderException("Velocity not found on classpath. Check if connection classpath attribute points to velocity-dep.jar");
+        checkDependencies(getClass().getClassLoader());
+    }
+
+    static void checkDependencies(ClassLoader classLoader) {
+        for (String[] dependency : DEPENDENCIES) {
+            try {
+                Class.forName(dependency[0], false, classLoader);
+            } catch (ClassNotFoundException e) {
+                throw missingDependency(dependency[1], e);
+            } catch (LinkageError e) {
+                throw missingDependency(dependency[1], e);
+            }
         }
+    }
+
+    private static VelocityProviderException missingDependency(String jar, Throwable cause) {
+        return new VelocityProviderException("Unable to load the Velocity dependency " + jar
+                + ". Check if the connection classpath attribute points to velocity.jar, "
+                + "commons-collections.jar, and commons-lang.jar", cause);
     }
 
     /**

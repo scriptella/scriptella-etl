@@ -38,6 +38,48 @@ import java.net.URLStreamHandler;
  */
 public class VelocityConnectionTest extends AbstractTestCase {
 
+    public void testSplitDependenciesAreValidated() {
+        assertMissingDependency("org.apache.commons.collections.ExtendedProperties",
+                "commons-collections.jar");
+        assertMissingDependency("org.apache.commons.lang.StringUtils", "commons-lang.jar");
+    }
+
+    public void testDependencyLinkageErrorIsWrapped() {
+        ClassLoader classLoader = new ClassLoader(getClass().getClassLoader()) {
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                if ("org.apache.commons.lang.StringUtils".equals(name)) {
+                    throw new NoClassDefFoundError(name);
+                }
+                return super.loadClass(name, resolve);
+            }
+        };
+        try {
+            Driver.checkDependencies(classLoader);
+            fail("Dependency validation should wrap linkage errors");
+        } catch (VelocityProviderException e) {
+            assertTrue(e.getMessage().contains("commons-lang.jar"));
+            assertTrue(e.getCause() instanceof NoClassDefFoundError);
+        }
+    }
+
+    private void assertMissingDependency(final String className, String jarName) {
+        ClassLoader classLoader = new ClassLoader(getClass().getClassLoader()) {
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                if (className.equals(name)) {
+                    throw new ClassNotFoundException(name);
+                }
+                return super.loadClass(name, resolve);
+            }
+        };
+        try {
+            Driver.checkDependencies(classLoader);
+            fail("Dependency validation should fail for " + className);
+        } catch (VelocityProviderException e) {
+            assertTrue(e.getMessage().contains(jarName));
+            assertTrue(e.getCause() instanceof ClassNotFoundException);
+        }
+    }
+
     /**
      * This test creates a velocity connection that produces output into memory.
      * Context chaining is also tested.

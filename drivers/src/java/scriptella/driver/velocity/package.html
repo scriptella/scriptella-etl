@@ -13,7 +13,11 @@ is sent to the URL specified as connection parameter.</p>
         <td><b>URL:</b></td><td><code>URL to send output to. URIs are resolved relative to a script file directory.</code></td>
     </tr>
     <tr>
-        <td><b>Runtime dependencies:</b></td><td><code><a href="http://www.ibiblio.org/pub/packages/maven2/velocity/velocity-dep/1.4/velocity-dep-1.4.jar">velocity-dep-1.4.jar</a></code></td>
+        <td><b>Runtime dependencies:</b></td>
+        <td><code>velocity.jar, commons-collections.jar, commons-lang.jar</code>.
+            These optional libraries are not bundled in the binary distribution.
+            Supply all three with the connection <code>classpath</code> attribute.
+            The examples distribution includes them for the packaged primes sample.</td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
@@ -33,7 +37,8 @@ is sent to the URL specified as connection parameter.</p>
 
 <h2>Example</h2>
 <code><pre>
-&lt;connection driver="scriptella.spi.velocity.Driver" url="report.html"&gt;
+&lt;connection driver="velocity" url="report.html"
+            classpath="lib/velocity.jar;lib/commons-collections.jar;lib/commons-lang.jar"&gt;
     encoding=UTF-8;
 &lt;/connection&gt;
 </pre></code>

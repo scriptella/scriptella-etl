@@ -111,7 +111,10 @@
             <fileset dir="${tools}/src/java" includes="**/*.java"/>
         </zip>
         <zip destfile="${build.dir}/${zip.name}">
-            <zipfileset dir="${lib.dir}" includes="commons-*.jar commons-*.license.txt" prefix="${product.name}/lib"/>
+            <zipfileset dir="${lib.dir}"
+                        includes="commons-jexl.jar commons-jexl.license.txt
+                                  commons-logging.jar commons-logging.license.txt"
+                        prefix="${product.name}/lib"/>
             <zipfileset dir="${lib.dir}"
                         includes="rhino-engine.jar rhino.jar rhino.license.txt rhino.source.txt"
                         prefix="${product.name}/lib"/>
@@ -145,9 +148,9 @@
     </target>
 
     <target name="test-distribution" depends="zip, examples">
-        <description>Tests the optional JavaScript contract against assembled distributions</description>
+        <description>Tests optional runtime contracts against assembled distributions</description>
         <exec executable="sh" failonerror="true">
-            <arg value="${tools}/src/test/distribution/optional-javascript-contract.sh"/>
+            <arg value="${tools}/src/test/distribution/optional-runtime-distribution-test.sh"/>
             <arg value="${build.dir}/${zip.name}"/>
             <arg value="${build.dir}/${examples.zip.name}"/>
             <arg value="${lib.dir}/rhino-engine.jar"/>

@@ -417,7 +417,7 @@ keep them green (or obtain an explicit behavior exception).
 | Spring | `spring:1.2` monolith | Spring Framework **5.3.39** modules | **High** — `SingletonBeanFactoryLocator` removed | **Remaining — implement with migration** |
 | Janino | 3.1.0 | **3.1.12** (+ commons-compiler) | Low | **Done** (July 25, 2026); call `setExtendedClass` on `ScriptEvaluator` (see hierarchy note above) |
 | JavaMail | `javax.mail:mail:1.4.1` | **`com.sun.mail:javax.mail:1.6.2`** + activation **1.1.1** | Low | **Done** (July 25, 2026) |
-| Velocity | 1.6.2 / `velocity-dep.jar` | **1.7** + Collections **3.2.2** + Lang **2.6** (no fat JAR) | Low–medium (packaging) | **Remaining** |
+| Velocity | 1.6.2 / `velocity-dep.jar` | **1.7** + Collections **3.2.2** + Lang **2.6** (no fat JAR) | Low–medium (packaging) | **Done** |
 | Ant (Maven tools) | 1.7.1 | **1.10.17** | Low | **Done** (July 25, 2026) |
 | Commons JEXL | 2.0.1 | **2.1.1** | Low–medium (engine) | **Rejected** (July 25, 2026) — stay on 2.0.1 (`var`/`return` keywords) |
 | Commons Logging | 1.0.4 | **1.2** | Low | **Done** (July 25, 2026) |
@@ -431,7 +431,7 @@ keep them green (or obtain an explicit behavior exception).
 3. JavaMail 1.6.2 + Activation 1.1.1 — **done**
 4. Ant 1.10.17 — **done**
 5. Commons Logging pin — **done**; Commons JEXL 2.1.1 — **rejected** (stay 2.0.1)
-6. Velocity 1.7 + split transitive JARs — **remaining**
+6. Velocity 1.7 + split transitive JARs — **done**
 7. Spring 5.3.39 migration (own PR if preferred) — **remaining**
 
 After each step: `mvn clean verify` and relevant Ant tests on JDK 17.

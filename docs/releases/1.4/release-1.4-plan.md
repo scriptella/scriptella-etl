@@ -1,8 +1,8 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, 5A, **5C**, **6**, and **6A** complete; 5B
-quick wins done; JEXL 2.1.1 rejected; remaining: Velocity fat-JAR
-split, Spring migration)
+quick wins and Velocity split done; JEXL 2.1.1 rejected; remaining: Spring
+migration)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -59,7 +59,7 @@ not a feature release. Order work and accept or reject changes by these themes:
 | High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | **Done** (July 25, 2026) |
 | High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | **Done** (July 30, 2026; H2 2.4.240) |
 | High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
-| Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | Packaging hygiene; keep optional driver without fat-JAR debt |
+| Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | **Done** (July 30, 2026) |
 | Medium | **5B Spring** — 5.3.39 migration (own PR) | JDK-era Spring; real code change, not drop-in |
 | Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + drop chunks (and remaining 5B) are settled |
 
@@ -697,7 +697,8 @@ sample libraries from earlier incomplete reverts.
 
 ## Chunk 5B — Implement Approved Dependency Upgrades
 
-**Status:** In progress (quick wins complete; JEXL 2.1.1 rejected July 25, 2026)
+**Status:** In progress (quick wins and Velocity split complete; JEXL 2.1.1
+rejected July 25, 2026; Spring migration remains)
 
 This is the implementation stage. Execute only the candidates approved by the
 impact analysis in [chunk-5a-dependency-impact.md](chunk-5a-dependency-impact.md).
@@ -748,13 +749,20 @@ break plus the package migration.
 
 Maven pin, `lib/commons-jexl.jar`, and `versions.properties` remain at **2.0.1**.
 
+### Velocity split completed (July 30, 2026)
+
+Velocity **1.7** now uses separate Velocity, Commons Collections **3.2.2**,
+and Commons Lang **2.6** JARs. The fat `velocity-dep.jar` was removed from
+`lib/` and the examples, while the optional Velocity driver and report sample
+remain supported. Driver initialization validates all three JARs, and the
+assembled-distribution contract runs the packaged primes sample to verify its
+connection classpath and examples-archive contents. The binary distribution
+does not bundle the optional Velocity runtime or its Commons dependencies.
+Velocity 2.x stays out of scope.
+
 ### Remaining 5B work
 
-1. Velocity **1.7** with split transitive JARs (**drop `velocity-dep.jar`**).
-   Keep the optional Velocity driver for existing report ETLs; the goal is
-   maintenance (explicit deps, no fat JAR), not a template-engine rewrite.
-   Velocity 2.x stays out of scope.
-2. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
+1. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
    holder; split modules). Prefer a dedicated PR.
 
 See also **Release themes and priorities**: HSQLDB removal (Chunk 6) and

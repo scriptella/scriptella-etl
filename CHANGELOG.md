@@ -16,6 +16,8 @@ For current development direction and planned work, see
   **Activation** → 1.1.1, **Ant** → 1.10.17, **Commons Logging** → 1.2.
   Commons JEXL stays on **2.0.1** for 1.4 (2.1.1 rejected: `var`/`return`
   become reserved words and break existing `${var}` scripts).
+* **Velocity** → 1.7 with explicit Commons Collections 3.2.2 and Commons Lang
+  2.6 dependencies; the bundled `velocity-dep.jar` fat JAR was removed.
 * **H2** → 2.4.240 as the bundled database used by tests and examples.
 
 ### Removed
