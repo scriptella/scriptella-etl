@@ -74,8 +74,8 @@ is complete; see
 4. ~~Velocity **1.7** with **explicit JARs** (drop fat
    `velocity-dep.jar`)~~ — **done**; the optional Velocity driver remains
    available for existing report ETLs;
-5. Spring Framework **5.3.x** with a small Scriptella migration for the removed
-   `SingletonBeanFactoryLocator` API;
+5. ~~Spring Framework **5.3.x** with a small Scriptella migration for the
+   removed `SingletonBeanFactoryLocator` API~~ — **done**;
 6. reconciling Maven, Ant, the all-in-one JAR, examples, licenses, and
    distribution archives so they contain consistent dependency versions.
 

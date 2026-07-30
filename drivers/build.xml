@@ -6,7 +6,7 @@
         <pathelement location="${basedir}/../lib/commons-lang.jar"/>
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/janino-commons-compiler.jar"/>
-        <pathelement location="${basedir}/../lib/spring.jar"/>
+        <fileset dir="${basedir}/../lib" includes="spring-*.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/mail.jar"/>
         <pathelement location="${basedir}/../lib/j2ee/activation.jar"/>

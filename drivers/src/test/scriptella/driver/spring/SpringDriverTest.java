@@ -17,6 +17,7 @@ package scriptella.driver.spring;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import scriptella.AbstractTestCase;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
@@ -24,7 +25,6 @@ import scriptella.execution.EtlExecutorException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Tests for {@link Driver}.
@@ -33,19 +33,42 @@ import java.sql.SQLException;
  * @version 1.0
  */
 public class SpringDriverTest extends AbstractTestCase {
-    public void test() throws SQLException, ClassNotFoundException, EtlExecutorException {
-        BeanFactory bf = new ClassPathXmlApplicationContext("scriptella/driver/spring/springbeans.xml");
-        DataSource ds = (DataSource) bf.getBean("datasource"); //Test if bean factory contain correct data
-        Connection con = ds.getConnection();
-        con.createStatement().executeQuery("select * from AutoStart"); //A table should be created on startup
-        EtlExecutor exec = (EtlExecutor) bf.getBean("executor");
-        exec.execute();
-        con.createStatement().executeQuery("select * from SpringTable"); //A table should be created
-        //Test batched executor
-        ResultSet rs = con.createStatement().executeQuery("select * from Batch order by id");//A table should be created
-        assertTrue(rs.next());
-        assertEquals(1, rs.getInt(1));
-        assertFalse(rs.next());
-        con.close();
+    public void test() throws Exception {
+        ClassPathXmlApplicationContext context =
+                new ClassPathXmlApplicationContext("scriptella/driver/spring/springbeans.xml");
+        try {
+            BeanFactory bf = context;
+            DataSource ds = (DataSource) bf.getBean("datasource"); //Test if bean factory contain correct data
+            Connection con = ds.getConnection();
+            con.createStatement().executeQuery("select * from AutoStart"); //A table should be created on startup
+            SpringBeanFactoryContractTest.assertNoContextBeanFactory();
+
+            EtlExecutor exec = (EtlExecutor) bf.getBean("executor");
+            exec.execute();
+            SpringBeanFactoryContractTest.assertNoContextBeanFactory();
+            con.createStatement().executeQuery("select * from SpringTable"); //A table should be created
+
+            EtlExecutorBean failingExecutor = new EtlExecutorBean();
+            failingExecutor.setBeanFactory(bf);
+            failingExecutor.setConfigLocation(new ClassPathResource(
+                    "scriptella/driver/spring/failing.etl.xml"));
+            failingExecutor.afterPropertiesSet();
+            try {
+                failingExecutor.execute();
+                fail("Expected the missing Spring datasource to fail");
+            } catch (EtlExecutorException expected) {
+                // ok
+            }
+            SpringBeanFactoryContractTest.assertNoContextBeanFactory();
+
+            //Test batched executor
+            ResultSet rs = con.createStatement().executeQuery("select * from Batch order by id");//A table should be created
+            assertTrue(rs.next());
+            assertEquals(1, rs.getInt(1));
+            assertFalse(rs.next());
+            con.close();
+        } finally {
+            context.close();
+        }
     }
 }

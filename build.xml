@@ -95,7 +95,7 @@
             <fileset dir="${basedir}/samples/lib" excludes="readme.txt"/>
         </delete>
         <copy todir="${basedir}/samples/lib" overwrite="true">
-            <fileset dir="${lib.dir}" excludes="spring.* lucene*"/>
+            <fileset dir="${lib.dir}" excludes="spring* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
     </target>

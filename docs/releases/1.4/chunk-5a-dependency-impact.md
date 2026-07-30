@@ -66,7 +66,7 @@ where noted.
 
 | Candidate | Available | Bytecode major | License (summary) |
 | --- | --- | --- | --- |
-| Spring Framework modules 5.3.39 (`spring-core`, `spring-beans`, `spring-context`, `spring-jdbc`, `spring-jcl`) | Yes | 52 (Java 8) | Apache 2.0 |
+| Spring Framework modules 5.3.39 (`spring-aop`, `spring-beans`, `spring-context`, `spring-core`, `spring-expression`, `spring-jcl`, `spring-jdbc`, `spring-tx`) | Yes | 52 (Java 8) | Apache 2.0 |
 | Monolithic `org.springframework:spring:5.3.39` | **No** (split modules only) | — | — |
 | Monolithic `org.springframework:spring:4.3.30.RELEASE` | **No** | — | — |
 | Spring modules 4.3.30.RELEASE | Yes | 50 (Java 6) | Apache 2.0 |
@@ -137,7 +137,7 @@ to accept classic bean XML; re-validate `springbeans.xml` after upgrade. Prefer
 keeping the existing DTD form if tests pass, rather than forcing XSD migration
 in 1.4.
 
-**Recommendation: implement only with an explicit migration (not drop-in)**
+**Implemented July 30, 2026 with an explicit migration (not drop-in)**
 
 Required migration steps for 5B (or a follow-on PR):
 
@@ -414,7 +414,7 @@ keep them green (or obtain an explicit behavior exception).
 
 | Library | Current (at 5A) | Target | Risk | 5B action |
 | --- | --- | --- | --- | --- |
-| Spring | `spring:1.2` monolith | Spring Framework **5.3.39** modules | **High** — `SingletonBeanFactoryLocator` removed | **Remaining — implement with migration** |
+| Spring | `spring:1.2` monolith | Spring Framework **5.3.39** modules | **High** — `SingletonBeanFactoryLocator` removed | **Implemented with migration** |
 | Janino | 3.1.0 | **3.1.12** (+ commons-compiler) | Low | **Done** (July 25, 2026); call `setExtendedClass` on `ScriptEvaluator` (see hierarchy note above) |
 | JavaMail | `javax.mail:mail:1.4.1` | **`com.sun.mail:javax.mail:1.6.2`** + activation **1.1.1** | Low | **Done** (July 25, 2026) |
 | Velocity | 1.6.2 / `velocity-dep.jar` | **1.7** + Collections **3.2.2** + Lang **2.6** (no fat JAR) | Low–medium (packaging) | **Done** |
@@ -432,7 +432,7 @@ keep them green (or obtain an explicit behavior exception).
 4. Ant 1.10.17 — **done**
 5. Commons Logging pin — **done**; Commons JEXL 2.1.1 — **rejected** (stay 2.0.1)
 6. Velocity 1.7 + split transitive JARs — **done**
-7. Spring 5.3.39 migration (own PR if preferred) — **remaining**
+7. Spring 5.3.39 migration — **complete July 30, 2026**
 
 After each step: `mvn clean verify` and relevant Ant tests on JDK 17.
 

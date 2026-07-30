@@ -1,8 +1,7 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, 5A, **5C**, **6**, and **6A** complete; 5B
-quick wins and Velocity split done; JEXL 2.1.1 rejected; remaining: Spring
-migration)
+**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, and **6A** complete;
+Chunk 7 matrix and Chunk 8 release documentation/RC remain)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -60,8 +59,8 @@ not a feature release. Order work and accept or reject changes by these themes:
 | High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | **Done** (July 30, 2026; H2 2.4.240) |
 | High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
 | Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | **Done** (July 30, 2026) |
-| Medium | **5B Spring** — 5.3.39 migration (own PR) | JDK-era Spring; real code change, not drop-in |
-| Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + drop chunks (and remaining 5B) are settled |
+| Medium | **5B Spring** — 5.3.39 migration (own PR) | **Done** (July 30, 2026) |
+| Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + dependency/drop chunks are settled |
 
 Within 5B, Velocity packaging comes before Spring because it is smaller and
 purely maintenance-oriented; Spring remains required for 1.4 if the Spring
@@ -656,10 +655,10 @@ Maven Central.
 
 | Area | Baseline at 5A | 1.4 target | 5B action |
 | --- | --- | --- | --- |
-| Spring driver | `org.springframework:spring:1.2` | Spring Framework **5.3.39** split modules | **Remaining — implement with migration** |
+| Spring driver | `org.springframework:spring:1.2` | Spring Framework **5.3.39** split modules | **Done** (July 30, 2026) |
 | Janino driver | `janino:3.1.0` | `janino:3.1.12` + `commons-compiler:3.1.12` | **Done** (July 25, 2026) |
 | Mail driver | `javax.mail:mail:1.4.1` + Activation 1.1 | `com.sun.mail:javax.mail:1.6.2` + `javax.activation:activation:1.1.1` | **Done** (July 25, 2026) |
-| Velocity driver | 1.6.2 / `velocity-dep.jar` | `velocity:1.7` + Collections **3.2.2** + Lang **2.6** | **Remaining** — keep driver; **must drop fat JAR** |
+| Velocity driver | 1.6.2 / `velocity-dep.jar` | `velocity:1.7` + Collections **3.2.2** + Lang **2.6** | **Done** (July 30, 2026) |
 | User-facing Ant | `ant:1.7.1` | Ant **1.10.17** | **Done** (July 25, 2026) |
 | Commons JEXL | 2.0.1 | **2.1.1** (not JEXL 3) | **Rejected** (July 25, 2026) — stay on 2.0.1 |
 | Commons Logging | 1.0.4 | **1.2** | **Done** (July 25, 2026) |
@@ -669,14 +668,12 @@ as the final pin.
 
 ### Key Spring finding
 
-`EtlExecutorBean.getGlobalThreadLocal()` depends on
+Before the migration, `EtlExecutorBean.getGlobalThreadLocal()` depended on
 `org.springframework.beans.factory.access.SingletonBeanFactoryLocator`, which
 exists in Spring 4.3 and is **absent** in Spring 5.3.39. A drop-in Spring 5
-upgrade is not possible. 5B must replace that locator with a Scriptella-owned
-JVM-global `ThreadLocal<BeanFactory>` (or equivalent) while preserving bug
-#4648 behavior, then adopt split Spring 5.3.39 modules
-(`spring-core` / `spring-beans` / `spring-context` / `spring-jdbc` +
-`spring-jcl`).
+upgrade was not possible. 5B replaced that locator with a Scriptella-owned
+classloader-safe thread-local context while preserving bug #4648 behavior,
+then adopted the complete split Spring 5.3.39 graph.
 
 ### Hygiene for 5B
 
@@ -697,8 +694,8 @@ sample libraries from earlier incomplete reverts.
 
 ## Chunk 5B — Implement Approved Dependency Upgrades
 
-**Status:** In progress (quick wins and Velocity split complete; JEXL 2.1.1
-rejected July 25, 2026; Spring migration remains)
+**Status:** Complete (July 30, 2026) — approved quick wins, Velocity split,
+and Spring 5.3.39 migration complete; JEXL 2.1.1 rejected July 25, 2026
 
 This is the implementation stage. Execute only the candidates approved by the
 impact analysis in [chunk-5a-dependency-impact.md](chunk-5a-dependency-impact.md).
@@ -760,10 +757,13 @@ connection classpath and examples-archive contents. The binary distribution
 does not bundle the optional Velocity runtime or its Commons dependencies.
 Velocity 2.x stays out of scope.
 
-### Remaining 5B work
+### Spring migration completed (July 30, 2026)
 
-1. Spring Framework **5.3.39** migration (rewrite thread-local BeanFactory
-   holder; split modules). Prefer a dedicated PR.
+The optional Spring driver now targets Spring Framework **5.3.39** using its
+split module graph. Scriptella owns the thread-local `BeanFactory` association
+used by nested `spring:` JDBC lookups, replacing the removed
+`SingletonBeanFactoryLocator` API and obsolete `beanFactory.xml` resource.
+Spring remains excluded from the base binary and examples distributions.
 
 See also **Release themes and priorities**: HSQLDB removal (Chunk 6) and
 Java 17 bytecode (Chunk 5C) outrank remaining 5B for overall maintainability.

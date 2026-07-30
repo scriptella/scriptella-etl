@@ -17,9 +17,14 @@ package scriptella.driver.spring;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import scriptella.AbstractTestCase;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * Characterization of the Spring BeanFactory thread-local contract used by
@@ -67,5 +72,55 @@ public class SpringBeanFactoryContractTest extends AbstractTestCase {
     public void testDriverRequiresSpringOnClasspath() {
         // Smoke: constructing the driver resolves BeanFactory.
         new Driver();
+    }
+
+    public void testChildLoadedDriverUsesParentBeanFactory() throws Exception {
+        Class<?> loaderType = Class.forName("scriptella.core.DriverClassLoader");
+        Constructor<?> constructor = loaderType.getDeclaredConstructor(URL[].class);
+        constructor.setAccessible(true);
+        ClassLoader childLoader = (ClassLoader) constructor.newInstance(
+                new Object[]{new URL[]{new URL("file:child-loader-regression")}});
+
+        Class<?> childDriverType = Class.forName(Driver.class.getName(), true, childLoader);
+        assertNotSame(Driver.class, childDriverType);
+        assertNotSame(EtlExecutorBean.class,
+                Class.forName(EtlExecutorBean.class.getName(), true, childLoader));
+
+        StaticApplicationContext ctx = new StaticApplicationContext();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource(
+                "jdbc:h2:mem:springChildLoader;DB_CLOSE_DELAY=-1", "sa", "");
+        ctx.getBeanFactory().registerSingleton("datasource", dataSource);
+        ctx.refresh();
+
+        Method setContext = EtlExecutorBean.class.getDeclaredMethod(
+                "setContextBeanFactory", BeanFactory.class);
+        setContext.setAccessible(true);
+        setContext.invoke(null, ctx);
+        try {
+            Object childDriver = childDriverType.getDeclaredConstructor().newInstance();
+            Method getConnection = childDriverType.getDeclaredMethod(
+                    "getConnection", String.class, Properties.class);
+            getConnection.setAccessible(true);
+            Connection connection = (Connection) getConnection.invoke(
+                    childDriver, "datasource", new Properties());
+            try {
+                assertFalse(connection.isClosed());
+            } finally {
+                connection.close();
+            }
+        } finally {
+            setContext.invoke(null, new Object[]{null});
+            ctx.close();
+        }
+        assertNoContextBeanFactory();
+    }
+
+    static void assertNoContextBeanFactory() {
+        try {
+            EtlExecutorBean.getContextBeanFactory();
+            fail("BeanFactory association must be cleared after execution");
+        } catch (IllegalStateException expected) {
+            // ok
+        }
     }
 }
