@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class NestedQueryTest extends DBTestCase {
     public void test() throws EtlExecutorException {
-        getConnection("nestedquerytestdb1"); //just for shutdown
+        getConnection("nestedquerytestdb1"); //keep the in-memory database alive for assertions
         final Connection con = getConnection("nestedquerytestdb2");
 
         final EtlExecutor se = newEtlExecutor();
@@ -62,7 +62,7 @@ public class NestedQueryTest extends DBTestCase {
     }
 
     public void test2() throws EtlExecutorException {
-        getConnection("nestedquerytest2db1");//just for shutdown
+        getConnection("nestedquerytest2db1");//keep the in-memory database alive for assertions
         final Connection con = getConnection("nestedquerytest2db2");
 
         final EtlExecutor se = newEtlExecutor("NestedQueryTest2.xml");

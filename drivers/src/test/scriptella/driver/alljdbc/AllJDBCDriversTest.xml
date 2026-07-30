@@ -10,7 +10,7 @@
         --Removed any data from table
         DELETE FROM Test;
         --Insert the test record
-        INSERT INTO Test VALUES (1, 3.14, 'String', 1, {ts '2006-07-21 19:43:00'}, '01010101', ?blob, ?clob, null);
+        INSERT INTO Test VALUES (1, 3.14, 'String', 1, {ts '2006-07-21 19:43:00'}, X'01010101', ?blob, ?clob, null);
     </script>
     <script connection-id="c2">
         DELETE FROM Test;<!--Clearing the previous data-->

@@ -39,8 +39,8 @@ properties and dependencies like progress indicator may also be injected.
 <code><pre>
 &lt;beans&gt;
     &lt;bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;
-        &lt;property name="driverClassName"&gt;&lt;value&gt;org.hsqldb.jdbcDriver&lt;/value&gt;&lt;/property&gt;
-        &lt;property name="url"&gt;&lt;value&gt;jdbc:hsqldb:mem:spring&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="driverClassName"&gt;&lt;value&gt;org.h2.Driver&lt;/value&gt;&lt;/property&gt;
+        &lt;property name="url"&gt;&lt;value&gt;jdbc:h2:mem:spring;MODE=LEGACY;NON_KEYWORDS=VALUE&lt;/value&gt;&lt;/property&gt;
         &lt;property name="username"&gt;&lt;value&gt;sa&lt;/value&gt;&lt;/property&gt;
         &lt;property name="password"&gt;&lt;value&gt;&lt;/value&gt;&lt;/property&gt;
     &lt;/bean>

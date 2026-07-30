@@ -70,7 +70,7 @@ public class VelocityScriptTest extends DBTestCase {
      */
     public void test() throws EtlExecutorException {
         params.put("test", 1);
-        getConnection("velocity");//just to shutdown at the end of the test
+        getConnection("velocity");//keep the in-memory database alive for assertions
         final EtlExecutor se = newEtlExecutor();
         se.execute();
         final String s = out.toString();
@@ -83,7 +83,7 @@ public class VelocityScriptTest extends DBTestCase {
      */
     public void test2() throws EtlExecutorException {
         params.put("test", 2);
-        getConnection("velocity");//just to shutdown at the end of the test
+        getConnection("velocity");//keep the in-memory database alive for assertions
         final EtlExecutor se = newEtlExecutor();
         se.execute();
         final String s = out.toString();

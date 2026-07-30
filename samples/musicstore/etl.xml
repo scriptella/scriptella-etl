@@ -27,7 +27,7 @@
         ALBUM_ID INT,
         NAME VARCHAR(100),
         DATA LONGVARBINARY,
-        CREATED DATETIME
+        CREATED TIMESTAMP
         );
         <!-- Inserts file with path relative to executed script directory location -->
         INSERT INTO Track(ID, ALBUM_ID, NAME, DATA, CREATED) VALUES
@@ -38,11 +38,4 @@
         INSERT INTO Track(ID, ALBUM_ID, NAME, DATA, CREATED) VALUES
         (2, 2, 'Song2.mp3', ?{file file2}, now());
     </script>
-    <script><!-- Correctly shutdown the DB -->
-        <dialect name=".*hsql.*">
-            COMMIT;
-            SHUTDOWN;
-        </dialect>
-    </script>
-
 </etl>

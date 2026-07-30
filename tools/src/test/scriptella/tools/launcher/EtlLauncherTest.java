@@ -294,7 +294,7 @@ public class EtlLauncherTest extends DBTestCase {
                     final Number n = (Number) srv.getAttribute(
                             mbeanName,
                             "ExecutedStatementsCount");
-                    assertEquals(2, n.intValue());
+                    assertEquals(1, n.intValue());
                 } catch (Exception e) {
                     fail(e.getMessage());
                 }

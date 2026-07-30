@@ -17,10 +17,9 @@ Scriptella is actually built and run. Features are secondary.
 * **Keep** optional drivers that still serve real (even if niche) users when a
   small hygiene fix is enough — e.g. Velocity reports stay supported, but the
   fat `velocity-dep.jar` goes away in favor of explicit JARs.
-* **Drop** stacks that are no longer relevant — notably **HSQLDB 1.8**, which
-  will be removed from tests, samples, and distributions (replacement TBD,
-  H2 is a candidate). The **ODBC / JDBC-ODBC bridge adapter** has already
-  been removed (Chunk 6A).
+* **Drop** stacks that are no longer relevant — **HSQLDB 1.8** has been
+  removed from tests, samples, and distributions and replaced by **H2
+  2.4.240**. The **ODBC / JDBC-ODBC bridge adapter** has also been removed.
 * **Do not** force library bumps that break existing scripts without a
   deliberate migration (e.g. Commons JEXL stays on **2.0.1** after a failed
   2.1.1 trial).
@@ -67,8 +66,8 @@ is complete; see
 
 1. ~~raise Maven and Ant compiles to **`release=17`** / class-file major **61**
    (Chunk 5C)~~ — **done**;
-2. **remove HSQLDB 1.8 entirely** after validating a Java 17-compatible
-   replacement for tests and examples (plan Chunk 6);
+2. ~~**remove HSQLDB 1.8 entirely** and replace it in tests and examples with
+   H2 **2.4.240** (Chunk 6)~~ — **done**;
 3. ~~**remove the ODBC driver** and sample (Chunk 6A)~~ — **done**;
 4. Velocity **1.7** with **explicit JARs** (drop fat `velocity-dep.jar`); keep
    the optional Velocity driver for existing report ETLs;
@@ -101,4 +100,3 @@ be recorded in the changelog with migration guidance where needed.
 The detailed implementation scope, decisions, validation evidence, and exit
 criteria are maintained in the
 [Scriptella 1.4 release plan](releases/1.4/release-1.4-plan.md).
-

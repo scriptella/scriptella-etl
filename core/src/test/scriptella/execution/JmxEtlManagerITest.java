@@ -49,7 +49,7 @@ public class JmxEtlManagerITest extends AbstractTestCase {
 
                     try {
                         final Number n = (Number) srv.getAttribute(name, "ExecutedStatementsCount");
-                        assertEquals(2, n.intValue());
+                        assertEquals(1, n.intValue());
                     } catch (Exception e) {
                         fail(e.getMessage());
                     }

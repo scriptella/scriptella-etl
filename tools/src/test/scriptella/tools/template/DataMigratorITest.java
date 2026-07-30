@@ -38,7 +38,7 @@ public class DataMigratorITest extends AbstractTestCase {
     private static final Pattern INSERT_INTO_PTR = Pattern.compile("INSERT INTO (\\w+)");
 
     /**
-     * Tests if data migrator correctly produces a template for HSQLDB table.
+     * Tests if data migrator correctly produces a template for H2 table.
      */
     public void test() throws IOException, EtlExecutorException {
         DataMigrator dm = new DataMigrator() {
@@ -56,9 +56,10 @@ public class DataMigratorITest extends AbstractTestCase {
         };
         newEtlExecutor().execute();
         Map<String,String> props = new HashMap<String, String>();
-        props.put(DataMigrator.DRIVER_PROPERTY_NAME, "org.hsqldb.jdbcDriver");
-        props.put(DataMigrator.URL_PROPERTY_NAME, "jdbc:hsqldb:mem:dataMigratorTest");
+        props.put(DataMigrator.DRIVER_PROPERTY_NAME, "org.h2.Driver");
+        props.put(DataMigrator.URL_PROPERTY_NAME, "jdbc:h2:mem:dataMigratorTest;DB_CLOSE_DELAY=-1;MODE=LEGACY;NON_KEYWORDS=VALUE");
         props.put(DataMigrator.USER_PROPERTY_NAME, "sa");
+        props.put(DataMigrator.SCHEMA_PROPERTY_NAME, "PUBLIC");
         dm.create(props);
 
         Matcher matcher = INSERT_INTO_PTR.matcher(etlFile.toString());

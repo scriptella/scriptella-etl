@@ -98,7 +98,7 @@ public class SQLSupportPerfTest extends DBTestCase {
         se.execute();
         ti = System.currentTimeMillis() - ti;
         System.out.println("ti = " + ti);
-        //Now let's test direct HSQL connection
+        //Now test a direct H2 connection.
         RepeatingInputStream ris = new RepeatingInputStream("update test set id=?\n".getBytes(), n);
         BufferedReader br = new BufferedReader(new InputStreamReader(ris));
         ti = System.currentTimeMillis();
@@ -110,7 +110,7 @@ public class SQLSupportPerfTest extends DBTestCase {
         }
         con.commit();
         ti = System.currentTimeMillis() - ti;
-        System.out.println("ti hsql = " + ti);
+        System.out.println("ti h2 = " + ti);
 
 
     }

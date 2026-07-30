@@ -46,7 +46,6 @@
     </script>
     <script>
         COMMIT;
-        SHUTDOWN COMPACT;
     </script>
 
 

@@ -1,6 +1,6 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:est2" user="sa" password=""/>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:est2;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script>
         create table t1 (
         id int
@@ -21,7 +21,6 @@
         </script>
     </query>
     <script>
-        SHUTDOWN;
     </script>
 
 

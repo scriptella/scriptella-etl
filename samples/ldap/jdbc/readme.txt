@@ -73,7 +73,7 @@ uniqueMember: uid=fbloggs,ou=people,dc=scriptella
 You may check for required data presence in LDAP by running:
 ldapsearch -b "dc=scriptella" "(objectclass=*)"
 
-Execute ldap2db.etl.xml script to migrate data from LDAP to HSQLDB database named "outdb".
+Execute ldap2db.etl.xml script to migrate data from LDAP to H2 database named "outdb".
 Note: Use command line "scriptella ldap2db" to run the script.
 
 Migration of database data to LDAP.

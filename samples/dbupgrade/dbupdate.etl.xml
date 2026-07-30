@@ -21,12 +21,4 @@
         <include href="2-1.sql"/>
     </script>
 
-    <script>
-        <!--A fix to correctly shutdown HSQLDB database.
-        Not necessary if scriptella.driver.hsqldb.Driver is used-->
-        COMMIT;
-        SHUTDOWN COMPACT;
-    </script>
-
-
 </etl>

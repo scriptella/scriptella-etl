@@ -5,9 +5,9 @@
         var=1
         b=$var|$var|$var|${var}|${var}|${var}
         <include href="PropertiesTest.properties"/>
-        url.prefix=jdbc:hsqldb:mem
+        url.prefix=jdbc:h2:mem
         dbname=propertiestest
-        driver=org.hsqldb.jdbcDriver
+        driver=org.h2.Driver
         #url should be substituted
         url=${url.prefix}:$dbname
         user=sa

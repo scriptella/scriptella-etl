@@ -33,11 +33,12 @@ import java.util.Set;
  */
 public class DynamicIncludeITest extends DBTestCase {
     public void test() throws EtlExecutorException {
+        final java.sql.Connection connection = getConnection("dynamicInclude");
         newEtlExecutor().execute();
         QueryHelper qh = new QueryHelper("SELECT * FROM Data");
         final Set<Integer> expected = new HashSet<Integer>(Arrays.asList(1, 2, -1));
 
-        qh.execute(getConnection("dynamicInclude"), new QueryCallback() {
+        qh.execute(connection, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 Integer p = (Integer) parameters.getParameter("1");
                 assertTrue("Unexpected number: " + p + ", expected values are: " + expected, expected.remove(p));

@@ -72,7 +72,7 @@ Use ldapadd -x -D "cn=root,dc=scriptella" -W -f init.ldif
 to add init.ldif file.
 
 
-Execute ldap2db.etl.xml script to migrate data from LDAP to HSQLDB database named "outdb".
+Execute ldap2db.etl.xml script to migrate data from LDAP to H2 database named "outdb".
 
 Migration of database data to LDAP.
 -----------------------------------

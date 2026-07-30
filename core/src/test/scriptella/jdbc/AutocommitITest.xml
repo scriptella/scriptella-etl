@@ -1,16 +1,16 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
-    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:autocommititest" user="sa" password="">
+    <connection id="c1" driver="org.h2.Driver" url="jdbc:h2:mem:autocommititest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         autocommit=true
     </connection>
-    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:autocommititest" user="sa" password="">
+    <connection id="c2" driver="org.h2.Driver" url="jdbc:h2:mem:autocommititest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         autocommit.size=4
     </connection>
 
     <script connection-id="c1">
         CREATE TABLE TST (
             ID INT
-        )
+        );
         INSERT INTO TST VALUES (1);
         ROLLBACK; <!-- nothing to rollback because of autocoomit-->
     </script>

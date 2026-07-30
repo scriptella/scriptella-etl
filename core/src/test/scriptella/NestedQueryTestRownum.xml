@@ -3,7 +3,7 @@
     <description>
         Test script for rownum pseudo-column functionality.
     </description>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytestrownum" user="sa" password=""/>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:nestedquerytestrownum;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
         ID INT

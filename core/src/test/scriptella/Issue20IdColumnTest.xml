@@ -3,8 +3,8 @@
     <properties>
         id=999
     </properties>
-    <connection id="db" driver="org.hsqldb.jdbcDriver"
-                url="jdbc:hsqldb:mem:issue20idcolumn" user="sa" password=""/>
+    <connection id="db" driver="org.h2.Driver"
+                url="jdbc:h2:mem:issue20idcolumn;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script connection-id="db">
         CREATE TABLE Source (ID INT);
         CREATE TABLE Result (

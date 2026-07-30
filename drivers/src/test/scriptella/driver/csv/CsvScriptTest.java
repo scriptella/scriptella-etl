@@ -53,9 +53,9 @@ public class CsvScriptTest extends DBTestCase {
                 throw new UnsupportedOperationException();
             }
         };
+        final Connection connection = getConnection("csv");
         final EtlExecutor se = newEtlExecutor();
         se.execute();
-        final Connection connection = getConnection("csv");
         QueryHelper q = new QueryHelper("SELECT * from Result");
         final Set<String> expected = new HashSet<String>();
         expected.add("1 2 3");expected.add("Col4 5 6");expected.add("7 8 9");

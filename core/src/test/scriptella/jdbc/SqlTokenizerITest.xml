@@ -1,10 +1,10 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
-    <connection id="orcl" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:toktest" user="sa" password="">
+    <connection id="orcl" driver="org.h2.Driver" url="jdbc:h2:mem:toktest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         statement.separator=/
         statement.separator.singleline=true
     </connection>
-    <connection id="syb" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:toktest" user="sa" password="">
+    <connection id="syb" driver="org.h2.Driver" url="jdbc:h2:mem:toktest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         statement.separator=go
         statement.separator.singleline=true
     </connection>

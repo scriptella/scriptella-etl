@@ -1,0 +1,5 @@
+H2 Database Engine 2.4.240 source code is available from:
+https://github.com/h2database/h2database/tree/version-2.4.240
+
+The corresponding Maven source artifact is:
+com.h2database:h2:2.4.240:sources

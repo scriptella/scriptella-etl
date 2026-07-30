@@ -42,7 +42,7 @@ public class PropertiesTest extends AbstractTestCase {
         EtlExecutor se = prepareExecutor(null);
         se.execute();
 
-        assertEquals("jdbc:hsqldb:mem:propertiestest", params.getUrl());
+        assertEquals("jdbc:h2:mem:propertiestest", params.getUrl());
         assertEquals("sa", params.getUser());
         assertEquals("", params.getPassword());
 
@@ -51,11 +51,11 @@ public class PropertiesTest extends AbstractTestCase {
         assertEquals("bar", ctx.getParameter("foo"));
         assertEquals("1", ctx.getParameter("var"));
         assertEquals("1|1|1|1|1|1", ctx.getParameter("b"));
-        assertEquals("jdbc:hsqldb:mem", ctx.getParameter("url.prefix"));
+        assertEquals("jdbc:h2:mem", ctx.getParameter("url.prefix"));
         assertEquals("propertiestest", ctx.getParameter("dbname"));
-        assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
-        assertEquals("org.hsqldb.jdbcDriver", ctx.getParameter("driver"));
-        assertEquals("jdbc:hsqldb:mem:propertiestest", ctx.getParameter("url"));
+        assertEquals("org.h2.Driver", ctx.getParameter("driver"));
+        assertEquals("org.h2.Driver", ctx.getParameter("driver"));
+        assertEquals("jdbc:h2:mem:propertiestest", ctx.getParameter("url"));
         assertEquals("sa", ctx.getParameter("user"));
         assertEquals("", ctx.getParameter("password"));
         Map<String,String> extra = new HashMap<String, String>();

@@ -3,7 +3,7 @@
 This suite tests valid JDBC timestamp escaping support, e.g. {ts 'yyyy-mm-dd hh:mm:ss.f...'}
 -->
 <etl>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcet" user="sa" password=""/>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:jdbcet;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
         ID INT,

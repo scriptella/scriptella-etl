@@ -44,12 +44,12 @@ public class JexlExpressionContractTest extends AbstractTestCase {
 
     public void testDottedParameterNamesAreFlatKeys() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("url.prefix", "jdbc:hsqldb:mem");
+        map.put("url.prefix", "jdbc:h2:mem");
         map.put("dbname", "contract");
         ParametersCallback cb = MockParametersCallbacks.fromMap(map);
         // $name form allows dotted flat keys (PropertiesTest url.prefix pattern).
         PropertiesSubstitutor ps = new PropertiesSubstitutor(cb);
-        assertEquals("jdbc:hsqldb:mem:contract", ps.substitute("$url.prefix:$dbname"));
+        assertEquals("jdbc:h2:mem:contract", ps.substitute("$url.prefix:$dbname"));
     }
 
     public void testMissingParameterIsSilent() {

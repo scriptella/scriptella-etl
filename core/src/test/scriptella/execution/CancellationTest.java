@@ -67,7 +67,7 @@ public class CancellationTest extends DBTestCase {
             }
         }.execute(c, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
-                assertEquals(0, parameters.getParameter("1"));
+                assertEquals(0, ((Number) parameters.getParameter("1")).intValue());
             }
         });
     }

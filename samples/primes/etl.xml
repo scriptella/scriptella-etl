@@ -27,10 +27,10 @@
     <!--Set up a connection to velocity engine.
     url parameter specifies a path to file relative to a script file directory-->
     <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity-dep.jar"/>
-    <!--Set up an in-memory connection to HSQLDB database.
-    hsql - driver name is a Scriptella adapter for HSQLDB.
-    You may specify org.hsqldb.jdbcDriver directly, see JDBC Adapters in Scriptella reference-->
-    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:mix" user="sa" classpath="../lib/hsqldb.jar"/>
+    <!--Set up an in-memory connection to H2 database.
+    h2 is the Scriptella adapter name for H2.
+    You may specify org.h2.Driver directly, see JDBC Adapters in Scriptella reference-->
+    <connection id="db" driver="h2" url="jdbc:h2:mem:mix;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" classpath="../lib/h2.jar"/>
 
     <!--Set up CSV driver-->
     <connection id="csv" driver="csv" url="report.csv">

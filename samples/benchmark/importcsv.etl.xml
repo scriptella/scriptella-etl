@@ -5,7 +5,7 @@
     </description>
     <connection id="in" driver="csv" url="tmp/output.csv"/>
     <!--Filtered output to another file -->
-    <connection id="out" driver="auto" url="jdbc:hsqldb:file:tmp/db"/>
+    <connection id="out" driver="auto" url="jdbc:h2:./tmp/db"/>
     <script connection-id="out">
         CREATE Table Test (
             ID INTEGER,

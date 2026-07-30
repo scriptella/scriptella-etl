@@ -69,9 +69,9 @@ This element may contain properties as plain text with includes.
     ignore_transactions=true
 </connection>
 
-<connection driver="hsqldb"
-            url="jdbc:hsqldb:file:db"
-            user="sa" classpath="hsqldb.jar"/>
+<connection driver="h2"
+            url="jdbc:h2:db"
+            user="sa" classpath="h2.jar"/>
 %
 -->
 <!ELEMENT connection (#PCDATA | include)*>

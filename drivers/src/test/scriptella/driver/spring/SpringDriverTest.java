@@ -46,6 +46,6 @@ public class SpringDriverTest extends AbstractTestCase {
         assertTrue(rs.next());
         assertEquals(1, rs.getInt(1));
         assertFalse(rs.next());
-        con.createStatement().execute("SHUTDOWN");
+        con.close();
     }
 }

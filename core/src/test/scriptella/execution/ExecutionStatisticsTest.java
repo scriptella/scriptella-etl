@@ -38,7 +38,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
         assertEquals(2, cats.size());
         assertEquals(3, cats.get(ScriptEl.TAG_NAME).intValue());
         assertEquals(2, cats.get(QueryEl.TAG_NAME).intValue());
-        assertEquals(12, s.getExecutedStatementsCount()); //4+2+2+1+3
+        assertEquals(11, s.getExecutedStatementsCount()); //4+2+2+1+2
 
         final Collection<ExecutionStatistics.ElementInfo> elements = s.getElements();
 
@@ -64,7 +64,7 @@ public class ExecutionStatisticsTest extends DBTestCase {
             } else if ("/etl/script[2]".equals(info.getId())) {
                 assertEquals(1, info.getSuccessfulExecutionCount());
                 assertEquals(0, info.getFailedExecutionCount());
-                assertEquals(3, info.getStatementsCount());
+                assertEquals(2, info.getStatementsCount());
             } else {
                 fail("Unrecognized statistic element " + info.getId());
             }

@@ -49,7 +49,7 @@ public class JNDIDriverTest extends AbstractTestCase {
      */
     public void testGetConnection() throws NamingException {
         //Just to initialize HSLQB driver class
-        Logger.getAnonymousLogger().fine("Initializing " + new scriptella.driver.hsqldb.Driver());
+        Logger.getAnonymousLogger().fine("Initializing " + new scriptella.driver.h2.Driver());
         //Preparing the environment
         Map<String, String> env = new HashMap<String, String>();
         //Setting up a test JNDI factory
@@ -116,7 +116,7 @@ public class JNDIDriverTest extends AbstractTestCase {
                 return proxy;
             } else if ("getConnection".equals(method.getName())) {
                 connections++;
-                return DriverManager.getConnection("jdbc:hsqldb:mem:jnditest", "sa", "");
+                return DriverManager.getConnection("jdbc:h2:mem:jnditest;MODE=LEGACY;NON_KEYWORDS=VALUE", "sa", "");
             } else {
                 throw new UnsupportedOperationException();
             }

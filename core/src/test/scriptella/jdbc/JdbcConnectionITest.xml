@@ -1,21 +1,21 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
-    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+    <connection id="c1" driver="org.h2.Driver" url="jdbc:h2:mem:jdbcconitest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         transaction.isolation=READ_UNCOMMITTED
         keepformat=true
     </connection>
-    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+    <connection id="c2" driver="org.h2.Driver" url="jdbc:h2:mem:jdbcconitest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         transaction.isolation=1     <!-- Read uncommitted-->
         statement.fetchSize=1       <!-- Not important for the test case,
                                         just to make sure this parameter is not breaking anything -->
         keepformat=true
     </connection>
 
-    <connection id="con_batch" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+    <connection id="con_batch" driver="org.h2.Driver" url="jdbc:h2:mem:jdbcconitest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         statement.batchSize=5
     </connection>
 
-    <connection id="con_batch_flush" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:jdbcconitest" user="sa" password="">
+    <connection id="con_batch_flush" driver="org.h2.Driver" url="jdbc:h2:mem:jdbcconitest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password="">
         statement.batchSize=5
         flushBeforeQuery=true
     </connection>

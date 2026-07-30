@@ -77,7 +77,7 @@ public class OnErrorTest extends DBTestCase {
             }
         });
         assertEquals("One error should be logged", 1, cnt[0]);
-        getConnection("onerrortest"); //call getConnection simply to shutdown HSQLDB after the test
+        getConnection("onerrortest"); //keep the in-memory database alive for assertions
     }
 
     /**

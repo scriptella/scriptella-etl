@@ -29,10 +29,11 @@ public class AutodiscoveryITest extends DBTestCase {
     int rows;
 
     public void test() throws EtlExecutorException {
+        final java.sql.Connection connection = getConnection("autotest");
         newEtlExecutor().execute();
         rows = 0;
         new QueryHelper("select * from Autodiscovery").execute(
-                getConnection("autotest"), new QueryCallback() {
+                connection, new QueryCallback() {
             public void processRow(final ParametersCallback parameters) {
                 rows++;
                 assertEquals(rows, parameters.getParameter("1"));

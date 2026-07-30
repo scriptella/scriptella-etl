@@ -7,8 +7,8 @@
         - Due to JdbcLdapDriver bug - do not insert extra spaces between attribute names ;)
     </description>
     <!--Connection to the in memory database-->
-    <connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:indb"
-                user="sa" password="" classpath="../lib/hsqldb.jar"/>
+    <connection id="in" driver="org.h2.Driver" url="jdbc:h2:mem:indb;MODE=LEGACY;NON_KEYWORDS=VALUE"
+                user="sa" password="" classpath="../lib/h2.jar"/>
     <!--Connection to the LDAP-->
     <connection id="out" driver="com.octetstring.jdbcLdap.sql.JdbcLdapDriver"
                 url="jdbc:ldap://localhost:389"

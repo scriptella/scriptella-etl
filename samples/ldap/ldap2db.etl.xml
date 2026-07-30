@@ -12,8 +12,8 @@
         search.scope=subtree
     </connection>
     <!--Connection to the target database -->
-    <connection id="out" url="jdbc:hsqldb:file:outdb"
-                user="sa" password="" classpath="../lib/hsqldb.jar"/>
+    <connection id="out" url="jdbc:h2:./outdb"
+                user="sa" password="" classpath="../lib/h2.jar"/>
     <script connection-id="out">
         <!--Creates empty database and drops exisiting tables if DB already exisis -->
         <include href="dbschema.sql"/>

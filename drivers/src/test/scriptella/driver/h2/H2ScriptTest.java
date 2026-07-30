@@ -45,8 +45,8 @@ public class H2ScriptTest extends AbstractTestCase {
      */
     public void test() throws EtlExecutorException, SQLException, ClassNotFoundException, IOException {
         Class.forName("org.h2.Driver");
-        //Opening a connection before executing a script to disable shutdown on last connection close.
-        Connection con = DriverManager.getConnection("jdbc:h2:mem:tst");
+        //Keep the in-memory database alive while the ETL connection is closed.
+        Connection con = DriverManager.getConnection("jdbc:h2:mem:tst;MODE=LEGACY;NON_KEYWORDS=VALUE");
         EtlExecutor se = newEtlExecutor();
         se.execute();
         ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Test ORDER BY ID");
@@ -57,7 +57,7 @@ public class H2ScriptTest extends AbstractTestCase {
             byte[] expBlob = new byte[4];
             Arrays.fill(expBlob, n.byteValue());
             Blob blob = (Blob) rs.getObject(2);
-            byte[] actualBlob = blob.getBytes(0, 4);
+            byte[] actualBlob = blob.getBytes(1, 4);
 
             assertEquals(4, blob.length()); //no bytes are left
 

@@ -14,12 +14,15 @@
         separator=;
     </connection>
     <!--In memory just for example-->
-    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:db" user="sa" classpath="../lib/hsqldb.jar"/>
+    <connection id="db" driver="h2" url="jdbc:h2:mem:db;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" classpath="../lib/h2.jar"/>
     <script connection-id="db">
         <!-- Creates Bug table to output CSV data -->
         DROP TABLE BUG IF EXISTS;
         CREATE TABLE Bug (
-            <include href="hsqldb/fields.sql"/>
+            ID INTEGER,
+            PRIORITY VARCHAR(20),
+            SUMMARY VARCHAR(255),
+            STATUS VARCHAR(20)
         );
     </script>
 

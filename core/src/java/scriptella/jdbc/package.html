@@ -174,7 +174,7 @@ Example 2. Bulk load of non-prepared statements (without ?, but $ are allowed)
 </pre></code>
 <h2>Examples</h2>
 <code><pre>
-    &lt;connection id="in" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:tmp" user="sa" classpath="hsqldb.jar"&gt;
+    &lt;connection id="in" driver="org.h2.Driver" url="jdbc:h2:tmp" user="sa" classpath="h2.jar"&gt;
         #Disable cache - just for example
         statement.cache=0
         #Set SQL statements separator

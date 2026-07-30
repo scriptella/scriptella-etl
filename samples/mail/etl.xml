@@ -5,8 +5,8 @@
     </description>
 
     <!-- In-memory database for demo purpose -->
-    <connection id="db" driver="hsqldb" url="jdbc:hsqldb:mem:users" user="sa"
-                classpath="../lib/hsqldb.jar"/>
+    <connection id="db" driver="h2" url="jdbc:h2:mem:users;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa"
+                classpath="../lib/h2.jar"/>
 
     <!-- JavaMail driver connection to a SMTP server -->
     <connection id="mail" driver="mail" url="mailto:$email?subject=Hello $name"

@@ -3,7 +3,7 @@
     <properties>
         n=5
     </properties>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:conditionstest" user="sa" password=""/>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:conditionstest;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
         ID INT

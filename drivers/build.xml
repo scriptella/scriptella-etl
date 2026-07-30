@@ -13,7 +13,6 @@
         <path refid="classpath"/>
         <pathelement location="${basedir}/../core/build/tmp/tests"/>
         <pathelement location="${basedir}/../lib/commons-logging.jar"/>
-        <pathelement location="${basedir}/../lib/hsqldb.jar"/>
         <pathelement location="${basedir}/../lib/h2.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/junit.jar"/>

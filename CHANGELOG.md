@@ -16,6 +16,7 @@ For current development direction and planned work, see
   **Activation** → 1.1.1, **Ant** → 1.10.17, **Commons Logging** → 1.2.
   Commons JEXL stays on **2.0.1** for 1.4 (2.1.1 rejected: `var`/`return`
   become reserved words and break existing `${var}` scripts).
+* **H2** → 2.4.240 as the bundled database used by tests and examples.
 
 ### Removed
 
@@ -24,14 +25,17 @@ For current development direction and planned work, see
   bridge has not existed since Java 8 and cannot work on the Java 17 baseline.
   Use Scriptella 1.3 only if you still depend on that adapter, or a maintained
   third-party JDBC driver with a normal JDBC connection / `GenericDriver`.
-* **HSQLDB 1.8** as the bundled test/sample database (planned; replacement TBD;
-  see release plan Chunk 6).
+* **HSQLDB 1.8** as the bundled test/sample database, including its adapter,
+  committed JAR, license, Maven/Ant dependencies, and provider-specific CSV
+  sample. Database-backed tests and examples now use H2 2.4.240.
 
 ### Upgrade notes
 
 * JDK 17 required for building. JavaScript automatically routes to Rhino on JDK 17.
   Maven consumers using JS must add `org.mozilla:rhino-engine` / `org.mozilla:rhino` explicitly.
 * ODBC users: there is no Scriptella `odbc` driver in 1.4.
+* Bundled examples that previously created HSQLDB file databases now create H2
+  databases. Existing HSQLDB database files are not converted automatically.
 
 ## [1.3] — 2026-07-17
 

@@ -34,7 +34,7 @@ public class DriverFactoryTest extends AbstractTestCase {
      */
     public void testClassPathDriver() throws ClassNotFoundException {
         ScriptellaDriver driver = DriverFactory.getDriver(
-                "org.hsqldb.jdbcDriver", getClass().getClassLoader());
+                "org.h2.Driver", getClass().getClassLoader());
         assertNotNull(driver);
         assertTrue(driver instanceof GenericDriver);
     }

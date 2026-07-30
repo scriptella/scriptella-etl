@@ -29,7 +29,7 @@
                 <pathelement location="../lib/scriptella.jar"/>
                 <!-- The following classpath elements are optional.
                 Use connection classpath attribute to specify driver's classpath in a script file -->
-                <pathelement location="../lib/hsqldb.jar"/>
+                <pathelement location="../lib/h2.jar"/>
             </classpath>
         </taskdef>
         <etl debug="true">
@@ -39,8 +39,8 @@
         <etl inheritAll="false"/>
     </target>
 
-    <target name="template" description="Produces data migration template based on an HSQLDB database">
-        <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/hsqldb.jar"/>
+    <target name="template" description="Produces data migration template based on an H2 database">
+        <taskdef resource="antscriptella.properties" classpath="../lib/scriptella.jar;../lib/h2.jar"/>
         <etl/> <!-- Initialize the database -->
         <!--
         Now call the template please note that driver,class,user,password properties must be set

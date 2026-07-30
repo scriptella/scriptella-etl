@@ -3,7 +3,7 @@
 This suite tests support of numbered parameters,e.g. ?1,?2 additionally to column names
 -->
 <etl>
-    <connection driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:sqlparamstst2" user="sa" password=""/>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:sqlparamstst2;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script>
         CREATE TABLE Test (
         ID INT,

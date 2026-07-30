@@ -24,7 +24,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 
 /**
@@ -36,21 +35,18 @@ import java.util.HashSet;
 public abstract class DBTestCase extends AbstractTestCase {
     static {
         try {
-            Class.forName("org.hsqldb.jdbcDriver");
+            Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
             throw new AssertionFailedError(e.getMessage());
         }
     }
 
-    private Collection<String> dbNames = new HashSet<String>();
     private Collection<Connection> connections = new ArrayList<Connection>();
 
     protected Connection getConnection(final String db) {
-        dbNames.add(db);
-
         try {
-            final Connection c = DriverManager.getConnection("jdbc:hsqldb:mem:" +
-                    db, "sa", "");
+            final Connection c = DriverManager.getConnection("jdbc:h2:mem:" +
+                    db + ";MODE=LEGACY;NON_KEYWORDS=VALUE", "sa", "");
             connections.add(c);
 
             return c;
@@ -62,19 +58,11 @@ public abstract class DBTestCase extends AbstractTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        for (String s : dbNames) {
-            try {
-                getConnection(s).createStatement().execute("SHUTDOWN");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         for (Connection connection : connections) {
+            connection.createStatement().execute("DROP ALL OBJECTS");
             JdbcUtils.closeSilent(connection);
         }
 
-        dbNames.clear();
         connections.clear();
     }
 }

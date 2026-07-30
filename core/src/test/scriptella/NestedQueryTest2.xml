@@ -1,7 +1,7 @@
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
-    <connection id="c1" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db1" user="sa" password=""/>
-    <connection id="c2" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:nestedquerytest2db2" user="sa" password=""/>
+    <connection id="c1" driver="org.h2.Driver" url="jdbc:h2:mem:nestedquerytest2db1;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
+    <connection id="c2" driver="org.h2.Driver" url="jdbc:h2:mem:nestedquerytest2db2;MODE=LEGACY;NON_KEYWORDS=VALUE" user="sa" password=""/>
     <script connection-id="c1">
         CREATE TABLE Test (
         ID INT

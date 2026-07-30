@@ -19,11 +19,11 @@
     <taskdef resource="antscriptella.properties">
         <classpath>
             <pathelement location="../lib/scriptella.jar"/>
-            <pathelement location="../lib/hsqldb.jar"/>
+            <pathelement location="../lib/h2.jar"/>
         </classpath>
     </taskdef>
     <target name="main">
-        <!--Executes etl.xml with hsqldb on classpath-->
+        <!--Executes etl.xml with h2 on classpath-->
         <!--Use debug="true" to see more execution details-->
         <etl/>
     </target>

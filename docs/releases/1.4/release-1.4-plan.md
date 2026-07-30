@@ -1,7 +1,7 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, 5A, **5C**, and **6A** complete; 5B
-quick wins done; JEXL 2.1.1 rejected; remaining: HSQLDB, Velocity fat-JAR
+**Status:** In progress (Chunks 1–3, 5A, **5C**, **6**, and **6A** complete; 5B
+quick wins done; JEXL 2.1.1 rejected; remaining: Velocity fat-JAR
 split, Spring migration)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
@@ -57,7 +57,7 @@ not a feature release. Order work and accept or reject changes by these themes:
 | Priority | Work | Why |
 | --- | --- | --- |
 | High | **Chunk 5C** — Maven/Ant `release=17`, class major 61 | **Done** (July 25, 2026) |
-| High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | Drop obsolete stack; largest maintenance win still open |
+| High | **Chunk 6** — **Remove HSQLDB entirely**; replace test/examples DB | **Done** (July 30, 2026; H2 2.4.240) |
 | High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
 | Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | Packaging hygiene; keep optional driver without fat-JAR debt |
 | Medium | **5B Spring** — 5.3.39 migration (own PR) | JDK-era Spring; real code change, not drop-in |
@@ -885,8 +885,8 @@ Confirm:
 
 ## Chunk 6 — Remove HSQLDB and Refresh Database Examples
 
-**Status:** Pending — **required for 1.4** (maintenance theme: abandon
-obsolete stacks; HSQLDB must not ship or anchor tests/examples)
+**Status:** Complete (July 30, 2026) — HSQLDB removed; tests and in-repository
+examples use H2 2.4.240
 
 **Reasoning level:** Higher
 
@@ -895,13 +895,17 @@ and committed examples, but it is not a core Scriptella runtime requirement.
 **Drop it entirely** from the 1.4 dependency and distribution system rather
 than carrying forward another legacy embedded database. Keep the replacement
 open until a compatibility spike compares the available Java 17-compatible
-embedded databases and their licenses; H2 is a candidate, not a decision in
-this plan. Partial removal is not success: no HSQLDB JARs, coordinates,
+embedded databases and their licenses. The compatibility spike selected
+**`com.h2database:h2:2.4.240`**: it supports the Java 17 baseline, provides a
+maintained JDBC driver, supports both in-memory and file databases, and is
+available under MPL 2.0 or EPL 1.0. Scriptella redistributes it under MPL 2.0.
+Partial removal is not success: no HSQLDB JARs, coordinates,
 licenses, sample URLs, or docs may remain in product or examples checkouts.
 
-This chunk covers both the `scriptella-etl` repository and the separate
-`scriptella-examples` project. Updating only the product checkout would leave
-the published examples and their build instructions inconsistent.
+The examples currently shipped for 1.4 live under `scriptella-etl/samples` and
+are assembled by this repository's `examples` target; no separate
+`scriptella-examples` checkout is present in this workspace or required by the
+current release build.
 
 ### Work
 
@@ -915,12 +919,11 @@ the published examples and their build instructions inconsistent.
    including JDBC, Spring, launcher, template, transaction, and nested-query
    coverage. Preserve test intent; do not merely change expected failures to
    obtain a green build.
-4. Update the separate `scriptella-examples` checkout in the same change
-   window: sample ETLs, Ant builds, properties, README material, database
-   driver names, URLs, initialization scripts, and any generated example
-   archives.
+4. Update the in-repository examples in the same change window: sample ETLs,
+   Ant builds, properties, README material, database driver names, URLs,
+   initialization scripts, and generated example archives.
 5. Remove HSQLDB coordinates, JARs, licenses, version properties, classpath
-   entries, and stale `org.hsqldb` references from both repositories and their
+   entries, and stale `org.hsqldb` references from product code, examples, and
    release packaging.
 6. Add characterization coverage for SQL and lifecycle differences discovered
    during the migration, especially shutdown, identity columns, aliases,
@@ -928,7 +931,7 @@ the published examples and their build instructions inconsistent.
 
 ### Compatibility and packaging validation
 
-Validate all of the following from clean checkouts of both repositories:
+Validate all of the following from a clean product checkout:
 
 * Maven and Ant tests pass without HSQLDB on any classpath;
 * the selected replacement works on the Java 17 baseline;
@@ -939,21 +942,31 @@ Validate all of the following from clean checkouts of both repositories:
 * the replacement's license and source/notice material are complete wherever
   it is redistributed;
 * no private checkout path or developer-local Maven repository is needed;
-* the separate `scriptella-examples` project builds and its documented samples
+* the in-repository examples archive builds and its documented database samples
   run against the same database choice.
 
 ### Exit criteria
 
 * HSQLDB is absent from Maven, Ant, source, tests, samples, and release
-  archives in both repositories.
+  archives.
 * The replacement database and version are explicitly recorded with their
   compatibility and licensing rationale.
 * Existing database-backed regression and example behavior is preserved, or
   approved differences have migration notes.
-* Scriptella and `scriptella-examples` use matching coordinates, URLs, driver
-  names, and packaging rules.
+* Scriptella tests and examples use matching coordinates, URLs, driver names,
+  and packaging rules.
 * The full Java 17 test and example matrix passes.
-* `git diff --check` is clean in both repositories.
+* `git diff --check` is clean.
+
+### Completion evidence (July 30, 2026)
+
+* `mvn clean test` passed all core, drivers, and tools tests on Java 17.
+* `ant clean test` passed with Ant 1.10.17 on Java 17.
+* `ant examples` assembled `scriptella-examples-1.4-SNAPSHOT.zip`; the archive
+  contains H2 2.4.240 plus its license/source material and no HSQLDB artifact
+  or reference.
+* The music-store, database-upgrade initialization, and CSV examples executed
+  successfully from an unpacked examples archive using H2 2.4.240.
 
 ## Chunk 6A — Remove ODBC / JDBC-ODBC Bridge Adapter
 

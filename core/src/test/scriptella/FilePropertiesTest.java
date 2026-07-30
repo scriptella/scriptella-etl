@@ -63,7 +63,7 @@ public class FilePropertiesTest extends DBTestCase {
                     public void processRow(final ParametersCallback rowEvaluator) {
                         final byte b[] = (byte[]) rowEvaluator.getParameter("c");
                         assertTrue(Arrays.equals(FILE, b));
-                        assertEquals(3, rowEvaluator.getParameter("1")); //3 rows
+                        assertEquals(3, ((Number) rowEvaluator.getParameter("1")).intValue()); //3 rows
                     }
                 });
         //Now check if text files are correctly inserted
@@ -71,13 +71,16 @@ public class FilePropertiesTest extends DBTestCase {
         q.execute(con,
                 new QueryCallback() {
                     public void processRow(final ParametersCallback rowEvaluator) {
-                        final Clob c = (Clob) rowEvaluator.getParameter("c");
+                        final Object value = rowEvaluator.getParameter("c");
                         try {
-                            assertEquals(TEST_FILE, IOUtils.toString(c.getCharacterStream()));
+                            final String actual = value instanceof Clob
+                                    ? IOUtils.toString(((Clob) value).getCharacterStream())
+                                    : value.toString();
+                            assertEquals(TEST_FILE, actual);
                         } catch (Exception e) {
                             throw new IllegalStateException(e);
                         }
-                        assertEquals(1, rowEvaluator.getParameter("1")); //3 rows
+                        assertEquals(1, ((Number) rowEvaluator.getParameter("1")).intValue()); //1 row
                     }
                 });
 
