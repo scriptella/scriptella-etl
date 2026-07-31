@@ -125,7 +125,8 @@ The release must include:
 * generated checksums for every POM and JAR.
 
 Each effective POM must retain the project name, description, HTTPS project
-URL, Apache-2.0 license, developer information, and SCM coordinates. Release
+URL, organization, Apache-2.0 license, developer information, and SCM
+coordinates. Release
 dependencies must already be available from Maven Central and may not use
 `-SNAPSHOT` versions.
 

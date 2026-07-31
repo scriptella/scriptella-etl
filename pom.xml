@@ -30,6 +30,10 @@
     </description>
     <url>https://scriptella.org/</url>
     <inceptionYear>2006</inceptionYear>
+    <organization>
+        <name>PVR Labs</name>
+        <url>https://pvrlabs.xyz/</url>
+    </organization>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -43,12 +47,28 @@
             <id>ejboy</id>
             <name>Ted (Fyodor) Kupolov</name>
             <timezone>America/Los_Angeles</timezone>
+            <roles>
+                <role>Founder</role>
+                <role>Lead Developer</role>
+                <role>Maintainer</role>
+            </roles>
         </developer>
+
         <developer>
             <id>hboutemy</id>
             <name>Hervé Boutemy</name>
             <email>hboutemy@apache.org</email>
             <timezone>+1</timezone>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Kirill Volgin</name>
+            <roles>
+                <role>Contributor</role>
+            </roles>
         </developer>
     </developers>
 
