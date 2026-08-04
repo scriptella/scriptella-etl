@@ -9,3 +9,4 @@ samples/lib/
 *.zip
 *.log
 /custom.build.properties
+.vscode
