@@ -38,30 +38,34 @@ JEXL also remains available out of the box.</p>
 </table>
 
 <h2>Query and Script Syntax</h2>
-This driver does not impose any limitations on a language syntax. See <a href="https://scripting.dev.java.net">JSR-223 script engines</a>
-project for more details on supported languages.
+This driver executes code through a JSR-223 script engine. The selected engine
+defines the language syntax.
 <p>
-    Scripts and queries can reference variables from ancestor elements. Declared variables are
-    exposed to nested elements.
+    A script runs once when reached. A query produces rows, and its nested
+    elements run once for every produced row. Scripts and queries can reference
+    variables from ancestor elements.
 </p>
-<p>Implicit variable <code>query</code> is available in &lt;query&gt; elements. This variable
-should be used to produce a result set:</p>
-<code>
-<pre>
+<p>
+    Script-based queries produce a row explicitly. The implicit
+    <code>query</code> variable is available inside a &lt;query&gt;; calling
+    <code>query.next()</code> exposes the current script variables to the nested
+    elements, runs those elements once, and then resumes the query script.
+    Database, CSV, and other row-producing drivers advance their queries
+    themselves and do not require <code>query.next()</code> in ETL content.
+</p>
+<pre><code>
     &lt;query&gt;&lt;![CDATA[
         var v1 = 'This variable is visible in a child script';
-        for (var i = 0; i < 10; i++) {
-            query.next(); // Triggers execution of a child script.
+        for (var i = 0; i &lt; 3; i++) {
+            query.next(); // Runs the nested script for the current row.
         }]]&gt;
         &lt;script&gt;
-            ......
-            v2 = v1 + '!';
-            ......
+            Current values are ${i} and ${v1}
         &lt;/script&gt;
     &lt;/query&gt;
-</pre>
-See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a> for more details.
-</code>
+</code></pre>
+<p>See <a href="ParametersCallbackMap.html">ParametersCallbackMap class Javadoc</a>
+for more details.</p>
 <h2><a name="javascript_provider">JavaScript provider</a></h2>
 <p>On JDK 17, JavaScript requires a JSR-223 provider. Scriptella's binary and
 examples distributions include Mozilla Rhino 1.9.1 as separate
@@ -87,35 +91,48 @@ The aliases <code>js</code>, <code>JS</code>, <code>javascript</code>,
 does not resolve another provider.
 <a name="examples"></a>
 <h2>Examples</h2>
-The following query executes a child script 10 times. As the result of execution 10 records
-are inserted into a database table. Additionally a log file log.txt is produced.
+The script driver defaults to JavaScript. The following query produces three
+rows. Each call to <code>query.next()</code> runs the nested text script with the
+current values of <code>i</code> and <code>name</code>:
 <code><pre>
 &lt;connection id="script" driver="script"/&gt;
-&lt;connection id="out" driver="oracle" url="jdbc:oracle:thin:@localhost:1521:DB"/&gt;
+&lt;connection id="console" driver="text"/&gt;
+
+&lt;query connection-id="script"&gt;
+    &lt;![CDATA[
+    for (var i = 0; i &lt; 3; i++) {
+        name = 'row-' + i;
+        query.next();
+    }]]&gt;
+    &lt;script connection-id="console"&gt;
+        ROW_${i}=${name}
+    &lt;/script&gt;
+&lt;/query&gt;
+</pre></code>
+
+<p><strong>Advanced example:</strong> Script variables and Java objects created
+by a query are also available to its nested scripts. This variation uses Java
+<code>MessageFormat</code> and reflection to write a formatted message to
+<code>log.txt</code> for every produced row:</p>
+<code><pre>
+&lt;connection id="script" driver="script"/&gt;
 &lt;connection id="log" driver="script" url="log.txt"/&gt;
 
 &lt;query connection-id="script"&gt;
     &lt;![CDATA[
-    for (var i = 0; i < 10; i++) {
-        login = 'login' + i;
-        //You can instantiate Java objects and invoke static methods
-        var now = new java.sql.Timestamp(java.lang.System.currentTimeMillis());
-        query.next(); //Executes a child script element
+    var format = new java.text.MessageFormat('Row {0}: {1}');
+    for (var i = 0; i &lt; 3; i++) {
+        name = 'row-' + i;
+        query.next();
     }]]&gt;
 
-    &lt;!-- Inserts a parameterized row into a database --&gt;
-    &lt;script connection-id="out"&gt;
-        INSERT INTO Table(ID, Login, Login_Time) VALUES (?i, ?login, ?now);
+    &lt;script connection-id="log"&gt;
+        // Build the Object[] expected by MessageFormat.format().
+        var values = java.lang.reflect.Array.newInstance(java.lang.Object, 2);
+        values[0] = i;
+        values[1] = name;
+        println(format.format(values));
     &lt;/script&gt;
-    
-    &lt;!-- Logs the message using MessageFormat class and parent context variables --&gt;
-    &lt;script connection-id="log">
-        // create Java String array of 2 elements
-        var a = java.lang.reflect.Array.newInstance(java.lang.Object, 2)
-        a[0] = now;a[1] = i;
-        println(format.format(a));
-    &gt;/script>
 &lt;/query&gt;
-
 </pre></code>
 </body>

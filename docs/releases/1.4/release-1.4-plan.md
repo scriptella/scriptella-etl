@@ -94,34 +94,36 @@ The `exp-jdk17` change set was trial-merged without conflicts onto commit
 | Ant-generated API documentation | Temurin 17.0.15 | Pass; populated in the binary ZIP |
 
 The experimental JavaScript alias fix is localized and preserves the primary
-engine lookup before attempting a Rhino fallback. It is useful groundwork,
-but it does not by itself establish complete JDK 17 runtime support.
+engine lookup before attempting a Rhino fallback. The follow-on packaging work
+in Chunks 3 and 7 completed the JDK 17 runtime contract.
 
-### Confirmed remaining gap
+### Resolved JavaScript packaging contract
 
 The Ant-built `scriptella.jar` embeds Scriptella, Commons JEXL, and Commons
-Logging, but not Rhino. Its `META-INF/services/javax.script.ScriptEngineFactory`
-registers JEXL only. The binary ZIP also omits `rhino.jar` and
-`rhino-js-engine.jar`.
+Logging, but does not embed Rhino classes or merge Rhino's service-provider
+metadata. Instead, the binary and examples distributions include the matching
+`rhino-engine.jar` and `rhino.jar` under `lib/`, and the all-in-one JAR manifest
+references those sibling files.
 
 Consequently:
 
-* Maven and Ant tests can execute JavaScript on JDK 17 because Rhino is on
-  their test classpaths.
-* An in-process consumer can execute JavaScript when Rhino is on the
-  application classpath.
-* Plain `java -jar scriptella.jar ...` cannot execute the default JavaScript
-  language on JDK 17 because Nashorn is absent and Rhino is not visible.
-* A script connection's `classpath` attribute does not currently solve this:
-  `ScriptEngineManager` uses the classloader that loaded `ScriptConnection`,
-  rather than the connection-specific driver classloader.
-* The historical `-Xbootclasspath/a` pattern is not a suitable Rhino
-  JSR-223 solution on modern modular JDKs.
-
-This is an optional script-driver limitation, not a blocker for core
-Scriptella operation: JEXL remains embedded and requires no external
-JavaScript engine. Do not describe JavaScript as bundled on JDK 17; document
-and test the optional Rhino classpath contract instead.
+* JEXL remains embedded and works without external dependencies.
+* An intact binary or examples distribution executes JavaScript on JDK 17
+  through `java -jar scriptella.jar ...` and the supported launchers.
+* The distribution launchers construct their application classpaths from
+  `lib/*.jar`, so the bundled Rhino provider is visible to
+  `ScriptEngineManager`.
+* A copied `scriptella.jar` without its sibling `lib/` directory does not carry
+  Rhino with it.
+* Maven and embedded consumers must add `org.mozilla:rhino-engine:1.9.1`
+  explicitly; Scriptella does not publish Rhino transitively from its drivers
+  module.
+* A script connection's `classpath` attribute alone does not replace the
+  application-classloader contract: `ScriptEngineManager` uses the classloader
+  that loaded `ScriptConnection`, rather than the connection-specific driver
+  classloader.
+* The historical `-Xbootclasspath/a` pattern is not a suitable Rhino JSR-223
+  solution on modern modular JDKs and must not be recommended.
 
 ---
 
@@ -1186,8 +1188,8 @@ Update:
 * relevant launcher and scripting examples
 * `docs/releases/RELEASE-RUNBOOK.md` when the validated release procedure
   changes
-* `scriptella.github.io/` compatibility and download wording when a release
-  candidate is intentionally prepared
+* a reviewed `scriptella.github.io/` update prepared without changing the live
+  website before publication
 
 Documentation must state separately:
 
@@ -1215,6 +1217,45 @@ Close issue #31 only after:
 
 Merging the alias fallback alone is progress, not sufficient reason to close
 the compatibility investigation.
+
+### Final post-publication step — update the public website
+
+Update and deploy `scriptella.github.io/` only after the Scriptella 1.4 Maven
+Central coordinates and GitHub Release assets are public and verified. The
+live website must continue to describe Scriptella 1.3 accurately until that
+point. Follow the website ordering and approval gates in
+`docs/releases/RELEASE-RUNBOOK.md`.
+
+The final website change must:
+
+* preserve familiar examples, names, and structure when they remain accurate;
+  prefer a small explanation or correction over an unnecessary rewrite;
+* make 1.4 the current release on the home, download, and change-history pages,
+  with the exact published Maven coordinates and verified release-asset URLs;
+* state the Java 17 runtime/build baseline and explain that the binary and
+  examples distributions bundle Rhino 1.9.1, while Maven and embedded users
+  add the Rhino provider explicitly;
+* remove ODBC/JDBC-ODBC and HSQLDB from the 1.4 driver and tutorial guidance,
+  pointing users with legacy requirements to Scriptella 1.3 where appropriate;
+* refresh the generated API and DTD documentation from the released 1.4 source
+  using the repository's documented synchronization workflow;
+* add a short runnable path from download to first ETL execution;
+* consistently explain that a query produces rows, nested scripts run once per
+  row, and `connection-id` selects the source or destination connection;
+* distinguish `$name`/`${expression}` textual expansion from JDBC
+  `?name`/`?{expression}` parameter binding;
+* explain that `query.next()` is required for script-based queries that produce
+  rows, not for JDBC, CSV, and other drivers that iterate rows themselves;
+* replace conceptual examples that appear runnable but omit required provider
+  JARs, or label them clearly and link to a complete runnable example;
+* fix malformed or misleading examples, including the unclosed script element
+  in the FAQ mutable-variable example; and
+* verify navigation, anchors, generated documentation links, downloads, Maven
+  examples, and representative desktop/mobile rendering before deployment.
+
+This website deployment is the final release step. Completion requires the
+public site to identify 1.4 as current with no stale RC, development, ODBC,
+HSQLDB, Java 8, or previous-latest-release wording in the 1.4 user path.
 
 ---
 

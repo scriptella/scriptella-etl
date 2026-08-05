@@ -68,6 +68,18 @@ Then create `csv-to-sql.etl.xml` in the same directory:
 </etl>
 ```
 
+The flow is source row to nested action:
+
+1. `<query connection-id="input">` asks the CSV connection for rows. The CSV
+   driver treats the first line as headers and emits one row for each remaining
+   line.
+2. The nested `<script connection-id="output">` runs once for every emitted
+   row. Its `connection-id` selects the destination; nesting supplies the
+   current source row.
+3. `$id` and `$name` expand values from that current row. This example writes
+   text, so substitution is intentional. When the destination is JDBC, use
+   `?id` and `?name` parameters to bind SQL values safely.
+
 Run it from that directory:
 
 ```bash
@@ -75,8 +87,7 @@ java -jar scriptella.jar csv-to-sql.etl.xml
 cat load.sql
 ```
 
-The generated `load.sql` contains one `INSERT` statement per CSV row. The CSV
-driver reads the header row, so `$id` and `$name` refer to those columns. No
+The generated `load.sql` contains one `INSERT` statement per CSV data row. No
 database or JDBC driver is required.
 
 ### First migration

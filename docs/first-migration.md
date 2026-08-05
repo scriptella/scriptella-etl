@@ -58,6 +58,12 @@ and credentials with those for your databases; do not commit real passwords.
 database adapters. Each adapter loads its JDBC driver from the connection's
 `classpath` attribute.
 
+The outer `<query>` selects rows from the `source` connection. For each result
+row, Scriptella runs the nested `<script>` against the `target` connection and
+makes the current row's columns available by name. JDBC placeholders such as
+`?id` and `?email` bind those values as prepared-statement parameters; they are
+not textual substitutions.
+
 ## Run and verify
 
 ```bash
@@ -65,9 +71,7 @@ java -jar scriptella.jar mysql-to-postgres.etl.xml
 psql -d target_db -c 'SELECT id, email FROM customers;'
 ```
 
-The nested `script` runs once for every selected MySQL row. `?id` and `?email`
-refer to the current row's column values. The PostgreSQL query should show the
-copied rows.
+The PostgreSQL query should show the copied rows.
 
 For production work, keep credentials outside the ETL file and make reruns
 safe—for example, by using a target-side upsert or clearing a dedicated staging
