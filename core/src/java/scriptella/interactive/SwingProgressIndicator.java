@@ -22,9 +22,13 @@ import java.awt.*;
 /**
  * TODO: Add documentation
  *
+ * @deprecated No longer used by Scriptella's built-in launchers. Use
+ *             {@link ConsoleProgressIndicator} or another
+ *             {@link ProgressIndicator} implementation instead.
  * @author Fyodor Kupolov
  * @version 1.0
  */
+@Deprecated
 public class SwingProgressIndicator extends ProgressIndicatorBase {
     private ProgressWindow w;
 
