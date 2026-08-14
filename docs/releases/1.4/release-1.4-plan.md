@@ -1173,8 +1173,8 @@ unit tests for standalone or distribution claims.
 
 ## Chunk 8 — Final Readiness and Release Preparation
 
-**Status:** In progress (readiness smoke passed August 7, 2026; final
-no-upload release gate remains)
+**Status:** In progress (definitive signed no-upload gate passed August 14,
+2026 from `706c19f`; maintainer Release GO remains gated)
 
 **Reasoning level:** Moderate
 
@@ -1197,6 +1197,34 @@ it does not replace the runbook's signed, release-version no-upload gate. That
 gate must run from the final reviewed source commit after release wording is
 settled.
 
+### Definitive final-gate evidence (August 14, 2026)
+
+The signed release-version no-upload gate passed from frozen source commit
+`706c19f5cb55efd447a10e63e25aab460620b6ce` on Temurin 17.0.15, Maven 3.9.9,
+Ant 1.10.17, and DTDDoc 1.1.0. The gate used the private Maven settings file
+with server ID `central`, signed with the approved fingerprint
+`5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`, and set
+`central.skipPublishing=true`; no upload or publication occurred.
+
+Maven passed with 154 core, 161 drivers, and 22 tools tests. Ant tests,
+distribution assembly, the artifact-level distribution contract, ZIP/JAR
+integrity checks, all 14 detached signature verifications, MD5/SHA-1/SHA-256/
+SHA-512 checksum computation, unpacked `java -jar` and executable Unix
+launcher smoke tests, JavaScript/CSV, H2, primes, and an isolated Maven
+consumer all passed. The distribution archives were:
+
+* `scriptella-1.4.zip` — SHA-256
+  `e96900158e0b2823b48954c33901a7867f8b9f82eb9510089d24f91a674e66ee`;
+* `scriptella-1.4-src.zip` — SHA-256
+  `715c5ab8bdd4e847e5b9593081defe519c0d3b16ed480c03e50edb7bcc81b18b`;
+* `scriptella-examples-1.4.zip` — SHA-256
+  `32ee702f5156c84466f4005325d6b5a115d4ed237124a35135882bac3f733bc7`.
+
+Detailed sanitized evidence is retained in the workspace-local
+`release-dir/1.4-final-readiness-evidence-706c19f.md`. It records the known
+Javadoc warnings, native-Windows limitation, disposable-artifact rule, and
+remaining GO prerequisites.
+
 ### Work
 
 * [x] Update `README.md`, `CHANGELOG.md`, and this plan with the current
@@ -1214,16 +1242,23 @@ settled.
   optional Rhino aliases, nested JavaScript, Janino, selected Mail coverage,
   examples archive execution, Maven consumer execution, and user-facing Ant
   tasks.
-* [ ] Run the signed, release-version no-upload gate from the final reviewed
+* [x] Run the signed, release-version no-upload gate from the final reviewed
   commit using `docs/releases/RELEASE-RUNBOOK.md`; record sanitized results,
   checksums, and any deviations.
+* [ ] Complete the maintainer GO prerequisites: independently publish and
+  retrieve the public signing key, prepare and review the final website commit,
+  and synchronize the reviewed source baseline without creating the release
+  tag.
 
 ### Exit criteria
 
-* The source checkout is clean and frozen at the reviewed release commit.
+* The source baseline is frozen at reviewed commit `706c19f`; the current
+  checkout has three local release-preparation commits not yet synchronized
+  with `origin/master`.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can be requested for the Maven publication.
+* Maintainer Release GO can be requested only after the public-key, website,
+  and source-synchronization prerequisites above are complete.
 
 Documentation must state separately:
 
