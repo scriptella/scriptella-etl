@@ -377,7 +377,7 @@ public class EtlLauncher {
             f = new File(dir, DEFAULT_FILE_NAME);
         } else {
             f = new File(dir, name);
-            if (!isFile(f) && name.indexOf('.') < 0) { //not a file and no extension
+            if (!isFile(f) && f.getName().indexOf('.') < 0) { //not a file and no extension
                 f = new File(dir, name + '.' + DEFAULT_FILE_NAME);
             }
         }
