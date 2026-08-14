@@ -1,7 +1,7 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunk 8 release documentation/RC remains)
+complete; Chunks 8–11 remain)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -60,7 +60,7 @@ not a feature release. Order work and accept or reject changes by these themes:
 | High | **Chunk 6A** — **Remove ODBC driver** and sample | **Done** (July 25, 2026) |
 | Medium | **5B Velocity** — 1.7 + split JARs, drop fat `velocity-dep.jar` | **Done** (July 30, 2026) |
 | Medium | **5B Spring** — 5.3.39 migration (own PR) | **Done** (July 30, 2026) |
-| Later | Chunk 7 matrix, Chunk 8 docs/RC | After bytecode + dependency/drop chunks are settled |
+| Later | Chunks 8–11 readiness, Maven release, and post-release adoption | After bytecode + dependency/drop chunks are settled |
 
 Within 5B, Velocity packaging comes before Spring because it is smaller and
 purely maintenance-oriented; Spring remains required for 1.4 if the Spring
@@ -1172,24 +1172,36 @@ unit tests for standalone or distribution claims.
 * No known packaging caveat contradicts the intended public compatibility
   statement.
 
-## Chunk 8 — Documentation and Adoption
+## Chunk 8 — Final Readiness and Release Preparation
 
 **Status:** Pending
 
 **Reasoning level:** Moderate
 
-Update:
+Complete only the minimum work needed to make the source tree and candidate
+release evidence ready for publication. This chunk does not update external
+consumer repositories or the live website.
 
-* `README.md`
-* `CHANGELOG.md`
-* this plan
-* the issue #31 technical status and final comment
-* issue #44 progress
-* relevant launcher and scripting examples
-* `docs/releases/RELEASE-RUNBOOK.md` when the validated release procedure
-  changes
-* a reviewed `scriptella.github.io/` update prepared without changing the live
-  website before publication
+### Work
+
+* Update `README.md`, `CHANGELOG.md`, this plan, and the issue #31/#44 status.
+* Record the Java 17 runtime/build/packaging baseline, tested JDKs, launcher
+  command, and Maven/Ant/embedded scripting-provider requirements.
+* Remove or replace stale `-Xbootclasspath/a` guidance.
+* Complete the final clean-checkout compatibility and distribution validation:
+  Maven, Ant, standalone launchers, JEXL, missing-provider diagnostics,
+  optional Rhino aliases, nested JavaScript, Janino, selected Mail coverage,
+  examples archive execution, Maven consumer execution, and user-facing Ant
+  tasks.
+* Run the no-upload release gate in `docs/releases/RELEASE-RUNBOOK.md` and
+  record sanitized results, checksums, and any deviations.
+
+### Exit criteria
+
+* The source checkout is clean and frozen at the reviewed release commit.
+* All required tests, artifact checks, and runtime validations pass.
+* Release documentation does not overstate compatibility.
+* Maintainer Release GO can be requested for the Maven publication.
 
 Documentation must state separately:
 
@@ -1218,12 +1230,55 @@ Close issue #31 only after:
 Merging the alias fallback alone is progress, not sufficient reason to close
 the compatibility investigation.
 
-### Final post-publication step — update the public website
+## Chunk 9 — Release Maven 1.4
 
-Update and deploy `scriptella.github.io/` only after the Scriptella 1.4 Maven
-Central coordinates and GitHub Release assets are public and verified. The
-live website must continue to describe Scriptella 1.3 accurately until that
-point. Follow the website ordering and approval gates in
+**Status:** Pending; requires completed Chunk 8 and explicit maintainer Release GO
+
+Publish the reviewed 1.4 Maven artifacts using the release runbook. Verify the
+Central deployment, signatures, checksums, coordinates, POM metadata, and an
+isolated consumer before declaring the Maven release complete. Do not update
+the external examples repository or live website before the artifacts are
+public and verified.
+
+### Exit criteria
+
+* Maven Central reports the deployment as valid and available.
+* Required artifacts, signatures, checksums, and metadata are verified.
+* The final source tag and GitHub release assets are prepared or published
+  according to the runbook.
+
+## Chunk 10 — Update External Examples After Publication
+
+**Status:** Pending; starts only after Chunk 9
+
+Update the separate `scriptella-examples` repository against the published
+1.4 artifacts. The current checkout contains stale `1.1-SNAPSHOT` and
+`com.javaforge.scriptella` coordinates, HSQLDB-based ETLs, old H2 and Spring
+versions, and old DTD URLs.
+
+### Work
+
+* Replace old Maven coordinates and versions with the published 1.4 values.
+* Migrate or clearly isolate HSQLDB-dependent examples; use the supported H2
+  path where appropriate.
+* Refresh Spring, H2, JavaScript/Rhino, launcher, and DTD instructions.
+* Add a clean Java 17 verification path for each runnable example.
+* Publish the examples-repository changes and update its release references.
+
+Do not treat the in-repository `scriptella-etl/samples` archive as validation of
+this separate repository; they are distinct deliverables.
+
+## Chunk 11 — Website and Adoption Updates
+
+**Status:** Pending; starts only after Chunks 9 and 10
+
+Prepare and deploy the reviewed `scriptella.github.io/` update only after the
+Maven artifacts, GitHub release assets, and updated examples links are public
+and verified.
+
+The live website must continue to describe Scriptella 1.3 accurately until the
+Scriptella 1.4 Maven Central coordinates and GitHub Release assets are public
+and verified. Follow the website ordering and approval gates in
 `docs/releases/RELEASE-RUNBOOK.md`.
 
 The final website change must:
