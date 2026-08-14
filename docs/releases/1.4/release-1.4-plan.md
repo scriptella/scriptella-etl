@@ -1,8 +1,8 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, **7**, and
-**8** complete except maintainer Release GO; source is synchronized at
-`d7bd94b`; Chunks 9–11 remain gated)
+**8** complete; Release GO received August 14, 2026; Chunk 9 not started;
+Chunks 10–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1174,11 +1174,8 @@ unit tests for standalone or distribution claims.
 
 ## Chunk 8 — Final Readiness and Release Preparation
 
-**Status:** In progress (definitive signed no-upload gate passed August 14,
-2026 from `706c19f`; final website commit `b36009e` is prepared on local
-website branch `release-1.4-site` and is not deployed; 1.4 uses the existing
-1.3 signing key; source `master` is synchronized at `d7bd94b`; maintainer
-Release GO remains pending)
+**Status:** Complete for readiness work. Release GO was received August 14,
+2026. Chunk 9 was not started.
 
 **Reasoning level:** Moderate
 
@@ -1278,22 +1275,40 @@ sign, verify, and publication command.
   public key is already on `keyserver.ubuntu.com`.
 * [x] Synchronize the reviewed source baseline without creating the release
   tag. Merged as [#49](https://github.com/scriptella/scriptella-etl/pull/49)
-  to `origin/master` at `d7bd94befc61ea470d73904eac88a4aadb734d02`. No
-  `scriptella-parent-1.4` tag was created.
+  and recorded in [#50](https://github.com/scriptella/scriptella-etl/pull/50).
+  `origin/master` after those merges is
+  `640625c4176991ffcace5fbb681723e205bcedff`. No `scriptella-parent-1.4`
+  tag was created.
+
+### Release GO (August 14, 2026)
+
+The maintainer gave Release GO in these words:
+
+> GO for Scriptella 1.4 using source 640625c, website b36009e, tag
+> scriptella-parent-1.4, and signing key
+> 5DA760EAF1B4169E1715DB80322E3E0A55DB94CE.
+
+After that GO, this session checked that `scriptella-etl` `HEAD` and
+`origin/master` were `640625c4176991ffcace5fbb681723e205bcedff`, that
+`scriptella.github.io` `release-1.4-site` was
+`b36009ef62933ca4cefb667c61a3d7619c0d1a69`, and that the tag and GitHub
+Release did not exist. A detached sign test with
+`5DA760EAF1B4169E1715DB80322E3E0A55DB94CE` failed in this session because
+GPG had no TTY/pinentry. `mvn release:prepare` was not run. No release
+commit, next-development commit, tag, GitHub Release, Central upload, or
+website deploy was created.
 
 ### Exit criteria
 
-* The signed-gate source remains `706c19f`. Synchronized `origin/master` is
-  `d7bd94b` (merge of #49), which contains that commit plus later readiness
-  and plan notes.
+* The signed-gate source remains `706c19f`. Synchronized `origin/master` at
+  the Release GO was `640625c` (merges of #49 and #50).
 * The reviewed final website commit is `b36009e` on local website branch
-  `release-1.4-site`. It must not be merged or deployed until the 1.4 Maven
-  coordinates and GitHub Release assets are public.
+  `release-1.4-site` and has not been merged or deployed.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can now be requested. It must name source
-  `d7bd94b`, website `b36009e`, tag `scriptella-parent-1.4`, and signing
-  fingerprint `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`.
+* Maintainer Release GO was given for source `640625c`, website `b36009e`,
+  tag `scriptella-parent-1.4`, and signing fingerprint
+  `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`.
 
 Documentation must state separately:
 
@@ -1324,7 +1339,8 @@ the compatibility investigation.
 
 ## Chunk 9 — Release Maven 1.4
 
-**Status:** Pending; requires completed Chunk 8 and explicit maintainer Release GO
+**Status:** Release GO received August 14, 2026; not started (`release:prepare`
+was not run)
 
 Publish the reviewed 1.4 Maven artifacts using the release runbook. Verify the
 Central deployment, signatures, checksums, coordinates, POM metadata, and an
