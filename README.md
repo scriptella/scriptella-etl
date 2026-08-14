@@ -7,14 +7,14 @@ orchestrates the workflow instead of a proprietary transformation language.
 
 ## Project status
 
-The latest release is **Scriptella 1.3** (Java 8 target and preserved
-Maven/Ant packaging), published on July 17, 2026.
+The latest release is **Scriptella 1.4** (Java 17 baseline), published on
+August 14, 2026.
 
-Scriptella 1.3 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3)
+Scriptella 1.4 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4)
 and Maven Central.
 
-The `master` branch is the development line for **Scriptella 1.4**. See the
-[changelog](CHANGELOG.md) for its current status and compatibility changes.
+See the [changelog](CHANGELOG.md) for the release details and compatibility
+changes.
 
 ## Requirements
 
@@ -108,7 +108,7 @@ the core module:
 <dependency>
   <groupId>org.scriptella</groupId>
   <artifactId>scriptella-core</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
 </dependency>
 ```
 

@@ -1,7 +1,9 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunk 8 readiness is in progress; Chunks 9–11 remain gated)
+complete; Chunk 8 website commit is prepared locally and the 1.3 signing
+key is the 1.4 key; source synchronization remains before Release GO;
+Chunks 9–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1173,8 +1175,11 @@ unit tests for standalone or distribution claims.
 
 ## Chunk 8 — Final Readiness and Release Preparation
 
-**Status:** In progress (readiness smoke passed August 7, 2026; final
-no-upload release gate remains)
+**Status:** In progress (definitive signed no-upload gate passed August 14,
+2026 from `706c19f`; final website commit `b36009e` is prepared on local
+website branch `release-1.4-site` and is not deployed; 1.4 uses the existing
+1.3 signing key; maintainer Release GO remains gated on source
+synchronization)
 
 **Reasoning level:** Moderate
 
@@ -1197,6 +1202,51 @@ it does not replace the runbook's signed, release-version no-upload gate. That
 gate must run from the final reviewed source commit after release wording is
 settled.
 
+### Definitive final-gate evidence (August 14, 2026)
+
+The signed release-version no-upload gate passed from frozen source commit
+`706c19f5cb55efd447a10e63e25aab460620b6ce` on Temurin 17.0.15, Maven 3.9.9,
+Ant 1.10.17, and DTDDoc 1.1.0. The gate used the private Maven settings file
+with server ID `central`, signed with the approved fingerprint
+`5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`, and set
+`central.skipPublishing=true`; no upload or publication occurred.
+
+Maven passed with 154 core, 161 drivers, and 22 tools tests. Ant tests,
+distribution assembly, the artifact-level distribution contract, ZIP/JAR
+integrity checks, all 14 detached signature verifications, MD5/SHA-1/SHA-256/
+SHA-512 checksum computation, unpacked `java -jar` and executable Unix
+launcher smoke tests, JavaScript/CSV, H2, primes, and an isolated Maven
+consumer all passed. The distribution archives were:
+
+* `scriptella-1.4.zip` — SHA-256
+  `e96900158e0b2823b48954c33901a7867f8b9f82eb9510089d24f91a674e66ee`;
+* `scriptella-1.4-src.zip` — SHA-256
+  `715c5ab8bdd4e847e5b9593081defe519c0d3b16ed480c03e50edb7bcc81b18b`;
+* `scriptella-examples-1.4.zip` — SHA-256
+  `32ee702f5156c84466f4005325d6b5a115d4ed237124a35135882bac3f733bc7`.
+
+Detailed sanitized evidence is retained in the workspace-local
+`release-dir/1.4-final-readiness-evidence-706c19f.md`. It records the known
+Javadoc warnings, native-Windows limitation, disposable-artifact rule, and
+remaining GO prerequisites.
+
+### Signing key
+
+**Use the existing Scriptella 1.3 signing key.** Do not generate a replacement
+for 1.4.
+
+* Identity: `Fyodor Kupolov <scriptella@gmail.com>`
+* Fingerprint: `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`
+* This key already signed the published Scriptella 1.3 Maven artifacts.
+* The 1.4 no-upload gate used the same fingerprint.
+* The public key is on the Central-supported server
+  `keyserver.ubuntu.com`.
+* RSA-2048 remains accepted by Central. Reuse keeps Scriptella signing
+  continuity.
+
+Set `SIGNING_KEY` / `-Dgpg.keyname` to that full fingerprint for every 1.4
+sign, verify, and publication command.
+
 ### Work
 
 * [x] Update `README.md`, `CHANGELOG.md`, and this plan with the current
@@ -1214,16 +1264,33 @@ settled.
   optional Rhino aliases, nested JavaScript, Janino, selected Mail coverage,
   examples archive execution, Maven consumer execution, and user-facing Ant
   tasks.
-* [ ] Run the signed, release-version no-upload gate from the final reviewed
+* [x] Run the signed, release-version no-upload gate from the final reviewed
   commit using `docs/releases/RELEASE-RUNBOOK.md`; record sanitized results,
   checksums, and any deviations.
+* [x] Prepare the final 1.4 website commit without deploying it. Local website
+  branch `release-1.4-site` commit `b36009ef62933ca4cefb667c61a3d7619c0d1a69`
+  makes 1.4 current on the home, download, and change-history pages, updates
+  tutorial/reference/FAQ/how-to guidance for Java 17, H2, and removed
+  ODBC/HSQLDB, and replaces generated API/DTD documentation from the frozen
+  1.4 source. Optional JSR-223/Rhino details stay on the driver and reference
+  pages. The live website remains on 1.3.
+* [x] Use the existing 1.3 OpenPGP signing key
+  `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`. Do not create a new key. The
+  public key is already on `keyserver.ubuntu.com`.
+* [ ] Synchronize the reviewed source baseline without creating the release
+  tag.
 
 ### Exit criteria
 
-* The source checkout is clean and frozen at the reviewed release commit.
+* The source baseline is frozen at reviewed commit `706c19f`; later local
+  plan-status commits are not yet synchronized with `origin/master`.
+* The reviewed final website commit is `b36009e` on local website branch
+  `release-1.4-site`. It must not be merged or deployed until the 1.4 Maven
+  coordinates and GitHub Release assets are public.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can be requested for the Maven publication.
+* Maintainer Release GO can be requested only after the source baseline is
+  synchronized. The signing key is the existing 1.3 key named above.
 
 Documentation must state separately:
 
@@ -1309,9 +1376,9 @@ The final website change must:
   prefer a small explanation or correction over an unnecessary rewrite;
 * make 1.4 the current release on the home, download, and change-history pages,
   with the exact published Maven coordinates and verified release-asset URLs;
-* state the Java 17 runtime/build baseline and explain that the binary and
-  examples distributions bundle Rhino 1.9.1, while Maven and embedded users
-  add the Rhino provider explicitly;
+* state the Java 17 runtime/build baseline; keep the optional JSR-223/Rhino
+  JavaScript contract in driver and reference documentation, not on the home
+  or download pages;
 * remove ODBC/JDBC-ODBC and HSQLDB from the 1.4 driver and tutorial guidance,
   pointing users with legacy requirements to Scriptella 1.3 where appropriate;
 * refresh the generated API and DTD documentation from the released 1.4 source

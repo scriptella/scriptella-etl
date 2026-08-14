@@ -38,9 +38,10 @@ Before a real release, a maintainer must:
    is missing.
 3. Generate a Portal user token and add it to the maintainer's Maven
    `settings.xml` under server ID `central`.
-4. Select a durable, passphrase-protected OpenPGP signing key and publish its
-   public key to a Central-supported key server such as `keys.openpgp.org` or
-   `keyserver.ubuntu.com`.
+4. Use the existing Scriptella 1.3 OpenPGP signing key
+   (`5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`). That key already signed the
+   published 1.3 artifacts; its public key is on `keyserver.ubuntu.com`. Do
+   not generate a replacement for 1.4.
 5. Build with the documented Java 8 and Maven 3.6+ environment.
 
 Never commit a Portal token, private key, or passphrase.

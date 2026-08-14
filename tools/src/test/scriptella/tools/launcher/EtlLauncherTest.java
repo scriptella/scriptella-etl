@@ -279,6 +279,17 @@ public class EtlLauncherTest extends DBTestCase {
                 getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherTest"}));
     }
 
+    public void testExtensionlessFileInDottedDirectory() throws FileNotFoundException {
+        EtlLauncher launcher = new EtlLauncher() {
+            @Override
+            protected boolean isFile(File file) {
+                return file.getPath().endsWith("script.etl.xml");
+            }
+        };
+        assertEquals(new File("parent.with.dot/script.etl.xml").getAbsoluteFile(),
+                launcher.resolveFile(null, "parent.with.dot/script"));
+    }
+
     /**
      * Tests if JMX monitoring is enabled during execution.
      */

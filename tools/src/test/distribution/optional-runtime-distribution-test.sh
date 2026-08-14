@@ -125,6 +125,8 @@ assert_contains "$work_dir/scriptella-manifest.txt" \
     "Class-Path: lib/rhino-engine.jar lib/rhino.jar"
 
 assert_contains "$dist_dir/bin/scriptella.sh" 'lib/*.jar'
+[ -x "$dist_dir/bin/scriptella.sh" ] \
+    || fail "$dist_dir/bin/scriptella.sh is not executable"
 assert_contains "$dist_dir/bin/scriptella.bat" '\lib'
 assert_contains "$dist_dir/bin/scriptella.bat" '%*'
 
