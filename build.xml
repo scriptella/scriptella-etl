@@ -120,7 +120,10 @@
                         prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
-            <zipfileset dir="${tools}/src/bin" prefix="${product.name}/bin"/>
+            <zipfileset dir="${tools}/src/bin" includes="scriptella.bat"
+                        prefix="${product.name}/bin"/>
+            <zipfileset dir="${tools}/src/bin" includes="scriptella.sh" filemode="755"
+                        prefix="${product.name}/bin"/>
             <zipfileset dir="${basedir}" includes="README.md CHANGELOG.md LICENSE NOTICE" prefix="${product.name}"/>
             <zipfileset file="${tmp.dir}/${srcide.zip.name}" prefix="${product.name}"/>
         </zip>
