@@ -1,8 +1,8 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, **7**, and
-**8** complete; Release GO received August 14, 2026; Chunk 9 not started;
-Chunks 10–11 remain gated)
+**8** complete; the signed Maven Central deployment is validated and awaits
+manual publication; Chunks 10–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1339,14 +1339,24 @@ the compatibility investigation.
 
 ## Chunk 9 — Release Maven 1.4
 
-**Status:** Release GO received August 14, 2026; not started (`release:prepare`
-was not run)
+**Status:** Prepared and validated August 14, 2026; Central publication is
+pending the maintainer's manual Publish action
 
 Publish the reviewed 1.4 Maven artifacts using the release runbook. Verify the
 Central deployment, signatures, checksums, coordinates, POM metadata, and an
 isolated consumer before declaring the Maven release complete. Do not update
 the external examples repository or live website before the artifacts are
 public and verified.
+
+### Publication evidence (August 14, 2026)
+
+`mvn release:prepare` completed from the current clean checkout and created
+the `scriptella-parent-1.4` tag, release commit, and `1.5-SNAPSHOT`
+development commit. The signed `mvn release:perform` deployment was accepted
+and validated by Central with deployment ID
+`731bd81b-2d31-4d08-a274-bb1ccf839d`; auto-publishing remains disabled. The
+deployment must be manually published in the Central Portal before Chunk 10
+or Chunk 11 begins.
 
 ### Exit criteria
 
