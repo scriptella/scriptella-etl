@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.4] — unreleased
+## [1.4] — 2026-08-14
 
 Scriptella 1.4 is a maintenance and modernization release focused on making
 the project easier to build, run, and maintain on current Java platforms while

@@ -7,11 +7,11 @@ Maintained HTML (tutorial, reference, support, …) is edited directly in the
 website repo. Only the generated trees under `docs/api/` and `docs/dtd/` are
 refreshed by this tooling.
 
-The published website currently contains the **Scriptella 1.3** documentation.
-When using `--build` to regenerate those trees, run this tool from a 1.3
-checkout or worktree and use Java 8. The current `master` checkout is the
-Scriptella 1.4 development line and requires JDK 17; do not use its generated
-output to refresh the published 1.3 documentation.
+Generate published documentation from the exact released tag, never from an
+unreviewed development checkout. Scriptella 1.4 documentation requires JDK 17;
+Scriptella 1.3 documentation requires Java 8. Keep the live site on its current
+released documentation until the replacement artifacts are public and the
+release runbook reaches the website deployment step.
 
 ## Layout assumptions
 
