@@ -1,8 +1,7 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, **7**, and
-**8** complete; the signed Maven Central deployment is validated and awaits
-manual publication; Chunks 10–11 remain gated)
+**Status:** Complete (Chunks 1–3, **5A–5C**, **6**, **6A**, **7**, **8**, **9**,
+**10**, and **11** complete; August 14, 2026)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1339,8 +1338,7 @@ the compatibility investigation.
 
 ## Chunk 9 — Release Maven 1.4
 
-**Status:** Prepared and validated August 14, 2026; Central publication is
-pending the maintainer's manual Publish action
+**Status:** Complete (August 14, 2026)
 
 Publish the reviewed 1.4 Maven artifacts using the release runbook. Verify the
 Central deployment, signatures, checksums, coordinates, POM metadata, and an
@@ -1354,20 +1352,19 @@ public and verified.
 the `scriptella-parent-1.4` tag, release commit, and `1.5-SNAPSHOT`
 development commit. The signed `mvn release:perform` deployment was accepted
 and validated by Central with deployment ID
-`731bd81b-2d31-4d08-a274-bb1ccf839d`; auto-publishing remains disabled. The
-deployment must be manually published in the Central Portal before Chunk 10
-or Chunk 11 begins.
+`731bd81b-2d31-4d08-a274-bb1ccf839d`; it was subsequently published in the
+Central Portal and verified as available.
 
 ### Exit criteria
 
-* Maven Central reports the deployment as valid and available.
+* Maven Central reports the deployment as valid, published, and available.
 * Required artifacts, signatures, checksums, and metadata are verified.
-* The final source tag and GitHub release assets are prepared or published
-  according to the runbook.
+* The final source tag and GitHub release assets are published according to
+  the runbook.
 
 ## Chunk 10 — Update External Examples After Publication
 
-**Status:** Pending; starts only after Chunk 9
+**Status:** Complete (August 14, 2026)
 
 Update the separate `scriptella-examples` repository against the published
 1.4 artifacts. The current checkout contains stale `1.1-SNAPSHOT` and
@@ -1388,7 +1385,7 @@ this separate repository; they are distinct deliverables.
 
 ## Chunk 11 — Website and Adoption Updates
 
-**Status:** Pending; starts only after Chunks 9 and 10
+**Status:** Complete (August 14, 2026)
 
 Prepare and deploy the reviewed `scriptella.github.io/` update only after the
 Maven artifacts, GitHub release assets, and updated examples links are public
@@ -1429,6 +1426,23 @@ The final website change must:
 This website deployment is the final release step. Completion requires the
 public site to identify 1.4 as current with no stale RC, development, ODBC,
 HSQLDB, Java 8, or previous-latest-release wording in the 1.4 user path.
+
+The website PR was merged and the public site was verified to identify 1.4 as
+current, with the 1.4 download path, Maven coordinates, examples links, Java
+17 guidance, and 1.3 Java 8 fallback available. This completed the release
+step on August 14, 2026.
+
+## Post-release follow-up
+
+The 1.4 release is complete. Track future work separately from this plan:
+
+* Issue #45 — evaluate a future JEXL 3 migration without changing the 1.4
+  expression user contract.
+* Issue #44 follow-up — review the remaining optional-driver dependency
+  surface, security advisories, and whether legacy MongoDB examples should be
+  modernized or retired.
+* Future maintenance — keep the Java 17 compatibility matrix and release
+  smoke test current for dependency and JDK updates.
 
 ---
 
