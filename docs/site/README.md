@@ -43,8 +43,8 @@ python3 docs/site/sync_generated_docs.py --dry-run
 python3 docs/site/sync_generated_docs.py --build --dry-run
 ```
 
-Requires **Python 3.9+**, **rsync**, and (for `--build`) **Ant**. DTDDoc is
-used when present for a full docs rebuild. For a 1.3 docs rebuild, prefer
+Requires **Python 3.9+**, **rsync**, and (for `--build`) **Ant 1.10.17**. DTDDoc
+is used when present for a full docs rebuild. For a 1.3 docs rebuild, prefer
 **Java 8** for Javadoc so the output matches the frameset layout currently
 published on scriptella.org (`--build` tries to select a Java 8 `JAVA_HOME`
 automatically on macOS). Current `master` requires JDK 17 and should only be

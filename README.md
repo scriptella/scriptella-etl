@@ -11,17 +11,17 @@ The latest release is **Scriptella 1.4** (Java 17 baseline), published on
 August 14, 2026.
 
 Scriptella 1.4 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4)
-and Maven Central.
+and [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core).
 
 See the [changelog](CHANGELOG.md) for the release details and compatibility
 changes.
 
 ## Requirements
 
-| Version | Java | Build tools |
-| --- | --- | --- |
-| **Scriptella 1.3 release** | Java **8** | Maven **3.6+**; Ant **1.10.17** for release packaging |
-| **Scriptella 1.4** | Java **17** | Maven **3.6+**; Ant **1.10.17** for release packaging |
+| Version | Java |
+| --- | --- |
+| **Scriptella 1.4** | Java **17** |
+| **Scriptella 1.3 (Java 8 compatibility release)** | Java **8** |
 
 ## Getting Scriptella
 
@@ -118,13 +118,14 @@ providers without assembling modules yourself.
 
 ### Build from source
 
-Current `master` must be built with JDK 17:
+Current `master` must be built with JDK 17. Use Maven 3.6 or newer for the
+module build; Ant 1.10.17 is required for release distribution packaging:
 
 ```bash
 # Module build and tests (primary path)
 mvn clean install
 
-# Optional: Ant packaging (Ant 1.10.17 for release dist / all-in-one JAR)
+# Optional: Ant packaging (release dist / all-in-one JAR)
 ant clean jar
 ```
 
