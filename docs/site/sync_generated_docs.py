@@ -293,12 +293,37 @@ def sanity_check_tree(
         )
 
 
+def is_redirect_or_frameset(path: Path) -> bool:
+    """True for Javadoc redirect stubs and frameset chrome, which should not be tracked."""
+    text = path.read_text(encoding="utf-8", errors="surrogateescape")
+    lower = text.lower()
+    if "<frameset" in lower:
+        return True
+    if "javadoc/IndexRedirectWriter" in text or "window.location.replace" in text:
+        return True
+    return "</body>" not in lower
+
+
+def api_hub_page(api_dest: Path) -> Path | None:
+    """Pick the real API landing page for the current Javadoc layout.
+
+    JDK 17+ publishes the package index as index.html and leaves
+    overview-summary.html as a redirect. Java 8 uses a frameset index.html
+    and overview-summary.html as the default content frame.
+    """
+    for name in ("index.html", "overview-summary.html"):
+        candidate = api_dest / name
+        if candidate.is_file() and not is_redirect_or_frameset(candidate):
+            return candidate
+    return None
+
+
 def track_targets(api_dest: Path, dtd_dest: Path) -> list[Path]:
     """The generated API and DTD entry points worth tracking."""
     targets: list[Path] = []
-    overview = api_dest / "overview-summary.html"
-    if overview.is_file():
-        targets.append(overview)
+    hub = api_hub_page(api_dest)
+    if hub is not None:
+        targets.append(hub)
     for name in ("intro.html", "elementsIndex.html"):
         path = dtd_dest / name
         if path.is_file():

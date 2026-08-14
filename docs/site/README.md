@@ -103,11 +103,14 @@ After copy, the separate Scriptella API documentation StatCounter project is
 injected into a **three-page allowlist** of generated HTML files (not every class
 page). The maintained website continues to use its own project:
 
-* `docs/api/overview-summary.html` — API hub / default content frame
+* `docs/api/index.html` — API hub (JDK 17+ package index). Falls back to
+  `docs/api/overview-summary.html` for Java 8 frameset Javadoc, where
+  `index.html` is chrome and the overview is the default content frame.
 * `docs/dtd/intro.html` — DTD hub
 * `docs/dtd/elementsIndex.html` — element index
 
-Skipped: API frameset chrome and content (`docs/api/**`), package summaries,
+Skipped: Javadoc redirect stubs (`overview-summary.html` on JDK 17+),
+API frameset chrome, package summaries,
 class/type pages, detailed DTD reference pages, `package-tree` / `package-use`,
 and other secondary generated pages.
 
