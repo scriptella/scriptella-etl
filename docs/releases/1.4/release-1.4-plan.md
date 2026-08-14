@@ -1,8 +1,9 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunk 8 website commit is prepared locally; public-key retrieval
-and source synchronization remain before Release GO; Chunks 9–11 remain gated)
+complete; Chunk 8 website commit is prepared locally and the 1.3 signing
+key is the 1.4 key; source synchronization remains before Release GO;
+Chunks 9–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1176,8 +1177,9 @@ unit tests for standalone or distribution claims.
 
 **Status:** In progress (definitive signed no-upload gate passed August 14,
 2026 from `706c19f`; final website commit `b36009e` is prepared on local
-website branch `release-1.4-site` and is not deployed; maintainer Release GO
-remains gated on public-key retrieval and source synchronization)
+website branch `release-1.4-site` and is not deployed; 1.4 uses the existing
+1.3 signing key; maintainer Release GO remains gated on source
+synchronization)
 
 **Reasoning level:** Moderate
 
@@ -1228,6 +1230,23 @@ Detailed sanitized evidence is retained in the workspace-local
 Javadoc warnings, native-Windows limitation, disposable-artifact rule, and
 remaining GO prerequisites.
 
+### Signing key
+
+**Use the existing Scriptella 1.3 signing key.** Do not generate a replacement
+for 1.4.
+
+* Identity: `Fyodor Kupolov <scriptella@gmail.com>`
+* Fingerprint: `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`
+* This key already signed the published Scriptella 1.3 Maven artifacts.
+* The 1.4 no-upload gate used the same fingerprint.
+* The public key is on the Central-supported server
+  `keyserver.ubuntu.com`.
+* RSA-2048 remains accepted by Central. Reuse keeps Scriptella signing
+  continuity.
+
+Set `SIGNING_KEY` / `-Dgpg.keyname` to that full fingerprint for every 1.4
+sign, verify, and publication command.
+
 ### Work
 
 * [x] Update `README.md`, `CHANGELOG.md`, and this plan with the current
@@ -1255,9 +1274,11 @@ remaining GO prerequisites.
   ODBC/HSQLDB, and replaces generated API/DTD documentation from the frozen
   1.4 source. Optional JSR-223/Rhino details stay on the driver and reference
   pages. The live website remains on 1.3.
-* [ ] Complete the remaining maintainer GO prerequisites: independently
-  publish and retrieve the public signing key, and synchronize the reviewed
-  source baseline without creating the release tag.
+* [x] Use the existing 1.3 OpenPGP signing key
+  `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`. Do not create a new key. The
+  public key is already on `keyserver.ubuntu.com`.
+* [ ] Synchronize the reviewed source baseline without creating the release
+  tag.
 
 ### Exit criteria
 
@@ -1268,8 +1289,8 @@ remaining GO prerequisites.
   coordinates and GitHub Release assets are public.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can be requested only after the public-key and
-  source-synchronization prerequisites above are complete.
+* Maintainer Release GO can be requested only after the source baseline is
+  synchronized. The signing key is the existing 1.3 key named above.
 
 Documentation must state separately:
 
