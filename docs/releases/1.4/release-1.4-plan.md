@@ -1175,7 +1175,7 @@ unit tests for standalone or distribution claims.
 ## Chunk 8 — Final Readiness and Release Preparation
 
 **Status:** In progress (definitive signed no-upload gate passed August 14,
-2026 from `706c19f`; final website commit `a74b663` is prepared on local
+2026 from `706c19f`; final website commit `b36009e` is prepared on local
 website branch `release-1.4-site` and is not deployed; maintainer Release GO
 remains gated on public-key retrieval and source synchronization)
 
@@ -1249,11 +1249,12 @@ remaining GO prerequisites.
   commit using `docs/releases/RELEASE-RUNBOOK.md`; record sanitized results,
   checksums, and any deviations.
 * [x] Prepare the final 1.4 website commit without deploying it. Local website
-  branch `release-1.4-site` commit `a74b663f5301e0b3e64ff4d59a599a53cfbdcb4b`
+  branch `release-1.4-site` commit `b36009ef62933ca4cefb667c61a3d7619c0d1a69`
   makes 1.4 current on the home, download, and change-history pages, updates
-  tutorial/reference/FAQ/how-to guidance for Java 17, H2, removed ODBC/HSQLDB,
-  and the Rhino 1.9.1 contract, and replaces generated API/DTD documentation
-  from the frozen 1.4 source. The live website remains on 1.3.
+  tutorial/reference/FAQ/how-to guidance for Java 17, H2, and removed
+  ODBC/HSQLDB, and replaces generated API/DTD documentation from the frozen
+  1.4 source. Optional JSR-223/Rhino details stay on the driver and reference
+  pages. The live website remains on 1.3.
 * [ ] Complete the remaining maintainer GO prerequisites: independently
   publish and retrieve the public signing key, and synchronize the reviewed
   source baseline without creating the release tag.
@@ -1262,7 +1263,7 @@ remaining GO prerequisites.
 
 * The source baseline is frozen at reviewed commit `706c19f`; later local
   plan-status commits are not yet synchronized with `origin/master`.
-* The reviewed final website commit is `a74b663` on local website branch
+* The reviewed final website commit is `b36009e` on local website branch
   `release-1.4-site`. It must not be merged or deployed until the 1.4 Maven
   coordinates and GitHub Release assets are public.
 * All required tests, artifact checks, and runtime validations pass.
@@ -1354,9 +1355,9 @@ The final website change must:
   prefer a small explanation or correction over an unnecessary rewrite;
 * make 1.4 the current release on the home, download, and change-history pages,
   with the exact published Maven coordinates and verified release-asset URLs;
-* state the Java 17 runtime/build baseline and explain that the binary and
-  examples distributions bundle Rhino 1.9.1, while Maven and embedded users
-  add the Rhino provider explicitly;
+* state the Java 17 runtime/build baseline; keep the optional JSR-223/Rhino
+  JavaScript contract in driver and reference documentation, not on the home
+  or download pages;
 * remove ODBC/JDBC-ODBC and HSQLDB from the 1.4 driver and tutorial guidance,
   pointing users with legacy requirements to Scriptella 1.3 where appropriate;
 * refresh the generated API and DTD documentation from the released 1.4 source
