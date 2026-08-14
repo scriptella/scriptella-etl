@@ -23,5 +23,5 @@ The Maven Central configuration and artifact publication details are in
 
 ## Current planning
 
-* [What's coming in Scriptella 1.4](next-version.md)
+* [Scriptella 1.4 release plan](releases/1.4/release-1.4-plan.md)
 * [Release history](../CHANGELOG.md)

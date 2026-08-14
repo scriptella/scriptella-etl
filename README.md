@@ -13,16 +13,15 @@ Maven/Ant packaging), published on July 17, 2026.
 Scriptella 1.3 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3)
 and Maven Central.
 
-The `master` branch is the development line for **Scriptella 1.4**. See
-[What's coming in the next version](docs/next-version.md) for its current
-status, compatibility changes, and planned modernization work.
+The `master` branch is the development line for **Scriptella 1.4**. See the
+[changelog](CHANGELOG.md) for its current status and compatibility changes.
 
 ## Requirements
 
 | Version | Java | Build tools |
 | --- | --- | --- |
 | **Scriptella 1.3 release** | Java **8** | Maven **3.6+**; Ant **1.10.17** for release packaging |
-| **`master` (`1.4-SNAPSHOT`)** | Java **17** | Maven **3.6+**; Ant **1.10.17** for release packaging |
+| **Scriptella 1.4** | Java **17** | Maven **3.6+**; Ant **1.10.17** for release packaging |
 
 ## Getting Scriptella
 
@@ -31,7 +30,8 @@ status, compatibility changes, and planned modernization work.
 Download a published release from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases)
 or [https://scriptella.org/download.html](https://scriptella.org/download.html).
 
-The binary ZIP includes `scriptella.jar`. Run an ETL file:
+Unzip the binary distribution, change to the extracted directory, and run an
+ETL file:
 
 ```bash
 java -jar scriptella.jar path/to/file.etl.xml
@@ -134,7 +134,6 @@ ant clean jar
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
 * Command-line usage contract and automation templates: [docs/cli-usage.md](docs/cli-usage.md)
-* Next version: [docs/next-version.md](docs/next-version.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Maintainer guide: [docs/MAINTAINING.md](docs/MAINTAINING.md)
 

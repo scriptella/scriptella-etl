@@ -1,7 +1,7 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunks 8–11 remain)
+complete; Chunk 8 readiness is in progress; Chunks 9–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -528,10 +528,10 @@ Track the exploration and future proposal in GitHub issue
 may decide between explicit user-script migration and a narrowly scoped,
 reviewed compatibility layer.
 
-As part of the general dependency refresh, the conservative interim target is
-Commons JEXL **2.1.1**, the latest release in the JEXL 2 branch. Treat that as
-a candidate only: it still requires impact analysis and must not be upgraded
-automatically if characterization finds breaking behavior.
+Scriptella 1.4 remains on Commons JEXL **2.0.1**. A trial of 2.1.1 was also
+rejected because `var` and `return` became reserved words and broke existing
+scripts. Any later JEXL upgrade belongs to issue #45 and requires an explicit
+compatibility and migration decision.
 
 ### Dependency decision
 
@@ -543,11 +543,11 @@ The last 2.x release is 2.1.1; there is no 2.2.x line. A move only to 2.1.1
 would minimize source changes but would leave Scriptella on an obsolete major
 line for another release.
 
-Version 3.6.4 is selected instead of 3.7.0 for Scriptella 1.4 because 3.7.0
-changes default permissions and language features in ways that can reject
-existing scripts at parse time. The 3.6.4 target modernizes JEXL without
-combining that migration with the new 3.7 security-default policy. A future
-release may adopt the stricter defaults deliberately.
+The abandoned spike evaluated 3.6.4 rather than 3.7.0 because 3.7.0 changes
+default permissions and language features in ways that can reject existing
+scripts at parse time. This was an exploration target, not an approved 1.4 or
+future-release baseline; issue #45 must re-evaluate the current versions and
+security defaults when the migration is resumed.
 
 ### Work
 
@@ -775,9 +775,8 @@ Java 17 bytecode (Chunk 5C) outrank remaining 5B for overall maintainability.
 1. Implement only a candidate with a reviewed recommendation that it is
    straightforward and non-breaking, or with a separately approved migration
    proposal.
-2. For Commons JEXL, consider only the 2.1.1 minor-line candidate in this
-   plan. Do not implement the JEXL 3.6.4 migration here; it belongs to GitHub
-   issue #45 and a future release decision.
+2. Keep Commons JEXL at 2.0.1 for 1.4. The 2.1.1 trial was rejected, and the
+   JEXL 3 migration belongs to GitHub issue #45.
 3. Preserve the focused characterization tests and add regression tests for
    every observed compatibility boundary. Never change expected results only
    to make a build green.
@@ -1174,7 +1173,8 @@ unit tests for standalone or distribution claims.
 
 ## Chunk 8 — Final Readiness and Release Preparation
 
-**Status:** Pending
+**Status:** In progress (readiness smoke passed August 7, 2026; final
+no-upload release gate remains)
 
 **Reasoning level:** Moderate
 
@@ -1182,19 +1182,40 @@ Complete only the minimum work needed to make the source tree and candidate
 release evidence ready for publication. This chunk does not update external
 consumer repositories or the live website.
 
+### Readiness evidence (August 7, 2026)
+
+A clean `1.4-SNAPSHOT` checkout at commit `67ae44a` passed the documented
+[readiness smoke test](release-1.4-readiness-smoke-test.md) on Temurin 17.0.15,
+Maven 3.9.9, and Ant 1.10.17. Maven verification, Ant tests and distribution
+assembly, archive integrity, unpacked launchers, JavaScript/CSV, H2, and the
+packaged primes example all passed. The exact environment, commands, archive
+checksums, understood Javadoc warnings, and native-Windows limitation are in
+the [readiness results](release-1.4-readiness-smoke-test-results.md).
+
+This evidence validates the development snapshot and distribution workflow;
+it does not replace the runbook's signed, release-version no-upload gate. That
+gate must run from the final reviewed source commit after release wording is
+settled.
+
 ### Work
 
-* Update `README.md`, `CHANGELOG.md`, this plan, and the issue #31/#44 status.
-* Record the Java 17 runtime/build/packaging baseline, tested JDKs, launcher
-  command, and Maven/Ant/embedded scripting-provider requirements.
-* Remove or replace stale `-Xbootclasspath/a` guidance.
-* Complete the final clean-checkout compatibility and distribution validation:
+* [x] Update `README.md`, `CHANGELOG.md`, and this plan with the current
+  development status.
+* [ ] Update the issue #31/#44 status with links to the final reviewed
+  evidence.
+* [x] Record the Java 17 runtime/build/packaging baseline, tested JDKs,
+  launcher command, and Maven/Ant/embedded scripting-provider requirements.
+* [x] Remove or replace stale user-facing `-Xbootclasspath/a` guidance. The
+  experiment record retains the failed command only as historical evidence.
+* [x] Complete the development-snapshot compatibility and distribution
+  validation:
   Maven, Ant, standalone launchers, JEXL, missing-provider diagnostics,
   optional Rhino aliases, nested JavaScript, Janino, selected Mail coverage,
   examples archive execution, Maven consumer execution, and user-facing Ant
   tasks.
-* Run the no-upload release gate in `docs/releases/RELEASE-RUNBOOK.md` and
-  record sanitized results, checksums, and any deviations.
+* [ ] Run the signed, release-version no-upload gate from the final reviewed
+  commit using `docs/releases/RELEASE-RUNBOOK.md`; record sanitized results,
+  checksums, and any deviations.
 
 ### Exit criteria
 
@@ -1334,9 +1355,8 @@ Small preparatory changes may merge earlier when independently useful and
 fully tested. Each such merge must leave issue #31 open and must not claim
 complete JDK 17 support.
 
-The JEXL 3.6.4 upgrade is intentionally a separate follow-on change and does
-not block merging an otherwise complete JDK 17 implementation. The final 1.4
-distribution matrix runs only after both changes are integrated.
+The JEXL upgrade is deferred to issue #45 and does not block Scriptella 1.4.
+The final 1.4 matrix validates the retained JEXL 2.0.1 behavior.
 
 ## Stop and reassess conditions
 
@@ -1360,7 +1380,8 @@ The completed workstream should produce:
 * supported JDK 17 build, runtime, and packaging behavior;
 * preserved and tested JavaScript aliases;
 * bundled JEXL operation plus an actionable optional Rhino strategy;
-* a separately reviewed upgrade to Commons JEXL 3.6.4;
+* an explicit decision to retain Commons JEXL 2.0.1 for 1.4, with later
+  migration tracked separately in issue #45;
 * a conservative JDK 17 refresh of the retained optional-driver dependencies;
 * reconciled dependencies, SPI metadata, and licenses;
 * a repeatable compatibility matrix;

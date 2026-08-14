@@ -2,16 +2,19 @@
 
 ## [1.4] — unreleased
 
-For current development direction and planned work, see
-[What's coming in Scriptella 1.4](docs/next-version.md).
+Scriptella 1.4 is a maintenance and modernization release focused on making
+the project easier to build, run, and maintain on current Java platforms while
+preserving its lightweight ETL model and existing scripting behavior.
 
 ### Changed
 
 * **Java 17** is the build and runtime baseline; Maven and Ant compile with
   **`release=17`** (class-file major version **61**). Scriptella 1.3 remains
   for Java 8.
-* **JavaScript** upgraded to Rhino 1.9.1 (`org.mozilla:rhino-engine`). Auto-fallback
-  to Rhino on JDK 17 when Nashorn is absent.
+* **JavaScript** upgraded to the official Rhino 1.9.1 JSR-223 provider. The
+  binary and examples distributions bundle `rhino-engine` and `rhino` under
+  `lib/`; supported JavaScript aliases fall back to Rhino when the requested
+  primary engine is absent.
 * **Janino** → 3.1.12, **JavaMail** → `com.sun.mail:javax.mail:1.6.2`,
   **Activation** → 1.1.1, **Ant** → 1.10.17, **Commons Logging** → 1.2.
   Commons JEXL stays on **2.0.1** for 1.4 (2.1.1 rejected: `var`/`return`
@@ -33,8 +36,13 @@ For current development direction and planned work, see
 
 ### Upgrade notes
 
-* JDK 17 required for building. JavaScript automatically routes to Rhino on JDK 17.
-  Maven consumers using JS must add `org.mozilla:rhino-engine` / `org.mozilla:rhino` explicitly.
+* JDK 17 is the minimum runtime and build JDK; artifacts use Java 17 bytecode.
+  Runtime and Maven builds were tested on Temurin 17 and 21, while release
+  packaging uses JDK 17, Ant 1.10.17, and DTDDoc 1.1.0.
+* Keep the binary distribution layout intact when using JavaScript. Maven and
+  embedded consumers must add `org.mozilla:rhino-engine:1.9.1` to the
+  application classpath; a script connection's `classpath` alone is not a
+  JSR-223 provider installation mechanism.
 * ODBC users: there is no Scriptella `odbc` driver in 1.4.
 * Bundled examples that previously created HSQLDB file databases now create H2
   databases. Existing HSQLDB database files are not converted automatically.
