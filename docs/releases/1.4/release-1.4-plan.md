@@ -1,9 +1,8 @@
 # Release 1.4 Plan
 
-**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunk 8 website commit is prepared locally and the 1.3 signing
-key is the 1.4 key; source synchronization remains before Release GO;
-Chunks 9–11 remain gated)
+**Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, **7**, and
+**8** complete except maintainer Release GO; source is synchronized at
+`d7bd94b`; Chunks 9–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1178,8 +1177,8 @@ unit tests for standalone or distribution claims.
 **Status:** In progress (definitive signed no-upload gate passed August 14,
 2026 from `706c19f`; final website commit `b36009e` is prepared on local
 website branch `release-1.4-site` and is not deployed; 1.4 uses the existing
-1.3 signing key; maintainer Release GO remains gated on source
-synchronization)
+1.3 signing key; source `master` is synchronized at `d7bd94b`; maintainer
+Release GO remains pending)
 
 **Reasoning level:** Moderate
 
@@ -1277,20 +1276,24 @@ sign, verify, and publication command.
 * [x] Use the existing 1.3 OpenPGP signing key
   `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`. Do not create a new key. The
   public key is already on `keyserver.ubuntu.com`.
-* [ ] Synchronize the reviewed source baseline without creating the release
-  tag.
+* [x] Synchronize the reviewed source baseline without creating the release
+  tag. Merged as [#49](https://github.com/scriptella/scriptella-etl/pull/49)
+  to `origin/master` at `d7bd94befc61ea470d73904eac88a4aadb734d02`. No
+  `scriptella-parent-1.4` tag was created.
 
 ### Exit criteria
 
-* The source baseline is frozen at reviewed commit `706c19f`; later local
-  plan-status commits are not yet synchronized with `origin/master`.
+* The signed-gate source remains `706c19f`. Synchronized `origin/master` is
+  `d7bd94b` (merge of #49), which contains that commit plus later readiness
+  and plan notes.
 * The reviewed final website commit is `b36009e` on local website branch
   `release-1.4-site`. It must not be merged or deployed until the 1.4 Maven
   coordinates and GitHub Release assets are public.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can be requested only after the source baseline is
-  synchronized. The signing key is the existing 1.3 key named above.
+* Maintainer Release GO can now be requested. It must name source
+  `d7bd94b`, website `b36009e`, tag `scriptella-parent-1.4`, and signing
+  fingerprint `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`.
 
 Documentation must state separately:
 
