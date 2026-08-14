@@ -1,7 +1,8 @@
 # Release 1.4 Plan
 
 **Status:** In progress (Chunks 1–3, **5A–5C**, **6**, **6A**, and **7**
-complete; Chunk 8 readiness is in progress; Chunks 9–11 remain gated)
+complete; Chunk 8 website commit is prepared locally; public-key retrieval
+and source synchronization remain before Release GO; Chunks 9–11 remain gated)
 
 **Umbrella issue:** [#44 — Scriptella 1.4: Release hardening, JDK 17 compatibility, and dependency modernization](https://github.com/scriptella/scriptella-etl/issues/44)
 
@@ -1174,7 +1175,9 @@ unit tests for standalone or distribution claims.
 ## Chunk 8 — Final Readiness and Release Preparation
 
 **Status:** In progress (definitive signed no-upload gate passed August 14,
-2026 from `706c19f`; maintainer Release GO remains gated)
+2026 from `706c19f`; final website commit `a74b663` is prepared on local
+website branch `release-1.4-site` and is not deployed; maintainer Release GO
+remains gated on public-key retrieval and source synchronization)
 
 **Reasoning level:** Moderate
 
@@ -1245,20 +1248,27 @@ remaining GO prerequisites.
 * [x] Run the signed, release-version no-upload gate from the final reviewed
   commit using `docs/releases/RELEASE-RUNBOOK.md`; record sanitized results,
   checksums, and any deviations.
-* [ ] Complete the maintainer GO prerequisites: independently publish and
-  retrieve the public signing key, prepare and review the final website commit,
-  and synchronize the reviewed source baseline without creating the release
-  tag.
+* [x] Prepare the final 1.4 website commit without deploying it. Local website
+  branch `release-1.4-site` commit `a74b663f5301e0b3e64ff4d59a599a53cfbdcb4b`
+  makes 1.4 current on the home, download, and change-history pages, updates
+  tutorial/reference/FAQ/how-to guidance for Java 17, H2, removed ODBC/HSQLDB,
+  and the Rhino 1.9.1 contract, and replaces generated API/DTD documentation
+  from the frozen 1.4 source. The live website remains on 1.3.
+* [ ] Complete the remaining maintainer GO prerequisites: independently
+  publish and retrieve the public signing key, and synchronize the reviewed
+  source baseline without creating the release tag.
 
 ### Exit criteria
 
-* The source baseline is frozen at reviewed commit `706c19f`; the current
-  checkout has three local release-preparation commits not yet synchronized
-  with `origin/master`.
+* The source baseline is frozen at reviewed commit `706c19f`; later local
+  plan-status commits are not yet synchronized with `origin/master`.
+* The reviewed final website commit is `a74b663` on local website branch
+  `release-1.4-site`. It must not be merged or deployed until the 1.4 Maven
+  coordinates and GitHub Release assets are public.
 * All required tests, artifact checks, and runtime validations pass.
 * Release documentation does not overstate compatibility.
-* Maintainer Release GO can be requested only after the public-key, website,
-  and source-synchronization prerequisites above are complete.
+* Maintainer Release GO can be requested only after the public-key and
+  source-synchronization prerequisites above are complete.
 
 Documentation must state separately:
 
