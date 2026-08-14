@@ -1201,8 +1201,9 @@ settled.
 
 * [x] Update `README.md`, `CHANGELOG.md`, and this plan with the current
   development status.
-* [ ] Update the issue #31/#44 status with links to the final reviewed
-  evidence.
+* [x] Update the issue #31/#44 status with links to the reviewed evidence.
+  Issue #31 was already closed; its final status comment now supersedes the
+  older partial-support finding. Issue #44 remains open for the release gates.
 * [x] Record the Java 17 runtime/build/packaging baseline, tested JDKs,
   launcher command, and Maven/Ant/embedded scripting-provider requirements.
 * [x] Remove or replace stale user-facing `-Xbootclasspath/a` guidance. The
