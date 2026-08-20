@@ -14,6 +14,19 @@ The installer must preserve and invoke the distribution's existing
 `bin/scriptella.sh` launcher. The 1.4 installer does not create an external
 launcher alias.
 
+The simple 1.4 installer is the preferred installer model going forward, not
+just a compatibility workaround. The installer should download the published
+Scriptella ZIP, verify its pinned checksum, unpack it under
+`${HOME}/.local/scriptella`, and make the distribution's `bin` directory
+available on `PATH`. The installer installs the distribution; it does not
+manufacture launcher aliases, wrappers, or symlinks outside it.
+
+If a cleaner command is needed in a future release, add a new launcher to the
+distribution as `bin/scriptella`, alongside the compatibility launcher
+`bin/scriptella.sh`. That launcher may have an independent implementation and
+is separate from this installer's scope. A modern `bin/scriptella` launcher
+should be tracked as a separate issue for launcher design and implementation.
+
 ## Agreed installation contract
 
 - [x] Keep the canonical installer at repository root as `install.sh` so each
@@ -22,10 +35,8 @@ launcher alias.
   SHA-256 value explicit and reviewable in `install.sh`.
 - [x] On development `master`, install the latest published stable release
   (initially 1.4), even though the reactor version is `1.5-SNAPSHOT`.
-- [ ] Keep the 1.4 installer during 1.5 release preparation. After the 1.5
-  archive is public, revisit the preserved `installer-1.5` implementation,
-  test it against that actual archive, and only then replace the public
-  installer and website copy.
+- [x] Keep the simple PATH-based installer as the default design for future
+  releases, including 1.5 unless requirements change.
 - [x] Install into the unversioned user-local directory
   `${HOME}/.local/scriptella` without requiring root privileges.
 - [x] Preserve the ZIP's contents and relative layout, including
@@ -170,16 +181,21 @@ published launcher predates external symlink resolution.
 The earlier external-symlink failure is resolved by simplifying the installer,
 not by modifying the immutable 1.4 ZIP or its packaged launcher.
 
-### Future stage — revisit after 1.5
+### Future stage — keep the simple installer and preserve the prototype
 
 The richer installer implementation and its associated tests are preserved on
 local branch `installer-1.5` at commit
-`9ffc156cadb98a3cfbe234054e3d0181f0da56b8`. After 1.5 is released:
+`9ffc156cadb98a3cfbe234054e3d0181f0da56b8`. It is preserved experimental and
+reference work, not the active specification or an expected replacement for
+the 1.4-style installer. Do not delete it. Revisit it only if future
+requirements justify additional installer behavior.
 
-- [ ] Revisit that implementation against the actual 1.5 distribution.
-- [ ] Confirm the packaged 1.5 launcher supports its richer command exposure.
-- [ ] Test the exact staged and public 1.5 ZIP before replacing the public
-  installer or website copy.
+For 1.5, keep the installer contract unchanged: download the ZIP, verify its
+checksum, unpack it, and add its `bin` directory to `PATH`. If the actual 1.5
+distribution includes a new `bin/scriptella` launcher, verify that archive and
+update installer-facing documentation to describe the available command; no
+special installer machinery is needed. Do not implement speculative launcher
+functionality as part of issue #54.
 
 Do not over-specify the 1.5 design until the actual 1.5 archive is available.
 
@@ -188,9 +204,8 @@ The intended lifecycle is:
 ```text
 1.4: simple PATH-based installer
   -> 1.5 released
-  -> revisit installer-1.5
-  -> test against the actual 1.5 ZIP
-  -> replace the public installer
+  -> update installer version, URL, and checksum
+  -> continue using the same installation model
 ```
 
 ## Non-goals retained
@@ -200,5 +215,17 @@ The intended lifecycle is:
 - [ ] Do not download Java, individual dependency JARs, or Maven/Gradle
   dependencies.
 - [ ] Do not rearrange distribution libraries or reconstruct its classpath.
+- [ ] Do not synthesize launcher aliases, wrappers, or symlinks outside the
+  distribution.
+- [ ] Do not add a new `bin/scriptella` launcher or otherwise redesign launcher
+  behavior in this issue; track that work separately if needed.
 - [ ] Do not replace `bin/scriptella.sh` or implement Windows installation in
   this issue.
+
+## Release-process follow-up
+
+This plan now makes the simple PATH-based installer the default for future
+releases. The release runbook still contains wording that describes the
+preserved `installer-1.5` prototype as a possible separate post-release
+installer publication. That runbook wording should be aligned separately; it
+must not be read as a requirement to replace the 1.4-style installer.

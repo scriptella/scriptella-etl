@@ -232,11 +232,16 @@ Before creating the release tag, review the installer fields and frozen binary
 ZIP hash as part of the release diff. The tag must contain the installer that
 was tested against that exact candidate archive. The 1.4 installer exposes
 only the packaged `bin/scriptella.sh` through the installation's own `bin`
-directory; future releases must be checked against their actual launcher
-before changing that contract. During the 1.5 transition, leave the 1.4
-installer unchanged through release preparation and publication. Revisit the
-preserved 1.5 implementation only after the public 1.5 ZIP exists, as a
-separate post-release installer publication.
+directory. The simple ZIP-plus-PATH installer remains the default for future
+releases, including 1.5 unless requirements change. Check each future release
+against its actual archive and packaged launcher before updating the release
+version, tag, archive URL, filename, checksum, or installer-facing
+documentation. During the 1.5 transition, leave the 1.4 installer unchanged
+through release preparation and publication. The preserved `installer-1.5`
+implementation is experimental/reference work; revisit it only if future
+requirements justify additional installer behavior. A future `bin/scriptella`
+launcher belongs in the distribution and requires no special installer
+machinery.
 
 Run Maven Release Plugin with remote pushing disabled and every version/tag
 choice supplied explicitly:
