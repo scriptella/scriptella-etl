@@ -42,6 +42,28 @@ attribute as needed. See the
 [tutorial](https://scriptella.org/tutorial.html) and
 [reference](https://scriptella.org/reference/).
 
+### Experimental curl installer
+
+Install Scriptella 1.4 with `curl`:
+
+```bash
+curl -fsSL https://scriptella.org/install.sh | sh
+```
+
+The installer places Scriptella under `${HOME}/.local/scriptella`. It either
+adds `${HOME}/.local/scriptella/bin` to an existing startup file or prints the
+exact PATH command to add manually. The guaranteed command is the packaged
+`scriptella.sh` launcher:
+
+```bash
+scriptella.sh path/to/file.etl.xml
+```
+
+The installer does not install Java; Scriptella 1.4 requires Java 17 or newer.
+When the installer updates a startup file, start a new shell or reload that
+file before using `scriptella.sh`. Manual ZIP installation and
+`java -jar scriptella.jar` remain available above.
+
 ### Quick start
 
 Create `people.csv` next to `scriptella.jar`:

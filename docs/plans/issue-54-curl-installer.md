@@ -7,30 +7,32 @@ distribution usable through either of these commands:
 
 ```sh
 curl -fsSL https://scriptella.org/install.sh | sh
-scriptella path/to/file.etl.xml
+scriptella.sh path/to/file.etl.xml
 ```
 
 The installer must preserve and invoke the distribution's existing
-`bin/scriptella.sh` launcher. The shorter `scriptella` command is a symlink to
-that launcher, not a second launcher implementation.
+`bin/scriptella.sh` launcher. The 1.4 installer does not create an external
+launcher alias.
 
 ## Agreed installation contract
 
 - [x] Keep the canonical installer at repository root as `install.sh` so each
-  source release tag contains the exact installer for that release.
+  current stable target has one explicit, reviewable installer.
 - [x] Keep the release version, GitHub tag, archive URL, archive filename, and
   SHA-256 value explicit and reviewable in `install.sh`.
 - [x] On development `master`, install the latest published stable release
   (initially 1.4), even though the reactor version is `1.5-SNAPSHOT`.
-- [ ] During release preparation, update the installer to the version being
-  released before creating its tag; after the release, leave it pinned to that
-  now-current stable version while the POMs advance to the next snapshot.
+- [ ] Keep the 1.4 installer during 1.5 release preparation. After the 1.5
+  archive is public, revisit the preserved `installer-1.5` implementation,
+  test it against that actual archive, and only then replace the public
+  installer and website copy.
 - [x] Install into the unversioned user-local directory
   `${HOME}/.local/scriptella` without requiring root privileges.
 - [x] Preserve the ZIP's contents and relative layout, including
   `scriptella.jar`, `lib/`, and `bin/scriptella.sh`.
-- [x] Expose both `scriptella.sh` and `scriptella` as symlinks to the packaged
-  `bin/scriptella.sh`; do not add another launcher script.
+- [x] Expose the packaged `bin/scriptella.sh` through the installation's own
+  `bin` directory; do not create external launcher symlinks or another
+  launcher script.
 - [x] Treat Java as a runtime prerequisite rather than an installation
   prerequisite: installation succeeds without Java, but prints a concise
   warning when Java 17 or newer is not available.
@@ -70,20 +72,15 @@ before the public website changes.
 
 ### PATH and command exposure
 
-- [x] Inspect existing `PATH` entries in order and identify safe, absolute,
-  existing, writable directories located inside the user's home directory.
-- [x] Prefer conventional general-purpose entries such as `${HOME}/.local/bin`
-  and `${HOME}/bin`; use another safe home-contained `PATH` directory only as
-  a fallback.
-- [x] In the selected directory, create both `scriptella.sh` and `scriptella`
-  symlinks targeting `${HOME}/.local/scriptella/bin/scriptella.sh`.
-- [x] Replace only links previously managed by this installer; never overwrite
-  an unrelated file, directory, or symlink with either command name.
-- [x] If no suitable home-directory entry is already on `PATH`, create
-  `${HOME}/.local/bin`, place both links there, and append one guarded,
-  idempotent PATH stanza to an appropriate user startup file.
-- [x] Make repeated runs preserve a single PATH stanza and refresh only the
-  installer-managed links.
+- [x] Use `${HOME}/.local/scriptella/bin` as the only command directory.
+- [x] If that directory is not already on `PATH`, append one guarded,
+  idempotent PATH stanza to an appropriate existing user startup file, or
+  print the exact manual PATH command when choosing a file is unsafe.
+- [x] Do not create shell startup files. For Bash this can change startup-file
+  precedence; for zsh, creating `.zprofile` does not configure non-login
+  interactive shells. Print manual guidance when no suitable file exists.
+- [x] Make repeated runs preserve a single PATH stanza and never create
+  external launcher symlinks.
 - [x] Explain when a new shell or an explicit startup-file reload is needed.
 
 ### Runtime notice and output
@@ -92,8 +89,8 @@ before the public website changes.
   packaged launcher (`JAVACMD`, a valid `JAVA_HOME`, or `java` on `PATH`).
 - [x] If practical, identify the Java major version and warn when it is absent
   or older than 17; do not download Java and do not fail installation.
-- [x] Print concise success output containing the install directory, exposed
-  command names, selected link directory, and one example invocation.
+- [x] Print concise success output containing the install directory, command
+  path, PATH status, and one `scriptella.sh` example invocation.
 - [x] Keep normal output quiet enough for the one-command installation flow and
   send actionable failures to standard error.
 
@@ -113,12 +110,10 @@ before the public website changes.
   root.
 - [x] Cover launcher validation, executable mode, and execution of a simple ETL
   through the installed distribution or a real locally built distribution.
-- [x] Cover selection of an existing home-directory PATH entry and creation of
-  both `scriptella.sh` and `scriptella` links.
-- [x] Cover the no-suitable-PATH-entry fallback and idempotent startup-file
-  modification.
-- [x] Cover collisions with unrelated files and symlinks without overwriting
-  them.
+- [x] Cover an existing `${HOME}/.local/scriptella/bin` PATH entry, addition to
+  existing Bash/zsh startup files, and manual guidance when no suitable file
+  exists.
+- [x] Cover idempotent startup-file modification without external links.
 - [x] Cover repeated installation and replacement of a prior managed install.
 - [x] Cover missing and pre-Java-17 runtimes as successful installs with
   warnings.
@@ -145,89 +140,58 @@ Phase-1 checksum evidence: Scriptella 1.4 uses
 `scriptella-1.4.zip`, independently checked against the GitHub Release API
 asset digest for tag `scriptella-parent-1.4`.
 
-## Phase 2 — Publication infrastructure and release lifecycle
+## Phase 2 — Current 1.4 publication and future 1.5 work
 
 This phase spans `scriptella-etl` and the sibling `scriptella.github.io`
-repository. It is split into publication of the already-tested installer for
-the published 1.4 release and the later 1.5 release cutover.
+repository. The current 1.4 stage is deliberately simple because the
+published launcher predates external symlink resolution.
 
-### Phase 2A — Publish the stable 1.4 installer now
+### Current stable stage — publish the 1.4 installer
 
-#### Website integration
+- [x] Target the exact published `scriptella-1.4.zip` and its approved
+  SHA-256.
+- [x] Install into `${HOME}/.local/scriptella` while preserving the ZIP
+  layout exactly.
+- [x] Put only `${HOME}/.local/scriptella/bin` on `PATH`.
+- [x] Guarantee `scriptella.sh`; do not create external `scriptella` or
+  `scriptella.sh` symlinks.
+- [x] Treat a legacy installer PATH marker as insufficient unless the actual
+  `${HOME}/.local/scriptella/bin` stanza is present.
+- [x] Verify the exact published 1.4 ZIP with `scriptella.sh --version` and a
+  small ETL through the installed PATH layout.
+- [ ] Copy the reviewed installer to the website root and verify byte identity.
+- [ ] Add concise 1.4 documentation to the website and source README, keeping
+  manual ZIP and `java -jar` instructions available.
+- [ ] Verify the live installer over HTTPS and run the documented disposable
+  public smoke test before publication.
+- [ ] Resolve the 1.4 release-note mismatch: do not claim checksum/signature
+  sidecars that are absent from the public release.
 
-- [ ] Copy the reviewed canonical 1.4 `install.sh` to the website root so it
-  is served as `https://scriptella.org/install.sh`.
-- [ ] Verify the website copy is byte-for-byte identical to the approved source
-  installer for 1.4.
-- [ ] Add a prominent copyable curl command to `download.html`, labeled as a
-  new or experimental alternative installation method.
-- [ ] Document `scriptella` and `scriptella.sh`, the default install directory,
-  the PATH/symlink behavior, the Java 17 runtime requirement, and how to reload
-  the shell when necessary.
-- [ ] Keep the existing ZIP download table and manual `java -jar` instructions
-  available as alternatives.
-- [ ] Update the source README installation section consistently without
-  implying that Java is installed by the installer.
+The earlier external-symlink failure is resolved by simplifying the installer,
+not by modifying the immutable 1.4 ZIP or its packaged launcher.
 
-#### Checksum and release-process alignment
+### Future stage — revisit after 1.5
 
-- [ ] Resolve the 1.4 publication mismatch: its release notes claim `.sha256`
-  and signature sidecars, while the public GitHub Release exposes only the
-  published ZIP files.
-- [ ] Update the release runbook so every future binary ZIP has an approved
-  SHA-256 value before the corresponding installer is tagged.
-- [ ] Add release checklist items to update the installer version, tag, URL,
-  filename, Java baseline when changed, embedded checksum, and smoke evidence.
-- [ ] Test the canonical 1.4 installer against the exact published 1.4 ZIP
-  before copying it to the website.
+The richer installer implementation and its associated tests are preserved on
+local branch `installer-1.5` at commit
+`9ffc156cadb98a3cfbe234054e3d0181f0da56b8`. After 1.5 is released:
 
-#### Public smoke validation
+- [ ] Revisit that implementation against the actual 1.5 distribution.
+- [ ] Confirm the packaged 1.5 launcher supports its richer command exposure.
+- [ ] Test the exact staged and public 1.5 ZIP before replacing the public
+  installer or website copy.
 
-- [ ] Verify `https://scriptella.org/install.sh` is served as the expected
-  shell source over HTTPS with no HTML fallback or redirect surprise.
-- [ ] Run the documented curl command in a disposable home directory on at
-  least Linux and macOS environments representative of supported Unix-like
-  users.
-- [ ] Verify both `scriptella --version` and `scriptella.sh --version` through
-  the selected PATH directory.
-- [ ] Execute a small ETL file through the installed launcher.
-- [ ] Re-run the public installer and confirm idempotent installation, links,
-  and startup-file behavior.
-- [ ] Simulate or verify actionable behavior when Java is missing without
-  treating extraction as failed.
-- [ ] Confirm the manual ZIP installation path still works and remains visible
-  on the website.
+Do not over-specify the 1.5 design until the actual 1.5 archive is available.
 
-#### Phase 2A completion gate
+The intended lifecycle is:
 
-- [ ] Record sanitized 1.4 smoke-test evidence.
-- [ ] Confirm the live installer, website documentation, and published 1.4
-  release asset identify the same stable version.
-
-### Phase 2B — Cut over to 1.5 during release preparation
-
-- [ ] Update `install.sh` from 1.4 to 1.5, including the release version, tag,
-  archive URL, filename, Java baseline if changed, and embedded checksum.
-- [ ] Test the 1.5 installer against the exact staged 1.5 ZIP before release
-  publication.
-- [ ] Create and tag the 1.5 release, then verify its public ZIP is reachable
-  and matches the staged artifact and approved checksum.
-- [ ] Keep the website on the working 1.4 installer until the 1.5 archive is
-  public and independently downloadable.
-- [ ] Copy the tested 1.5 installer to the website and verify byte-for-byte
-  identity with the canonical source.
-- [ ] Run the final public curl smoke test, including both launcher names and
-  a small ETL execution.
-- [ ] Verify that the live installer, website documentation, GitHub release
-  asset, release tag, and embedded checksum all identify the same stable
-  version.
-
-#### Phase 2B completion gate
-
-- [ ] Confirm all issue acceptance criteria match the final Java and command
-  alias decisions.
-- [ ] Record sanitized 1.5 smoke-test evidence and close issue #54 only after
-  the live one-command flow and both launcher names succeed.
+```text
+1.4: simple PATH-based installer
+  -> 1.5 released
+  -> revisit installer-1.5
+  -> test against the actual 1.5 ZIP
+  -> replace the public installer
+```
 
 ## Non-goals retained
 

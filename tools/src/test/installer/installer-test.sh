@@ -48,7 +48,7 @@ downloader=$script_dir/test-downloader.sh
 [ -x "$installer" ] || fail "installer is not executable"
 [ -x "$downloader" ] || fail "test downloader is not executable"
 
-for command_name in mktemp mkdir rm cp chmod ln zip unzip grep awk sed perl; do
+for command_name in mktemp mkdir rm cp chmod zip unzip grep awk sed perl; do
     command -v "$command_name" >/dev/null 2>&1 || fail "missing test command: $command_name"
 done
 
@@ -182,41 +182,56 @@ assert_file "$home_one/.local/scriptella/scriptella.jar"
 assert_file "$home_one/.local/scriptella/lib/provider.jar"
 assert_file "$home_one/.local/scriptella/bin/scriptella.sh"
 [ -x "$home_one/.local/scriptella/bin/scriptella.sh" ] || fail 'launcher lost executable mode'
-[ "$(readlink "$home_one/bin/scriptella")" = "$home_one/.local/scriptella/bin/scriptella.sh" ] || fail 'scriptella link target mismatch'
-[ "$(readlink "$home_one/bin/scriptella.sh")" = "$home_one/.local/scriptella/bin/scriptella.sh" ] || fail 'scriptella.sh link target mismatch'
+assert_not_exists "$home_one/bin/scriptella"
+assert_not_exists "$home_one/bin/scriptella.sh"
 assert_contains "$home_one/install.stderr" 'Java 17 or newer was not found'
-assert_contains "$home_one/install.stdout" 'Example: scriptella path/to/file.etl.xml'
+assert_contains "$home_one/install.stdout" 'Example: scriptella.sh path/to/file.etl.xml'
+assert_contains "$home_one/install.stdout" 'PATH updated in'
 
-SCRIPTELLA_EXECUTION_LOG=$home_one/execution.log "$home_one/bin/scriptella" sample.etl.xml
+SCRIPTELLA_EXECUTION_LOG=$home_one/execution.log \
+    PATH="$home_one/.local/scriptella/bin:$common_path" \
+    scriptella.sh sample.etl.xml
 assert_contains "$home_one/execution.log" 'sample.etl.xml'
 run_install "$home_one" "$home_one/bin:$common_path" "$valid_archive" "$archive_sha256" ''
-assert_not_exists "$home_one/.profile"
+assert_contains "$home_one/install.stdout" 'PATH stanza already present'
 
-home_preferred="$work_dir/preferred-path-home"
-mkdir -p "$home_preferred/project/bin" "$home_preferred/.local/bin"
-run_install "$home_preferred" "$home_preferred/project/bin:$home_preferred/.local/bin:$common_path" "$valid_archive" "$archive_sha256" ''
-[ "$(readlink "$home_preferred/.local/bin/scriptella")" = "$home_preferred/.local/scriptella/bin/scriptella.sh" ] \
-    || fail 'conventional PATH directory did not take precedence'
-assert_not_exists "$home_preferred/project/bin/scriptella"
+home_on_path="$work_dir/on-path-home"
+on_path_dir="$home_on_path/.local/scriptella/bin"
+mkdir -p "$on_path_dir"
+run_install "$home_on_path" "$on_path_dir:$common_path" "$valid_archive" "$archive_sha256" ''
+assert_contains "$home_on_path/install.stdout" 'PATH already contains'
+assert_not_exists "$home_on_path/.profile"
 
 home_two="$work_dir/fallback-home"
 run_install "$home_two" "$common_path" "$valid_archive" "$archive_sha256" ''
-assert_dir "$home_two/.local/bin"
 assert_file "$home_two/.profile"
-assert_contains "$home_two/.profile" '# Scriptella installer PATH'
-[ "$(grep -F -c '# Scriptella installer PATH' "$home_two/.profile")" -eq 1 ] || fail 'initial PATH stanza count mismatch'
+assert_contains "$home_two/.profile" '# Scriptella installer PATH (Scriptella bin; do not edit)'
+assert_contains "$home_two/.profile" '.local/scriptella/bin'
+[ "$(grep -F -c '# Scriptella installer PATH (Scriptella bin; do not edit)' "$home_two/.profile")" -eq 1 ] || fail 'initial PATH stanza count mismatch'
 run_install "$home_two" "$common_path" "$valid_archive" "$archive_sha256" ''
-[ "$(grep -F -c '# Scriptella installer PATH' "$home_two/.profile")" -eq 1 ] || fail 'PATH stanza was duplicated'
-[ "$(readlink "$home_two/.local/bin/scriptella")" = "$home_two/.local/scriptella/bin/scriptella.sh" ] || fail 'fallback link target mismatch'
+[ "$(grep -F -c '# Scriptella installer PATH (Scriptella bin; do not edit)' "$home_two/.profile")" -eq 1 ] || fail 'PATH stanza was duplicated'
+
+home_transition="$work_dir/legacy-path-home"
+mkdir -p "$home_transition"
+cat >"$home_transition/.profile" <<'EOF'
+# Scriptella installer PATH (do not edit)
+if [ -d "$HOME/.local/bin" ]; then
+    case ":${PATH-}:" in
+        *:"$HOME/.local/bin":*) ;;
+        *) PATH="$HOME/.local/bin:${PATH-}"; export PATH ;;
+    esac
+fi
+EOF
+run_install "$home_transition" "$common_path" "$valid_archive" "$archive_sha256" ''
+assert_contains "$home_transition/.profile" '# Scriptella installer PATH (Scriptella bin; do not edit)'
+assert_contains "$home_transition/.profile" '.local/scriptella/bin'
+[ "$(grep -F -c '# Scriptella installer PATH (Scriptella bin; do not edit)' "$home_transition/.profile")" -eq 1 ] \
+    || fail 'legacy PATH marker was mistaken for the new stanza'
+assert_contains "$home_transition/install.stdout" 'PATH updated in'
 
 home_three="$work_dir/collision-home"
-mkdir -p "$home_three/bin"
-printf 'unrelated\n' >"$home_three/bin/scriptella"
-ln -s "$work_dir/unrelated-target" "$home_three/bin/scriptella.sh"
+mkdir -p "$home_three/.profile"
 expect_install_failure "$home_three" "$home_three/bin:$common_path" "$valid_archive" "$archive_sha256" ''
-assert_contains "$home_three/bin/scriptella" 'unrelated'
-[ "$(readlink "$home_three/bin/scriptella.sh")" = "$work_dir/unrelated-target" ] \
-    || fail 'unrelated symlink was overwritten'
 assert_not_exists "$home_three/.local/scriptella"
 
 home_four="$work_dir/download-failure-home"
@@ -252,12 +267,11 @@ assert_not_exists "$home_symlink/.local/scriptella"
 assert_not_exists "$work_dir/symlink-outside/payload.txt"
 
 home_ten="$work_dir/preservation-home"
-mkdir -p "$home_ten/bin"
-run_install "$home_ten" "$home_ten/bin:$common_path" "$valid_archive" "$archive_sha256" ''
+preserved_path="$home_ten/.local/scriptella/bin"
+run_install "$home_ten" "$preserved_path:$common_path" "$valid_archive" "$archive_sha256" ''
 printf 'keep this installation\n' >"$home_ten/.local/scriptella/preservation-marker"
-expect_install_failure "$home_ten" "$home_ten/bin:$common_path" "$valid_archive" "0000000000000000000000000000000000000000000000000000000000000000" ''
+expect_install_failure "$home_ten" "$preserved_path:$common_path" "$valid_archive" "0000000000000000000000000000000000000000000000000000000000000000" ''
 assert_contains "$home_ten/.local/scriptella/preservation-marker" 'keep this installation'
-[ "$(readlink "$home_ten/bin/scriptella")" = "$home_ten/.local/scriptella/bin/scriptella.sh" ] || fail 'managed link was not preserved'
 mkdir "$home_ten/.profile"
 expect_install_failure "$home_ten" "$common_path" "$valid_archive" "$archive_sha256" ''
 assert_contains "$home_ten/.local/scriptella/preservation-marker" 'keep this installation'
@@ -273,22 +287,50 @@ assert_contains "$home_eleven/install.stderr" 'Java 8 was found'
 assert_dir "$home_eleven/.local/scriptella"
 
 home_bashrc="$work_dir/bashrc-home"
+mkdir -p "$home_bashrc"
+printf 'alias preserved=true\n' >"$home_bashrc/.bashrc"
 if ! run_install_with_shell_startup "$home_bashrc" "$common_path" "$valid_archive" "$archive_sha256" '' /bin/bash; then
     cat "$home_bashrc/install.stderr" >&2
     fail 'bash startup-file installation failed'
 fi
-assert_file "$home_bashrc/.bashrc"
-assert_contains "$home_bashrc/.bashrc" '# Scriptella installer PATH'
+assert_contains "$home_bashrc/.bashrc" 'alias preserved=true'
+assert_not_contains "$home_bashrc/.bashrc" '# Scriptella installer PATH'
 assert_not_exists "$home_bashrc/.bash_profile"
+assert_not_exists "$home_bashrc/.bash_login"
+assert_not_exists "$home_bashrc/.profile"
+assert_contains "$home_bashrc/install.stdout" 'PATH was not changed automatically.'
+assert_contains "$home_bashrc/install.stdout" 'export PATH="$HOME/.local/scriptella/bin:$PATH"'
+
+home_bash_profile="$work_dir/bash-profile-home"
+mkdir -p "$home_bash_profile"
+printf '# existing Bash login configuration\n' >"$home_bash_profile/.bash_profile"
+if ! run_install_with_shell_startup "$home_bash_profile" "$common_path" "$valid_archive" "$archive_sha256" '' /bin/bash; then
+    cat "$home_bash_profile/install.stderr" >&2
+    fail 'existing bash profile installation failed'
+fi
+assert_contains "$home_bash_profile/.bash_profile" '# existing Bash login configuration'
+assert_contains "$home_bash_profile/.bash_profile" '# Scriptella installer PATH (Scriptella bin; do not edit)'
 
 home_zshrc="$work_dir/zshrc-home"
+mkdir -p "$home_zshrc"
+printf '# existing zsh configuration\n' >"$home_zshrc/.zshrc"
 if ! run_install_with_shell_startup "$home_zshrc" "$common_path" "$valid_archive" "$archive_sha256" '' /bin/zsh; then
     cat "$home_zshrc/install.stderr" >&2
     fail 'zsh startup-file installation failed'
 fi
-assert_file "$home_zshrc/.zshrc"
-assert_contains "$home_zshrc/.zshrc" '# Scriptella installer PATH'
+assert_contains "$home_zshrc/.zshrc" '# existing zsh configuration'
+assert_contains "$home_zshrc/.zshrc" '# Scriptella installer PATH (Scriptella bin; do not edit)'
 assert_not_exists "$home_zshrc/.zprofile"
+
+home_zsh_manual="$work_dir/zsh-manual-home"
+if ! run_install_with_shell_startup "$home_zsh_manual" "$common_path" "$valid_archive" "$archive_sha256" '' /bin/zsh; then
+    cat "$home_zsh_manual/install.stderr" >&2
+    fail 'zsh manual PATH installation failed'
+fi
+assert_not_exists "$home_zsh_manual/.zshrc"
+assert_not_exists "$home_zsh_manual/.zprofile"
+assert_contains "$home_zsh_manual/install.stdout" 'PATH was not changed automatically.'
+assert_contains "$home_zsh_manual/install.stdout" 'export PATH="$HOME/.local/scriptella/bin:$PATH"'
 
 if [ "$#" -gt 1 ]; then
     fail 'expected zero or one real distribution archive argument'
@@ -306,7 +348,9 @@ if [ "$#" -eq 1 ]; then
     fi
     assert_file "$real_home/.local/scriptella/scriptella.jar"
     assert_file "$real_home/.local/scriptella/lib/rhino-engine.jar"
-    if ! "$real_home/.local/bin/scriptella" --version >"$real_home/version.out" 2>"$real_home/version.err"; then
+    if ! PATH="$real_home/.local/scriptella/bin:$common_path" \
+        "$real_home/.local/scriptella/bin/scriptella.sh" --version \
+        >"$real_home/version.out" 2>"$real_home/version.err"; then
         cat "$real_home/version.err" >&2
         fail 'installed real distribution launcher failed'
     fi
@@ -318,7 +362,8 @@ if [ "$#" -eq 1 ]; then
     <script connection-id="jexl">answer = 6 * 7;</script>
 </etl>
 EOF
-    if ! "$real_home/.local/bin/scriptella" "$real_home/simple.etl.xml" \
+    if ! PATH="$real_home/.local/scriptella/bin:$common_path" \
+        "$real_home/.local/scriptella/bin/scriptella.sh" "$real_home/simple.etl.xml" \
         >"$real_home/simple.out" 2>"$real_home/simple.err"; then
         cat "$real_home/simple.err" >&2
         fail 'installed real distribution failed to execute an ETL'

@@ -1,9 +1,9 @@
 #!/bin/sh
 # Scriptella 1.4 user-local installer.
 #
-# This file is intentionally self-contained: it is copied to the website and
-# streamed by the documented curl command. Test-only SCRIPTELLA_INSTALLER_*
-# overrides are documented below next to the values they replace.
+# This file is intentionally self-contained and is streamed by the documented
+# curl command. Test-only SCRIPTELLA_INSTALLER_* overrides are documented below
+# next to the values they replace.
 
 set -eu
 set -f
@@ -62,14 +62,10 @@ require_command unzip
 require_command mkdir
 require_command mv
 require_command rm
-require_command ln
-require_command chmod
 require_command grep
 require_command sed
 require_command awk
-require_command readlink
 require_command cp
-require_command rmdir
 
 if [ -n "$test_downloader" ]; then
     [ -x "$test_downloader" ] || fail "test downloader is not executable: $test_downloader"
@@ -104,7 +100,6 @@ work_dir=$(mktemp -d "$tmp_parent/scriptella-installer.XXXXXX") \
     || fail 'unable to create a temporary staging directory'
 backup_root=
 transaction_active=0
-created_link_dir=0
 startup_changed=0
 startup_had_file=0
 
@@ -118,15 +113,6 @@ cleanup() {
         if [ "$old_install" = 1 ] && path_exists "$backup_root/installation"; then
             mv "$backup_root/installation" "$install_dir" || cleanup_status=1
         fi
-        for link_name in scriptella.sh scriptella; do
-            link_path=$link_dir/$link_name
-            if path_exists "$link_path"; then
-                rm -f "$link_path" || cleanup_status=1
-            fi
-            if path_exists "$backup_root/$link_name"; then
-                mv "$backup_root/$link_name" "$link_path" || cleanup_status=1
-            fi
-        done
         if [ "$startup_changed" = 1 ]; then
             if [ "$startup_had_file" = 1 ]; then
                 rm -f "$startup_file" || cleanup_status=1
@@ -134,9 +120,6 @@ cleanup() {
             else
                 rm -f "$startup_file" || cleanup_status=1
             fi
-        fi
-        if [ "$created_link_dir" = 1 ]; then
-            rmdir "$link_dir" 2>/dev/null || true
         fi
         transaction_active=0
         set -e
@@ -240,85 +223,66 @@ grep -F 'lib/*.jar' "$launcher" >/dev/null \
 install_dir=$home/.local/scriptella
 install_parent=$home/.local
 launcher_target=$install_dir/bin/scriptella.sh
+path_dir=$install_dir/bin
 
-select_link_dir() {
-    for preferred_dir in "$home/.local/bin" "$home/bin"; do
-        case ":$installer_path:" in
-            *:"$preferred_dir":*)
-                if [ -d "$preferred_dir" ] && [ -w "$preferred_dir" ] \
-                    && [ ! -L "$preferred_dir" ]; then
-                    link_dir=$preferred_dir
-                    return
-                fi
-                ;;
-        esac
-    done
-
-    old_ifs=$IFS
-    IFS=:
-    for path_entry in $installer_path; do
-        [ -n "$path_entry" ] || continue
-        case "$path_entry" in
-            /*) ;;
-            *) continue ;;
-        esac
-        case "$path_entry" in
-            "$home"|"$home"/*) ;;
-            *) continue ;;
-        esac
-        [ "$path_entry" != "$home" ] || continue
-        [ -d "$path_entry" ] || continue
-        [ -w "$path_entry" ] || continue
-        [ -L "$path_entry" ] && continue
-        link_dir=$path_entry
-        IFS=$old_ifs
-        return
-    done
-    IFS=$old_ifs
-    link_dir=$home/.local/bin
-}
-select_link_dir
-
-if [ -e "$link_dir" ] || [ -L "$link_dir" ]; then
-    [ -d "$link_dir" ] || fail "selected PATH directory is not a directory: $link_dir"
-    [ -w "$link_dir" ] || fail "selected PATH directory is not writable: $link_dir"
-    [ -L "$link_dir" ] && fail "selected PATH directory must not be a symlink: $link_dir"
-else
-    case "$link_dir" in
-        "$home"/*) ;;
-        *) fail 'refusing to create a PATH directory outside HOME' ;;
-    esac
-fi
-
-for link_name in scriptella.sh scriptella; do
-    link_path=$link_dir/$link_name
-    if path_exists "$link_path"; then
-        [ -L "$link_path" ] || fail "refusing to overwrite existing $link_path"
-        existing_target=$(readlink "$link_path" 2>/dev/null || true)
-        [ "$existing_target" = "$launcher_target" ] \
-            || fail "refusing to overwrite unrelated symlink $link_path"
+path_contains_dir=0
+old_ifs=$IFS
+IFS=:
+for path_entry in $installer_path; do
+    if [ "$path_entry" = "$path_dir" ]; then
+        path_contains_dir=1
+        break
     fi
 done
+IFS=$old_ifs
 
 if [ -n "$startup_override" ]; then
     startup_file=$startup_override
 elif [ -n "${SHELL-}" ]; then
     case "$SHELL" in
-        */zsh) startup_file=$home/.zshrc ;;
-        */bash) startup_file=$home/.bashrc ;;
-        *) startup_file=$home/.profile ;;
+        */zsh)
+            if [ -e "$home/.zshrc" ] || [ -L "$home/.zshrc" ]; then
+                startup_file=$home/.zshrc
+            else
+                startup_file=
+            fi
+            ;;
+        */bash)
+            if [ -e "$home/.bash_profile" ] || [ -L "$home/.bash_profile" ]; then
+                startup_file=$home/.bash_profile
+            elif [ -e "$home/.bash_login" ] || [ -L "$home/.bash_login" ]; then
+                startup_file=$home/.bash_login
+            elif [ -e "$home/.profile" ] || [ -L "$home/.profile" ]; then
+                startup_file=$home/.profile
+            else
+                startup_file=
+            fi
+            ;;
+        *)
+            if [ -e "$home/.profile" ] || [ -L "$home/.profile" ]; then
+                startup_file=$home/.profile
+            else
+                startup_file=
+            fi
+            ;;
     esac
 else
-    startup_file=$home/.profile
+    if [ -e "$home/.profile" ] || [ -L "$home/.profile" ]; then
+        startup_file=$home/.profile
+    else
+        startup_file=
+    fi
 fi
 
-if [ "$link_dir" = "$home/.local/bin" ]; then
-    case ":$installer_path:" in
-        *:"$link_dir":*) add_path_stanza=0 ;;
-        *) add_path_stanza=1 ;;
-    esac
-else
-    add_path_stanza=0
+add_path_stanza=0
+startup_stanza_present=0
+manual_path_setup=0
+if [ "$path_contains_dir" = 0 ]; then
+    if [ -n "$startup_file" ]; then
+        add_path_stanza=1
+    else
+        manual_path_setup=1
+    fi
 fi
 
 old_install=0
@@ -330,7 +294,6 @@ umask 077
 mkdir -p "$install_parent"
 backup_root=$install_parent/.scriptella-installer-backup.$$
 mkdir "$backup_root" || fail 'unable to create installation rollback state'
-mkdir "$backup_root/links"
 transaction_active=1
 
 if [ "$old_install" = 1 ]; then
@@ -339,27 +302,13 @@ if [ "$old_install" = 1 ]; then
 fi
 mv "$dist_dir" "$install_dir" || fail 'unable to place the new installation'
 
-if [ ! -d "$link_dir" ]; then
-    mkdir -p "$link_dir" || fail 'unable to create the selected PATH directory'
-    created_link_dir=1
-fi
-
-for link_name in scriptella.sh scriptella; do
-    link_path=$link_dir/$link_name
-    if path_exists "$link_path"; then
-        mv "$link_path" "$backup_root/$link_name" \
-            || fail "unable to save existing managed link $link_path"
-    fi
-    ln -s "$launcher_target" "$link_path" \
-        || fail "unable to create managed link $link_path"
-done
-
 if [ "$add_path_stanza" = 1 ]; then
     if [ -e "$startup_file" ] || [ -L "$startup_file" ]; then
         [ -f "$startup_file" ] || fail "startup path is not a regular file: $startup_file"
         [ -w "$startup_file" ] || fail "startup file is not writable: $startup_file"
-        if grep -F '# Scriptella installer PATH' "$startup_file" >/dev/null 2>&1; then
+        if grep -F '.local/scriptella/bin' "$startup_file" >/dev/null 2>&1; then
             add_path_stanza=0
+            startup_stanza_present=1
         else
             cp "$startup_file" "$backup_root/startup" \
                 || fail 'unable to save the existing startup file'
@@ -369,11 +318,11 @@ if [ "$add_path_stanza" = 1 ]; then
     if [ "$add_path_stanza" = 1 ]; then
         startup_changed=1
         {
-            printf '\n# Scriptella installer PATH (do not edit)\n'
-            printf 'if [ -d "$HOME/.local/bin" ]; then\n'
+            printf '\n# Scriptella installer PATH (Scriptella bin; do not edit)\n'
+            printf 'if [ -d "$HOME/.local/scriptella/bin" ]; then\n'
             printf '    case ":${PATH-}:" in\n'
-            printf '        *:"$HOME/.local/bin":*) ;;\n'
-            printf '        *) PATH="$HOME/.local/bin:${PATH-}"; export PATH ;;\n'
+            printf '        *:"$HOME/.local/scriptella/bin":*) ;;\n'
+            printf '        *) PATH="$HOME/.local/scriptella/bin:${PATH-}"; export PATH ;;\n'
             printf '    esac\n'
             printf 'fi\n'
         } >>"$startup_file" || fail 'unable to update the startup file'
@@ -421,11 +370,20 @@ else
 fi
 
 echo "Scriptella $SCRIPTELLA_RELEASE_VERSION installed in $install_dir"
-echo "Commands: $link_dir/scriptella and $link_dir/scriptella.sh"
+echo "Command: $launcher_target"
 if [ -n "$java_notice" ]; then
     echo "Warning: $java_notice" >&2
 fi
-if [ "$add_path_stanza" = 1 ]; then
-    echo "A new shell or reload of $startup_file is needed before 'scriptella' is on PATH."
+if [ "$path_contains_dir" = 1 ]; then
+    echo "PATH already contains $path_dir"
+elif [ "$startup_changed" = 1 ]; then
+    echo "PATH updated in $startup_file; start a new shell or reload that file before using scriptella.sh."
+elif [ "$startup_stanza_present" = 1 ]; then
+    echo "PATH stanza already present in $startup_file; start a new shell or reload that file before using scriptella.sh."
+elif [ "$manual_path_setup" = 1 ]; then
+    echo 'PATH was not changed automatically.'
+    echo 'Add this line to an appropriate shell startup file: export PATH="$HOME/.local/scriptella/bin:$PATH"'
+else
+    echo "Add $path_dir to PATH before using scriptella.sh."
 fi
-echo "Example: scriptella path/to/file.etl.xml"
+echo "Example: scriptella.sh path/to/file.etl.xml"

@@ -59,6 +59,7 @@ The private release plan must resolve and record these placeholders:
 | `<release-date>` | Actual publication date |
 | `<source-commit>` | Reviewed source baseline before release preparation |
 | `<website-commit>` | Reviewed final website change |
+| `<binary-zip-sha256>` | Approved SHA-256 for the exact binary ZIP used by the installer |
 | `<signing-key-fingerprint>` | Full approved OpenPGP fingerprint |
 | `<central-deployment-id>` | Deployment returned by Central after upload |
 
@@ -187,6 +188,19 @@ private plan:
 * unpacked examples; and
 * an isolated Maven consumer resolving the candidate release version.
 
+For a release that is actually changing the user-local installer, create a
+dedicated release-candidate staging area from the exact release-version
+content; do not use artifacts from
+the disposable validation worktree as final assets. Freeze the candidate
+binary ZIP there, record its SHA-256, verify its integrity, and update the
+canonical `install.sh` with the release version, tag, archive URL, filename,
+Java baseline, and checksum before tagging. The frozen candidate is the
+approved installer asset. Do not assume that a separately rebuilt post-tag
+ZIP will be byte-for-byte identical: validate any such rebuild by comparing
+normalized archive contents, file modes, launcher/version data, and extracted
+file checksums. If the rebuilt asset is to be published instead, stop, update
+the installer hash before tagging, and repeat the gate.
+
 Verify every ZIP with an archive-integrity tool and every JAR as a readable ZIP
 archive. Record hashes for evidence, but do not reuse artifacts from this
 disposable validation as final release assets.
@@ -213,6 +227,16 @@ Require an unambiguous **GO** naming the source commit, website commit, tag,
 and signing fingerprint. Anything else is **NO-GO**.
 
 ## 5. Prepare and inspect release history
+
+Before creating the release tag, review the installer fields and frozen binary
+ZIP hash as part of the release diff. The tag must contain the installer that
+was tested against that exact candidate archive. The 1.4 installer exposes
+only the packaged `bin/scriptella.sh` through the installation's own `bin`
+directory; future releases must be checked against their actual launcher
+before changing that contract. During the 1.5 transition, leave the 1.4
+installer unchanged through release preparation and publication. Revisit the
+preserved 1.5 implementation only after the public 1.5 ZIP exists, as a
+separate post-release installer publication.
 
 Run Maven Release Plugin with remote pushing disabled and every version/tag
 choice supplied explicitly:
@@ -254,7 +278,10 @@ local next-development commit IDs.
 
 Create fresh detached worktrees and asset directories from the pushed tag.
 Build the final Maven and Ant outputs there. Copy only the approved primary
-assets into a dedicated staging directory.
+assets into a dedicated staging directory. For an installer release, verify
+the staged binary ZIP against the frozen pre-tag candidate rather than
+silently substituting a separately rebuilt archive. Any independent rebuild
+is validation evidence unless the pre-tag installer/checksum gate is repeated.
 
 For every primary GitHub asset:
 
