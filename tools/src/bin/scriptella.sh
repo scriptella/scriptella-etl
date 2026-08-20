@@ -16,7 +16,22 @@
 # Scriptella launcher script for Unix-like systems.
 
 if [ -z "$SCRIPTELLA_HOME" ]; then
-    SCRIPTELLA_HOME=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+    _SCRIPTELLA_LAUNCHER=$0
+    _SCRIPTELLA_SYMLINK_DEPTH=0
+    while [ -L "$_SCRIPTELLA_LAUNCHER" ]; do
+        if [ "$_SCRIPTELLA_SYMLINK_DEPTH" -ge 40 ]; then
+            echo "Scriptella launcher: too many symbolic links while resolving $0" >&2
+            exit 1
+        fi
+        _SCRIPTELLA_SYMLINK_DEPTH=$((_SCRIPTELLA_SYMLINK_DEPTH + 1))
+        _SCRIPTELLA_LAUNCHER_DIR=$(CDPATH= cd -- "$(dirname -- "$_SCRIPTELLA_LAUNCHER")" && pwd)
+        _SCRIPTELLA_LAUNCHER_TARGET=$(readlink "$_SCRIPTELLA_LAUNCHER")
+        case "$_SCRIPTELLA_LAUNCHER_TARGET" in
+            /*) _SCRIPTELLA_LAUNCHER=$_SCRIPTELLA_LAUNCHER_TARGET ;;
+            *) _SCRIPTELLA_LAUNCHER=$_SCRIPTELLA_LAUNCHER_DIR/$_SCRIPTELLA_LAUNCHER_TARGET ;;
+        esac
+    done
+    SCRIPTELLA_HOME=$(CDPATH= cd -- "$(dirname -- "$_SCRIPTELLA_LAUNCHER")/.." && pwd)
 fi
 
 if [ -z "$SCRIPTELLA_JAVA_OPTS" ]; then

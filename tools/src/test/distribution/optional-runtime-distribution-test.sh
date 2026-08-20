@@ -130,6 +130,17 @@ assert_contains "$dist_dir/bin/scriptella.sh" 'lib/*.jar'
 assert_contains "$dist_dir/bin/scriptella.bat" '\lib'
 assert_contains "$dist_dir/bin/scriptella.bat" '%*'
 
+mkdir "$work_dir/launcher-cycle"
+ln -s launcher-b "$work_dir/launcher-cycle/launcher-a"
+ln -s launcher-a "$work_dir/launcher-cycle/launcher-b"
+if perl -e 'alarm shift; exec @ARGV' 5 sh -c '. "$1"' \
+        "$work_dir/launcher-cycle/launcher-a" "$dist_dir/bin/scriptella.sh" \
+        >"$work_dir/launcher-cycle.out" 2>"$work_dir/launcher-cycle.err"; then
+    fail "launcher symlink cycle unexpectedly succeeded"
+fi
+assert_contains "$work_dir/launcher-cycle.err" \
+    'Scriptella launcher: too many symbolic links'
+
 cat >"$work_dir/jexl.etl.xml" <<'EOF'
 <!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
 <etl>
@@ -238,3 +249,6 @@ if grep -F 'org.mozilla:' "$work_dir/unknown-language.out" >/dev/null; then
 fi
 
 echo "Optional runtime distribution contract passed."
+installer_test=$(CDPATH= cd -- "$(dirname "$0")/../installer" && pwd)/installer-test.sh
+sh "$installer_test" "$binary_zip" \
+    || fail "installer integration test failed"
