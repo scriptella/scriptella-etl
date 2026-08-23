@@ -1,9 +1,22 @@
 # Scriptella
 
-Scriptella is an open-source, Java-based ETL (Extract-Transform-Load) tool for
-moving and transforming data between databases, files, and other systems. Use
-SQL or another language suited to each data source, while a small XML file
-orchestrates the workflow instead of a proprietary transformation language.
+[![GitHub stars](https://img.shields.io/github/stars/scriptella/scriptella-etl?style=flat&logo=github)](https://github.com/scriptella/scriptella-etl/stargazers)
+[![CI](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/org.scriptella/scriptella-core?logo=apachemaven)](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
+[![GitHub release](https://img.shields.io/github/v/release/scriptella/scriptella-etl?logo=github)](https://github.com/scriptella/scriptella-etl/releases/latest)
+
+Scriptella is a lightweight, XML-driven ETL and database migration tool for
+Java. Use SQL and scripting languages directly to move and transform data
+without a proprietary transformation language or graphical designer.
+
+## Why Scriptella?
+
+* **SQL-first:** Work in the language best suited to each data source instead
+  of learning a proprietary transformation language.
+* **Lightweight:** Run jobs from a single configuration file without a server
+  or graphical designer.
+* **Automation-friendly:** Keep migrations and data jobs in version control and
+  run them locally, in build pipelines, or on a schedule.
 
 ## Project status
 
