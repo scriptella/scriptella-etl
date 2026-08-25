@@ -11,3 +11,6 @@ samples/lib/
 *.log
 /custom.build.properties
 .vscode
+/drivers/drivers.iml
+/core/core.iml
+/tools/tools.iml
