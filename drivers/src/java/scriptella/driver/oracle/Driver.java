@@ -30,7 +30,7 @@ import java.util.Properties;
  * @version 1.0
  */
 public class Driver extends GenericDriver {
-    public static final String ORACLE_DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
+    public static final String ORACLE_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 
     public Driver() {
         loadDrivers(ORACLE_DRIVER_NAME);

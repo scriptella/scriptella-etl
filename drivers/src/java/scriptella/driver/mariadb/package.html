@@ -1,0 +1,29 @@
+<body>
+MariaDB Connector/J adapter for Scriptella. Use the <code>mariadb</code> alias with canonical
+<code>jdbc:mariadb:</code> URLs.
+<p>See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
+<p>See the <a href="https://github.com/scriptella/scriptella-etl/blob/master/docs/supported-databases.md">database driver compatibility matrix</a> for the current validation target and status.</p>
+<h2>General information</h2>
+<table>
+    <tr>
+        <td><b>Driver class:</b></td><td><code>scriptella.driver.mariadb.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>JDBC driver class:</b></td><td><code>org.mariadb.jdbc.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>jdbc:mariadb://host:3306/database</code></td>
+    </tr>
+    <tr>
+        <td><b>Runtime dependencies:</b></td>
+        <td><a href="https://mariadb.com/docs/connectors/mariadb-connector-j/">MariaDB Connector/J</a>
+            (<code>mariadb-java-client-VERSION.jar</code>), supplied through the connection <code>classpath</code>.</td>
+    </tr>
+</table>
+<h2>Examples</h2>
+<code><pre>
+    &lt;connection driver="mariadb" url="jdbc:mariadb://localhost:3306/test"
+                user="username" password="password" classpath="mariadb-java-client.jar"&gt;
+    &lt;/connection&gt;
+</pre></code>
+</body>

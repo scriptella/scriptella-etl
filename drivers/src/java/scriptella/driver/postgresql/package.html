@@ -1,17 +1,22 @@
 <body>
-PostgreSQL Driver Adapter for Scriptella.
+PostgreSQL pgJDBC adapter for Scriptella.
 <p>See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
+<p>See the <a href="https://github.com/scriptella/scriptella-etl/blob/master/docs/supported-databases.md">database driver compatibility matrix</a> for the current validation target and status.</p>
 <h2>General information</h2>
 <table>
     <tr>
         <td><b>Driver class:</b></td><td><code>scriptella.driver.postgresql.Driver</code></td>
     </tr>
     <tr>
-        <td><b>URL:</b></td><td><code>Same as for PostgreSQL JDBC Driver.</code></td>
+        <td><b>JDBC driver class:</b></td><td><code>org.postgresql.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>jdbc:postgresql://host:5432/database</code></td>
     </tr>
     <tr>
         <td><b>Runtime dependencies:</b></td>
-        <td><code><a href="http://jdbc.postgresql.org/download.html">postgresql-8x.jdbc3.jar</a></code></td>
+        <td><a href="https://jdbc.postgresql.org/download/">pgJDBC</a>
+            (<code>postgresql-VERSION.jar</code>), supplied through the connection <code>classpath</code>.</td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>

@@ -33,8 +33,8 @@ This driver is used by default if no "driver" connection attribute was specified
 </table>
 <h2>Example</h2>
 <code><pre>
-    &lt;!-- connection to a SQL Server database via JTDS driver-->
-    &lt;connection driver="auto" url="jdbc:jtds:sqlserver://localhost:1433/northwind"/&gt;
+    &lt;!-- connection to a SQL Server database via the Microsoft JDBC driver -->
+    &lt;connection driver="auto" url="jdbc:sqlserver://localhost:1433;databaseName=northwind"/&gt;
 
     &lt;!-- connection to a JNDI bound datasource -->
     &lt;connection url="jndi:ds/appDataSource"/&gt;

@@ -20,24 +20,24 @@ import scriptella.jdbc.GenericDriver;
 /**
  * Scriptella Adapter for Microsoft SQL Server database JDBC driver.
  *
- * This driver looks in classpath for the following drivers(in search order) :
- * <ul>
- * <li>Microsoft JDBC Driver for MS SQL Server 2005 - <code>com.microsoft.sqlserver.jdbc.SQLServerDriver</code></li>
- * <li>Microsoft JDBC Driver for MS SQL Server 2000 - <code>com.microsoft.jdbc.sqlserver.SQLServerDriver</code></li>
- * <li>jTDS JDBC Driver for Microsoft SQL Server - <code>net.sourceforge.jtds.jdbc.Driver</code></li>
- * </ul>
+ * Uses the current Microsoft JDBC Driver for SQL Server,
+ * <code>com.microsoft.sqlserver.jdbc.SQLServerDriver</code>.
  * <p>For configuration details and examples see <a href="package-summary.html">overview page</a>.
  *
  * @author Kirill Volgin
  * @version 1.0
  */
 public class Driver extends GenericDriver {
-    public static final String MSSQL_2005_DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String MSSQL_2000_DRIVER_NAME = "com.microsoft.jdbc.sqlserver.SQLServerDriver";
-    public static final String MSSQL_TDS_DRIVER_NAME = "net.sourceforge.jtds.jdbc.Driver";
+    public static final String MSSQL_DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    /**
+     * @deprecated Use {@link #MSSQL_DRIVER_NAME}. The Microsoft driver class
+     *             represented by this constant remains current.
+     */
+    @Deprecated
+    public static final String MSSQL_2005_DRIVER_NAME = MSSQL_DRIVER_NAME;
 
     public Driver() {
-        loadDrivers(MSSQL_2005_DRIVER_NAME, MSSQL_2000_DRIVER_NAME, MSSQL_TDS_DRIVER_NAME);
+        loadDrivers(MSSQL_DRIVER_NAME);
     }
 
 }

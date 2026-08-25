@@ -25,7 +25,7 @@ import scriptella.jdbc.GenericDriver;
  * @version 1.0
  */
 public class Driver extends GenericDriver {
-    public static final String MYSQL_DRIVER_NAME = "com.mysql.jdbc.Driver";
+    public static final String MYSQL_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
 
 
     public Driver() {

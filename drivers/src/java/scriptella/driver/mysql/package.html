@@ -1,17 +1,22 @@
 <body>
-MySQL Driver(Connector/J) adapter for Scriptella. 
+MySQL Connector/J adapter for Scriptella.
 <p>See <a href="../../jdbc/package-summary.html#package_description">Overview of JDBC package</a> for a description of common features and connection properties.</p>
+<p>See the <a href="https://github.com/scriptella/scriptella-etl/blob/master/docs/supported-databases.md">database driver compatibility matrix</a> for the current validation target and status.</p>
 <h2>General information</h2>
 <table>
     <tr>
         <td><b>Driver class:</b></td><td><code>scriptella.driver.mysql.Driver</code></td>
     </tr>
     <tr>
-        <td><b>URL:</b></td><td><code>Same as for MySQL JDBC Driver.</code></td>
+        <td><b>JDBC driver class:</b></td><td><code>com.mysql.cj.jdbc.Driver</code></td>
+    </tr>
+    <tr>
+        <td><b>URL:</b></td><td><code>jdbc:mysql://host:3306/database</code></td>
     </tr>
     <tr>
         <td><b>Runtime dependencies:</b></td>
-        <td><code><a href="http://www.mysql.com/products/connector/j/">mysql-connector-java.jar</a></code></td>
+        <td><a href="https://dev.mysql.com/downloads/connector/j/">MySQL Connector/J</a>
+            (<code>mysql-connector-j-VERSION.jar</code>), supplied through the connection <code>classpath</code>.</td>
     </tr>
 </table>
 <h2>Driver Specific Properties</h2>
