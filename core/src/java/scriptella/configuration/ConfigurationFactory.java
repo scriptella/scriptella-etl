@@ -43,9 +43,10 @@ import java.util.logging.Logger;
  */
 public class ConfigurationFactory {
     private static final Logger LOG = Logger.getLogger(ConfigurationFactory.class.getName());
-    private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
     private static final String DTD_NAME = "etl.dtd";
+    private static final String DOCTYPE_DECLARATION = "<!DOCTYPE";
     private static final String RES_PATH = "/scriptella/dtd/" + DTD_NAME;
+    private static volatile boolean validating;
     private URL resourceURL;
     private ParametersCallback externalParameters;
 
@@ -60,7 +61,7 @@ public class ConfigurationFactory {
      * @param validating true if XML file validation should be performed.
      */
     public static void setValidating(boolean validating) {
-        DBF.setValidating(validating);
+        ConfigurationFactory.validating = validating;
     }
 
     public ConfigurationFactory() {
@@ -108,12 +109,7 @@ public class ConfigurationFactory {
             throw new ConfigurationException("Configuration URL is required");
         }
         try {
-            DocumentBuilder db = DBF.newDocumentBuilder();
-            db.setEntityResolver(ETL_ENTITY_RESOLVER);
-            db.setErrorHandler(ETL_ERROR_HANDLER);
-
-            final InputSource inputSource = new InputSource(resourceURL.toString());
-            final Document document = db.parse(inputSource);
+            final Document document = parse(validationRequired());
             HierarchicalParametersCallback params = new HierarchicalParametersCallback(
                     externalParameters == null ? NullParametersCallback.INSTANCE : externalParameters, null);
             PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
@@ -124,6 +120,58 @@ public class ConfigurationFactory {
             throw new ConfigurationException("Unable to load document: " + e, e);
         } catch (Exception e) {
             throw new ConfigurationException("Unable to parse document: " + e, e);
+        }
+    }
+
+    private Document parse(final boolean validating) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(validating);
+
+        DocumentBuilder db = factory.newDocumentBuilder();
+        db.setEntityResolver(ETL_ENTITY_RESOLVER);
+        db.setErrorHandler(ETL_ERROR_HANDLER);
+
+        return db.parse(new InputSource(resourceURL.toString()));
+    }
+
+    /**
+     * Returns whether validation should be enabled for this document.
+     * Only ordinary local files are probed; other URL types retain the historical behavior.
+     */
+    private boolean validationRequired() throws IOException {
+        if (!validating || !"file".equals(resourceURL.getProtocol())) {
+            return validating;
+        }
+
+        return !isDefinitelyWithoutDoctype();
+    }
+
+    /**
+     * Performs a lightweight DOCTYPE probe without parsing the document.
+     * Returns false when the encoding is uncertain so validation remains enabled.
+     */
+    private boolean isDefinitelyWithoutDoctype() throws IOException {
+        byte[] buffer = new byte[1024];
+        int doctypeMatched = 0;
+
+        try (InputStream stream = resourceURL.openStream()) {
+            for (int length; (length = stream.read(buffer)) >= 0;) {
+                for (int i = 0; i < length; i++) {
+                    // NUL bytes indicate a multibyte encoding such as UTF-16/UTF-32.
+                    if (buffer[i] == 0) {
+                        return false;
+                    }
+                    char c = (char) (buffer[i] & 0xff);
+                    if (c == DOCTYPE_DECLARATION.charAt(doctypeMatched)) {
+                        if (++doctypeMatched == DOCTYPE_DECLARATION.length()) {
+                            return false;
+                        }
+                    } else {
+                        doctypeMatched = c == DOCTYPE_DECLARATION.charAt(0) ? 1 : 0;
+                    }
+                }
+            }
+            return true;
         }
     }
 
