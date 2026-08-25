@@ -43,7 +43,7 @@ timestamps, progress messages, exception text, or execution statistics as a
 machine protocol.
 
 Supported launcher options are `-h`/`--help`, `-d`/`--debug`, `-q`/`--quiet`,
-`-v`/`--version`, `--no-stat`, `--no-jmx`, and `-t`/`--template`. Put JVM options,
+`-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, and `-t`/`--template`. Put JVM options,
 including `-D` properties, before `-jar`; put launcher options after the JAR:
 
 ```sh
@@ -59,15 +59,15 @@ compatibility. Prefer the canonical double-dash options above in new scripts.
 
 | Code | Meaning |
 |---:|---|
-| `0` | All selected ETL files succeeded, or help/version/template generation succeeded. |
-| `1` | At least one ETL execution failed, or template generation failed. |
+| `0` | All selected ETL files executed successfully, all `--check` files passed, or help/version/template generation succeeded. |
+| `1` | At least one ETL execution or `--check` failed, or template generation failed. |
 | `2` | An ETL input file could not be resolved. No ETL files are executed if resolution of any command-line file fails. |
 | `3` | An unrecognized launcher option was supplied. |
 
-When several ETL files resolve successfully, the launcher executes them in
-argument order. A runtime failure does not stop later files; the final status is
-`1` if any file failed. Scriptella attempts transaction rollback after an
-execution failure, but rollback is not guaranteed for non-transactional
+When several ETL files resolve successfully, the launcher processes them in
+argument order. A runtime or checking failure does not stop later files; the
+final status is `1` if any file failed. Scriptella attempts transaction rollback
+after an execution failure, but rollback is not guaranteed for non-transactional
 connections, autocommit connections, files, or external processes.
 
 Unrecognized options print `Unrecognized option <option>` to stderr, return
@@ -97,10 +97,35 @@ Connection URLs, connection `classpath` entries, and `<include href="...">`
 resources are resolved relative to the directory containing the ETL file.
 Prefer absolute paths for generated or environment-specific runtime values.
 
-## 5. Validate before execution
+## 5. Experimental static checking
 
-Scriptella has no validation-only or dry-run launcher option. Perform strict
-XML/DTD validation without executing the ETL:
+Use `--check` when a developer or coding agent needs to load an ETL file without
+executing it:
+
+```sh
+scriptella.sh --check my-job.etl.xml
+```
+
+The checker reuses Scriptella's normal `ConfigurationFactory` and configuration
+model, including XML/DTD validation and model-level connection-reference
+validation. It also checks that configured driver names resolve to a compatible
+JDBC or Scriptella driver class. It does not create a `Session`, initialize a
+driver, open a configured Scriptella/JDBC connection, or execute scripts or
+queries. Configuration parsing may still read external resources referenced by
+the ETL, such as included properties or XML resources, and it does not validate
+runtime SQL or external-system behavior.
+
+Do not treat `--check` as a sandbox for untrusted ETL files.
+
+Exit status `0` means that Scriptella loaded the configuration and the
+implemented static checks passed. A nonzero status means loading or checking
+failed. Passing `--check` does not guarantee that the ETL will execute
+successfully or safely against real systems.
+
+## 6. Validate before execution
+
+For strict XML/DTD validation independent of the model checker, use the
+following helper without executing the ETL:
 
 ```sh
 docs/agent-templates/validate-etl.sh "$SCRIPTELLA_JAR" "$ETL_FILE"
@@ -115,7 +140,7 @@ JDBC drivers, expand every runtime property, read every include, parse SQL, or
 predict side effects. There is no general safe command that performs those
 checks: a normal Scriptella run may initialize connections and execute work.
 
-## 6. External properties
+## 7. External properties
 
 The CLI exposes JVM system properties to ETL files. Pass non-secret values with
 `-Dname=value` before `-jar` and reference them as `${name}`:
@@ -150,7 +175,7 @@ mode `0600`), keep it outside the repository, and delete it through the
 credential provider's normal lifecycle. Do not put secret values in ETL XML,
 shell history, process arguments, logs, issue reports, or generated SQL.
 
-## 7. Output contract
+## 8. Output contract
 
 Launcher help and version output go to stdout. Launcher progress, statistics,
 warnings, and failures use Java logging and normally go to stderr. Missing-file
@@ -170,7 +195,7 @@ java -jar "$SCRIPTELLA_JAR" --quiet --no-jmx "$ETL_FILE" \
 rc=$?
 ```
 
-## 8. Copyable templates
+## 9. Copyable templates
 
 Templates are in [`docs/agent-templates/`](agent-templates/):
 
@@ -215,7 +240,8 @@ java -Dsource.file=/data/input.txt -Dtarget.file=/data/output.txt \
 
 ## Open issues / non-guarantees
 
-- There is no first-class `--validate` or `--dry-run` launcher mode.
+- `--check` is experimental and intentionally performs only lightweight static
+  checks; it is not a general-purpose ETL linter or dry run.
 - Launcher logs are human-readable and have no stable JSON or event schema.
 - Success output is not intrinsically isolated from driver or child-process
   output.

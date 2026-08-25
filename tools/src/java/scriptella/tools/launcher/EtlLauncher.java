@@ -16,7 +16,10 @@
 package scriptella.tools.launcher;
 
 import scriptella.configuration.ConfigurationEl;
+import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConfigurationFactory;
+import scriptella.configuration.ConnectionEl;
+import scriptella.core.DriverFactory;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
@@ -34,6 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,6 +161,7 @@ public class EtlLauncher {
         List<File> files = new ArrayList<File>();
         ConsoleProgressIndicator indicator = new ConsoleProgressIndicator("Execution Progress");
         boolean defaultFile = false;
+        boolean checkOnly = false;
 
         try {
             List<String> arguments = new ArrayList<String>(Arrays.asList(args));
@@ -187,6 +193,10 @@ public class EtlLauncher {
                 }
                 if (isNoJmxOption(arg)) {
                     setNoJmx(true);
+                    continue;
+                }
+                if (isCheckOption(arg)) {
+                    checkOnly = true;
                     continue;
                 }
                 if (arg.startsWith("-")) {
@@ -221,18 +231,30 @@ public class EtlLauncher {
         }
         for (File file : files) {
             try {
-                execute(file);
+                if (checkOnly) {
+                    check(file);
+                    getOut().println("CHECK OK " + file);
+                } else {
+                    execute(file);
+                }
             } catch (Exception e) {
                 failed = true;
-                LOG.log(Level.SEVERE,
-                        "Script " + file + " execution failed.", e);
-                if (BugReport.isPossibleBug(e)) {
-                    LOG.log(Level.SEVERE, new BugReport(e).toString());
-                } else if (h.getLevel().intValue() < Level.INFO.intValue()) {
-                    //Print stack trace of exception in debug mode
-                    getErr().println("---------------Debug Stack Trace-----------------");
-                    Throwable t = e.getCause() == null ? e : e.getCause();
-                    t.printStackTrace(getErr());
+                if (checkOnly) {
+                    getErr().println("CHECK FAILED " + file + ": " + failureMessage(e));
+                    if (h.getLevel().intValue() < Level.INFO.intValue()) {
+                        e.printStackTrace(getErr());
+                    }
+                } else {
+                    LOG.log(Level.SEVERE,
+                            "Script " + file + " execution failed.", e);
+                    if (BugReport.isPossibleBug(e)) {
+                        LOG.log(Level.SEVERE, new BugReport(e).toString());
+                    } else if (h.getLevel().intValue() < Level.INFO.intValue()) {
+                        //Print stack trace of exception in debug mode
+                        getErr().println("---------------Debug Stack Trace-----------------");
+                        Throwable t = e.getCause() == null ? e : e.getCause();
+                        t.printStackTrace(getErr());
+                    }
                 }
             }
         }
@@ -269,6 +291,10 @@ public class EtlLauncher {
         return "--no-jmx".equals(arg) || "-nojmx".equals(arg);
     }
 
+    private static boolean isCheckOption(String arg) {
+        return "--check".equals(arg);
+    }
+
     protected void printVersion() {
         String v = AbstractScriptellaDriver.getScriptellaVersion();
         String p = AbstractScriptellaDriver.getScriptellaTitle();
@@ -301,6 +327,7 @@ public class EtlLauncher {
         out.println("  -v, --version          Show version information");
         out.println("  -d, --debug            Enable debug logging");
         out.println("  -q, --quiet            Suppress informational output");
+        out.println("      --check            Load and statically check ETL without executing it");
         out.println("      --no-stat          Disable execution statistics");
         out.println("      --no-jmx           Disable JMX registration");
         out.println("  -t, --template [name]  Create an ETL template in the current directory");
@@ -359,6 +386,56 @@ public class EtlLauncher {
             }
             LOG.info("Successfully executed ETL file " + file);
         }
+    }
+
+    /**
+     * Loads and checks an ETL configuration without creating an executor
+     * session or connecting any configured driver.
+     */
+    public void check(final File file) {
+        try {
+            factory.setResourceURL(IOUtils.toUrl(file));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Wrong file path " + file.getPath(), e);
+        }
+
+        factory.setExternalParameters(properties);
+        ConfigurationEl configuration = factory.createConfiguration();
+        for (ConnectionEl connection : configuration.getConnections()) {
+            checkDriver(connection, configuration.getDocumentUrl());
+        }
+    }
+
+    private void checkDriver(ConnectionEl connection, URL documentUrl) {
+        URLClassLoader loader = null;
+        try {
+            ClassLoader parent = getClass().getClassLoader();
+            if (connection.getClasspath() != null) {
+                URL[] urls = new scriptella.util.UrlPathTokenizer(documentUrl).split(connection.getClasspath());
+                loader = new URLClassLoader(urls, parent);
+                parent = loader;
+            }
+            DriverFactory.validateDriver(connection.getDriver(), parent);
+        } catch (MalformedURLException e) {
+            throw new ConfigurationException("Unable to resolve driver classpath for connection " +
+                    connection.getId(), e);
+        } catch (ClassNotFoundException e) {
+            throw new ConfigurationException("Driver " + connection.getDriver() +
+                    " was not found for connection " + connection.getId(), e);
+        } catch (LinkageError e) {
+            throw new ConfigurationException("Unable to load driver " + connection.getDriver() +
+                    " for connection " + connection.getId() + ": " + e, e);
+        } catch (IllegalArgumentException e) {
+            throw new ConfigurationException(e.getMessage(), e);
+        } finally {
+            if (loader != null) {
+                IOUtils.closeSilently(loader);
+            }
+        }
+    }
+
+    private static String failureMessage(Exception e) {
+        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
 
     /**

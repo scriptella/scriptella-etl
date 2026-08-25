@@ -1,0 +1,3 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
+<etl>
+    <connection driver="org.h2.Driver" url="jdbc:h2:mem:check-malformed"/>

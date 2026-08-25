@@ -27,6 +27,8 @@ import java.sql.Driver;
  * @version 1.0
  */
 public final class DriverFactory {
+    private static final String DRIVER_PACKAGE_PREFIX = "scriptella.driver.";
+
     //singleton
     private DriverFactory() {
     }
@@ -53,7 +55,7 @@ public final class DriverFactory {
             return getDriver(Class.forName(driverName, true, loader));
         } catch (ClassNotFoundException e) {
             //if not found try to produce a full name from a short one
-            String fullName = "scriptella.driver."+driverName+".Driver";
+            String fullName = DRIVER_PACKAGE_PREFIX + driverName + ".Driver";
             try {
                 return getDriver(Class.forName(fullName, true, loader));
             } catch (ClassNotFoundException ignoredException) {
@@ -61,8 +63,48 @@ public final class DriverFactory {
             }
 
         }
+    }
 
+    /**
+     * Finds a driver class without initializing or instantiating it.
+     *
+     * @param driverName driver class short or full name.
+     * @param loader class loader to use when loading driver classes.
+     * @return found driver class.
+     * @throws ClassNotFoundException if no drivers satisfy specified name.
+     */
+    public static Class<?> getDriverClass(String driverName, ClassLoader loader) throws ClassNotFoundException {
+        //try direct match
+        try {
+            return Class.forName(driverName, false, loader);
+        } catch (ClassNotFoundException e) {
+            //if not found try to produce a full name from a short one
+            String fullName = DRIVER_PACKAGE_PREFIX + driverName + ".Driver";
+            try {
+                return Class.forName(fullName, false, loader);
+            } catch (ClassNotFoundException ignoredException) {
+                throw e;//it's not a typo - return the first exception
+            }
 
+        }
+    }
+
+    /**
+     * Checks that a named driver class is compatible with Scriptella without
+     * initializing or instantiating it.
+     *
+     * @param driverName driver class short or full name.
+     * @param loader class loader to use when loading driver classes.
+     * @throws ClassNotFoundException if no drivers satisfy specified name.
+     * @throws IllegalArgumentException if the class is not a JDBC or Scriptella driver.
+     */
+    public static void validateDriver(String driverName, ClassLoader loader) throws ClassNotFoundException {
+        Class<?> driverClass = getDriverClass(driverName, loader);
+        if (!Driver.class.isAssignableFrom(driverClass) &&
+                !ScriptellaDriver.class.isAssignableFrom(driverClass)) {
+            throw new IllegalArgumentException("Class " + driverClass +
+                    " is not a scriptella compatible driver.");
+        }
     }
 
     /**

@@ -115,6 +115,7 @@ public class EtlLauncherTest extends DBTestCase {
         assertTrue(help.contains("--version"));
         assertTrue(help.contains("--debug"));
         assertTrue(help.contains("--quiet"));
+        assertTrue(help.contains("--check"));
         assertTrue(help.contains("--no-stat"));
         assertTrue(help.contains("--no-jmx"));
         assertTrue(help.contains("--template"));
@@ -136,6 +137,42 @@ public class EtlLauncherTest extends DBTestCase {
         assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"--version"}));
         assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-v"}));
         assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-version"}));
+    }
+
+    public void testCheckLoadsConfigurationWithoutExecutingIt() {
+        final boolean[] executed = {false};
+        CapturingLauncher launcher = new CapturingLauncher() {
+            @Override
+            public void execute(File file) {
+                executed[0] = true;
+                fail("--check must not execute the ETL");
+            }
+        };
+
+        String file = getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherTest";
+        assertEquals(EtlLauncher.ErrorCode.OK,
+                launcher.launch(new String[]{"--check", file}));
+        assertFalse(executed[0]);
+        assertTrue(launcher.outText().contains("CHECK OK"));
+    }
+
+    public void testCheckReportsInvalidDriver() {
+        CapturingLauncher launcher = new CapturingLauncher();
+        String file = getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherCheckInvalidDriver.etl.xml";
+
+        assertEquals(EtlLauncher.ErrorCode.FAILED,
+                launcher.launch(new String[]{"--check", file}));
+        assertTrue(launcher.errText().contains("CHECK FAILED"));
+        assertTrue(launcher.errText().contains("was not found"));
+    }
+
+    public void testCheckReportsMalformedXml() {
+        CapturingLauncher launcher = new CapturingLauncher();
+        String file = getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherCheckMalformed.etl.xml";
+
+        assertEquals(EtlLauncher.ErrorCode.FAILED,
+                launcher.launch(new String[]{"--check", file}));
+        assertTrue(launcher.errText().contains("CHECK FAILED"));
     }
 
     public void testCanonicalAndLegacyOptionsRecognized() {
