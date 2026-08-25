@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.ParametersCallback;
@@ -31,6 +32,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -44,7 +47,6 @@ import java.util.logging.Logger;
 public class ConfigurationFactory {
     private static final Logger LOG = Logger.getLogger(ConfigurationFactory.class.getName());
     private static final String DTD_NAME = "etl.dtd";
-    private static final String DOCTYPE_DECLARATION = "<!DOCTYPE";
     private static final String RES_PATH = "/scriptella/dtd/" + DTD_NAME;
     private static volatile boolean validating;
     private URL resourceURL;
@@ -109,7 +111,7 @@ public class ConfigurationFactory {
             throw new ConfigurationException("Configuration URL is required");
         }
         try {
-            final Document document = parse(validationRequired());
+            final Document document = parse(validating);
             HierarchicalParametersCallback params = new HierarchicalParametersCallback(
                     externalParameters == null ? NullParametersCallback.INSTANCE : externalParameters, null);
             PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
@@ -129,50 +131,22 @@ public class ConfigurationFactory {
 
         DocumentBuilder db = factory.newDocumentBuilder();
         db.setEntityResolver(ETL_ENTITY_RESOLVER);
-        db.setErrorHandler(ETL_ERROR_HANDLER);
+        DeferredErrorHandler errorHandler = validating ? new DeferredErrorHandler() : null;
+        db.setErrorHandler(errorHandler == null ? ETL_ERROR_HANDLER : errorHandler);
 
-        return db.parse(new InputSource(resourceURL.toString()));
-    }
-
-    /**
-     * Returns whether validation should be enabled for this document.
-     * Only ordinary local files are probed; other URL types retain the historical behavior.
-     */
-    private boolean validationRequired() throws IOException {
-        if (!validating || !"file".equals(resourceURL.getProtocol())) {
-            return validating;
-        }
-
-        return !isDefinitelyWithoutDoctype();
-    }
-
-    /**
-     * Performs a lightweight DOCTYPE probe without parsing the document.
-     * Returns false when the encoding is uncertain so validation remains enabled.
-     */
-    private boolean isDefinitelyWithoutDoctype() throws IOException {
-        byte[] buffer = new byte[1024];
-        int doctypeMatched = 0;
-
-        try (InputStream stream = resourceURL.openStream()) {
-            for (int length; (length = stream.read(buffer)) >= 0;) {
-                for (int i = 0; i < length; i++) {
-                    // NUL bytes indicate a multibyte encoding such as UTF-16/UTF-32.
-                    if (buffer[i] == 0) {
-                        return false;
-                    }
-                    char c = (char) (buffer[i] & 0xff);
-                    if (c == DOCTYPE_DECLARATION.charAt(doctypeMatched)) {
-                        if (++doctypeMatched == DOCTYPE_DECLARATION.length()) {
-                            return false;
-                        }
-                    } else {
-                        doctypeMatched = c == DOCTYPE_DECLARATION.charAt(0) ? 1 : 0;
-                    }
-                }
+        Document document;
+        try {
+            document = db.parse(new InputSource(resourceURL.toString()));
+        } catch (Exception e) {
+            if (errorHandler != null) {
+                errorHandler.publishTo(ETL_ERROR_HANDLER);
             }
-            return true;
+            throw e;
         }
+        if (errorHandler != null && document.getDoctype() != null) {
+            errorHandler.publishTo(ETL_ERROR_HANDLER);
+        }
+        return document;
     }
 
     //XML-related stuff -  resolver+error handler
@@ -224,5 +198,41 @@ public class ConfigurationFactory {
             LOG.severe(messageFor(exception));
         }
     };
+
+    private static final class DeferredErrorHandler implements ErrorHandler {
+        private final List<Diagnostic> diagnostics = new ArrayList<Diagnostic>();
+
+        public void warning(final SAXParseException exception) {
+            diagnostics.add(new Diagnostic(exception, true));
+        }
+
+        public void error(final SAXParseException exception) {
+            diagnostics.add(new Diagnostic(exception, false));
+        }
+
+        public void fatalError(final SAXParseException exception) throws SAXException {
+            ETL_ERROR_HANDLER.fatalError(exception);
+        }
+
+        private void publishTo(final ErrorHandler errorHandler) throws SAXException {
+            for (Diagnostic diagnostic : diagnostics) {
+                if (diagnostic.warning) {
+                    errorHandler.warning(diagnostic.exception);
+                } else {
+                    errorHandler.error(diagnostic.exception);
+                }
+            }
+        }
+    }
+
+    private static final class Diagnostic {
+        private final SAXParseException exception;
+        private final boolean warning;
+
+        private Diagnostic(final SAXParseException exception, final boolean warning) {
+            this.exception = exception;
+            this.warning = warning;
+        }
+    }
 
 }

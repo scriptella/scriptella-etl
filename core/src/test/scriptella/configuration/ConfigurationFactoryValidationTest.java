@@ -53,6 +53,23 @@ public class ConfigurationFactoryValidationTest extends TestCase {
         }
     }
 
+    public void testValidationDiagnosticsArePublishedBeforeParseFailure() {
+        List<String> messages = captureConfigurationWarnings();
+        try {
+            ConfigurationFactory factory = newFactory("DtdValidationThenMalformedTest.xml");
+            try {
+                factory.createConfiguration();
+                fail("Malformed XML should fail parsing");
+            } catch (ConfigurationException expected) {
+                // Expected.
+            }
+
+            assertTrue(messages.toString(), containsMessage(messages, "unexpected"));
+        } finally {
+            removeHandlers();
+        }
+    }
+
     private ConfigurationFactory newFactory(String resource) {
         ConfigurationFactory factory = new ConfigurationFactory();
         factory.setResourceURL(getClass().getResource(resource));
