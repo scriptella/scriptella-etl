@@ -54,12 +54,11 @@ public class PropertiesEl extends XmlConfigurableBase {
         if (element.getElement().hasChildNodes()) {
             PropertiesMap p = new PropertiesMap();
             ContentEl content = new ContentEl(element);
-            InputStream is = null;
 
-            try {
+            try (InputStream is = new ByteArrayInputStream(
+                    element.expandProperties(IOUtils.toString(content.open())).getBytes())) {
                 //TODO use unicode conversion similar to native2ascii
                 //expand global properties
-                is = new ByteArrayInputStream(element.expandProperties(IOUtils.toString(content.open())).getBytes());
                 p.load(is);
                 //Now let's expand local properties
                 PropertiesSubstitutor ps = new PropertiesSubstitutor(p);
@@ -73,8 +72,6 @@ public class PropertiesEl extends XmlConfigurableBase {
             } catch (Exception e) {
                 throw new ConfigurationException("Unable to load properties", e,
                         element);
-            } finally {
-                IOUtils.closeSilently(is);
             }
         }
     }

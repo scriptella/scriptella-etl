@@ -63,13 +63,12 @@ public class TemplateManager {
         String xmlName = baseName + XML_EXT;
         String propsName = baseName + PROPS_EXT;
 
-        Writer w = newFileWriter(xmlName);
-
-        w.write(MessageFormat.format(loadResourceAsString(DEFAULT_ETL_XML), propsName));
-        w.close();
-        w = newFileWriter(propsName);
-        w.write(loadResourceAsString(DEFAULT_ETL_PROPS));
-        w.close();
+        try (Writer w = newFileWriter(xmlName)) {
+            w.write(MessageFormat.format(loadResourceAsString(DEFAULT_ETL_XML), propsName));
+        }
+        try (Writer w = newFileWriter(propsName)) {
+            w.write(loadResourceAsString(DEFAULT_ETL_PROPS));
+        }
         logger.info("Files " + xmlName + ", " + propsName + " have been successfully created.");
     }
 
@@ -135,7 +134,9 @@ public class TemplateManager {
             template = forName(name);
             final File filePath = new File(StringUtils.isEmpty(propertiesFile) ? name + ".properties" : propertiesFile);
             if (filePath.isFile()) {
-                map = new PropertiesMap(new FileInputStream(filePath));
+                try (InputStream input = new FileInputStream(filePath)) {
+                    map = new PropertiesMap(input);
+                }
             } else if (!StringUtils.isEmpty(propertiesFile)) { //If file was specified but absent - throw an exception
                 throw new FileNotFoundException("File " + filePath.toString() + " not found");
             }

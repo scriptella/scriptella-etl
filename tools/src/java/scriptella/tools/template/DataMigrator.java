@@ -98,13 +98,13 @@ public class DataMigrator extends TemplateManager {
         params.put("etl.properties", propsName);
         params.put("queries", queriesXml.toString());
         //Writing an ETL file
-        Writer w = newFileWriter(xmlName);
-        w.write(ps.substitute(etlXml));
-        w.close();
+        try (Writer w = newFileWriter(xmlName)) {
+            w.write(ps.substitute(etlXml));
+        }
         //Writing properties
-        w = newFileWriter(propsName);
-        w.write(loadResourceAsString(DATA_MIGRATOR_ETL_PROPERTIES));
-        w.close();
+        try (Writer w = newFileWriter(propsName)) {
+            w.write(loadResourceAsString(DATA_MIGRATOR_ETL_PROPERTIES));
+        }
     }
 
 
@@ -208,17 +208,17 @@ public class DataMigrator extends TemplateManager {
         }
 
         for (int i = 0; i < n; i++) {
-            final ResultSet rs = metaData.getExportedKeys(schema.getCatalog(), schema.getSchema(), tables[i]);
-            while (rs.next()) {
-                String t2 = rs.getString("FKTABLE_NAME");
-                int i2 = indexOf(tables, t2);
+            try (ResultSet rs = metaData.getExportedKeys(
+                    schema.getCatalog(), schema.getSchema(), tables[i])) {
+                while (rs.next()) {
+                    String t2 = rs.getString("FKTABLE_NAME");
+                    int i2 = indexOf(tables, t2);
 
-                if (i2 >= 0) {
-                    m[i][i2] += ((rs.getInt("DELETE_RULE") != 2) ? 10 : 1);
+                    if (i2 >= 0) {
+                        m[i][i2] += ((rs.getInt("DELETE_RULE") != 2) ? 10 : 1);
+                    }
                 }
             }
-
-            rs.close();
         }
         return m;
     }

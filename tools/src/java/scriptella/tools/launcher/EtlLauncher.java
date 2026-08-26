@@ -35,6 +35,7 @@ import scriptella.util.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -407,14 +408,11 @@ public class EtlLauncher {
     }
 
     private void checkDriver(ConnectionEl connection, URL documentUrl) {
-        URLClassLoader loader = null;
-        try {
-            ClassLoader parent = getClass().getClassLoader();
-            if (connection.getClasspath() != null) {
-                URL[] urls = new scriptella.util.UrlPathTokenizer(documentUrl).split(connection.getClasspath());
-                loader = new URLClassLoader(urls, parent);
-                parent = loader;
-            }
+        try (URLClassLoader loader = connection.getClasspath() == null ? null :
+                new URLClassLoader(
+                        new scriptella.util.UrlPathTokenizer(documentUrl).split(connection.getClasspath()),
+                        getClass().getClassLoader())) {
+            ClassLoader parent = loader == null ? getClass().getClassLoader() : loader;
             DriverFactory.validateDriver(connection.getDriver(), parent);
         } catch (MalformedURLException e) {
             throw new ConfigurationException("Unable to resolve driver classpath for connection " +
@@ -427,10 +425,8 @@ public class EtlLauncher {
                     " for connection " + connection.getId() + ": " + e, e);
         } catch (IllegalArgumentException e) {
             throw new ConfigurationException(e.getMessage(), e);
-        } finally {
-            if (loader != null) {
-                IOUtils.closeSilently(loader);
-            }
+        } catch (IOException ignored) {
+            // Preserve the previous closeSilently behavior for the temporary classloader.
         }
     }
 
