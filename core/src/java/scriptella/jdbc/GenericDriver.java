@@ -22,6 +22,8 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,40 +61,60 @@ public class GenericDriver extends AbstractScriptellaDriver {
      */
     protected void loadDrivers(String... drivers) {
         if (drivers.length > 0) {
-            Throwable throwable = null;
             final boolean debug = LOG.isLoggable(Level.FINE);
+            List<String> missingDrivers = new ArrayList<String>();
+            ClassNotFoundException missingCause = null;
             for (String name : drivers) {
                 try {
-                    try {
-                        Class.forName(name);
-                    } catch (ClassNotFoundException e) {
-                        Class.forName(name, true, Thread.currentThread().getContextClassLoader());
-                    }
+                    loadDriver(name);
                     if (debug) {
                         LOG.fine("Found driver class " + name);
                     }
-                    throwable = null;
-                    break;
-                } catch (Throwable t) {
-                    if (throwable == null) {
-                        throwable = t;
-                    } else {
-                        if (debug) {
-                            LOG.log(Level.FINE, "Failed to load driver class " + name, t);
-                        }
+                    return;
+                } catch (ClassNotFoundException e) {
+                    missingDrivers.add(name);
+                    if (missingCause == null) {
+                        missingCause = e;
                     }
+                    if (debug) {
+                        LOG.log(Level.FINE, "JDBC driver class not found " + name, e);
+                    }
+                } catch (LinkageError e) {
+                    throw brokenDriver(name, e);
+                } catch (RuntimeException e) {
+                    throw brokenDriver(name, e);
                 }
             }
-            if (throwable != null) {
-                throw new JdbcException("Couldn't find appropriate jdbc driver : " + drivers[0] +
-                        ". Please check class path settings", throwable);
+            throw new JdbcException("None of the JDBC driver classes could be found: " + missingDrivers +
+                    ". Check the connection classpath.", missingCause);
+        }
+    }
+
+    private void loadDriver(String name) throws ClassNotFoundException {
+        try {
+            Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+            if (contextLoader == null) {
+                throw e;
+            }
+            try {
+                Class.forName(name, true, contextLoader);
+            } catch (ClassNotFoundException contextException) {
+                contextException.addSuppressed(e);
+                throw contextException;
             }
         }
     }
 
+    private JdbcException brokenDriver(String name, Throwable cause) {
+        return new JdbcException("JDBC driver class " + name +
+                " was found but could not be initialized or linked", cause);
+    }
+
     public JdbcConnection connect(ConnectionParameters params) {
+        Properties props = new Properties();
         try {
-            Properties props = new Properties();
             props.putAll(params.getProperties());
             //according to JDBC spec
             if (params.getUser() != null) {
@@ -104,10 +126,10 @@ public class GenericDriver extends AbstractScriptellaDriver {
             return connect(params, props);
 
         } catch (SQLException e) {
-            throw new JdbcException("Unable to obtain connection for URL " + params.getUrl(), e);
+            throw new JdbcException("Unable to obtain connection for " + JdbcUtils.getUrlDescription(params.getUrl()) +
+                    ". The loaded JDBC driver may not support this URL.", JdbcUtils.sanitize(e, params, props));
         }
     }
-
 
     /**
      * Creates Scriptella JDBC connection.

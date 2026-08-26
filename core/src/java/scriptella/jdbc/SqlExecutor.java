@@ -137,6 +137,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
                 connection.commit();
             }
         } catch (SQLException e) {
+            // TODO Sanitize the JDBC exception before exposing its details.
             throw new JdbcException("Unable to execute statement", e, sql, params);
         } catch (JdbcException e) {
             //if ProviderException has no SQL - attach it

@@ -84,6 +84,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
             try {
                 con.setTransactionIsolation(txIsolation);
             } catch (SQLException e) {
+                // TODO Sanitize the JDBC exception before exposing its details.
                 throw new JdbcException("Unable to set transaction isolation level for " + toString(), e);
             }
         }
@@ -98,6 +99,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
             try {
                 con.setAutoCommit(autocommit);
             } catch (Exception e) {
+                // TODO Sanitize the JDBC exception before exposing its details.
                 throw new JdbcException("Unable to set autocommit=false for " + toString(), e);
             }
         }
@@ -252,6 +254,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
             try {
                 con.commit();
             } catch (Exception e) {
+                // TODO Sanitize the JDBC exception before exposing its details.
                 throw new JdbcException("Unable to commit transaction", e);
             }
         }
@@ -267,6 +270,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
             try {
                 con.rollback();
             } catch (Exception e) {
+                // TODO Sanitize the JDBC exception before exposing its details.
                 throw new JdbcException("Unable to roll back transaction", e);
             }
         }
@@ -279,6 +283,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
                 try {
                     executor.cache.flush();
                 } catch (SQLException e) {
+                    // TODO Sanitize the JDBC exception before exposing its details.
                     throw new JdbcException("Unable to commit transaction - cannot flush cache", e);
                 }
             }
@@ -296,6 +301,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
                 con.close();
                 con = null;
             } catch (SQLException e) {
+                // TODO Sanitize the JDBC exception before exposing its details.
                 throw new JdbcException("Unable to close a connection", e);
             }
 
