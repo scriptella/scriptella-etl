@@ -17,11 +17,15 @@ CREATE TABLE customers (
 
 Place [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) and the
 [PostgreSQL JDBC driver](https://jdbc.postgresql.org/download/) in a `lib/`
-directory next to `scriptella.jar`, named `mysql-connector-j.jar` and
-`postgresql.jar`:
+directory next to `scriptella.jar`. The current development targets are
+MySQL Connector/J `26.7.0` and pgJDBC `42.7.13`; use the filenames that match
+the JARs you downloaded, for example:
 
 ```bash
 mkdir -p lib
+# Rename or copy the downloaded files to these paths as appropriate.
+# lib/mysql-connector-j-26.7.0.jar
+# lib/postgresql-42.7.13.jar
 ```
 
 ## Create the ETL file
@@ -37,13 +41,13 @@ and credentials with those for your databases; do not commit real passwords.
                 url="jdbc:mysql://localhost:3306/source_db"
                 user="source_user"
                 password="source_password"
-                classpath="lib/mysql-connector-j.jar"/>
+                classpath="lib/mysql-connector-j-26.7.0.jar"/>
     <connection id="target"
                 driver="postgresql"
                 url="jdbc:postgresql://localhost:5432/target_db"
                 user="target_user"
                 password="target_password"
-                classpath="lib/postgresql.jar"/>
+                classpath="lib/postgresql-42.7.13.jar"/>
 
     <query connection-id="source">
         SELECT id, email FROM customers
@@ -55,8 +59,15 @@ and credentials with those for your databases; do not commit real passwords.
 ```
 
 `driver="mysql"` and `driver="postgresql"` select Scriptella's built-in
-database adapters. Each adapter loads its JDBC driver from the connection's
-`classpath` attribute.
+database adapters. The MySQL adapter uses
+`com.mysql.cj.jdbc.Driver`, and the PostgreSQL adapter uses
+`org.postgresql.Driver`. Each adapter loads its JDBC driver from the
+connection's `classpath` attribute. MySQL remains provisional until the
+certification matrix includes a MySQL server.
+
+For MariaDB, Oracle Database, and Microsoft SQL Server examples, including
+their current driver classes and connection classpaths, see the
+[core database compatibility page](core-database-compatibility.md).
 
 The outer `<query>` selects rows from the `source` connection. For each result
 row, Scriptella runs the nested `<script>` against the `target` connection and

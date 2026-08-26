@@ -169,7 +169,7 @@ ant clean jar
 * Website: [https://scriptella.org](https://scriptella.org)
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
-* Database driver compatibility and validation targets: [docs/supported-databases.md](docs/supported-databases.md)
+* Core database compatibility and validation targets: [docs/core-database-compatibility.md](docs/core-database-compatibility.md)
 * Command-line usage contract and automation templates: [docs/cli-usage.md](docs/cli-usage.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Maintainer guide: [docs/MAINTAINING.md](docs/MAINTAINING.md)
