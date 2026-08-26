@@ -47,9 +47,11 @@ public final class JdbcUtils {
     }
 
     /**
-     * Returns a copy of a JDBC exception with connection details removed from
-     * its messages. The complete {@link SQLException#getNextException()} chain
-     * is copied as well.
+     * Returns a credential-safe copy of a JDBC exception.
+     * <p>The SQL exception subtype, SQL metadata, ordinary cause chain, and
+     * complete {@link SQLException#getNextException()} chain are retained when
+     * their constructors permit it. Connection details are removed from all
+     * copied messages.
      *
      * @param source     exception to sanitize
      * @param parameters connection parameters
@@ -177,6 +179,12 @@ public final class JdbcUtils {
         }
     }
 
+    /**
+     * Returns a credential-safe description of a JDBC URL.
+     *
+     * @param url JDBC URL, possibly null
+     * @return the JDBC scheme or a generic configured-URL description
+     */
     static String getUrlDescription(String url) {
         if (url != null && url.startsWith("jdbc:")) {
             int separator = url.indexOf(':', 5);
