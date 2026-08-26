@@ -120,11 +120,7 @@ public final class JdbcUtils {
             Throwable copy = constructor.newInstance(message);
             copy.initCause(cause);
             return copy;
-        } catch (ReflectiveOperationException e) {
-            return fallbackThrowable(source, message, cause);
-        } catch (SecurityException e) {
-            return fallbackThrowable(source, message, cause);
-        } catch (IllegalStateException e) {
+        } catch (ReflectiveOperationException | SecurityException | IllegalStateException e) {
             return fallbackThrowable(source, message, cause);
         }
     }
