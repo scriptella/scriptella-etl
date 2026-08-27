@@ -17,9 +17,9 @@
 * Release CI now builds and tests Maven and Ant paths on JDK 17 and JDK 25.
   Both paths compile Scriptella with a Java 17 class-file baseline.
 * PostgreSQL and MariaDB are the tested first-class database targets for the
-  1.5 candidate, using the recorded release-validation matrix. MySQL remains
-  explicitly provisional: its modern adapter and documentation are present,
-  but no MySQL server contract is included in this release's validation.
+  1.5 candidate, using the recorded release-validation matrix. MySQL has one
+  targeted validation lane using MySQL Server 8.4.11 and Connector/J 26.7.0;
+  it is intentionally not a broad MySQL compatibility matrix.
 
 ## [1.4] — 2026-08-14
 

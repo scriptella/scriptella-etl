@@ -1,9 +1,10 @@
 # Core database compatibility
 
 Scriptella supports a broad spectrum of databases through JDBC and other
-providers. This page documents the core relational databases used for recurring
-compatibility and certification validation; it is not an exhaustive list of
-every database Scriptella can connect to.
+providers. This page helps users configure Scriptella with common relational
+databases and understand their compatibility, including the preferred driver,
+driver class, URL, validation status, and known limitations. It is not an
+exhaustive list of every database Scriptella can connect to.
 
 Scriptella does not bundle vendor JDBC drivers. Download the appropriate driver
 from its vendor and make its JAR available through the connection `classpath`
@@ -11,20 +12,22 @@ or the Scriptella runtime classpath.
 
 ## Core database validation targets
 
-This is the initial database modernization baseline selected on 2026-08-25.
-The 1.5 candidate's applicable packaged-distribution matrix passed for
-PostgreSQL and MariaDB on 2026-08-27 using JDK 25. “Tested for the 1.5
-candidate” below means that the recorded practical matrix passed for the
-listed server and driver versions; it is not an industry certification or an
-unbounded compatibility promise. “Provisional” means that the adapter or
-smoke coverage exists, but the corresponding real-server contract has not
-passed.
+The 1.5 candidate's full packaged-distribution matrix passed for PostgreSQL
+and MariaDB on 2026-08-27 using JDK 25. A separate targeted
+packaged lane also passed for MySQL Server 8.4.11 with Connector/J 26.7.0.
+“Tested for the 1.5 candidate” below means that the recorded practical matrix
+passed for the listed server and driver versions; it is not an industry
+certification or an unbounded compatibility promise. “Targeted 1.5 lane” means
+that one recorded server/driver contract passed, without implying a broad
+compatibility matrix.
+“Provisional” means that the adapter or smoke coverage exists, but the
+corresponding real-server contract has not passed.
 
 | Database | Scriptella alias | Preferred JDBC class | Canonical URL prefix | Validation target | Status |
 |---|---|---|---|---|---|
 | PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` / PostgreSQL `17.11` | Tested for 1.5 candidate |
 | MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` / MariaDB `11.8.8` | Tested for 1.5 candidate |
-| MySQL | `mysql` | `com.mysql.cj.jdbc.Driver` | `jdbc:mysql:` | MySQL Connector/J `26.7.0` | Provisional; no MySQL server in the initial matrix |
+| MySQL | `mysql` | `com.mysql.cj.jdbc.Driver` | `jdbc:mysql:` | MySQL Connector/J `26.7.0` / MySQL `8.4.11` | Targeted 1.5 lane; not a full matrix |
 | Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | Not yet selected | Provisional; no real-server matrix |
 | Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | Not yet selected | Provisional; no real-server matrix |
 
@@ -32,14 +35,14 @@ Scriptella 1.5 provides first-class aliases and URL autodetection for the
 current driver classes and canonical URLs above. Obsolete or deprecated driver
 classes and URL schemes are not retained as adapter fallbacks. Other JDBC
 drivers may still be usable by specifying their fully qualified driver class,
-but they are outside the supported and certified baseline.
+but they are outside the documented compatibility baseline.
 
-MySQL is intentionally provisional for 1.5. The adapter, preferred driver
-class, canonical URL, and external-classpath example are covered by focused
-product checks and documentation, but no MySQL server was included in the
-release-candidate contract. Do not describe MySQL as tested or certified until
-the same connection, parameterized write/read, commit, and rollback contract
-has passed against a recorded MySQL server and Connector/J version.
+MySQL has one intentionally narrow 1.5 validation lane: MySQL Server `8.4.11`
+with Connector/J `26.7.0`. The packaged contract passed connection,
+parameterized write/read, H2↔MySQL migration, commit, and rollback checks. This
+is targeted evidence for the common MySQL configuration, not a broad MySQL
+compatibility matrix; multiple server releases, driver generations, and
+vendor-specific edge cases are outside the claim.
 
 When upgrading to Scriptella 1.5, use current JDBC driver generations. The
 legacy MySQL and Oracle driver class names and the SQL Server 2000, jTDS, and
@@ -122,18 +125,15 @@ not for production.
 See the [Microsoft JDBC encryption guidance](https://learn.microsoft.com/sql/connect/jdbc/connecting-with-ssl-encryption)
 for the driver-specific trust-store options.
 
-## Certification record
+## Compatibility validation
 
-For each version promoted from a validation target to a tested version, the
-certification record must include:
+The Scriptella Project Team performs internal compatibility validation against
+the database and JDBC driver targets documented on this page. These results
+help users understand the tested configurations; each applies only to the
+recorded versions and test scope, including any stated limitations. They are
+not an industry or regulatory certification or an unbounded compatibility
+promise.
 
-- the packaged Scriptella version and source revision;
-- the JDK version;
-- the JDBC driver version and checksum;
-- the database server version;
-- the test date and applicable matrix routes; and
-- the result, including any documented limitations.
-
-“Certified” in this documentation means that Scriptella's practical
-compatibility suite passed for the recorded versions. It is not an industry or
-regulatory certification or an unbounded compatibility promise.
+For support or to request compatibility validation for another database,
+contact PVR Labs, the maintainer of Scriptella, through the
+[Scriptella support page](https://scriptella.org/support.html).
