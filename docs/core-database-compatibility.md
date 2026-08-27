@@ -12,25 +12,34 @@ or the Scriptella runtime classpath.
 ## Core database validation targets
 
 This is the initial database modernization baseline selected on 2026-08-25.
-The versions below are targets for compatibility testing on JDK 17; they are
-not yet certified or an unconditional recommendation for every deployment.
-A target becomes a tested version only after the applicable certification
-matrix passes against a packaged Scriptella release candidate and the result
-is recorded.
+The 1.5 candidate's applicable packaged-distribution matrix passed for
+PostgreSQL and MariaDB on 2026-08-27 using JDK 25. “Tested for the 1.5
+candidate” below means that the recorded practical matrix passed for the
+listed server and driver versions; it is not an industry certification or an
+unbounded compatibility promise. “Provisional” means that the adapter or
+smoke coverage exists, but the corresponding real-server contract has not
+passed.
 
 | Database | Scriptella alias | Preferred JDBC class | Canonical URL prefix | Validation target | Status |
 |---|---|---|---|---|---|
-| PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` | Pending certification |
-| MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` | Pending certification |
+| PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` / PostgreSQL `17.11` | Tested for 1.5 candidate |
+| MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` / MariaDB `11.8.8` | Tested for 1.5 candidate |
 | MySQL | `mysql` | `com.mysql.cj.jdbc.Driver` | `jdbc:mysql:` | MySQL Connector/J `26.7.0` | Provisional; no MySQL server in the initial matrix |
-| Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | Not yet selected | Limited compatibility target |
-| Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | Not yet selected | Limited compatibility target |
+| Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | Not yet selected | Provisional; no real-server matrix |
+| Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | Not yet selected | Provisional; no real-server matrix |
 
 Scriptella 1.5 provides first-class aliases and URL autodetection for the
 current driver classes and canonical URLs above. Obsolete or deprecated driver
 classes and URL schemes are not retained as adapter fallbacks. Other JDBC
 drivers may still be usable by specifying their fully qualified driver class,
 but they are outside the supported and certified baseline.
+
+MySQL is intentionally provisional for 1.5. The adapter, preferred driver
+class, canonical URL, and external-classpath example are covered by focused
+product checks and documentation, but no MySQL server was included in the
+release-candidate contract. Do not describe MySQL as tested or certified until
+the same connection, parameterized write/read, commit, and rollback contract
+has passed against a recorded MySQL server and Connector/J version.
 
 When upgrading to Scriptella 1.5, use current JDBC driver generations. The
 legacy MySQL and Oracle driver class names and the SQL Server 2000, jTDS, and
