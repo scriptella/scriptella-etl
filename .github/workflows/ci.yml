@@ -61,12 +61,32 @@ jobs:
           ant_version=1.10.17
           ant_archive="$RUNNER_TEMP/apache-ant-${ant_version}-bin.zip"
           ant_home="$RUNNER_TEMP/apache-ant-${ant_version}"
-          curl --fail --location \
-            --output "$ant_archive" \
-            "https://archive.apache.org/dist/ant/binaries/apache-ant-${ant_version}-bin.zip"
           expected_checksum=5205a3c87902dd356a6bfcfc5d07659361d1c74627716662d7b31ab47817388dd1d985cfc27ca81a607827cb58d9e36d2d2fbf87a961a5dd4eeabfbde380aa71
-          actual_checksum=$(sha512sum "$ant_archive" | awk '{print $1}')
-          test "$actual_checksum" = "$expected_checksum"
+          verified=false
+          for base_url in \
+            https://dlcdn.apache.org/ant/binaries \
+            https://archive.apache.org/dist/ant/binaries; do
+            for attempt in 1 2 3; do
+              echo "Downloading Ant from $base_url (attempt $attempt)"
+              if curl --fail --location --retry 3 --retry-all-errors \
+                   --output "$ant_archive" \
+                   "$base_url/apache-ant-${ant_version}-bin.zip" &&
+                 printf '%s  %s\n' "$expected_checksum" "$ant_archive" |
+                   sha512sum --check --status; then
+                verified=true
+                break 2
+              fi
+
+              actual_checksum=$(sha512sum "$ant_archive" 2>/dev/null |
+                awk '{print $1}')
+              echo "::warning::Ant download failed verification; SHA-512=${actual_checksum:-unavailable}"
+            done
+          done
+
+          if [[ "$verified" != true ]]; then
+            echo "::error::Unable to download a verified Apache Ant ${ant_version} archive"
+            exit 1
+          fi
           unzip -q "$ant_archive" -d "$RUNNER_TEMP"
           export PATH="$ant_home/bin:$PATH"
           echo "ANT_HOME=$ant_home" >> "$GITHUB_ENV"
