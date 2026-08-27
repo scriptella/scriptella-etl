@@ -1,8 +1,14 @@
 <body>
-Scriptella JDBC Bridge.
-<p>As specified in Service Provider API all JDBC drivers are registered
-    via this bridge. This procedure is transparent to end user,
-    he only have to specify jdbc driver class name or an alias.</p>
+Scriptella Core JDBC Bridge.
+<p>This bridge is part of <code>scriptella-core</code> and allows Scriptella to
+    use vendor JDBC drivers supplied by an application. Scriptella does not
+    bundle vendor JDBC libraries. The vendor driver class name can be supplied
+    directly, while the aliases and specialized database adapters are provided
+    by the optional <code>scriptella-drivers</code> module.</p>
+<p>As specified in the Service Provider API, JDBC drivers are registered
+    through this bridge. This is transparent to the end user: specify the JDBC
+    driver class name or a Scriptella adapter alias and make the required
+    vendor JAR available on the connection or application classpath.</p>
 <h2>General information</h2>
 <table>
     <tr>

@@ -15,7 +15,14 @@
  */
 
 /**
- * Parent package for Scriptella drivers.
+ * Parent package for Scriptella's built-in drivers.
+ *
+ * <p>The {@code scriptella-drivers} module is a representative collection of
+ * optional adapters, not an exhaustive list of all providers that Scriptella
+ * can use. The module depends on {@code scriptella-core}; core contains the
+ * ETL engine, service-provider API, and generic JDBC bridge. Applications can
+ * therefore use core with a separately supplied vendor JDBC driver, or add
+ * this module for its database aliases and other built-in adapters.
  *
  * <p>This package is the recommended namespace for drivers. Scriptella's
  * driver lookup automatically searches for driver classes in this package
