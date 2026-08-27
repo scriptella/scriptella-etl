@@ -15,20 +15,77 @@ concurrency:
 
 jobs:
   test:
-    name: Maven tests (Java 17)
+    name: Maven tests (Java ${{ matrix.java }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '25']
 
     steps:
       - name: Check out source
         uses: actions/checkout@v6
 
-      - name: Set up Java 17
+      - name: Set up Java ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: ${{ matrix.java }}
           cache: maven
 
       - name: Build and test
         run: mvn --batch-mode --no-transfer-progress clean verify
+
+  ant:
+    name: Ant package contract (Java ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '25']
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Java ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Set up Apache Ant 1.10.17
+        run: |
+          ant_version=1.10.17
+          ant_archive="$RUNNER_TEMP/apache-ant-${ant_version}-bin.zip"
+          ant_home="$RUNNER_TEMP/apache-ant-${ant_version}"
+          curl --fail --location \
+            --output "$ant_archive" \
+            "https://archive.apache.org/dist/ant/binaries/apache-ant-${ant_version}-bin.zip"
+          expected_checksum=5205a3c87902dd356a6bfcfc5d07659361d1c74627716662d7b31ab47817388dd1d985cfc27ca81a607827cb58d9e36d2d2fbf87a961a5dd4eeabfbde380aa71
+          actual_checksum=$(sha512sum "$ant_archive" | awk '{print $1}')
+          test "$actual_checksum" = "$expected_checksum"
+          unzip -q "$ant_archive" -d "$RUNNER_TEMP"
+          export PATH="$ant_home/bin:$PATH"
+          echo "ANT_HOME=$ant_home" >> "$GITHUB_ENV"
+          echo "$ant_home/bin" >> "$GITHUB_PATH"
+          ant -version 2>&1 | grep -F "version ${ant_version}"
+
+      - name: Set up DTDDoc 1.1.0
+        run: |
+          mkdir -p "$RUNNER_TEMP/dtddoc"
+          for artifact in \
+            net.sf.dtddoc:DTDDoc:1.1.0 \
+            net.sf.dtddoc:dtdparser:1.20-dtddoc \
+            regexp:regexp:1.2 \
+            com.uwyn:jhighlight:1.0; do
+            mvn --batch-mode --no-transfer-progress \
+              org.apache.maven.plugins:maven-dependency-plugin:3.7.0:copy \
+              -Dartifact="$artifact" \
+              -DoutputDirectory="$RUNNER_TEMP/dtddoc"
+          done
+
+      - name: Build, test, and package Ant artifacts
+        run: ant -noinput -Ddtddoc.dir="$RUNNER_TEMP/dtddoc" clean test test-distribution

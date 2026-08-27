@@ -1,9 +1,12 @@
 <project name="scriptella-drivers" default="jar">
     <path id="classpath">
         <pathelement location="${basedir}/../core/build/tmp/classes"/>
-        <pathelement location="${basedir}/../lib/velocity.jar"/>
-        <pathelement location="${basedir}/../lib/commons-collections.jar"/>
-        <pathelement location="${basedir}/../lib/commons-lang.jar"/>
+        <pathelement location="${basedir}/../lib/velocity-engine-core.jar"/>
+        <pathelement location="${basedir}/../lib/commons-lang3.jar"/>
+        <pathelement location="${basedir}/../lib/slf4j-api.jar"/>
+        <pathelement location="${basedir}/../lib/micrometer-observation.jar"/>
+        <pathelement location="${basedir}/../lib/micrometer-commons.jar"/>
+        <pathelement location="${basedir}/../lib/jspecify.jar"/>
         <pathelement location="${basedir}/../lib/janino.jar"/>
         <pathelement location="${basedir}/../lib/janino-commons-compiler.jar"/>
         <fileset dir="${basedir}/../lib" includes="spring-*.jar"/>

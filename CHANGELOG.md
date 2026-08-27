@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Security and compatibility
+
+* Replaced the vulnerable Commons Lang 2.6 / Velocity 1.7 integration with
+  Apache Velocity Engine 2.4.1, Commons Lang 3.20.0, and SLF4J API 1.7.36.
+  The optional Velocity driver now requires the maintained dependency set.
+* Updated the optional Spring driver from the unsupported 5.3.39 line through
+  Spring Framework 6.2.12 to the OSS-supported Spring Framework 7.0.9. This
+  addresses the later 6.2.x DataBinder and SpEL advisories while retaining
+  Java 17 compatibility. See
+  [the issue #58 security disposition](https://github.com/scriptella/scriptella-etl/issues/58).
+  The standalone source runtime set includes Spring's required Micrometer
+  Observation/Common APIs and JSpecify annotations.
+* Release CI now builds and tests Maven and Ant paths on JDK 17 and JDK 25.
+  Both paths compile Scriptella with a Java 17 class-file baseline.
+
 ## [1.4] — 2026-08-14
 
 Scriptella 1.4 is a maintenance and modernization release focused on making

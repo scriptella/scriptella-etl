@@ -1,5 +1,0 @@
-Apache Commons Lang 2.6
-
-Commons Lang 2.6 is licensed under the Apache License, Version 2.0.
-The complete license and notice texts are included in commons-lang.jar under
-META-INF/.

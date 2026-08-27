@@ -20,7 +20,6 @@ import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.DialectIdentifier;
 
-import java.util.logging.Logger;
 
 /**
  * Scriptella Driver for <a href="http://jakarta.apache.org/velocity">Velocity</a> template engine.
@@ -30,11 +29,10 @@ import java.util.logging.Logger;
  */
 public class Driver extends AbstractScriptellaDriver {
     static final DialectIdentifier DIALECT = new DialectIdentifier("Velocity", "1.4");
-    static final Logger LOG = Logger.getLogger(Driver.class.getName());
     private static final String[][] DEPENDENCIES = {
-            {"org.apache.velocity.VelocityContext", "velocity.jar"},
-            {"org.apache.commons.collections.ExtendedProperties", "commons-collections.jar"},
-            {"org.apache.commons.lang.StringUtils", "commons-lang.jar"}
+            {"org.apache.velocity.VelocityContext", "velocity-engine-core.jar"},
+            {"org.apache.commons.lang3.StringUtils", "commons-lang3.jar"},
+            {"org.slf4j.Logger", "slf4j-api.jar"}
     };
 
 
@@ -56,8 +54,8 @@ public class Driver extends AbstractScriptellaDriver {
 
     private static VelocityProviderException missingDependency(String jar, Throwable cause) {
         return new VelocityProviderException("Unable to load the Velocity dependency " + jar
-                + ". Check if the connection classpath attribute points to velocity.jar, "
-                + "commons-collections.jar, and commons-lang.jar", cause);
+                + ". Check if the connection classpath attribute points to velocity-engine-core.jar, "
+                + "commons-lang3.jar, and slf4j-api.jar", cause);
     }
 
     /**

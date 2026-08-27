@@ -134,6 +134,19 @@ writes directly to a database with JDBC parameter binding, see
 The [tutorial](https://scriptella.org/tutorial.html) has additional database
 and file integration examples.
 
+### Modules and drivers
+
+Scriptella is split into a core module and optional provider modules.
+`scriptella-core` contains the ETL engine, service-provider API, and generic
+JDBC bridge. It can use any vendor JDBC driver supplied by the application;
+the vendor's JAR is not part of Scriptella core.
+
+`scriptella-drivers` contains an opinionated collection of built-in adapters,
+including database aliases, CSV, text, Velocity, Spring, mail, and scripting
+providers. It depends on `scriptella-core`, but core does not depend on the
+drivers module. Third-party drivers and providers can be supplied separately
+through a connection's `classpath` attribute.
+
 ### Maven coordinates
 
 Published artifacts use group ID `org.scriptella` (from 1.2 onward). Example for
@@ -147,22 +160,23 @@ the core module:
 </dependency>
 ```
 
-Drivers and tools modules follow the same version. Prefer the binary
-distribution or the all-in-one JAR when you need the full set of bundled
-providers without assembling modules yourself.
+Drivers and tools modules follow the same version. For most Maven-based JDBC
+usage, `scriptella-core` is sufficient together with your database's JDBC
+driver. Add `scriptella-drivers` when you need Scriptella's built-in aliases or
+specialized providers, or use the binary distribution/all-in-one JAR for the
+assembled product. Optional provider runtime libraries may still need to be
+supplied separately; see the provider documentation.
 
 ### Build from source
 
-Current `master` must be built with JDK 17. Use Maven 3.6 or newer for the
-module build; Ant 1.10.17 is required for release distribution packaging:
+Requires Java 17+ and Maven 3.6+:
 
 ```bash
-# Module build and tests (primary path)
 mvn clean install
-
-# Optional: Ant packaging (release dist / all-in-one JAR)
-ant clean jar
 ```
+
+Release packaging uses Ant 1.10.17 and is validated on JDK 17 and JDK 25;
+artifacts remain Java 17-compatible (`--release 17`).
 
 ## Documentation
 

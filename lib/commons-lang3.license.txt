@@ -1,0 +1,5 @@
+Apache Commons Lang 3.20.0
+
+Commons Lang is licensed under the Apache License, Version 2.0.
+The complete license and notice texts are included in commons-lang3.jar
+under META-INF/.

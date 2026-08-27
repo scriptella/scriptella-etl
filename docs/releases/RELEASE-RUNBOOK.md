@@ -184,6 +184,10 @@ private plan:
 * manifests and embedded version strings;
 * README, changelog, license, notice, and dependency-license contents;
 * dependency versions and byte-identical bundled copies where expected;
+* the [issue #58 security disposition](../security/dependabot-2026-08.md),
+  including exact dependency versions in every generated archive;
+* successful Maven and Ant validation on JDK 17 and JDK 25, with product
+  class files remaining at `--release 17` (major version 61);
 * unpacked launcher and representative ETL execution;
 * unpacked examples; and
 * an isolated Maven consumer resolving the candidate release version.

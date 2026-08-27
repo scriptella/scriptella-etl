@@ -25,3 +25,4 @@ The Maven Central configuration and artifact publication details are in
 
 * [Scriptella 1.4 release plan](releases/1.4/release-1.4-plan.md)
 * [Release history](../CHANGELOG.md)
+* [Issue #58 security and JDK 25 disposition](security/dependabot-2026-08.md)

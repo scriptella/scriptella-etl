@@ -5,8 +5,9 @@ set -eu
 
 binary_zip=$1
 examples_zip=$2
-rhino_engine_jar=$3
-rhino_runtime_jar=$4
+source_zip=$3
+rhino_engine_jar=$4
+rhino_runtime_jar=$5
 
 fail() {
     echo "optional runtime contract failed: $*" >&2
@@ -17,19 +18,22 @@ assert_contains() {
     grep -F "$2" "$1" >/dev/null || fail "$1 does not contain: $2"
 }
 
-for required_file in "$binary_zip" "$examples_zip" "$rhino_engine_jar" "$rhino_runtime_jar"; do
+for required_file in "$binary_zip" "$examples_zip" "$source_zip" "$rhino_engine_jar" "$rhino_runtime_jar"; do
     [ -f "$required_file" ] || fail "missing required file: $required_file"
 done
 
 work_dir=$(mktemp -d "${TMPDIR:-/tmp}/scriptella-runtime-contract.XXXXXX")
 trap 'rm -rf "$work_dir"' EXIT HUP INT TERM
 
-mkdir "$work_dir/binary" "$work_dir/examples"
+mkdir "$work_dir/binary" "$work_dir/examples" "$work_dir/source"
 unzip -q "$binary_zip" -d "$work_dir/binary"
 unzip -q "$examples_zip" -d "$work_dir/examples"
+unzip -q "$source_zip" -d "$work_dir/source"
 dist_dir=$(find "$work_dir/binary" -mindepth 1 -maxdepth 1 -type d | head -1)
 [ -n "$dist_dir" ] || fail "binary distribution has no root directory"
 examples_dir="$work_dir/examples"
+source_dir="$work_dir/source"
+[ -d "$source_dir/lib" ] || fail "source distribution has no top-level lib directory"
 
 assert_rhino_bundle() {
     bundle_lib=$1
@@ -78,7 +82,7 @@ assert_velocity_dependencies() {
     bundle_lib=$1
     [ -d "$bundle_lib" ] || fail "missing library directory: $bundle_lib"
 
-    for artifact in commons-collections commons-lang; do
+    for artifact in commons-lang3 slf4j-api; do
         [ -f "$bundle_lib/$artifact.jar" ] \
             || fail "$bundle_lib has no $artifact.jar"
         [ -f "$bundle_lib/$artifact.license.txt" ] \
@@ -87,16 +91,28 @@ assert_velocity_dependencies() {
 }
 
 assert_velocity_dependencies "$examples_dir/lib"
-[ ! -f "$dist_dir/lib/velocity.jar" ] \
-    || fail "$dist_dir/lib unexpectedly bundles velocity.jar"
-[ ! -f "$dist_dir/lib/commons-collections.jar" ] \
-    || fail "$dist_dir/lib unexpectedly bundles commons-collections.jar"
-[ ! -f "$dist_dir/lib/commons-lang.jar" ] \
-    || fail "$dist_dir/lib unexpectedly bundles commons-lang.jar"
-[ -f "$examples_dir/lib/velocity.jar" ] \
-    || fail "$examples_dir/lib has no velocity.jar"
-[ -f "$examples_dir/lib/velocity.license.txt" ] \
-    || fail "$examples_dir/lib has no Velocity license"
+[ ! -f "$examples_dir/lib/commons-collections.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Commons Collections 3"
+[ ! -f "$examples_dir/lib/commons-lang.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Commons Lang 2"
+[ ! -f "$examples_dir/lib/velocity.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Velocity 1.x"
+[ ! -f "$dist_dir/lib/velocity-engine-core.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles velocity-engine-core.jar"
+[ ! -f "$dist_dir/lib/commons-lang3.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles commons-lang3.jar"
+[ ! -f "$dist_dir/lib/slf4j-api.jar" ] \
+    || fail "$dist_dir/lib unexpectedly bundles slf4j-api.jar"
+[ -f "$examples_dir/lib/velocity-engine-core.jar" ] \
+    || fail "$examples_dir/lib has no velocity-engine-core.jar"
+[ -f "$examples_dir/lib/velocity-engine-core.license.txt" ] \
+    || fail "$examples_dir/lib has no Velocity Engine license"
+[ ! -f "$examples_dir/lib/micrometer-observation.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Spring's Micrometer observation API"
+[ ! -f "$examples_dir/lib/micrometer-commons.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Spring's Micrometer commons API"
+[ ! -f "$examples_dir/lib/jspecify.jar" ] \
+    || fail "$examples_dir/lib unexpectedly contains Spring's JSpecify annotations"
 
 assert_jar_version() {
     jar_file=$1
@@ -107,9 +123,46 @@ assert_jar_version() {
     assert_contains "$manifest_file" "Implementation-Version: $expected_version"
 }
 
-assert_jar_version "$examples_dir/lib/velocity.jar" "1.7"
-assert_jar_version "$examples_dir/lib/commons-collections.jar" "3.2.2"
-assert_jar_version "$examples_dir/lib/commons-lang.jar" "2.6"
+assert_jar_version "$examples_dir/lib/velocity-engine-core.jar" "2.4.1"
+assert_jar_version "$examples_dir/lib/commons-lang3.jar" "3.20.0"
+assert_jar_version "$examples_dir/lib/slf4j-api.jar" "1.7.36"
+
+find "$source_dir/lib" -maxdepth 1 -type f -name 'spring-*.jar' -exec basename {} \; \
+    | sort >"$work_dir/actual-spring-jars.txt"
+{
+    echo "spring-aop.jar"
+    echo "spring-beans.jar"
+    echo "spring-context.jar"
+    echo "spring-core.jar"
+    echo "spring-expression.jar"
+    echo "spring-jdbc.jar"
+    echo "spring-tx.jar"
+} >"$work_dir/expected-spring-jars.txt"
+cmp "$work_dir/expected-spring-jars.txt" "$work_dir/actual-spring-jars.txt" >/dev/null \
+    || fail "source distribution does not contain exactly the supported Spring JARs"
+[ ! -f "$source_dir/lib/spring-jcl.jar" ] \
+    || fail "source distribution unexpectedly contains removed spring-jcl.jar"
+for artifact in spring-aop spring-beans spring-context spring-core spring-expression spring-jdbc spring-tx; do
+assert_jar_version "$source_dir/lib/$artifact.jar" "7.0.9"
+done
+assert_jar_version "$source_dir/lib/commons-logging.jar" "1.3.5"
+
+find "$source_dir/lib" -maxdepth 1 -type f -name 'micrometer-*.jar' -exec basename {} \; \
+    | sort >"$work_dir/actual-micrometer-jars.txt"
+{
+    echo "micrometer-commons.jar"
+    echo "micrometer-observation.jar"
+} >"$work_dir/expected-micrometer-jars.txt"
+cmp "$work_dir/expected-micrometer-jars.txt" "$work_dir/actual-micrometer-jars.txt" >/dev/null \
+    || fail "source distribution does not contain exactly the Spring Micrometer runtime set"
+for artifact in micrometer-observation micrometer-commons; do
+    assert_jar_version "$source_dir/lib/$artifact.jar" "1.16.7"
+    [ -f "$source_dir/lib/$artifact.license.txt" ] \
+        || fail "source distribution has no $artifact license"
+done
+assert_jar_version "$source_dir/lib/jspecify.jar" "1.0.0"
+[ -f "$source_dir/lib/jspecify.license.txt" ] \
+    || fail "source distribution has no JSpecify license"
 
 main_jar="$dist_dir/scriptella.jar"
 [ -f "$main_jar" ] || fail "binary distribution has no scriptella.jar"

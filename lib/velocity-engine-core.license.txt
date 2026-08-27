@@ -1,0 +1,5 @@
+Apache Velocity Engine 2.4.1
+
+Velocity Engine is licensed under the Apache License, Version 2.0.
+The complete license and notice texts are included in
+velocity-engine-core.jar under META-INF/.

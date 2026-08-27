@@ -26,7 +26,7 @@
     <connection id="jexl" driver="jexl"/>
     <!--Set up a connection to velocity engine.
     url parameter specifies a path to file relative to a script file directory-->
-    <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity.jar;../lib/commons-collections.jar;../lib/commons-lang.jar"/>
+    <connection id="velocity" driver="velocity" url="report.html" classpath="../lib/velocity-engine-core.jar;../lib/commons-lang3.jar;../lib/slf4j-api.jar"/>
     <!--Set up an in-memory connection to H2 database.
     h2 is the Scriptella adapter name for H2.
     You may specify org.h2.Driver directly, see JDBC Adapters in Scriptella reference-->

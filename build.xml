@@ -95,7 +95,7 @@
             <fileset dir="${basedir}/samples/lib" excludes="readme.txt"/>
         </delete>
         <copy todir="${basedir}/samples/lib" overwrite="true">
-            <fileset dir="${lib.dir}" excludes="spring* lucene*"/>
+            <fileset dir="${lib.dir}" excludes="spring* micrometer-* jspecify* lucene*"/>
             <fileset file="${build.dir}/${jar.name}"/>
         </copy>
     </target>
@@ -150,12 +150,13 @@
         <description>Prepares binary and src distribution</description>
     </target>
 
-    <target name="test-distribution" depends="zip, examples">
+    <target name="test-distribution" depends="zip, srczip, examples">
         <description>Tests optional runtime contracts against assembled distributions</description>
         <exec executable="sh" failonerror="true">
             <arg value="${tools}/src/test/distribution/optional-runtime-distribution-test.sh"/>
             <arg value="${build.dir}/${zip.name}"/>
             <arg value="${build.dir}/${examples.zip.name}"/>
+            <arg value="${build.dir}/${src.zip.name}"/>
             <arg value="${lib.dir}/rhino-engine.jar"/>
             <arg value="${lib.dir}/rhino.jar"/>
         </exec>

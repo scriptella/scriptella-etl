@@ -39,15 +39,14 @@ import java.net.URLStreamHandler;
 public class VelocityConnectionTest extends AbstractTestCase {
 
     public void testSplitDependenciesAreValidated() {
-        assertMissingDependency("org.apache.commons.collections.ExtendedProperties",
-                "commons-collections.jar");
-        assertMissingDependency("org.apache.commons.lang.StringUtils", "commons-lang.jar");
+        assertMissingDependency("org.apache.commons.lang3.StringUtils", "commons-lang3.jar");
+        assertMissingDependency("org.slf4j.Logger", "slf4j-api.jar");
     }
 
     public void testDependencyLinkageErrorIsWrapped() {
         ClassLoader classLoader = new ClassLoader(getClass().getClassLoader()) {
             protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                if ("org.apache.commons.lang.StringUtils".equals(name)) {
+                if ("org.apache.commons.lang3.StringUtils".equals(name)) {
                     throw new NoClassDefFoundError(name);
                 }
                 return super.loadClass(name, resolve);
@@ -57,7 +56,7 @@ public class VelocityConnectionTest extends AbstractTestCase {
             Driver.checkDependencies(classLoader);
             fail("Dependency validation should wrap linkage errors");
         } catch (VelocityProviderException e) {
-            assertTrue(e.getMessage().contains("commons-lang.jar"));
+            assertTrue(e.getMessage().contains("commons-lang3.jar"));
             assertTrue(e.getCause() instanceof NoClassDefFoundError);
         }
     }

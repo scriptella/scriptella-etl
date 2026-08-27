@@ -1,0 +1,4 @@
+JSpecify 1.0.0
+
+JSpecify is licensed under the Apache License, Version 2.0.
+See https://github.com/jspecify/jspecify for the project license.

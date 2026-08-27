@@ -1,5 +1,0 @@
-Apache Commons Collections 3.2.2
-
-Commons Collections 3.2.2 is licensed under the Apache License, Version 2.0.
-The complete license and notice texts are included in commons-collections.jar
-under META-INF/.

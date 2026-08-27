@@ -1,0 +1,5 @@
+Micrometer Commons 1.16.7
+
+Micrometer is licensed under the Apache License, Version 2.0.
+The complete license and notice texts are included in
+micrometer-commons.jar under META-INF/.

@@ -1,0 +1,5 @@
+SLF4J API 1.7.36
+
+SLF4J source code and binaries are distributed under the MIT License.
+See https://www.slf4j.org/license.html for the applicable license terms
+and notices.
