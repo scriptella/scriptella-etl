@@ -69,17 +69,18 @@ jobs:
             for attempt in 1 2 3; do
               echo "Downloading Ant from $base_url (attempt $attempt)"
               if curl --fail --location --retry 3 --retry-all-errors \
-                   --output "$ant_archive" \
-                   "$base_url/apache-ant-${ant_version}-bin.zip" &&
-                 printf '%s  %s\n' "$expected_checksum" "$ant_archive" |
-                   sha512sum --check --status; then
-                verified=true
-                break 2
+                --output "$ant_archive" \
+                "$base_url/apache-ant-${ant_version}-bin.zip"; then
+                actual_checksum=$(sha512sum "$ant_archive" | awk '{print $1}')
+                if [[ "$actual_checksum" == "$expected_checksum" ]]; then
+                  echo "Verified Apache Ant ${ant_version} archive"
+                  verified=true
+                  break 2
+                fi
+                echo "::warning::Ant download failed verification; SHA-512=$actual_checksum"
+              else
+                echo "::warning::Unable to download Ant from $base_url"
               fi
-
-              actual_checksum=$(sha512sum "$ant_archive" 2>/dev/null |
-                awk '{print $1}')
-              echo "::warning::Ant download failed verification; SHA-512=${actual_checksum:-unavailable}"
             done
           done
 
@@ -87,11 +88,22 @@ jobs:
             echo "::error::Unable to download a verified Apache Ant ${ant_version} archive"
             exit 1
           fi
+          echo "Extracting Apache Ant ${ant_version}"
           unzip -q "$ant_archive" -d "$RUNNER_TEMP"
           export PATH="$ant_home/bin:$PATH"
           echo "ANT_HOME=$ant_home" >> "$GITHUB_ENV"
           echo "$ant_home/bin" >> "$GITHUB_PATH"
-          ant -version 2>&1 | grep -F "version ${ant_version}"
+          if ant_version_output=$(ant -version 2>&1); then
+            echo "$ant_version_output"
+          else
+            echo "::error::Apache Ant failed to start"
+            echo "$ant_version_output"
+            exit 1
+          fi
+          if ! grep -Fq "version ${ant_version}" <<< "$ant_version_output"; then
+            echo "::error::Unexpected Apache Ant version"
+            exit 1
+          fi
 
       - name: Set up DTDDoc 1.1.0
         run: |
