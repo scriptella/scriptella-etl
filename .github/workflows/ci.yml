@@ -90,6 +90,7 @@ jobs:
           fi
           echo "Extracting Apache Ant ${ant_version}"
           unzip -q "$ant_archive" -d "$RUNNER_TEMP"
+          export ANT_HOME="$ant_home"
           export PATH="$ant_home/bin:$PATH"
           echo "ANT_HOME=$ant_home" >> "$GITHUB_ENV"
           echo "$ant_home/bin" >> "$GITHUB_PATH"
