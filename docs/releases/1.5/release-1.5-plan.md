@@ -69,78 +69,80 @@ wants the final release evidence tied directly to the release commit.
 
 ### 1. Freeze scope and tracking
 
-- [ ] Review commits since `scriptella-parent-1.4` and classify every change as
+- [x] Review commits since `scriptella-parent-1.4` and classify every change as
       included, deferred, or a release blocker.
 - [ ] Reconcile issue #48 with the completed implementation and private
       packaged-validation evidence; close it when its public acceptance wording
       is accurate.
-- [ ] Confirm issue #58 remains remediated with no open release-blocking alert.
-- [ ] Keep unrelated features, dependency changes, and cleanup out of the
+- [x] Confirm issue #58 remains remediated with no open release-blocking alert.
+- [x] Keep unrelated features, dependency changes, and cleanup out of the
       frozen release baseline.
 
 ### 2. Final source wording
 
-- [ ] Convert `CHANGELOG.md` Unreleased content into the final 1.5 section with
+- [x] Convert `CHANGELOG.md` Unreleased content into the final 1.5 section with
       the actual release date and comparison link.
-- [ ] Update `README.md` latest-release wording, requirements table, Maven
+- [x] Update `README.md` latest-release wording, requirements table, Maven
       examples, and installer wording to 1.5.
-- [ ] Remove candidate, rehearsal, and not-yet-published language from content
+- [x] Remove candidate, rehearsal, and not-yet-published language from content
       shipped in the final artifacts while preserving honest validation tiers.
-- [ ] Prepare reviewed GitHub release notes from the changelog, including the
+- [x] Prepare reviewed GitHub release notes from the changelog, including the
       Java baseline, database support tiers, dependency upgrades, and upgrade
       notes.
 
 ### 3. Website preparation
 
-- [ ] Create `release-1.5-site` from current website `master`; do not merge or
+- [x] Create `release-1.5-site` from current website `master`; do not merge or
       deploy it before the release artifacts are public.
-- [ ] Update the homepage, download page, changelog, tutorial, CLI reference,
+- [x] Update the homepage, download page, changelog, tutorial, CLI reference,
       driver reference, and installer wording for 1.5.
-- [ ] Regenerate and review API and DTD documentation from the frozen 1.5
+- [x] Regenerate and review API and DTD documentation from the frozen 1.5
       source where required.
-- [ ] Use the final release date, tag, Maven coordinates, and exact GitHub asset
+- [x] Use the final release date, tag, Maven coordinates, and exact GitHub asset
       names in the deployable website commit.
-- [ ] Record the reviewed website commit in the private execution plan.
+- [x] Record the reviewed website commit in the private execution plan.
 
 ### 4. Final no-upload gate
 
-- [ ] Select and record the exact source commit, website commit, release date,
+- [x] Select and record the exact source commit, website commit, release date,
       next development version, tag, signing fingerprint, and expected assets
       in the private execution plan.
-- [ ] Run the complete signed, no-upload Maven release lifecycle on JDK 17 and
+- [x] Run the complete signed, no-upload Maven release lifecycle on JDK 17 and
       JDK 25 as required by the runbook.
-- [ ] Run Ant tests and the DTDDoc distribution build with the approved tool
+- [x] Run Ant tests and the DTDDoc distribution build with the approved tool
       versions.
-- [ ] Validate artifact inventory, licenses, dependency versions, signatures,
+- [x] Validate artifact inventory, licenses, dependency versions, signatures,
       checksums, archive integrity, Java 17 class-file baseline, launcher,
       representative ETL, examples, and isolated Maven consumer.
-- [ ] Run the final packaged PostgreSQL/MariaDB/H2 matrix and targeted MySQL
+- [x] Run the final packaged PostgreSQL/MariaDB/H2 matrix and targeted MySQL
       lane when required by the frozen-source rule above; record the exact
       source and artifact hashes.
-- [ ] Freeze the installer candidate ZIP, record its SHA-256, and update the
-      source `install.sh` before tagging as required by the runbook.
+- [x] Freeze the installer candidate ZIP and record its SHA-256. The 1.4
+      installer was intentionally preserved through the 1.5 tag/publication
+      transition; source `install.sh` is now updated to the published 1.5 ZIP
+      and checksum in the post-publication follow-up.
 
 ### 5. Approval and publication
 
-- [ ] Present the complete no-upload evidence and obtain the first explicit
+- [x] Present the complete no-upload evidence and obtain the first explicit
       Release GO before any external release action.
-- [ ] Run and inspect Maven release preparation locally with pushing disabled.
-- [ ] Push the approved release commit and tag atomically, then build and stage
+- [x] Run and inspect Maven release preparation locally with pushing disabled.
+- [x] Push the approved release commit and tag atomically, then build and stage
       immutable signed GitHub assets from the tag.
-- [ ] Create and inspect the draft GitHub Release.
-- [ ] Upload to Central without automatic publication and require `VALIDATED`.
-- [ ] Obtain the second explicit Publication GO.
-- [ ] Publish Central, verify public resolution, publish and verify the GitHub
+- [x] Create and inspect the draft GitHub Release.
+- [x] Upload to Central without automatic publication and require `VALIDATED`.
+- [x] Obtain the second explicit Publication GO.
+- [x] Publish Central, verify public resolution, publish and verify the GitHub
       Release, and only then merge/deploy the website branch.
 
 ### 6. Post-publication verification
 
-- [ ] Update the website installer to the published 1.5 ZIP URL and pinned
+- [x] Update the website installer to the published 1.5 ZIP URL and pinned
       SHA-256, then run the clean disposable-home test required by #56.
 - [ ] Verify homepage, downloads, changelog, tutorial, reference, API/DTD docs,
       Maven examples, installer instructions, links, assets, and responsive
       presentation on the deployed site.
-- [ ] Push the next-development commit only after release surfaces are public
+- [x] Push the next-development commit only after release surfaces are public
       and verified.
 - [ ] Record sanitized evidence in issue #55; close #56 and #55 when their
       final checks pass.
@@ -153,15 +155,15 @@ gate:
 | Parameter | Planned value |
 | --- | --- |
 | Release version | `1.5` |
-| Next development version | To decide before release preparation |
+| Next development version | `1.6-SNAPSHOT` |
 | Release tag | `scriptella-parent-1.5` |
-| Release date | Set on the final release day |
-| Source commit | Freeze after final review |
+| Release date | `2026-09-08` |
+| Source commit | `cdcdc32623ba477e637353e6a9c6914d455b65ed` |
 | Website branch | `release-1.5-site` |
-| Website commit | Freeze after final website review |
-| Binary ZIP SHA-256 | Record from the approved frozen 1.5 ZIP |
-| Signing fingerprint | Record and verify privately |
-| Central deployment ID | Record after upload |
+| Website commit | Post-publication website commit |
+| Binary ZIP SHA-256 | `1dffead6fdde974ce6e70f8b505906acf25892362b94662509436eeb234bfcbf` |
+| Signing fingerprint | `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE` |
+| Central deployment ID | `0503f1b9-a42e-44e4-a667-2a685c238539` (`PUBLISHED`) |
 
 ## Definition of done
 
