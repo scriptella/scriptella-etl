@@ -139,7 +139,7 @@ wants the final release evidence tied directly to the release commit.
 
 - [x] Update the website installer to the published 1.5 ZIP URL and pinned
       SHA-256, then run the clean disposable-home test required by #56.
-- [ ] Verify homepage, downloads, changelog, tutorial, reference, API/DTD docs,
+- [x] Verify homepage, downloads, changelog, tutorial, reference, API/DTD docs,
       Maven examples, installer instructions, links, assets, and responsive
       presentation on the deployed site.
 - [x] Push the next-development commit only after release surfaces are public
@@ -160,15 +160,15 @@ gate:
 | Release date | `2026-09-08` |
 | Source commit | `cdcdc32623ba477e637353e6a9c6914d455b65ed` |
 | Website branch | `release-1.5-site` |
-| Website commit | Post-publication website commit |
+| Website commit | `cc4bf50` |
 | Binary ZIP SHA-256 | `1dffead6fdde974ce6e70f8b505906acf25892362b94662509436eeb234bfcbf` |
 | Signing fingerprint | `5DA760EAF1B4169E1715DB80322E3E0A55DB94CE` |
 | Central deployment ID | `0503f1b9-a42e-44e4-a667-2a685c238539` (`PUBLISHED`) |
 
 ## Definition of done
 
-Scriptella 1.5 is complete only when the immutable artifacts resolve from
-Maven Central and GitHub, their signatures and hashes verify, the published
-installer passes against the exact 1.5 ZIP, the prepared website is deployed
-and validated, the next development version is pushed, and the release tracker
-contains the sanitized evidence required by the release runbook.
+Scriptella 1.5 is complete: the immutable artifacts resolve from Maven Central
+and GitHub, their signatures and hashes verify, the published installer passes
+against the exact 1.5 ZIP, the website is deployed and validated, the next
+development version is pushed, and the release evidence is recorded in the
+private execution plan.
