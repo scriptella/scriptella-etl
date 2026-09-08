@@ -22,10 +22,10 @@ without a proprietary transformation language or graphical designer.
 
 ## Project status
 
-The latest release is **Scriptella 1.4** (Java 17 baseline), published on
-August 14, 2026.
+The latest release is **Scriptella 1.5** (Java 17 baseline), published on
+September 8, 2026.
 
-Scriptella 1.4 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4)
+Scriptella 1.5 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.5)
 and [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core).
 
 See the [changelog](CHANGELOG.md) for the release details and compatibility
@@ -35,7 +35,7 @@ changes.
 
 | Version | Java |
 | --- | --- |
-| **Scriptella 1.4** | Java **17** |
+| **Scriptella 1.5** | Java **17** |
 | **Scriptella 1.3 (Java 8 compatibility release)** | Java **8** |
 
 ## Getting Scriptella
@@ -59,7 +59,7 @@ attribute as needed. See the
 
 ### Experimental curl installer
 
-Install Scriptella 1.4 with `curl`:
+Install Scriptella 1.5 with `curl`:
 
 ```bash
 curl -fsSL https://scriptella.org/install.sh | sh
@@ -74,7 +74,7 @@ exact PATH command to add manually. The guaranteed command is the packaged
 scriptella.sh path/to/file.etl.xml
 ```
 
-The installer does not install Java; Scriptella 1.4 requires Java 17 or newer.
+The installer does not install Java; Scriptella 1.5 requires Java 17 or newer.
 When the installer updates a startup file, start a new shell or reload that
 file before using `scriptella.sh`. Manual ZIP installation and
 `java -jar scriptella.jar` remain available above.
@@ -158,7 +158,7 @@ the core module:
 <dependency>
   <groupId>org.scriptella</groupId>
   <artifactId>scriptella-core</artifactId>
-  <version>1.4</version>
+  <version>1.5</version>
 </dependency>
 ```
 

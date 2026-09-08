@@ -17,18 +17,14 @@ Scriptella 是一个轻量级、由 XML 驱动的 Java ETL 和数据库迁移工
 
 ## 项目状态
 
-最新版本是 **Scriptella 1.4**（以 Java 17 为基线），于 2026 年 8 月 14 日发布。
-
-Scriptella 1.4 可从 [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4) 和 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core) 获取。
+最新稳定版本可从 [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases) 和 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core) 获取。
 
 发布详情和兼容性变更请参阅[变更日志](CHANGELOG.md)。
 
 ## 要求
 
-| 版本 | Java |
-| --- | --- |
-| **Scriptella 1.4** | Java **17** |
-| **Scriptella 1.3（兼容 Java 8 的版本）** | Java **8** |
+当前 Scriptella 版本需要 Java 17 或更高版本。需要 Java 8 兼容性时，请使用
+Scriptella 1.3。
 
 ## 获取 Scriptella
 
@@ -46,7 +42,7 @@ java -jar scriptella.jar path/to/file.etl.xml
 
 ### 实验性的 curl 安装程序
 
-使用 `curl` 安装 Scriptella 1.4：
+使用 `curl` 安装最新的 Scriptella 版本：
 
 ```bash
 curl -fsSL https://scriptella.org/install.sh | sh
@@ -58,7 +54,7 @@ curl -fsSL https://scriptella.org/install.sh | sh
 scriptella.sh path/to/file.etl.xml
 ```
 
-安装程序不会安装 Java；Scriptella 1.4 要求 Java 17 或更高版本。安装程序更新启动文件后，请启动新 shell 或重新加载该文件，再使用 `scriptella.sh`。上面的手动 ZIP 安装和 `java -jar scriptella.jar` 仍然可用。
+安装程序不会安装 Java；Scriptella 要求 Java 17 或更高版本。安装程序更新启动文件后，请启动新 shell 或重新加载该文件，再使用 `scriptella.sh`。上面的手动 ZIP 安装和 `java -jar scriptella.jar` 仍然可用。
 
 ### 快速开始
 
@@ -114,17 +110,12 @@ Scriptella 分为 core 模块和可选的 provider 模块。
 
 ### Maven 坐标
 
-已发布的 artifact 使用 group ID `org.scriptella`（从 1.2 开始）。core 模块示例：
-
-```xml
-<dependency>
-  <groupId>org.scriptella</groupId>
-  <artifactId>scriptella-core</artifactId>
-  <version>1.4</version>
-</dependency>
-```
-
-drivers 和 tools 模块使用相同的版本。对于大多数基于 Maven 的 JDBC 使用场景，`scriptella-core` 配合数据库的 JDBC driver 即已足够。需要 Scriptella 内置别名或专用 provider 时再添加 `scriptella-drivers`，也可以使用二进制发行版或 all-in-one JAR 获取组装后的产品。可选 provider 的运行时库仍可能需要单独提供；请参阅 provider 文档。
+已发布的 artifact 使用 group ID `org.scriptella`（从 1.2 开始）。当前依赖版本和
+Maven 使用示例请参阅 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
+和[英文 README](README.md)。对于大多数基于 Maven 的 JDBC 使用场景，`scriptella-core`
+配合数据库的 JDBC driver 即已足够。需要 Scriptella 内置别名或专用 provider 时再添加
+`scriptella-drivers`，也可以使用二进制发行版或 all-in-one JAR 获取组装后的产品。
+可选 provider 的运行时库仍可能需要单独提供；请参阅 provider 文档。
 
 ### 从源代码构建
 
@@ -133,8 +124,6 @@ drivers 和 tools 模块使用相同的版本。对于大多数基于 Maven 的 
 ```bash
 mvn clean install
 ```
-
-发布打包使用 Ant 1.10.17，并在 JDK 17 和 JDK 25 上验证；产物仍兼容 Java 17（`--release 17`）。
 
 ## 文档
 

@@ -12,10 +12,10 @@ or the Scriptella runtime classpath.
 
 ## Core database validation targets
 
-The 1.5 candidate's full packaged-distribution matrix passed for PostgreSQL
+Scriptella 1.5's full packaged-distribution matrix passed for PostgreSQL
 and MariaDB on 2026-08-27 using JDK 25. A separate targeted
 packaged lane also passed for MySQL Server 8.4.11 with Connector/J 26.7.0.
-“Tested for the 1.5 candidate” below means that the recorded practical matrix
+“Tested for Scriptella 1.5” below means that the recorded practical matrix
 passed for the listed server and driver versions; it is not an industry
 certification or an unbounded compatibility promise. “Targeted 1.5 lane” means
 that one recorded server/driver contract passed, without implying a broad
@@ -25,8 +25,8 @@ corresponding real-server contract has not passed.
 
 | Database | Scriptella alias | Preferred JDBC class | Canonical URL prefix | Validation target | Status |
 |---|---|---|---|---|---|
-| PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` / PostgreSQL `17.11` | Tested for 1.5 candidate |
-| MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` / MariaDB `11.8.8` | Tested for 1.5 candidate |
+| PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` / PostgreSQL `17.11` | Tested for Scriptella 1.5 |
+| MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` / MariaDB `11.8.8` | Tested for Scriptella 1.5 |
 | MySQL | `mysql` | `com.mysql.cj.jdbc.Driver` | `jdbc:mysql:` | MySQL Connector/J `26.7.0` / MySQL `8.4.11` | Targeted 1.5 lane; not a full matrix |
 | Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | Not yet selected | Provisional; no real-server matrix |
 | Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | Not yet selected | Provisional; no real-server matrix |

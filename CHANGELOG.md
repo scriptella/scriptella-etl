@@ -1,6 +1,46 @@
 # Changelog
 
-## Unreleased
+## [1.5] — 2026-09-08
+
+Scriptella 1.5 is a focused compatibility and usability release that keeps
+the Java 17 baseline while improving current JDBC database support, optional
+integration dependencies, and release-time validation.
+
+### Added
+
+* Added first-class PostgreSQL and MariaDB adapters with canonical URL
+  autodetection and current preferred driver classes.
+* Added an experimental `--check` command that loads and statically checks an
+  ETL configuration without opening configured connections or executing it.
+* Added credential-safe diagnostics for missing, broken, or URL-incompatible
+  JDBC drivers.
+
+### Changed
+
+* Updated the MySQL adapter to the current Connector/J driver class and
+  documented a targeted MySQL 8.4.11 / Connector/J 26.7.0 validation lane.
+  Oracle and SQL Server use current preferred driver classes but remain
+  provisional without real-server matrix results.
+* Replaced the vulnerable Commons Lang 2.6 / Velocity 1.7 integration with
+  Apache Velocity Engine 2.4.1, Commons Lang 3.20.0, and SLF4J API 1.7.36.
+* Updated the optional Spring driver to Spring Framework 7.0.9 and included
+  its required standalone runtime dependencies.
+* Added release validation on JDK 17 and JDK 25 while retaining Java 17
+  class-file output.
+* Added public H2 contract coverage for JDBC commit, rollback,
+  parameter-binding, and value-flow behavior.
+
+### Upgrade notes
+
+* Java 17 remains the minimum runtime and build JDK. Scriptella 1.3 remains
+  the Java 8 compatibility line.
+* Vendor JDBC drivers are external dependencies and must be supplied through
+  the connection `classpath` or the application runtime classpath.
+* The Velocity and Spring optional integrations use new maintained runtime
+  dependency sets; review their documented dependencies when upgrading.
+* PostgreSQL and MariaDB have full recorded validation for the documented
+  versions. MySQL validation is intentionally limited to the targeted lane;
+  Oracle and SQL Server remain adapter-level, provisional support.
 
 ### Security and compatibility
 
@@ -16,8 +56,8 @@
   Observation/Common APIs and JSpecify annotations.
 * Release CI now builds and tests Maven and Ant paths on JDK 17 and JDK 25.
   Both paths compile Scriptella with a Java 17 class-file baseline.
-* PostgreSQL and MariaDB are the tested first-class database targets for the
-  1.5 candidate, using the recorded release-validation matrix. MySQL has one
+* PostgreSQL and MariaDB are the tested first-class database targets for
+  Scriptella 1.5, using the recorded release-validation matrix. MySQL has one
   targeted validation lane using MySQL Server 8.4.11 and Connector/J 26.7.0;
   it is intentionally not a broad MySQL compatibility matrix.
 
@@ -181,6 +221,7 @@ For changes before 1.0 and additional historical detail, see
 [#20]: https://github.com/scriptella/scriptella-etl/issues/20
 [#29]: https://github.com/scriptella/scriptella-etl/issues/29
 [#32]: https://github.com/scriptella/scriptella-etl/issues/32
+[1.5]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.5
 [1.4]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4
 [1.3]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3
 [1.2]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.2

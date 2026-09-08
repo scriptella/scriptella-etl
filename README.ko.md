@@ -17,18 +17,14 @@ Scriptella는 가볍고 XML로 구동되는 Java ETL 및 데이터베이스 마�
 
 ## 프로젝트 상태
 
-최신 릴리스는 **Scriptella 1.4**(Java 17 기준)이며 2026년 8월 14일에 게시되었습니다.
-
-Scriptella 1.4는 [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4)와 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)에서 받을 수 있습니다.
+최신 안정 릴리스는 [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases)와 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)에서 받을 수 있습니다.
 
 릴리스 세부 사항과 호환성 변경 내용은 [변경 로그](CHANGELOG.md)를 참고하세요.
 
 ## 요구 사항
 
-| 버전 | Java |
-| --- | --- |
-| **Scriptella 1.4** | Java **17** |
-| **Scriptella 1.3 (Java 8 호환 릴리스)** | Java **8** |
+현재 Scriptella 릴리스는 Java 17 이상이 필요합니다. Java 8 호환성이
+필요한 경우 Scriptella 1.3을 사용하세요.
 
 ## Scriptella 받기
 
@@ -46,7 +42,7 @@ java -jar scriptella.jar path/to/file.etl.xml
 
 ### 실험적 curl 설치 프로그램
 
-`curl`로 Scriptella 1.4를 설치합니다.
+`curl`로 최신 Scriptella 릴리스를 설치합니다.
 
 ```bash
 curl -fsSL https://scriptella.org/install.sh | sh
@@ -58,7 +54,7 @@ curl -fsSL https://scriptella.org/install.sh | sh
 scriptella.sh path/to/file.etl.xml
 ```
 
-설치 프로그램은 Java를 설치하지 않습니다. Scriptella 1.4에는 Java 17 이상이 필요합니다. 설치 프로그램이 startup 파일을 변경했다면 새 shell을 시작하거나 해당 파일을 다시 불러온 뒤 `scriptella.sh`를 사용하세요. 위의 수동 ZIP 설치와 `java -jar scriptella.jar`도 계속 사용할 수 있습니다.
+설치 프로그램은 Java를 설치하지 않습니다. Scriptella는 Java 17 이상이 필요합니다. 설치 프로그램이 startup 파일을 변경했다면 새 shell을 시작하거나 해당 파일을 다시 불러온 뒤 `scriptella.sh`를 사용하세요. 위의 수동 ZIP 설치와 `java -jar scriptella.jar`도 계속 사용할 수 있습니다.
 
 ### 빠른 시작
 
@@ -114,17 +110,13 @@ Scriptella는 core 모듈과 선택적 provider 모듈로 나뉩니다.
 
 ### Maven 좌표
 
-배포된 artifact는 (1.2부터) group ID `org.scriptella`를 사용합니다. core 모듈 예시는 다음과 같습니다.
-
-```xml
-<dependency>
-  <groupId>org.scriptella</groupId>
-  <artifactId>scriptella-core</artifactId>
-  <version>1.4</version>
-</dependency>
-```
-
-drivers와 tools 모듈도 같은 버전을 사용합니다. 대부분의 Maven 기반 JDBC 사용에서는 `scriptella-core`와 데이터베이스의 JDBC driver면 충분합니다. Scriptella의 기본 별칭이나 특수 provider가 필요할 때 `scriptella-drivers`를 추가하거나, 조립된 제품인 바이너리 배포판/all-in-one JAR을 사용하세요. 선택적 provider 런타임 라이브러리는 별도로 제공해야 할 수 있으므로 provider 문서를 확인하세요.
+배포된 artifact는 (1.2부터) group ID `org.scriptella`를 사용합니다. 현재
+의존성 버전과 Maven 사용 예시는 [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)과
+[영문 README](README.md)에서 확인하세요. 대부분의 Maven 기반 JDBC 사용에서는
+`scriptella-core`와 데이터베이스의 JDBC driver면 충분합니다. Scriptella의 기본
+별칭이나 특수 provider가 필요할 때 `scriptella-drivers`를 추가하거나, 조립된
+제품인 바이너리 배포판/all-in-one JAR을 사용하세요. 선택적 provider 런타임
+라이브러리는 별도로 제공해야 할 수 있으므로 provider 문서를 확인하세요.
 
 ### 소스에서 빌드
 
@@ -133,8 +125,6 @@ Java 17+ 및 Maven 3.6+이 필요합니다.
 ```bash
 mvn clean install
 ```
-
-릴리스 패키징은 Ant 1.10.17을 사용하며 JDK 17과 JDK 25에서 검증됩니다. 생성물은 `--release 17`을 사용해 Java 17과 호환됩니다.
 
 ## 문서
 
