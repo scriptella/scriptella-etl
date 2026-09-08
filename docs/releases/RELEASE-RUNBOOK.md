@@ -118,6 +118,37 @@ test, and retrieve the public key into a separate temporary keyring when
 practical. Stop if the identity, passphrase, signing capability, expiry, or
 public-key distribution is uncertain.
 
+### Mandatory manual signing-key stop
+
+Before any Maven command that signs artifacts, the agent must stop and wait
+for the operator to unlock the approved signing key interactively. Do not
+start Maven and hope that pinentry appears; a non-interactive signing failure
+can occur before the reactor begins.
+
+In a separate interactive terminal, the operator runs the following with the
+private release-plan value substituted for `SIGNING_KEY`:
+
+```bash
+export SIGNING_KEY='<signing-key-fingerprint>'
+export GPG_TTY="$(tty)"
+gpgconf --kill gpg-agent 2>/dev/null || true
+PINENTRY="$(command -v pinentry-curses || command -v pinentry)"
+test -n "$PINENTRY" || { echo 'pinentry is not installed' >&2; exit 1; }
+eval "$(gpg-agent --daemon --pinentry-program "$PINENTRY")"
+probe="$(mktemp "${TMPDIR:-/tmp}/scriptella-signing-probe.XXXXXX")"
+trap 'rm -f "$probe" "$probe.asc"' EXIT
+printf '%s\n' 'Scriptella release signing probe' > "$probe"
+gpg --armor --detach-sign \
+  --local-user "$SIGNING_KEY" \
+  --output "$probe.asc" "$probe"
+gpg --verify "$probe.asc" "$probe"
+```
+
+The operator must confirm the successful signature verification explicitly as
+`GPG_UNLOCKED` before the agent continues. The agent then verifies the key and
+starts the signed no-upload Maven gate. Never send the passphrase through the
+agent, put it on a command line, or record it in a log.
+
 ## 2. Refresh, review, and freeze
 
 Fetch both repositories and compare every branch used by the release with its
