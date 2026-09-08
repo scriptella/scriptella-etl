@@ -5,7 +5,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.scriptella/scriptella-core?logo=apachemaven)](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
 [![GitHub release](https://img.shields.io/github/v/release/scriptella/scriptella-etl?logo=github)](https://github.com/scriptella/scriptella-etl/releases/latest)
 
-[English](README.md) · 简体中文 · [한국어](README.ko.md)
+[English](README.md) · 简体中文 · [한국어](README.ko.md) · [Deutsch (Geschichte)](README.de.md)
 
 Scriptella 是一个轻量级、由 XML 驱动的 Java ETL 和数据库迁移工具。你可以直接使用 SQL 和脚本语言移动、转换数据，无需专有的转换语言或图形化设计器。
 
