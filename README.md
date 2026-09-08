@@ -5,6 +5,8 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.scriptella/scriptella-core?logo=apachemaven)](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
 [![GitHub release](https://img.shields.io/github/v/release/scriptella/scriptella-etl?logo=github)](https://github.com/scriptella/scriptella-etl/releases/latest)
 
+[简体中文](README.zh-CN.md) · [한국어](README.ko.md)
+
 Scriptella is a lightweight, XML-driven ETL and database migration tool for
 Java. Use SQL and scripting languages directly to move and transform data
 without a proprietary transformation language or graphical designer.
@@ -204,6 +206,8 @@ project focus.
 
 This software is licensed under the terms in the file named `LICENSE` in this
 directory (Apache License, Version 2.0).
+
+If Scriptella is useful, consider starring the project on GitHub to help others discover it.
 
 Thank you for using Scriptella.
 
