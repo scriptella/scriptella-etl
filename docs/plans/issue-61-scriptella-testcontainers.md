@@ -93,19 +93,19 @@ abstraction layer.
 
 ### Other lightweight database
 
-- [ ] Apply the same smoke-test contract to the remaining PostgreSQL or MariaDB
+- [x] Apply the same smoke-test contract to the remaining PostgreSQL or MariaDB
   target.
-- [ ] Keep database-specific DDL or ETL fixture differences explicit and small.
-- [ ] Confirm both lightweight databases run sequentially as part of the full
+- [x] Keep database-specific DDL or ETL fixture differences explicit and small.
+- [x] Confirm both lightweight databases run sequentially as part of the full
   local suite.
 
 ### Oracle Free
 
-- [ ] Add a normal supported Oracle Free Testcontainers image and Oracle JDBC
+- [x] Add a normal supported Oracle Free Testcontainers image and Oracle JDBC
   driver.
-- [ ] Adapt the simple tables and ETL fixture only where Oracle syntax requires
+- [x] Adapt the simple tables and ETL fixture only where Oracle syntax requires
   it.
-- [ ] Pass the shared smoke-test contract using the `oracle` Scriptella alias.
+- [x] Pass the shared smoke-test contract using the `oracle` Scriptella alias.
 
 ### Microsoft SQL Server
 
