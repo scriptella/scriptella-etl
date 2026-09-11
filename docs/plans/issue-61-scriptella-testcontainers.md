@@ -128,23 +128,33 @@ abstraction layer.
 
 - [ ] Publish the local repository as the public
   `scriptella/scriptella-testcontainers` repository.
-- [ ] Add one Linux GitHub Actions job per database so targets are easy to
+- [x] Add one Linux GitHub Actions job per database so targets are easy to
   identify and may run in parallel.
-- [ ] Run each job against the repository's normal pinned stable Scriptella
+- [x] Run each job against the repository's normal pinned stable Scriptella
   version.
-- [ ] Allow the workflow to receive or set a `scriptella.version` override for
+- [x] Allow the workflow to receive or set a `scriptella.version` override for
   testing another version available from a configured Maven repository.
-- [ ] Add a simple current-source path that checks out `scriptella-etl`, installs
+- [x] Add a simple current-source path that checks out `scriptella-etl`, installs
   its Maven artifacts in the same job, and runs the suite with that version.
   Use this path for unpublished development snapshots, which cannot resolve
   from a version override alone.
-- [ ] Keep the workflow self-contained and use standard Maven dependency caching
+- [x] Keep the workflow self-contained and use standard Maven dependency caching
   only if it is useful.
 - [ ] Complete one successful public CI run across all four databases.
 
 Do not add custom image caching, registries, artifact protocols, custom log
 collection, self-hosted runners, or a detailed CI policy unless a concrete
 problem later requires one.
+
+The initial public workflows run all four databases in parallel. If runner
+resource or duration constraints become a concrete problem, PostgreSQL and
+MariaDB are the likely minimum always-on subset; Oracle Free and SQL Server may
+then move to default-branch, manual, or another lower-frequency path. This is a
+future fallback, not current scope.
+
+The `scriptella-etl` workflow builds and installs the current source in each
+job, checks out the public compatibility suite alongside it, and invokes the
+same wrapper with the locally installed `1.6-SNAPSHOT` artifacts.
 
 ## Phase 5 — Finish minimal documentation
 
