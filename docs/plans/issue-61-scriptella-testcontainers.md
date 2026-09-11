@@ -9,8 +9,12 @@ answers:
 > against this database?
 
 The initial suite covers PostgreSQL, MariaDB, Oracle Free, and Microsoft SQL
-Server. It is a public compatibility smoke suite, not the complete Scriptella
-certification matrix.
+Server. It is a public real-database compatibility suite, not the complete
+Scriptella certification matrix.
+
+The terminology change from “smoke tests” to “database compatibility tests”
+reflects what the existing test contract already verifies. It does not expand
+the scope of Issue #61 or change the lightweight implementation strategy.
 
 Phases and checkboxes are only for tracking progress and making interrupted
 work easy to resume. They are not approval gates.
@@ -35,7 +39,7 @@ work easy to resume. They are not approval gates.
 - [x] Do not attempt to support SQL Server locally on Apple Silicon; Linux CI is
   the reliable environment for that target.
 
-## Shared smoke-test contract
+## Shared compatibility-test contract
 
 Each database test should:
 
@@ -79,7 +83,7 @@ abstraction layer.
 
 - [x] Start with MariaDB or PostgreSQL, choosing whichever produces the simplest
   first working test.
-- [x] Implement the shared smoke-test contract with a checked-in ETL fixture.
+- [x] Implement the shared compatibility-test contract with a checked-in ETL fixture.
 - [x] Pass Testcontainers-generated connection information to Scriptella
   without fixed host ports.
 - [x] Keep the container lifecycle shared for that database test class so the
@@ -93,7 +97,7 @@ abstraction layer.
 
 ### Other lightweight database
 
-- [x] Apply the same smoke-test contract to the remaining PostgreSQL or MariaDB
+- [x] Apply the same compatibility-test contract to the remaining PostgreSQL or MariaDB
   target.
 - [x] Keep database-specific DDL or ETL fixture differences explicit and small.
 - [x] Confirm both lightweight databases run sequentially as part of the full
@@ -105,19 +109,19 @@ abstraction layer.
   driver.
 - [x] Adapt the simple tables and ETL fixture only where Oracle syntax requires
   it.
-- [x] Pass the shared smoke-test contract using the `oracle` Scriptella alias.
+- [x] Pass the shared compatibility-test contract using the `oracle` Scriptella alias.
 
 ### Microsoft SQL Server
 
-- [ ] Add a normal supported Microsoft SQL Server Linux image and Microsoft JDBC
+- [x] Add a normal supported Microsoft SQL Server Linux image and Microsoft JDBC
   driver.
-- [ ] Accept the image license in the standard Testcontainers-supported way.
-- [ ] Use test-only connection settings suitable for the local container.
-- [ ] Adapt the simple tables and ETL fixture only where SQL Server syntax
+- [x] Accept the image license in the standard Testcontainers-supported way.
+- [x] Use test-only connection settings suitable for the local container.
+- [x] Adapt the simple tables and ETL fixture only where SQL Server syntax
   requires it.
-- [ ] Pass the shared smoke-test contract on Linux using the `mssql` Scriptella
+- [x] Pass the shared compatibility-test contract on Linux using the `mssql` Scriptella
   alias.
-- [ ] Document that SQL Server is not supported locally on Apple Silicon; do not
+- [x] Document that SQL Server is not supported locally on Apple Silicon; do not
   add emulation or another workaround.
 
 ## Phase 4 — Add basic public CI
@@ -156,7 +160,7 @@ problem later requires one.
 - [ ] Document the `scriptella.version` override and locally installed snapshot
   flow.
 - [ ] Document the SQL Server and Apple Silicon limitation.
-- [ ] Explain that this is a small public compatibility smoke suite rather than
+- [ ] Explain that this is a small public real-database compatibility suite rather than
   the complete private certification matrix.
 - [ ] Mention that MySQL is covered separately by private Scriptella
   certification; do not imply MariaDB proves MySQL compatibility.
