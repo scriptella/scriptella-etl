@@ -20,16 +20,16 @@ passed for the listed server and driver versions; it is not an industry
 certification or an unbounded compatibility promise. “Targeted 1.5 lane” means
 that one recorded server/driver contract passed, without implying a broad
 compatibility matrix.
-“Provisional” means that the adapter or smoke coverage exists, but the
-corresponding real-server contract has not passed.
+“Provisional” means that adapter or focused compatibility coverage exists, but
+the corresponding broad release matrix has not passed.
 
 | Database | Scriptella alias | Preferred JDBC class | Canonical URL prefix | Validation target | Status |
 |---|---|---|---|---|---|
 | PostgreSQL | `postgresql` | `org.postgresql.Driver` | `jdbc:postgresql:` | pgJDBC `42.7.13` / PostgreSQL `17.11` | Tested for Scriptella 1.5 |
 | MariaDB | `mariadb` | `org.mariadb.jdbc.Driver` | `jdbc:mariadb:` | MariaDB Connector/J `3.5.7` / MariaDB `11.8.8` | Tested for Scriptella 1.5 |
 | MySQL | `mysql` | `com.mysql.cj.jdbc.Driver` | `jdbc:mysql:` | MySQL Connector/J `26.7.0` / MySQL `8.4.11` | Targeted 1.5 lane; not a full matrix |
-| Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | Not yet selected | Provisional; no real-server matrix |
-| Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | Not yet selected | Provisional; no real-server matrix |
+| Oracle Database | `oracle` | `oracle.jdbc.OracleDriver` | `jdbc:oracle:` | ojdbc17 `23.26.3.0.0` / Oracle Free `23.26.2` | Focused public real-database coverage; not a broad release matrix |
+| Microsoft SQL Server | `mssql` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver:` | mssql-jdbc `13.6.0.jre11` / SQL Server `2022-CU26` | Focused public real-database coverage; not a broad release matrix |
 
 Scriptella 1.5 provides first-class aliases and URL autodetection for the
 current driver classes and canonical URLs above. Obsolete or deprecated driver
@@ -126,6 +126,20 @@ See the [Microsoft JDBC encryption guidance](https://learn.microsoft.com/sql/con
 for the driver-specific trust-store options.
 
 ## Compatibility validation
+
+### Public real-database compatibility tests
+
+The public [Scriptella Testcontainers suite](https://github.com/scriptella/scriptella-testcontainers)
+runs focused ETL compatibility tests against real PostgreSQL, MariaDB, Oracle
+Free, and Microsoft SQL Server databases using pinned container images and JDBC
+driver versions. The tests exercise representative reads, writes, values, and
+transaction rollback.
+
+Recorded results are available in the suite's
+[compatibility history](https://github.com/scriptella/scriptella-testcontainers/blob/main/docs/compatibility-results.md).
+
+These public tests are intentionally narrower than the project's comprehensive
+internal compatibility certification.
 
 The Scriptella Project Team performs internal compatibility validation against
 the database and JDBC driver targets documented on this page. These results
