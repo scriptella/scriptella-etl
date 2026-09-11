@@ -186,6 +186,7 @@ artifacts remain Java 17-compatible (`--release 17`).
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
 * Core database compatibility and validation targets: [docs/core-database-compatibility.md](docs/core-database-compatibility.md)
+* Public real-database compatibility tests powered by Testcontainers: [scriptella-testcontainers](https://github.com/scriptella/scriptella-testcontainers)
 * Command-line usage contract and automation templates: [docs/cli-usage.md](docs/cli-usage.md)
 * Open Knowledge Format: curated machine-readable knowledge about Scriptella's configuration, execution model, providers, JDBC compatibility, CLI, and security: [okf/index.md](okf/index.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
