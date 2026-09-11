@@ -57,19 +57,19 @@ abstraction layer.
 
 ## Phase 1 — Bootstrap the repository
 
-- [ ] Create the public `scriptella/scriptella-testcontainers` repository with
+- [x] Initialize the separate local `scriptella-testcontainers` repository with
   the normal Scriptella license and a minimal `.gitignore`.
-- [ ] Add a single-module Maven build using the documented minimum Java version.
-- [ ] Add JUnit 5 and the Testcontainers BOM.
-- [ ] Add `scriptella-core` and `scriptella-drivers` using the same
+- [x] Add a single-module Maven build using the documented minimum Java version.
+- [x] Add JUnit 5 and the Testcontainers BOM.
+- [x] Add `scriptella-core` and `scriptella-drivers` using the same
   `${scriptella.version}` property.
-- [ ] Add explicit test dependencies for the PostgreSQL, MariaDB, Oracle, and
+- [x] Add explicit test dependencies for the PostgreSQL, MariaDB, Oracle, and
   SQL Server JDBC drivers and Testcontainers database modules.
-- [ ] Select and pin one normal supported database image version for each
+- [x] Select and pin one normal supported database image version for each
   target, staying close to Scriptella 1.5 validation versions where practical.
-- [ ] Add a small test-resource layout for checked-in ETL XML and
+- [x] Add a small test-resource layout for checked-in ETL XML and
   database-specific SQL.
-- [ ] Document how to override the Scriptella dependency, for example
+- [x] Document how to override the Scriptella dependency, for example
   `mvn verify -Dscriptella.version=1.6-SNAPSHOT` after installing that snapshot
   from a local `scriptella-etl` checkout.
 
@@ -120,6 +120,8 @@ abstraction layer.
 
 ## Phase 4 — Add basic public CI
 
+- [ ] Publish the local repository as the public
+  `scriptella/scriptella-testcontainers` repository.
 - [ ] Add one Linux GitHub Actions job per database so targets are easy to
   identify and may run in parallel.
 - [ ] Run each job against the repository's normal pinned stable Scriptella
