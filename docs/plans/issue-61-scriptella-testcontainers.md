@@ -126,7 +126,7 @@ abstraction layer.
 
 ## Phase 4 — Add basic public CI
 
-- [ ] Publish the local repository as the public
+- [x] Publish the local repository as the public
   `scriptella/scriptella-testcontainers` repository.
 - [x] Add one Linux GitHub Actions job per database so targets are easy to
   identify and may run in parallel.
@@ -140,7 +140,7 @@ abstraction layer.
   from a version override alone.
 - [x] Keep the workflow self-contained and use standard Maven dependency caching
   only if it is useful.
-- [ ] Complete one successful public CI run across all four databases.
+- [x] Complete one successful public CI run across all four databases.
 
 Do not add custom image caching, registries, artifact protocols, custom log
 collection, self-hosted runners, or a detailed CI policy unless a concrete
