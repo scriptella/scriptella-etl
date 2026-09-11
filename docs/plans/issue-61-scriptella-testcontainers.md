@@ -29,6 +29,8 @@ work easy to resume. They are not approval gates.
 - [x] Keep MySQL outside the initial public suite; it remains covered by the
   private certification suite.
 - [x] Run databases sequentially on developer machines.
+- [x] Prefer Colima's Docker runtime for local macOS development; any
+  Testcontainers-compatible Docker runtime remains supported.
 - [x] Use separate Linux CI jobs for the four databases.
 - [x] Do not attempt to support SQL Server locally on Apple Silicon; Linux CI is
   the reliable environment for that target.
@@ -75,16 +77,16 @@ abstraction layer.
 
 ## Phase 2 — Implement the first lightweight database
 
-- [ ] Start with MariaDB or PostgreSQL, choosing whichever produces the simplest
+- [x] Start with MariaDB or PostgreSQL, choosing whichever produces the simplest
   first working test.
-- [ ] Implement the shared smoke-test contract with a checked-in ETL fixture.
-- [ ] Pass Testcontainers-generated connection information to Scriptella
+- [x] Implement the shared smoke-test contract with a checked-in ETL fixture.
+- [x] Pass Testcontainers-generated connection information to Scriptella
   without fixed host ports.
-- [ ] Keep the container lifecycle shared for that database test class so the
+- [x] Keep the container lifecycle shared for that database test class so the
   database is not restarted for every assertion.
-- [ ] Verify the copied data and rollback independently with the vendor JDBC
+- [x] Verify the copied data and rollback independently with the vendor JDBC
   driver.
-- [ ] Make the database runnable by itself with a short documented Maven
+- [x] Make the database runnable by itself with a short documented Maven
   command such as `mvn verify -Ddatabase=mariadb`.
 
 ## Phase 3 — Add the remaining databases
@@ -146,7 +148,9 @@ problem later requires one.
 - [ ] List PostgreSQL, MariaDB, Oracle Free, and SQL Server as the initial
   targets.
 - [ ] List Java, Maven, and a Testcontainers-compatible Docker runtime as
-  prerequisites.
+  prerequisites, with Colima documented as the preferred local macOS runtime.
+- [ ] Document the Colima setup and Testcontainers environment variables needed
+  for local database runs.
 - [ ] Document the commands for one selected database and the complete
   sequential suite.
 - [ ] Document the `scriptella.version` override and locally installed snapshot
