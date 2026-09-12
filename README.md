@@ -4,7 +4,7 @@
 [![CI](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.scriptella/scriptella-core?logo=apachemaven)](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
 [![GitHub release](https://img.shields.io/github/v/release/scriptella/scriptella-etl?logo=github)](https://github.com/scriptella/scriptella-etl/releases/latest)
-[![DB CI pipeline: PG, MariaDB, Oracle, MSSQL](https://raw.githubusercontent.com/scriptella/scriptella-testcontainers/main/docs/scriptella-testcontainers-tested.svg)](https://github.com/scriptella/scriptella-testcontainers)
+[![DB CI pipeline: PG, MariaDB, Oracle, MSSQL](https://raw.githubusercontent.com/scriptella/scriptella-testcontainers/main/docs/scriptella-testcontainers-tested.svg)](https://github.com/scriptella/scriptella-testcontainers#test-status-for-scriptella-15-latest-release)
 
 [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [Deutsch (Geschichte)](README.de.md)
 
