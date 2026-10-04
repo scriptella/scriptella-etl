@@ -18,7 +18,6 @@ package scriptella.jdbc;
 import scriptella.spi.AbstractScriptellaDriver;
 import scriptella.spi.ConnectionParameters;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -38,20 +37,9 @@ public class GenericDriver extends AbstractScriptellaDriver {
 
     private static final Logger LOG = Logger.getLogger(GenericDriver.class.getName());
 
-    static {
-        //Redirects DriverManager's logging
-        final Logger LOG = Logger.getLogger("scriptella.DriverManagerLog");
-        if (LOG.isLoggable(Level.FINE)) {
-            if (DriverManager.getLogWriter() == null) {
-                DriverManager.setLogWriter(new PrintWriter(System.out) {
-                    public void println(String s) {
-                        LOG.fine(s);
-                    }
-                });
-
-            }
-        }
-    }
+    // Do not enable DriverManager logging, even at FINE: raw driver messages can
+    // expose URLs and credentials before exception sanitization. Any log writer
+    // explicitly installed by the embedding application remains its responsibility.
 
     /**
      * Tries to load one of the specified driver class names.

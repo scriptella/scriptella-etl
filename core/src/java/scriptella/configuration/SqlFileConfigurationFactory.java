@@ -16,6 +16,7 @@
 package scriptella.configuration;
 
 import scriptella.jdbc.GenericDriver;
+import scriptella.expression.PropertiesSubstitutor;
 import scriptella.spi.Resource;
 import scriptella.spi.support.MapParametersCallback;
 import scriptella.util.CollectionUtils;
@@ -43,10 +44,15 @@ public final class SqlFileConfigurationFactory {
     /** Internal helper used by EtlExecutor's SQL factory. */
     public static ConfigurationEl create(final File file, String url, String user, String password,
                                          String driver, boolean substitution) {
+        Map<String, Object> variables = new HashMap<String, Object>(CollectionUtils.asMap(System.getProperties()));
+        PropertiesSubstitutor substitutor = new PropertiesSubstitutor(variables);
+        url = substitutor.substitute(url);
+        user = substitutor.substitute(user);
+        password = substitutor.substitute(password);
+        driver = substitutor.substitute(driver);
         if (file == null || url == null || !url.startsWith("jdbc:")) {
             throw new IllegalArgumentException("A SQL file and JDBC URL are required");
         }
-        Map<String, Object> variables = new HashMap<String, Object>(CollectionUtils.asMap(System.getProperties()));
         ConnectionEl connection = new ConnectionEl(
                 url, user, password, Collections.singletonMap("substitution", substitution));
         connection.setDriver(driver == null ? GenericDriver.class.getName() : driver);

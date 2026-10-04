@@ -69,6 +69,8 @@ public class PropertiesEl extends XmlConfigurableBase {
                     }
                 }
                 map = p;
+            } catch (MissingEnvironmentVariableException e) {
+                throw new ConfigurationException("Unable to load properties: " + e.getMessage(), e, element);
             } catch (Exception e) {
                 throw new ConfigurationException("Unable to load properties", e,
                         element);

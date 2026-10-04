@@ -24,6 +24,8 @@ import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
 import scriptella.execution.JmxEtlManager;
+import scriptella.expression.PropertiesSubstitutor;
+import scriptella.expression.Expression;
 import scriptella.interactive.ConsoleProgressIndicator;
 import scriptella.interactive.LoggingConfigurer;
 import scriptella.interactive.ProgressIndicator;
@@ -315,7 +317,7 @@ public class EtlLauncher {
                 return ErrorCode.UNRECOGNIZED_OPTION;
             }
         }
-        if (url == null || !url.startsWith("jdbc:") || file == null) {
+        if (url == null || (!url.startsWith("jdbc:") && !hasLeadingSubstitution(url)) || file == null) {
             getErr().println("execute-sql requires --url jdbc:... and one SQL file");
             return ErrorCode.UNRECOGNIZED_OPTION;
         }
@@ -348,6 +350,26 @@ public class EtlLauncher {
         } finally {
             LoggingConfigurer.remove(handler);
         }
+    }
+
+    private static boolean hasLeadingSubstitution(String value) {
+        if (!value.startsWith("$")) {
+            return false;
+        }
+        String reference = value.substring(1);
+        if (PropertiesSubstitutor.PROP_PTR.matcher(reference).lookingAt()) {
+            return true;
+        }
+        java.util.regex.Matcher expression = PropertiesSubstitutor.EXPR_PTR.matcher(reference);
+        if (expression.lookingAt()) {
+            try {
+                Expression.compile(expression.group(1));
+                return true;
+            } catch (Expression.ParseException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     private void printSqlUsage() {

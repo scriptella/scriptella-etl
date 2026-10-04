@@ -28,6 +28,62 @@ import java.util.Collections;
  * @version 1.0
  */
 public class PropertiesSubstitutorTest extends AbstractTestCase {
+    public void testEnvironmentNamespace() {
+        String name = System.getenv("PATH") == null ? "Path" : "PATH";
+        assertNotNull("Process search path must be defined", System.getenv(name));
+        String value = System.getenv(name);
+        java.util.Map<String, Object> properties = new java.util.HashMap<String, Object>();
+        properties.put("env", Collections.singletonMap(name, "shadow"));
+        properties.put("env." + name, "shadow");
+        properties.put("foo", "ordinary");
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(properties);
+        assertEquals(value, ps.substitute("${env." + name + "}"));
+        assertEquals(value, ps.substitute("$env." + name));
+        assertEquals(value + "!", ps.substitute("${env." + name + " + '!'}"));
+        assertEquals(value, ps.substitute("${env['" + name + "']}"));
+        assertEquals("ordinary", ps.substitute("${foo}"));
+        assertEquals("${unknown}", ps.substitute("${unknown}"));
+        assertEquals("[environment]", ps.substitute("${env}"));
+        java.util.Map env = (java.util.Map) Expression.compile("env").evaluate(ps.getParameters());
+        try {
+            env.put(name, "shadow");
+            fail("Environment must be read-only");
+        } catch (UnsupportedOperationException expected) {
+            assertEquals(value, ps.substitute("${env." + name + "}"));
+        }
+    }
+
+    public void testEnvironmentEvaluationErrorDoesNotExposeValue() {
+        String name = System.getenv("PATH") == null ? "Path" : "PATH";
+        assertNotNull(System.getenv(name));
+        try {
+            Expression.compile("env." + name + " - 1").evaluate(MockParametersCallbacks.NULL);
+            fail("Expected number conversion error");
+        } catch (Expression.EvaluationException expected) {
+            assertEquals("Unable to evaluate expression using environment variables", expected.getMessage());
+            assertNull(expected.getCause());
+        }
+    }
+
+    public void testMissingEnvironmentVariable() {
+        String name = "SCRIPTELLA_MISSING_65_" + java.util.UUID.randomUUID().toString().replace("-", "");
+        PropertiesSubstitutor ps = new PropertiesSubstitutor(Collections.singletonMap("env." + name, "shadow"));
+        for (String reference : new String[]{"${env." + name + "}", "$env." + name,
+                "${env['" + name + "']}", "${env." + name + " + '!'}"}) {
+            try {
+                ps.substitute(reference);
+                fail("Expected missing environment error: " + reference);
+            } catch (RuntimeException expected) {
+                String messages = "";
+                for (Throwable cause = expected; cause != null; cause = cause.getCause()) {
+                    messages += cause.getMessage();
+                }
+                assertTrue(messages, messages.contains("Missing environment variable: " + name));
+                assertFalse(messages, messages.contains("shadow"));
+            }
+        }
+    }
+
     public void testVerbatimString() {
         PropertiesSubstitutor ps = new PropertiesSubstitutor();
         String exp = "No $ Params to substitute$$$";

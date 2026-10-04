@@ -63,6 +63,49 @@ public class SqlLauncherTest extends TestCase {
         }
     }
 
+    public void testEnvironmentSettingsInChildProcess() throws Exception {
+        Path file = Files.createTempFile("scriptella-env-launcher", ".sql");
+        try {
+            Files.writeString(file, "CREATE TABLE deployment(payload VARCHAR NOT NULL CHECK(payload='bound-value')); INSERT INTO deployment VALUES ('${env.SCRIPTELLA_TEST_VALUE}');");
+            assertEnvironmentLaunch(file, "jdbc:h2:mem:envLauncher", "credential-password-marker", 0);
+            assertEnvironmentLaunch(file, "jdbc:h2:mem:emptyPassword", "", 0);
+            assertEnvironmentLaunch(file, "jdbc:missing:credential-url-marker", "credential-password-marker", 1);
+            assertEnvironmentLaunch(file, null, "credential-password-marker", 1);
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private void assertEnvironmentLaunch(Path file, String url, String password, int expectedExit) throws Exception {
+        ProcessBuilder builder = new ProcessBuilder(
+                java.nio.file.Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-cp", System.getProperty("java.class.path"), EtlLauncher.class.getName(),
+                "execute-sql", "--debug", "--no-jmx", "--url", "${env.SCRIPTELLA_TEST_URL}",
+                "--user", "${env.SCRIPTELLA_TEST_USER}", "--password", "${env.SCRIPTELLA_TEST_PASSWORD}",
+                "--driver", "${env.SCRIPTELLA_TEST_DRIVER}", file.toString());
+        if (url == null) {
+            builder.environment().remove("SCRIPTELLA_TEST_URL");
+        } else {
+            builder.environment().put("SCRIPTELLA_TEST_URL", url);
+        }
+        builder.environment().put("SCRIPTELLA_TEST_USER", "credential-user-marker");
+        builder.environment().put("SCRIPTELLA_TEST_PASSWORD", password);
+        builder.environment().put("SCRIPTELLA_TEST_DRIVER", "org.h2.Driver");
+        builder.environment().put("SCRIPTELLA_TEST_VALUE", "bound-value");
+        builder.redirectErrorStream(true);
+        Process process = builder.start();
+        String output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        assertEquals(output, expectedExit, process.waitFor());
+        assertFalse(output, output.contains("credential-password-marker"));
+        assertFalse(output, output.contains("credential-user-marker"));
+        assertFalse(output, output.contains("credential-url-marker"));
+        if (url == null) {
+            assertTrue(output, output.contains("Missing environment variable: SCRIPTELLA_TEST_URL"));
+        } else {
+            assertFalse(output, output.contains(url));
+        }
+    }
+
     private static class CapturingLauncher extends EtlLauncher {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         final ByteArrayOutputStream err = new ByteArrayOutputStream();
@@ -75,6 +118,15 @@ public class SqlLauncherTest extends TestCase {
         public void setNoJmx(boolean noJmx) {
             this.noJmx = noJmx;
             super.setNoJmx(noJmx);
+        }
+    }
+
+    public void testMalformedDollarUrlsAreInvalidArguments() {
+        for (String url : new String[]{"foo$bar", "foo${env.DB_URL}", "$", "$$url",
+                "${}", "${env.DB_URL", "${1 +}"}) {
+            CapturingLauncher launcher = new CapturingLauncher();
+            assertEquals(url, EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                    launcher.launch(new String[]{"execute-sql", "--url", url, "missing.sql"}));
         }
     }
 

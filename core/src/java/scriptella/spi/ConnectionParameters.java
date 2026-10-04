@@ -322,7 +322,7 @@ public class ConnectionParameters {
     }
 
     public String toString() {
-        return "ConnectionParameters{" + propertiesSource + ", url='" + url + '\'' + ", user='" + user + '\'' +
+        return "ConnectionParameters{properties=[redacted], url=[redacted], user=[redacted]" +
                 (password == null ? "" : ", password='" + StringUtils.getMaskedPassword(password) + '\'') +
                 ", schema='" + schema + '\'' + ", catalog='" + catalog + '\'' + '}';
     }

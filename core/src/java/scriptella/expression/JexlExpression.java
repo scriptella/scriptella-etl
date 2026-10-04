@@ -48,10 +48,19 @@ public final class JexlExpression extends Expression {
 
     public Object evaluate(final ParametersCallback callback)
             throws EvaluationException {
-        JexlContextAdapter a = new JexlContextAdapter(callback);
+        EnvironmentParameters parameters = new EnvironmentParameters(callback);
+        JexlContextAdapter a = new JexlContextAdapter(parameters);
         try {
-            return expression.evaluate(a);
+            Object result = expression.evaluate(a);
+            // JEXL may treat a failed map lookup as null; missing env variables are always errors.
+            parameters.check();
+            return result;
         } catch (Exception e) {
+            parameters.check();
+            if (parameters.isEnvironmentUsed()) {
+                // Evaluation causes (e.g. number conversion) may contain resolved credentials.
+                throw new EvaluationException("Unable to evaluate expression using environment variables");
+            }
             throw new EvaluationException(e);
         }
 

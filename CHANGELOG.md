@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Added the reserved, read-only `${env.FOO}` environment namespace for shared
+  expressions, ETL configuration, and direct SQL connection settings (#65).
+  Missing environment variables fail clearly; ordinary property lookup and
+  precedence remain unchanged.
 * Added `EtlExecutor.newSqlFileExecutor` and `execute-sql` launcher support for
   direct UTF-8 SQL files, JDBC credentials, property substitution, literal mode,
   transaction handling, and completion counts without ETL XML.

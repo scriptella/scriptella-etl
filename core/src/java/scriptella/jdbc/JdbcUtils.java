@@ -43,6 +43,10 @@ public final class JdbcUtils {
     private static final Pattern URL_PROPERTY = Pattern.compile("(?:[?;&])([^=?;&]+)=([^;&]*)");
     private static final Pattern URL_USER_INFO = Pattern.compile("^jdbc:[^:]+://([^/@]+)@");
 
+    private static final Pattern USER_CONTEXT = Pattern.compile(
+            "(?i)(\\b(?:user(?:name)?|login)(?:\\s*[=:]\\s*|\\s+))" +
+                    "(\"[^\"]*\"|'[^']*'|[^\\s,;:&)\\]}\"']+?(?=[.!?]*(?:$|[\\s,;:&)\\]}])))");
+
     private JdbcUtils() {
     }
 
@@ -135,6 +139,7 @@ public final class JdbcUtils {
     private static String sanitizeMessage(String message, ConnectionParameters parameters, Properties properties) {
         message = sanitize(message, parameters.getUrl(), getUrlDescription(parameters.getUrl()));
         message = sanitize(message, parameters.getPassword(), "[hidden]");
+        message = sanitizeUser(message, parameters.getUser());
         for (String sensitiveValue : getSensitiveUrlValues(parameters.getUrl())) {
             message = sanitize(message, sensitiveValue, "[hidden]");
         }
@@ -193,6 +198,29 @@ public final class JdbcUtils {
             }
         }
         return "the configured JDBC URL";
+    }
+
+    private static String sanitizeUser(String message, String user) {
+        if (message == null || user == null || user.isEmpty()) {
+            return message;
+        }
+        // Only redact a complete value following a recognizable user/login label.
+        // Short usernames must not replace characters inside unrelated diagnostics.
+        Matcher context = USER_CONTEXT.matcher(message);
+        StringBuffer result = new StringBuffer();
+        while (context.find()) {
+            String value = context.group(2);
+            boolean quoted = value.startsWith("\"") || value.startsWith("'");
+            String name = quoted ? value.substring(1, value.length() - 1) : value;
+            if (user.equalsIgnoreCase(name)) {
+                String replacement = quoted ? value.charAt(0) + "[hidden]" + value.charAt(0) : "[hidden]";
+                context.appendReplacement(result, Matcher.quoteReplacement(context.group(1) + replacement));
+            } else {
+                context.appendReplacement(result, Matcher.quoteReplacement(context.group()));
+            }
+        }
+        context.appendTail(result);
+        return result.toString();
     }
 
     private static String sanitize(String message, String sensitiveValue, String replacement) {

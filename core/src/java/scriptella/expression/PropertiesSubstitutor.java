@@ -133,7 +133,7 @@ public class PropertiesSubstitutor {
                 String v;
 
                 if (m == m1) {
-                    v = toString(parameters.getParameter(name));
+                    v = toString(EnvironmentParameters.get(parameters, name));
                 } else {
                     v = toString(Expression.compile(name).evaluate(parameters));
                 }

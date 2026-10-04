@@ -107,6 +107,79 @@ public class GenericDriverTest extends AbstractTestCase {
         }
     }
 
+    public void testShortUsernamesOnlyRedactCredentialContexts() {
+        for (final String user : new String[]{"a", "sa"}) {
+            ConnectionParameters parameters = new SensitiveParameters("jdbc:example:test", null) {
+                @Override
+                public String getUser() {
+                    return user;
+                }
+            };
+            String unrelated = "Database unavailable; unsafe transaction state; sample diagnostic.";
+            String message = unrelated + " user=" + user + "; username: \"" + user +
+                    "\", Login failed for user '" + user + "'; user=admin; username=sam;";
+            SQLException sanitized = JdbcUtils.sanitize(new SQLException(message), parameters, new Properties());
+            assertEquals(unrelated + " user=[hidden]; username: \"[hidden]\", " +
+                    "Login failed for user '[hidden]'; user=admin; username=sam;", sanitized.getMessage());
+        }
+    }
+
+    public void testQuotedUsernamesWithPunctuationAndHostSuffixes() {
+        ConnectionParameters parameters = new SensitiveParameters("jdbc:example:test", null) {
+            @Override
+            public String getUser() {
+                return "alice";
+            }
+        };
+        String message = "Login failed for user 'alice'. Access denied for user 'alice'@'host'. " +
+                "username=\"alice\"@host; user='alice-other'; user=alice-other;";
+        SQLException sanitized = JdbcUtils.sanitize(new SQLException(message), parameters, new Properties());
+        assertEquals("Login failed for user '[hidden]'. Access denied for user '[hidden]'@'host'. " +
+                "username=\"[hidden]\"@host; user='alice-other'; user=alice-other;", sanitized.getMessage());
+    }
+
+    public void testUnquotedUsernamesWithSentencePunctuation() {
+        for (final String user : new String[]{"alice", "alice.smith"}) {
+            ConnectionParameters parameters = new SensitiveParameters("jdbc:example:test", null) {
+                @Override
+                public String getUser() {
+                    return user;
+                }
+            };
+            for (String punctuation : new String[]{".", "!", "?", "..."}) {
+                String message = "Login failed for user " + user + punctuation + " user=" + user + punctuation +
+                        " user=" + user + "-other; user=" + user + ".other.";
+                SQLException sanitized = JdbcUtils.sanitize(new SQLException(message), parameters, new Properties());
+                assertEquals("Login failed for user [hidden]" + punctuation + " user=[hidden]" + punctuation +
+                        " user=" + user + "-other; user=" + user + ".other.", sanitized.getMessage());
+            }
+        }
+    }
+
+    public void testDebugDoesNotEnableRawDriverManagerLogging() throws Exception {
+        // Class initialization must happen in a fresh JVM with FINE already enabled.
+        for (String mode : new String[]{"disabled", "application-writer"}) {
+            Process process = new ProcessBuilder(
+                    java.nio.file.Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                    "-cp", System.getProperty("java.class.path"), GenericDriverTest.class.getName(), mode)
+                    .redirectErrorStream(true).start();
+            String output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            assertEquals(output, 0, process.waitFor());
+        }
+    }
+
+    /** Fresh-JVM probe for GenericDriver's effect on the global JDBC log writer. */
+    public static void main(String[] args) throws Exception {
+        java.util.logging.Logger.getLogger("scriptella.DriverManagerLog").setLevel(java.util.logging.Level.FINE);
+        java.io.PrintWriter writer = "application-writer".equals(args[0]) ?
+                new java.io.PrintWriter(new java.io.StringWriter()) : null;
+        java.sql.DriverManager.setLogWriter(writer);
+        Class.forName(GenericDriver.class.getName());
+        if (java.sql.DriverManager.getLogWriter() != writer) {
+            throw new AssertionError("Debug logging must preserve the application's DriverManager log writer");
+        }
+    }
+
     private JdbcException expectLoadFailure(String... drivers) {
         try {
             new TestDriver().load(drivers);

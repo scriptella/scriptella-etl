@@ -23,6 +23,24 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 
 public class SqlFileExecutorTest extends TestCase {
+    public void testEnvironmentConnectionSettings() throws Exception {
+        String name = System.getenv("PATH") == null ? "Path" : "PATH";
+        assertNotNull("Process search path must be defined", System.getenv(name));
+        String reference = "${env." + name + "}";
+        Path file = Files.createTempFile("scriptella-env", ".sql");
+        try {
+            EtlExecutor executor = EtlExecutor.newSqlFileExecutor(file.toFile(),
+                    "jdbc:h2:mem:" + reference, reference, reference, null, false);
+            scriptella.configuration.ConnectionEl connection = executor.getConfiguration().getConnections().get(0);
+            assertEquals("jdbc:h2:mem:" + System.getenv(name), connection.getUrl());
+            assertEquals(System.getenv(name), connection.getUser());
+            assertEquals(System.getenv(name), connection.getPassword());
+            assertFalse(connection.toString().contains(System.getenv(name)));
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
     public void testFactoryReturnsReusableNormalExecutor() throws Exception {
         String key = "scriptella.sql.test.value";
         String previous = System.getProperty(key);

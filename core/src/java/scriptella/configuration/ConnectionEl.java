@@ -159,10 +159,10 @@ public class ConnectionEl extends XmlConfigurableBase {
             res.append(", catalog='").append(catalog).append('\'');
         }
         if (user != null) {
-            res.append(", user='").append(user).append('\'');
+            res.append(", user=[redacted]");
         }
         if (url != null) {
-            res.append(", url='").append(url).append('\'');
+            res.append(", url=[redacted]");
         }
         if (id != null) {
             res.append(", id='").append(id).append('\'' + '}');

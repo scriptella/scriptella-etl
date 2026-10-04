@@ -155,8 +155,9 @@ External JVM properties take precedence over values declared inside the ETL
 `<properties>` element. Environment variables are not imported as ETL
 properties automatically.
 
-For credentials, pass only a protected properties-file path on the command
-line:
+For credentials, use a protected external properties file or the reserved
+[`${env.*}` namespace](#environment-variables). With a protected file, pass
+only its path on the command line:
 
 ```xml
 <properties>
@@ -285,6 +286,46 @@ ETL query elements.
 For execution inside an application, see [Executing Scriptella from Java](java-execution.md)
 for `EtlExecutor`, direct SQL files, job parameters, progress, and background execution.
 
+## Environment variables
+
+`${env.FOO}` reads `FOO` from the environment of the Scriptella process. Use it
+in ETL configuration attributes, property values, and expressions, or in direct
+SQL connection settings:
+
+```xml
+<connection driver="jdbc" url="${env.DB_URL}"
+            user="${env.DB_USER}" password="${env.DB_PASSWORD}"/>
+```
+
+```bash
+scriptella.sh execute-sql --url '${env.DB_URL}' \
+  --user '${env.DB_USER}' --password '${env.DB_PASSWORD}' schema.sql
+```
+
+Export the variables before starting Scriptella. Single quotes in the command
+keep the shell from interpreting Scriptella's expressions. `--driver` also
+supports substitution. Connection settings are expanded even with
+`--no-substitution`, which disables substitution only in the SQL file.
+
+The `env` namespace is reserved and read-only: ETL or external properties named
+`env` or `env.FOO` cannot shadow it. A referenced missing environment variable is
+a configuration error naming the variable, without printing its value. An empty
+but defined variable is valid. Ordinary `${foo}` references keep their existing
+behavior, including unresolved references; external properties still take
+precedence over ETL properties. Environment variables are not merged into that
+property namespace.
+
+Environment variables are a convenient configuration and credential transport
+mechanism, not a secret store. They can be exposed by process inspection, child
+processes, or operational tooling. Keep credentials out of source control and
+avoid substituting them into SQL text or scripts that may be logged. SQL text
+substitution does not escape values. Scriptella redacts connection URL and user
+values from connection debug descriptions and masks passwords; treat provider
+and application output as potentially sensitive. Debug mode does not enable raw
+JDBC DriverManager logging, since it can print credentials before sanitization.
+Applications that explicitly configure a DriverManager log writer are responsible
+for protecting that output.
+
 ## Open issues / non-guarantees
 
 - `--check` is experimental and intentionally performs only lightweight static
@@ -295,7 +336,8 @@ for `EtlExecutor`, direct SQL files, job parameters, progress, and background ex
 - JVM `-D` values are visible in process arguments on many systems; use them
   only for non-secrets or a protected secret-file path.
 - Provider exceptions can contain connection details; treat captured stderr as
-  potentially sensitive even when credentials came from a protected file.
+  potentially sensitive even when credentials came from a protected file or
+  environment variables.
 - DTD validation does not verify includes, property completeness, JDBC
   classpaths, SQL syntax, permissions, transactionality, or idempotency.
 - File-producing drivers and non-transactional systems cannot provide the same

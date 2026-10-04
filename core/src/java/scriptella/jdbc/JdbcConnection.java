@@ -116,7 +116,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
 
         StringBuilder statusMsg = new StringBuilder();
         if (!StringUtils.isAsciiWhitespacesOnly(parameters.getUrl())) {
-            statusMsg.append(parameters.getUrl()).append(": ");
+            statusMsg.append(JdbcUtils.getUrlDescription(parameters.getUrl())).append(": ");
         }
         substitution = parameters.getBooleanProperty("substitution", true);
         statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);

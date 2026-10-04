@@ -221,3 +221,11 @@ An executor can be reused for sequential runs. Each run creates a new execution
 session; a SQL executor rereads its file on each run. Create a new executor when
 parameters or configuration change, and finish setting executor options before
 starting execution.
+
+Connection settings passed to `newSqlFileExecutor` use the shared property and
+expression substitution mechanism, including `${env.DB_URL}`,
+`${env.DB_USER}`, and `${env.DB_PASSWORD}`. The reserved `env` namespace reads
+process environment variables and fails if a referenced variable is missing.
+Connection settings are expanded regardless of the SQL `substitution` flag.
+See [environment variables](cli-usage.md#environment-variables) for the lookup
+contract and credential transport guidance.
