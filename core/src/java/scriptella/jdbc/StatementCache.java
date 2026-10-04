@@ -103,9 +103,7 @@ class StatementCache implements Closeable {
      */
     protected StatementWrapper create(final String sql) throws SQLException {
         Statement statement = connection.createStatement();
-        if (fetchSize != 0) {
-            statement.setFetchSize(fetchSize);
-        }
+        configureFetchSize(statement);
         return new StatementWrapper.Simple(statement, sql, converter);
     }
 
@@ -114,13 +112,25 @@ class StatementCache implements Closeable {
      */
     protected StatementWrapper.Prepared prepare(final String sql) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        if (fetchSize != 0) {
-            preparedStatement.setFetchSize(fetchSize);
-        }
+        configureFetchSize(preparedStatement);
         if (isBatchMode()) {
             return new StatementWrapper.BatchedPrepared(preparedStatement, converter, batchSize);
         } else {
             return new StatementWrapper.Prepared(preparedStatement, converter);
+        }
+    }
+
+    private void configureFetchSize(Statement statement) throws SQLException {
+        boolean configured = false;
+        try {
+            if (fetchSize != 0) {
+                statement.setFetchSize(fetchSize);
+            }
+            configured = true;
+        } finally {
+            if (!configured) {
+                JdbcUtils.closeSilent(statement);
+            }
         }
     }
 
@@ -168,6 +178,8 @@ class StatementCache implements Closeable {
     }
 
     public void close() {
+        IOUtils.closeSilently(sharedBatchedStatement);
+        sharedBatchedStatement = null;
         if (map != null) {
             //closing statements
             IOUtils.closeSilently(map.values());

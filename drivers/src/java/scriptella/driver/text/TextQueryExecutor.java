@@ -139,7 +139,7 @@ class TextQueryExecutor implements ParametersCallback {
                 }
                 if (m.find()) {
                     if (LOG.isLoggable(Level.FINE)) {
-                        LOG.info("Pattern matched: " + m);
+                        LOG.fine("Pattern matched: " + m);
                     }
                     result = m;
                     qc.processRow(this);

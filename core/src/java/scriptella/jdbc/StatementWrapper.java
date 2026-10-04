@@ -300,10 +300,6 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             return 0;
         }
 
-        @Override
-        public void close() {
-            super.close();
-        }
     }
 
 
@@ -371,10 +367,6 @@ abstract class StatementWrapper<T extends Statement> implements Closeable {
             return super.query();
         }
 
-        @Override
-        public void close() {
-            super.close();
-        }
     }
 
 

@@ -188,9 +188,6 @@ class SqlExecutor extends SqlParserBase implements Closeable {
 
         }
         Level level = warnings == null ? Level.FINE : Level.INFO;
-        if (warnings != null) { //If warnings present - use INFO priority
-            level = Level.INFO;
-        }
 
         if (LOG.isLoggable(level)) {
             StringBuilder sb = new StringBuilder("     Executed statement ");

@@ -19,7 +19,6 @@ import scriptella.spi.ParametersCallback;
 import scriptella.spi.QueryCallback;
 
 import javax.script.Bindings;
-import java.util.*;
 
 /**
  * Implementation of {@link javax.script.Bindings} for Java 8 JavaScript engine "Nashorn".
@@ -34,7 +33,6 @@ import java.util.*;
  */
 public class NashornBindingsParametersCallback extends BindingsParametersCallback {
     private Bindings nashornGlobal;
-    private Set<String> exportVars = new HashSet<String>(Arrays.asList("f1", "localProp"));
 
     public NashornBindingsParametersCallback(ParametersCallback parentParameters) {
         super(parentParameters);
@@ -50,16 +48,6 @@ public class NashornBindingsParametersCallback extends BindingsParametersCallbac
             return nashornGlobal.get(name);
         }
         return super.getParameter(name);
-    }
-
-    @Override
-    public Object get(Object key) {
-        return super.get(key);
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return super.containsKey(key);
     }
 
     @Override

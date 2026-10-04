@@ -81,11 +81,7 @@ class JdbcTypesConverter implements Closeable {
                 Reader reader = rs.getCharacterStream(index);
                 return reader == null ? null : toClob(reader);
         }
-        Object res = rs.getObject(index);
-        if (res == null) {
-            return null;
-        }
-        return res;
+        return rs.getObject(index);
     }
 
 

@@ -69,7 +69,7 @@ public class XPathQueryExecutor implements ParametersCallback {
         try {
             expressionStr = IOUtils.toString(xpathResource.open());
         } catch (IOException e) {
-            throw new XPathProviderException("Unable to read XPath query content");
+            throw new XPathProviderException("Unable to read XPath query content", e);
         }
     }
 

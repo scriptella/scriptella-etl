@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.io.Reader;
-import java.util.logging.Logger;
 
 /**
  * This class executes a shell script from the body of the query and exports its output as a set of rows,
@@ -40,12 +39,10 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 class ShellQueryExecutor implements ParametersCallback {
-    private static final Logger LOG = Logger.getLogger(ShellQueryExecutor.class.getName());
     private static final int MAX_LENGTH = 100000; // 100Kb max query size
 
     private final PropertiesSubstitutor ps;
     private String query;
-    private ShellConnectionParameters shellParams;
     private ShellCommandRunner shellCommandRunner;
     private final BufferedWriter shellCommandOutWriter;
     private final BufferedReader bufferedReader;
@@ -53,7 +50,6 @@ class ShellQueryExecutor implements ParametersCallback {
 
     public ShellQueryExecutor(final Reader queryReader, final PropertiesSubstitutor substitutor,
                              final ShellConnectionParameters shellParams) {
-        this.shellParams = shellParams;
         ps = substitutor;
         String queryStr;
         try {

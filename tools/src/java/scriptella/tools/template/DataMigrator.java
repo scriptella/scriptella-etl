@@ -20,6 +20,7 @@ import scriptella.expression.PropertiesSubstitutor;
 import scriptella.jdbc.JdbcException;
 import scriptella.jdbc.JdbcUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.Connection;
@@ -79,43 +80,39 @@ public class DataMigrator extends TemplateManager {
 
         String etlXml = loadResourceAsString(DATA_MIGRATOR_ETL_XML);
         String block = loadResourceAsString(DATA_MIGRATOR_BLOCK_ETL_XML);
-        DbSchema schema = DbSchema.initialize(properties);
-        final Set<String> tables = sortTables(schema);
-        StringBuilder queriesXml = new StringBuilder(block.length() * tables.size());
-        final Map<String, String> params = new HashMap<String, String>();
-        final PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
-        StringBuilder tmp = new StringBuilder();
-        for (String table : tables) {
-            params.put("table", table);
-            tmp.setLength(0);
-            appendColumnNames(schema, table, tmp);
-            params.put("columns", tmp.toString());
-            tmp.setLength(0);
-            appendColumnNames(schema, table, tmp, ", ", "?");
-            params.put("values", tmp.toString());
-            queriesXml.append(ps.substitute(block));
-        }
-        params.put("etl.properties", propsName);
-        params.put("queries", queriesXml.toString());
-        //Writing an ETL file
-        try (Writer w = newFileWriter(xmlName)) {
-            w.write(ps.substitute(etlXml));
-        }
-        //Writing properties
-        try (Writer w = newFileWriter(propsName)) {
-            w.write(loadResourceAsString(DATA_MIGRATOR_ETL_PROPERTIES));
+        try (DbSchema schema = DbSchema.initialize(properties)) {
+            final Set<String> tables = sortTables(schema);
+            StringBuilder queriesXml = new StringBuilder(block.length() * tables.size());
+            final Map<String, String> params = new HashMap<String, String>();
+            final PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
+            StringBuilder tmp = new StringBuilder();
+            for (String table : tables) {
+                final Set<String> tableColumns = schema.getTableColumns(table);
+                params.put("table", table);
+                tmp.setLength(0);
+                appendColumnNames(tableColumns, tmp, ", ", "");
+                params.put("columns", tmp.toString());
+                tmp.setLength(0);
+                appendColumnNames(tableColumns, tmp, ", ", "?");
+                params.put("values", tmp.toString());
+                queriesXml.append(ps.substitute(block));
+            }
+            params.put("etl.properties", propsName);
+            params.put("queries", queriesXml.toString());
+            //Writing an ETL file
+            try (Writer w = newFileWriter(xmlName)) {
+                w.write(ps.substitute(etlXml));
+            }
+            //Writing properties
+            try (Writer w = newFileWriter(propsName)) {
+                w.write(loadResourceAsString(DATA_MIGRATOR_ETL_PROPERTIES));
+            }
         }
     }
 
 
-    private static StringBuilder appendColumnNames(DbSchema schema, final String table, final StringBuilder sql) {
-        return appendColumnNames(schema, table, sql, ", ", "");
-    }
-
-    private static StringBuilder appendColumnNames(DbSchema schema, final String table,
+    private static StringBuilder appendColumnNames(final Set<String> tableColumns,
                                                    final StringBuilder sql, final String separator, final String prefix) {
-        final Set<String> tableColumns = schema.getTableColumns(table);
-
         for (Iterator<String> it = tableColumns.iterator(); it.hasNext();) {
             String s = it.next();
             sql.append(prefix);
@@ -139,21 +136,15 @@ public class DataMigrator extends TemplateManager {
 
         try {
             int[][] m = getTablesMatrix(schema, tbls);
-            StringBuilder msg = DEBUG ? new StringBuilder() : null;
-
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (DEBUG) {
+            if (DEBUG) {
+                StringBuilder msg = new StringBuilder();
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
                         msg.append(m[i][j]);
                         msg.append((m[i][j] >= 10) ? " " : "  ");
                     }
-                }
-                if (DEBUG) {
                     msg.append(tbls[i]).append('\n');
                 }
-            }
-            if (DEBUG) {
                 LOG.fine("Tables dependencies matrix: \n" + msg);
             }
 
@@ -203,10 +194,6 @@ public class DataMigrator extends TemplateManager {
         int n = tables.length;
         int m[][] = new int[n][n];
 
-        for (int[] a : m) {
-            Arrays.fill(a, 0);
-        }
-
         for (int i = 0; i < n; i++) {
             try (ResultSet rs = metaData.getExportedKeys(
                     schema.getCatalog(), schema.getSchema(), tables[i])) {
@@ -233,7 +220,7 @@ public class DataMigrator extends TemplateManager {
         return -1;
     }
 
-    static class DbSchema {
+    static class DbSchema implements Closeable {
         private Connection connection;
         private DatabaseMetaData metaData;
         private String catalog;
@@ -269,6 +256,11 @@ public class DataMigrator extends TemplateManager {
             }
         }
 
+
+        @Override
+        public void close() {
+            JdbcUtils.closeSilent(connection);
+        }
 
         List<String> getTables() {
             try {

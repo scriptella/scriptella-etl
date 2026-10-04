@@ -32,6 +32,8 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Pattern;
@@ -169,13 +171,40 @@ public final class IOUtils {
      * see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4191800">
      * FileURLConnection doesn't implement getOutputStream()</a>
      *
+     * <p>For file URLs, fragments are ignored and query text is retained as part of
+     * the local filename for compatibility. URI escapes are decoded; authorities
+     * are ignored as in the legacy implementation.
+     *
      * @param url URL to open an output stream.
      * @return output stream for URL.
      * @throws IOException if an I/O error occurs while creating the output stream.
      */
     public static OutputStream getOutputStream(final URL url) throws IOException {
         if ("file".equals(url.getProtocol())) {
-            return new FileOutputStream(url.getFile());
+            try {
+                // Keep accepting literal spaces in legacy file URLs, while decoding URI escapes.
+                String fileUrl = url.toExternalForm();
+                int fragment = fileUrl.indexOf('#');
+                if (fragment >= 0) {
+                    fileUrl = fileUrl.substring(0, fragment);
+                }
+                // getFile() historically included query text in the filename.
+                // Escape '?' before parsing so all file URL forms keep that behavior.
+                URI uri = new URI(fileUrl.replace(" ", "%20").replace("?", "%3F"));
+                // Legacy file URLs may be relative/opaque or name an authority.
+                // As before, an authority does not select a remote filesystem.
+                File file;
+                if (uri.isOpaque()) {
+                    file = new File(uri.getSchemeSpecificPart());
+                } else if (uri.getAuthority() != null) {
+                    file = new File(uri.getPath());
+                } else {
+                    file = new File(uri);
+                }
+                return new FileOutputStream(file);
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                throw new IOException("Invalid file URL: " + url, e);
+            }
         } else {
             final URLConnection con = url.openConnection();
             con.setDoOutput(true);
