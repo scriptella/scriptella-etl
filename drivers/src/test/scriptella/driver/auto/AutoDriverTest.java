@@ -72,6 +72,7 @@ public class AutoDriverTest extends AbstractTestCase {
         d.connect(new MockConnectionParameters(null, "jdbc:H2:....."));
         assertNull(expectedDriver);
 
+        assertAutodetected(d, "sqlite", "jdbc:sqlite:/tmp/source.db");
         assertAutodetected(d, "mysql", "jdbc:mysql://localhost/test");
         assertAutodetected(d, "mariadb", "jdbc:mariadb://localhost/test");
         assertAutodetected(d, "postgresql", "jdbc:postgresql://localhost/test");

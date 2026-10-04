@@ -1,0 +1,18 @@
+<body>
+SQLite adapter for file-backed databases using the <code>sqlite</code> alias.
+Canonical <code>jdbc:sqlite:</code> URLs are also detected by the default auto driver.
+<p>Supply Xerial <code>org.xerial:sqlite-jdbc:3.53.4.0</code> externally through
+ the connection classpath or application runtime classpath; it is not bundled.</p>
+<pre>&lt;connection driver="sqlite" url="jdbc:sqlite:/absolute/path/source.db"
+            classpath="lib/sqlite-jdbc-3.53.4.0.jar"/&gt;</pre>
+<p>The JDBC class is <code>org.sqlite.JDBC</code>. Common JDBC properties and
+transaction behavior apply; see the JDBC package overview.</p>
+<p>Verified scope: file-backed schema creation, reads/writes, persistence, signed
+64-bit integers, common numeric values, Unicode/text, NULL versus empty text,
+commit, rollback, and SQLite to PostgreSQL migration.</p>
+<p>SQLite NUMERIC/REAL can lose high-precision decimal digits. Xerial may return
+Double values, and PostgreSQL NUMERIC binding may round further. Arbitrary
+numeric migration is not lossless. Explicit conversion is required for exact
+decimals and cannot restore precision already lost in source REAL storage.</p>
+<p>See <a href="https://github.com/scriptella/scriptella-etl/blob/master/docs/sqlite.md">SQLite setup and migration example</a>.</p>
+</body>

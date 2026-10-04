@@ -151,3 +151,11 @@ promise.
 For support or to request compatibility validation for another database,
 contact PVR Labs, the maintainer of Scriptella, through the
 [Scriptella support page](https://scriptella.org/support.html).
+
+## SQLite (1.6)
+
+The `sqlite` alias and canonical `jdbc:sqlite:` autodetection use external Xerial
+SQLite JDBC 3.53.4.0. See [SQLite support](sqlite.md) for the bounded file-backed
+contract, public evidence, SQLite → PostgreSQL sample, and NUMERIC/REAL decimal
+precision limitation. SQLite validation uses a real file and is separate from
+the Testcontainers matrix.
