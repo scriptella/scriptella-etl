@@ -82,50 +82,15 @@ file before using `scriptella.sh`. Manual ZIP installation and
 
 ### Direct SQL execution (development version)
 
-Run a UTF-8 SQL file without an ETL XML wrapper:
+Run a SQL file directly against a JDBC connection without ETL XML:
 
 ```bash
-SCRIPTELLA_JAVA_OPTS="-Dschema=myapp -Denvironment=prod" \
-  scriptella.sh execute-sql \
-  --url jdbc:postgresql://localhost/app \
-  --user app \
-  schema.sql
+scriptella.sh execute-sql --url jdbc:postgresql://localhost/app --user app schema.sql
 ```
 
-Place your JDBC driver JAR in the distribution's `lib/` directory. JDBC driver
-registration is automatic; `--driver org.postgresql.Driver` explicitly loads a
-class if needed. Use `execute-sql --help` for all options. Common options such as
-`--debug`, `--quiet`, `--no-jmx`, and `--no-stat` work before or after `execute-sql`.
-
-`--password VALUE` is convenience syntax; it can expose the password in shell
-history and process listings.
-
-The curl installer installs the current published release.
-`execute-sql` is currently available only in development builds.
-
-JVM system properties are available to Scriptella's normal SQL substitution,
-using the same property mechanism as ETL XML execution.
-For example, `CREATE SCHEMA ${schema};` substitutes an identifier and
-`INSERT INTO deployment(environment) VALUES (?environment);` binds a data value.
-Text substitution such as `'${environment}'` does not escape SQL. Use
-`--no-substitution` to preserve all dollar and question-mark expressions literally.
-`SCRIPTELLA_JAVA_OPTS='-Denvironment=staging'` supplies JVM system properties
-through the shell launcher.
-
-Execution commits on success and attempts rollback on failure; DDL transaction
-behavior depends on the database. Completion reports statements executed and the
-sum of positive JDBC update counts. Queries and result dumping require normal
-ETL query elements.
-
-The Java factory builds an in-memory ETL configuration and returns a normal
-`scriptella.execution.EtlExecutor` (with JDBC drivers on the classpath):
-
-```java
-EtlExecutor executor = EtlExecutor.newSqlFileExecutor(
-    new File("schema.sql"), "jdbc:postgresql://localhost/app", "app", "secret");
-ExecutionStatistics result = executor.execute();
-// Optional overload: newSqlFileExecutor(file, url, user, password, driver, substitution)
-```
+Available in development builds. See the [direct SQL guide](docs/cli-usage.md#10-direct-sql-execution-development-version)
+for JDBC driver setup, JVM properties, and CLI options. For embedded execution,
+see [Executing Scriptella from Java](docs/java-execution.md).
 
 ### Quick start
 
@@ -232,15 +197,17 @@ artifacts remain Java 17-compatible (`--release 17`).
 
 * Website: [https://scriptella.org](https://scriptella.org)
 * Reference: [https://scriptella.org/reference/](https://scriptella.org/reference/)
+* Executing from Java: [docs/java-execution.md](docs/java-execution.md)
 * API docs: [https://scriptella.org/docs/api/](https://scriptella.org/docs/api/)
 * Core database compatibility and validation targets: [docs/core-database-compatibility.md](docs/core-database-compatibility.md)
 * Public real-database compatibility tests powered by Testcontainers: [scriptella-testcontainers](https://github.com/scriptella/scriptella-testcontainers)
 * Command-line usage contract and automation templates: [docs/cli-usage.md](docs/cli-usage.md)
-* Open Knowledge Format: curated machine-readable knowledge about Scriptella's configuration, execution model, providers, JDBC compatibility, CLI, and security: [okf/index.md](okf/index.md)
+* Open Knowledge Format: curated machine-readable knowledge about Scriptella's configuration, execution model, providers, JDBC compatibility, CLI, and security: [okf/index.md](https://github.com/scriptella/scriptella-etl/blob/master/okf/index.md)
 * Release history: [CHANGELOG.md](CHANGELOG.md)
 * Maintainer guide: [docs/MAINTAINING.md](docs/MAINTAINING.md)
 
-Packaged documentation may also appear under `docs/` in distribution archives.
+Distribution archives include these Markdown guides under `docs/`, alongside
+any generated documentation.
 
 ## Support and contributions
 

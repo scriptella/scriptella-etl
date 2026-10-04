@@ -35,6 +35,24 @@ examples_dir="$work_dir/examples"
 source_dir="$work_dir/source"
 [ -d "$source_dir/lib" ] || fail "source distribution has no top-level lib directory"
 
+# The packaged README must resolve its maintained documentation links locally.
+for documentation_root in "$dist_dir" "$work_dir/examples" "$source_dir"; do
+    for documentation_file in README.md README.zh-CN.md README.ko.md README.de.md \
+            CHANGELOG.md CONTRIBUTING.md RELEASE-PUBLISHING.md \
+            docs/cli-usage.md docs/java-execution.md docs/first-migration.md \
+            docs/core-database-compatibility.md docs/MAINTAINING.md \
+            docs/agent-templates/csv-to-sql.etl.xml docs/agent-templates/jdbc-to-jdbc.etl.xml \
+            docs/agent-templates/sql-script.etl.xml docs/agent-templates/file-transform.etl.xml \
+            docs/agent-templates/validate-etl.sh; do
+        [ -f "$documentation_root/$documentation_file" ] \
+            || fail "$documentation_root is missing $documentation_file"
+    done
+    for excluded_directory in releases plans site security experiments; do
+        [ ! -d "$documentation_root/docs/$excluded_directory" ] \
+            || fail "$documentation_root unexpectedly includes docs/$excluded_directory"
+    done
+done
+
 assert_rhino_bundle() {
     bundle_lib=$1
     [ -d "$bundle_lib" ] || fail "missing library directory: $bundle_lib"

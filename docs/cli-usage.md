@@ -128,7 +128,7 @@ For strict XML/DTD validation independent of the model checker, use the
 following helper without executing the ETL:
 
 ```sh
-docs/agent-templates/validate-etl.sh "$SCRIPTELLA_JAR" "$ETL_FILE"
+sh docs/agent-templates/validate-etl.sh "$SCRIPTELLA_JAR" "$ETL_FILE"
 ```
 
 The validator requires `unzip` and `xmllint`, uses the DTD bundled in the
@@ -237,6 +237,53 @@ java -Dsource.file=/data/input.txt -Dtarget.file=/data/output.txt \
      -jar "$SCRIPTELLA_JAR" --quiet --no-jmx \
      /absolute/path/to/file-transform.etl.xml
 ```
+
+## 10. Direct SQL execution (development version)
+
+Run a UTF-8 SQL file without an ETL XML wrapper:
+
+```bash
+SCRIPTELLA_JAVA_OPTS="-Dschema=myapp -Denvironment=prod" \
+  scriptella.sh execute-sql \
+  --url jdbc:postgresql://localhost/app \
+  --user app \
+  schema.sql
+```
+
+Place your JDBC driver JAR in the distribution's `lib/` directory. JDBC driver
+registration is automatic; `--driver org.postgresql.Driver` explicitly loads a
+class if needed. Use `execute-sql --help` for all options. Common options such as
+`--debug`, `--quiet`, `--no-jmx`, and `--no-stat` work before or after `execute-sql`.
+
+`--password VALUE` is convenience syntax; it can expose the password in shell
+history and process listings.
+
+The curl installer installs the current published release.
+`execute-sql` is currently available only in development builds.
+
+JVM system properties are available to Scriptella's normal SQL substitution,
+using the same property mechanism as ETL XML execution.
+For example, `CREATE SCHEMA ${schema};` substitutes an identifier and
+`INSERT INTO deployment(environment) VALUES (?environment);` binds a data value.
+Text substitution such as `'${environment}'` does not escape SQL. Use
+`--no-substitution` to preserve all dollar and question-mark expressions literally.
+`SCRIPTELLA_JAVA_OPTS='-Denvironment=staging'` supplies JVM system properties
+through the shell launcher.
+
+The command accepts exactly one SQL file, using its path literally without the
+ETL filename fallback rules. Exit status is `0` for success, `1` for execution
+failure, `2` for a missing SQL file, and `3` for invalid or missing arguments.
+Successful completion is written to stdout unless `--quiet` is used;
+`--no-stat` omits the completion counts. Errors are written to stderr, with
+stack traces enabled by `--debug`. `--check` applies only to ETL XML files.
+
+Execution commits on success and attempts rollback on failure; DDL transaction
+behavior depends on the database. Completion reports statements executed and the
+sum of positive JDBC update counts. Queries and result dumping require normal
+ETL query elements.
+
+For execution inside an application, see [Executing Scriptella from Java](java-execution.md)
+for `EtlExecutor`, direct SQL files, job parameters, progress, and background execution.
 
 ## Open issues / non-guarantees
 
