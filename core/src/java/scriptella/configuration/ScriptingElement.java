@@ -35,6 +35,11 @@ public abstract class ScriptingElement extends XmlConfigurableBase {
         this.parent = parent;
     }
 
+    /** Sets content shared by all dialects for a programmatically created script. */
+    void setContent(Resource resource) {
+        contentEl = new DialectBasedContentEl(resource);
+    }
+
     public String getConnectionId() {
         return connectionId;
     }

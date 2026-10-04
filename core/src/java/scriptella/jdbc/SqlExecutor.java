@@ -45,6 +45,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     protected final Resource resource;
     protected final JdbcConnection connection;
     protected final StatementCache cache;
+    private boolean substitution = true;
     private QueryCallback callback;
     private ParametersCallback paramsCallback;
     private List<Object> params = new ArrayList<Object>();
@@ -82,7 +83,22 @@ class SqlExecutor extends SqlParserBase implements Closeable {
                 throw new JdbcException("Failed to open resource", e);
             }
         }
-        parse(tok);
+        if (substitution) {
+            parse(tok);
+        } else {
+            try {
+                String sql;
+                while ((sql = tok.nextStatement()) != null) {
+                    if (!StringUtils.isAsciiWhitespacesOnly(sql)) {
+                        statementParsed(sql);
+                    }
+                }
+            } catch (IOException e) {
+                throw new JdbcException("Failed to read SQL script", e);
+            } finally {
+                scriptella.util.IOUtils.closeSilently(tok);
+            }
+        }
         //We should remember cached tokenizer only if all statements were parsed
         //i.e. no errors occured
         if (cache) {
@@ -90,6 +106,10 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         }
         
 
+    }
+
+    void setSubstitution(boolean substitution) {
+        this.substitution = substitution;
     }
 
     int getUpdateCount() {
@@ -158,6 +178,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         counter.statements++;
         if (updateCount > 0) {
             this.updateCount += updateCount;
+            connection.addUpdateCount(updateCount);
         }
         SQLWarning warnings = null;
         try {

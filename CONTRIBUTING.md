@@ -3,6 +3,11 @@
 Thank you for contributing to Scriptella. Keep changes focused and make
 functional diffs easy to review.
 
+## Commit messages
+
+Include the issue number in the commit message when an issue is available.
+For example: `Add direct SQL file execution without ETL XML (#63)`.
+
 ## Code style
 
 * Create new text files as UTF-8 without a byte-order mark (BOM), using LF

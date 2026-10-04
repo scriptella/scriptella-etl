@@ -36,6 +36,25 @@ public class ConfigurationEl extends XmlConfigurableBase {
     private HierarchicalParametersCallback parametersCallback;
     private URL documentUrl;
 
+    /**
+     * Creates a configuration directly without parsing XML, validating the same
+     * connection IDs and script references as the XML configuration path.
+     * The supplied lists are copied so caller list changes do not alter the configuration.
+     * @throws ConfigurationException if connections or script references are invalid
+     */
+    ConfigurationEl(URL documentUrl, ParametersCallback parameters,
+                           List<ConnectionEl> connections, List<ScriptingElement> scripts) {
+        this.documentUrl = documentUrl;
+        this.parametersCallback = new HierarchicalParametersCallback(parameters, null);
+        if (scripts == null) {
+            throw new ConfigurationException("Scripting elements must not be null");
+        }
+        this.connections = connections == null ? java.util.Collections.<ConnectionEl>emptyList() :
+                new java.util.ArrayList<ConnectionEl>(connections);
+        this.scriptingElements = new java.util.ArrayList<ScriptingElement>(scripts);
+        validateScriptingElements(null);
+    }
+
     public ConfigurationEl(XmlElement element, HierarchicalParametersCallback parametersCallback) {
         this.parametersCallback = parametersCallback;
         configure(element);
@@ -81,17 +100,20 @@ public class ConfigurationEl extends XmlConfigurableBase {
 
         setConnections(load(element.getChildren("connection"),
                 ConnectionEl.class));
-        if (connections.isEmpty()) {
-            throw new ConfigurationException("At least one connection element must be declared", element);
-        }
         scriptingElements = QueryEl.loadScriptingElements(element, null);
         validateScriptingElements(element);
     }
 
     void validateScriptingElements(final XmlElement element) {
+        if (connections.isEmpty()) {
+            throw new ConfigurationException("At least one connection element must be declared", element);
+        }
         //validating scriptingElements
         Set<String> allowedConIds = new HashSet<String>();
         for (ConnectionEl connectionEl : connections) {
+            if (connectionEl == null) {
+                throw new ConfigurationException("Connection element must not be null", element);
+            }
             final String cid = connectionEl.getId();
             if (!allowedConIds.add(cid)) {
                 throw new ConfigurationException("Connection ID must be unique for ETL file", element);
@@ -106,6 +128,9 @@ public class ConfigurationEl extends XmlConfigurableBase {
 
     void validateScriptingElements(final Set<String> allowedConIds, final XmlElement element, final List<ScriptingElement> elements) {
         for (ScriptingElement se : elements) {
+            if (se == null) {
+                throw new ConfigurationException("Scripting element must not be null", element);
+            }
             //If one connection check
             final int allowedConSize = allowedConIds.size();
             final String seConnectionId = se.getConnectionId();

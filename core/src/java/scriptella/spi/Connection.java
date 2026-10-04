@@ -68,6 +68,11 @@ public interface Connection {
      */
     long getExecutedStatementsCount();
 
+    /** Returns the sum of positive update counts, or zero when unsupported. */
+    default long getUpdateCount() {
+        return 0;
+    }
+
     /**
      * Commits a current transaction (if any).
      * <p>Throwing an error during commit phase cause {@link #rollback() rollback}.

@@ -37,6 +37,7 @@ import java.util.Map;
  */
 public class ExecutionStatistics {
     int statements;
+    long updateCount;
     Map<String, ElementInfo> elements = new LinkedHashMap<String, ElementInfo>();
     private Date started;
     private Date finished;
@@ -51,6 +52,14 @@ public class ExecutionStatistics {
      */
     public int getExecutedStatementsCount() {
         return statements;
+    }
+
+    /**
+     * Sum of positive update counts reported by connections, including batches
+     * flushed during commit. Zero also means unsupported or statistics suppressed.
+     */
+    public long getUpdateCount() {
+        return updateCount;
     }
 
     public Collection<ElementInfo> getElements() {

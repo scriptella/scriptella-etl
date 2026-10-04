@@ -168,6 +168,15 @@ public class ConnectionManager {
         return s;
     }
 
+    /** Returns update counts reported by all managed connections. */
+    public long getUpdateCount() {
+        long count = 0;
+        for (Connection c : getAllConnections()) {
+            count += c.getUpdateCount();
+        }
+        return count;
+    }
+
     /**
      * @return connection and newtx connections
      */

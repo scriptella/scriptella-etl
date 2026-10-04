@@ -17,6 +17,7 @@ package scriptella.execution;
 
 import scriptella.configuration.ConfigurationEl;
 import scriptella.configuration.ConfigurationFactory;
+import scriptella.configuration.SqlFileConfigurationFactory;
 import scriptella.core.Session;
 import scriptella.core.SystemException;
 import scriptella.core.ThreadSafe;
@@ -35,9 +36,9 @@ import java.util.logging.Logger;
 
 
 /**
- * Executes a Scriptella ETL file.
+ * Executes a Scriptella ETL configuration loaded from XML or created in memory.
  *
- * <p>The simplest way to run a file is:</p>
+ * <p>The simplest way to run an ETL XML file is:</p>
  * <pre>{@code
  * EtlExecutor executor = EtlExecutor.newExecutor(new File("etl.xml"));
  * ExecutionStatistics statistics = executor.execute();
@@ -48,6 +49,29 @@ import java.util.logging.Logger;
  * parameters. To supply parameters explicitly, use
  * {@link #newExecutor(URL, Map)}. External parameters take precedence over
  * properties declared in the ETL file.</p>
+ *
+ * <h3>Direct SQL file execution</h3>
+ * <p>For a single SQL file, use {@link #newSqlFileExecutor(File, String, String, String)}
+ * to create a normal executor with one JDBC connection and one script in memory.
+ * No ETL XML file is needed:</p>
+ * <pre>{@code
+ * EtlExecutor executor = EtlExecutor.newSqlFileExecutor(
+ *     new File("schema.sql"), "jdbc:postgresql://localhost/app", "app", "secret");
+ * ExecutionStatistics statistics = executor.execute();
+ * long updatedRows = statistics.getUpdateCount();
+ * }</pre>
+ * <p>SQL files are read as UTF-8 at execution time. JDBC driver JARs must be on
+ * the classpath. As with the default XML factories, SQL variables come from
+ * JVM system properties, captured when the factory is called.
+ * Scriptella's normal SQL substitution is enabled by default. Set
+ * {@code substitution} to {@code false} to preserve dollar and question-mark
+ * expressions literally. Use {@code ?name} bindings for data values; text
+ * substitutions such as {@code ${name}} do not escape SQL.</p>
+ * <p>The returned executor uses the same transactions, cleanup, progress,
+ * statistics, optional JMX, and cancellation as an XML-based executor.
+ * Execution commits on success and attempts rollback on failure; database DDL
+ * may not support rollback. SQL files support updates and DDL. Use an ETL query
+ * element when results need to be processed.</p>
  *
  * <p>For more control, use {@link ConfigurationFactory} to parse the ETL file,
  * then pass the resulting {@link ConfigurationEl} to
@@ -87,7 +111,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     }
 
     /**
-     * Creates an ETL executor for specified configuration file.
+     * Creates an ETL executor for a parsed or programmatically constructed configuration.
      *
      * @param configuration ETL configuration.
      */
@@ -191,6 +215,9 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
             execute(ctx);
             ctx.getProgressCallback().step(5, "Commiting transactions");
             commitAll(ctx);
+            if (!suppressStatistics) {
+                ctx.getStatisticsBuilder().getStatistics().updateCount = ctx.session.getUpdateCount();
+            }
         } catch (Throwable e) {
             if (ctx != null) {
                 rollbackAll(ctx);
@@ -307,6 +334,53 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
             cf.setExternalParameters(externalProperties);
         }
         return new EtlExecutor(cf.createConfiguration());
+    }
+
+    /**
+     * Creates a SQL file executor without explicit JDBC credentials.
+     * @param file UTF-8 SQL file
+     * @param url JDBC connection URL
+     * @return a normal ETL executor
+     * @see #newSqlFileExecutor(File, String, String, String)
+     */
+    public static EtlExecutor newSqlFileExecutor(File file, String url) {
+        return newSqlFileExecutor(file, url, null, null);
+    }
+
+    /**
+     * Creates an executor for a UTF-8 SQL file and a JDBC URL, without ETL XML.
+     * System properties are available for SQL substitution. No connection is
+     * opened until execution. JDBC driver JARs must be on the classpath.
+     * @param file UTF-8 SQL file
+     * @param url JDBC connection URL
+     * @param user optional username
+     * @param password optional password
+     * @return a normal ETL executor
+     * @see #newSqlFileExecutor(File, String, String, String, String, boolean)
+     */
+    public static EtlExecutor newSqlFileExecutor(File file, String url, String user, String password) {
+        return newSqlFileExecutor(file, url, user, password, null, true);
+    }
+
+    /**
+     * Creates a SQL file executor using the normal ETL execution lifecycle.
+     * Execution commits on success and attempts rollback on failure; DDL rollback
+     * depends on the database. SELECT results are unsupported; use an ETL query.
+     * SQL variables come from a snapshot of JVM system properties. Text substitution
+     * does not escape SQL; use ?name bindings for data values.
+     *
+     * @param file UTF-8 SQL file, read at execution time
+     * @param url JDBC connection URL
+     * @param user optional username
+     * @param password optional password
+     * @param driver optional JDBC driver class; null uses JDBC automatic registration
+     * @param substitution whether Scriptella SQL substitution is enabled
+     * @return a normal ETL executor supporting execute(), progress, JMX, and cancellation
+     * @throws IllegalArgumentException if file is null or the URL does not start with jdbc:
+     */
+    public static EtlExecutor newSqlFileExecutor(final File file, String url, String user, String password,
+                                                String driver, boolean substitution) {
+        return new EtlExecutor(SqlFileConfigurationFactory.create(file, url, user, password, driver, substitution));
     }
 
     //Runnable/Callable convenience interfaces

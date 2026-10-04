@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+* Added `EtlExecutor.newSqlFileExecutor` and `execute-sql` launcher support for
+  direct UTF-8 SQL files, JDBC credentials, property substitution, literal mode,
+  transaction handling, and completion counts without ETL XML.
+
 ## [1.5] — 2026-09-08
 
 Scriptella 1.5 is a focused compatibility and usability release that keeps

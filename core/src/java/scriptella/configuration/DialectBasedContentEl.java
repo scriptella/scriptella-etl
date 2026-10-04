@@ -51,6 +51,14 @@ public class DialectBasedContentEl extends XmlConfigurableBase {
         configure(element);
     }
 
+    /** Creates content shared by all dialects from a resource. */
+    DialectBasedContentEl(Resource resource) {
+        Dialect dialect = new Dialect();
+        dialect.contentEl = new ContentEl();
+        dialect.contentEl.append(resource);
+        dialects = java.util.Collections.singletonList(dialect);
+    }
+
     public void configure(final XmlElement element) {
         Dialect defaultDialect = null;
         dialects = new ArrayList<Dialect>();

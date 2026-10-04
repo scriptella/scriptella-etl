@@ -115,6 +115,17 @@ public class Session {
         return s;
     }
 
+    /** Returns update counts reported by this session's connections. */
+    public long getUpdateCount() {
+        long count = 0;
+        if (managedConnections != null) {
+            for (ConnectionManager connection : managedConnections.values()) {
+                count += connection.getUpdateCount();
+            }
+        }
+        return count;
+    }
+
     public void close() {
         if (managedConnections != null) {
             for (ConnectionManager connectionManager : managedConnections.values()) {

@@ -33,6 +33,13 @@ public class ScriptEl extends ScriptingElement {
         configure(element);
     }
 
+    /** Creates a standalone script declaration directly from a resource. */
+    ScriptEl(scriptella.spi.Resource resource) {
+        super(null);
+        setContent(resource);
+        setLocation(new Location("/etl/script[1]"));
+    }
+
     public boolean isNewTx() {
         return newTx;
     }

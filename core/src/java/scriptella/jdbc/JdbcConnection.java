@@ -70,6 +70,8 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
     protected boolean keepformat;
     protected int autocommitSize;
 
+    private long updateCount;
+    private boolean substitution;
     private Integer txIsolation;
     private final Map<Resource, SqlExecutor> resourcesMap = new IdentityHashMap<Resource, SqlExecutor>();
 
@@ -116,6 +118,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
         if (!StringUtils.isAsciiWhitespacesOnly(parameters.getUrl())) {
             statusMsg.append(parameters.getUrl()).append(": ");
         }
+        substitution = parameters.getBooleanProperty("substitution", true);
         statementCacheSize = parameters.getIntegerProperty(STATEMENT_CACHE_KEY, 64);
         if (statementCacheSize > 0) {
             statusMsg.append("Statement cache is enabled (cache size ").append(statementCacheSize).append("). ");
@@ -183,6 +186,17 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
         initDialectIdentifier();
     }
 
+    @Override
+    public long getUpdateCount() {
+        return updateCount;
+    }
+
+    void addUpdateCount(long count) {
+        if (count > 0) {
+            updateCount += count;
+        }
+    }
+
     StatementCounter getStatementCounter() {
         return counter;
     }
@@ -211,6 +225,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
         if (s == null) {
             resourcesMap.put(scriptContent, s = new SqlExecutor(scriptContent, this));
         }
+        s.setSubstitution(substitution);
         s.execute(parametersCallback);
     }
 
@@ -281,7 +296,7 @@ public class JdbcConnection extends AbstractConnection implements NativeConnecti
         if (resourcesMap != null) {
             for (SqlExecutor executor : resourcesMap.values()) {
                 try {
-                    executor.cache.flush();
+                    updateCount += executor.cache.flush();
                 } catch (SQLException e) {
                     // TODO Sanitize the JDBC exception before exposing its details.
                     throw new JdbcException("Unable to commit transaction - cannot flush cache", e);

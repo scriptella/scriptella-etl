@@ -173,12 +173,7 @@ public class EtlLauncher {
                     printUsage();
                     return ErrorCode.OK;
                 }
-                if (isDebugOption(arg)) {
-                    h.setLevel(Level.FINE);
-                    continue;
-                }
-                if (isQuietOption(arg)) {
-                    h.setLevel(Level.WARNING);
+                if (handleCommonOption(arg, h)) {
                     continue;
                 }
                 if (isVersionOption(arg)) {
@@ -188,17 +183,16 @@ public class EtlLauncher {
                 if (isTemplateOption(arg)) {
                     return template(arguments);
                 }
-                if (isNoStatOption(arg)) {
-                    setNoStat(true);
-                    continue;
-                }
-                if (isNoJmxOption(arg)) {
-                    setNoJmx(true);
-                    continue;
-                }
                 if (isCheckOption(arg)) {
                     checkOnly = true;
                     continue;
+                }
+                if ("execute-sql".equals(arg) && files.isEmpty()) {
+                    if (checkOnly) {
+                        getErr().println("--check applies to ETL XML files, not execute-sql");
+                        return ErrorCode.UNRECOGNIZED_OPTION;
+                    }
+                    return executeSql(arguments.toArray(new String[arguments.size()]), h);
                 }
                 if (arg.startsWith("-")) {
                     getErr().println("Unrecognized option " + arg);
@@ -264,6 +258,114 @@ public class EtlLauncher {
         return failed ? ErrorCode.FAILED : ErrorCode.OK;
     }
 
+    private boolean handleCommonOption(String arg, ConsoleHandler handler) {
+        if (isDebugOption(arg)) {
+            handler.setLevel(Level.FINE);
+        } else if (isQuietOption(arg)) {
+            handler.setLevel(Level.WARNING);
+        } else if (isNoStatOption(arg)) {
+            setNoStat(true);
+        } else if (isNoJmxOption(arg)) {
+            setNoJmx(true);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private ErrorCode executeSql(String[] args, ConsoleHandler handler) {
+        String url = null, user = null, password = null, driver = null;
+        File file = null;
+        boolean substitution = true, positional = false;
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (!positional && isHelpOption(arg)) {
+                printSqlUsage();
+                return ErrorCode.OK;
+            }
+            if (!positional && handleCommonOption(arg, handler)) {
+                continue;
+            }
+            if (!positional && isVersionOption(arg)) {
+                printVersion();
+                return ErrorCode.OK;
+            }
+            if (!positional && "--".equals(arg)) {
+                positional = true;
+            } else if (!positional && "--no-substitution".equals(arg)) {
+                substitution = false;
+            } else if (!positional && ("--url".equals(arg) || "--user".equals(arg) ||
+                    "--password".equals(arg) || "--driver".equals(arg))) {
+                if (++i == args.length) {
+                    getErr().println("Missing value for " + arg);
+                    return ErrorCode.UNRECOGNIZED_OPTION;
+                }
+                String value = args[i];
+                if ("--url".equals(arg)) { url = value; }
+                else if ("--user".equals(arg)) { user = value; }
+                else if ("--password".equals(arg)) { password = value; }
+                else if ("--driver".equals(arg)) { driver = value; }
+            } else if (!positional && arg.startsWith("-")) {
+                getErr().println("Unrecognized execute-sql option " + arg);
+                return ErrorCode.UNRECOGNIZED_OPTION;
+            } else if (file == null) {
+                file = new File(arg);
+            } else {
+                getErr().println("execute-sql requires exactly one SQL file");
+                return ErrorCode.UNRECOGNIZED_OPTION;
+            }
+        }
+        if (url == null || !url.startsWith("jdbc:") || file == null) {
+            getErr().println("execute-sql requires --url jdbc:... and one SQL file");
+            return ErrorCode.UNRECOGNIZED_OPTION;
+        }
+        if (!isFile(file)) {
+            getErr().println("SQL file " + file + " was not found.");
+            return ErrorCode.FILE_NOT_FOUND;
+        }
+        LoggingConfigurer.configure(handler);
+        try {
+            EtlExecutor executor = EtlExecutor.newSqlFileExecutor(
+                    file, url, user, password, driver, substitution);
+            executor.setJmxEnabled(exec.isJmxEnabled());
+            executor.setSuppressStatistics(exec.isSuppressStatistics());
+            ExecutionStatistics result = executor.execute(indicator);
+            if (handler.getLevel().intValue() <= Level.INFO.intValue()) {
+                String completion = "Successfully executed SQL file " + file;
+                if (!executor.isSuppressStatistics()) {
+                    completion += ": " + result.getExecutedStatementsCount() + " statements, " +
+                            result.getUpdateCount() + " rows updated (JDBC counts).";
+                }
+                getOut().println(completion);
+            }
+            return ErrorCode.OK;
+        } catch (Exception | LinkageError e) {
+            getErr().println("SQL execution failed: " + e.getMessage());
+            if (handler.getLevel().intValue() < Level.INFO.intValue()) {
+                e.printStackTrace(getErr());
+            }
+            return ErrorCode.FAILED;
+        } finally {
+            LoggingConfigurer.remove(handler);
+        }
+    }
+
+    private void printSqlUsage() {
+        getOut().println("Usage: scriptella.sh execute-sql --url jdbc:... [options] file.sql");
+        getOut().println("  --user NAME           JDBC username");
+        getOut().println("  --password VALUE      JDBC password (convenience syntax; may be visible in shell history/process listings)");
+        getOut().println("  --driver CLASS        Load a JDBC driver class (JAR must be in lib/ or classpath)");
+        getOut().println("  --no-substitution     Preserve literal dollar and question-mark expressions");
+        getOut().println("  -d, --debug           Enable debug logging and error stack traces");
+        getOut().println("  -q, --quiet           Suppress informational output");
+        getOut().println("      --no-jmx          Disable JMX registration");
+        getOut().println("      --no-stat         Disable execution statistics");
+        getOut().println("  -v, --version         Show version information");
+        getOut().println("Common options may appear before or after execute-sql.");
+        getOut().println("SQL files are UTF-8. System properties are expanded by default.");
+        getOut().println("Updates and DDL only; use ETL queries to process result sets.");
+    }
+
     private static boolean isHelpOption(String arg) {
         return "-h".equals(arg) || "--help".equals(arg) || "-help".equals(arg);
     }
@@ -315,6 +417,8 @@ public class EtlLauncher {
         out.println();
         out.println("Usage:");
         out.println("  java -jar scriptella.jar [options] [<etl-file>...]");
+        out.println("  scriptella.sh execute-sql --url jdbc:... [options] file.sql");
+        out.println("  scriptella.sh execute-sql --help");
         out.println();
         out.println("If no ETL file is specified, Scriptella runs etl.xml from the current directory.");
         out.println();

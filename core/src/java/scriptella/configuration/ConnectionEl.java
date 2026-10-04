@@ -38,6 +38,19 @@ public class ConnectionEl extends XmlConfigurableBase {
     public ConnectionEl() {
     }
 
+    /**
+     * Creates a connection declaration directly without parsing XML.
+     * @param properties connection properties, or null for an empty map
+     */
+    ConnectionEl(String url, String user, String password, Map<String, ?> properties) {
+        this.url = url;
+        this.user = user;
+        this.password = password;
+        this.properties = new PropertiesEl();
+        this.properties.map = properties == null ? java.util.Collections.<String, Object>emptyMap() :
+                new java.util.HashMap<String, Object>(properties);
+    }
+
     public String getId() {
         return id;
     }

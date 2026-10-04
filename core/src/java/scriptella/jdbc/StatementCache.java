@@ -178,19 +178,22 @@ class StatementCache implements Closeable {
     /**
      * Flushes pending batches.
      *
+     * @return sum of positive JDBC update counts from flushed batches
      * @throws SQLException if DB error occurs.
      */
-    public void flush() throws SQLException {
+    public long flush() throws SQLException {
+        long updateCount = 0;
         if (isBatchMode()) {
             if (sharedBatchedStatement != null) {
-                sharedBatchedStatement.flush();
+                updateCount += sharedBatchedStatement.flush();
             }
             if (map != null) {
                 for (StatementWrapper sw : map.values()) {
-                    sw.flush();
+                    updateCount += sw.flush();
                 }
             }
         }
+        return updateCount;
     }
 
     /**
