@@ -120,5 +120,9 @@ jobs:
               -DoutputDirectory="$RUNNER_TEMP/dtddoc"
           done
 
+      - name: Set up SQLite JDBC for Ant tests
+        run: |
+          mvn --batch-mode --no-transfer-progress -N -Pant-test-dependencies dependency:copy
+
       - name: Build, test, and package Ant artifacts
-        run: ant -noinput -Ddtddoc.dir="$RUNNER_TEMP/dtddoc" clean test test-distribution
+        run: ant -noinput -Ddtddoc.dir="$RUNNER_TEMP/dtddoc" -Dsqlite.jdbc.jar="$GITHUB_WORKSPACE/build/test-dependencies/sqlite-jdbc.jar" clean test test-distribution

@@ -91,6 +91,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sqlite.jdbc.version>3.53.4.0</sqlite.jdbc.version>
         <!-- Override on local validation builds to create a bundle without uploading it. -->
         <central.skipPublishing>false</central.skipPublishing>
     </properties>
@@ -376,6 +377,30 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>ant-test-dependencies</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.7.0</version>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.xerial</groupId>
+                                    <artifactId>sqlite-jdbc</artifactId>
+                                    <version>${sqlite.jdbc.version}</version>
+                                    <outputDirectory>${project.basedir}/build/test-dependencies</outputDirectory>
+                                    <destFileName>sqlite-jdbc.jar</destFileName>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>reporting</id>
             <reporting>

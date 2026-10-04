@@ -1,4 +1,6 @@
 <project name="scriptella-drivers" default="jar">
+    <property name="sqlite.jdbc.jar"
+              location="${basedir}/../build/test-dependencies/sqlite-jdbc.jar"/>
     <path id="classpath">
         <pathelement location="${basedir}/../core/build/tmp/classes"/>
         <pathelement location="${basedir}/../lib/velocity-engine-core.jar"/>
@@ -21,6 +23,8 @@
         <pathelement location="${basedir}/../lib/h2.jar"/>
         <pathelement location="${basedir}/../lib/commons-jexl.jar"/>
         <pathelement location="${basedir}/../lib/junit.jar"/>
+        <!-- External SQLite JDBC driver: test-only, outside the packaged lib directory. -->
+        <pathelement location="${sqlite.jdbc.jar}"/>
         <!-- Optional JavaScript provider: test-only, never packaged by the Ant build. -->
         <pathelement location="${basedir}/../lib/rhino-engine.jar"/>
         <pathelement location="${basedir}/../lib/rhino.jar"/>

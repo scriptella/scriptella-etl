@@ -33,3 +33,21 @@ to ensure that only intended lines changed.
 If a legacy file is intentionally normalized, prefer two separate commits:
 one mechanical normalization commit and one functional commit. This keeps both
 changes reviewable and makes history easier to follow.
+
+## Ant tests
+
+The SQLite contract test requires the same external JDBC driver as the Maven
+tests. Before running `ant test`, fetch it from the repository root:
+
+```bash
+mvn --batch-mode --no-transfer-progress -N -Pant-test-dependencies dependency:copy
+```
+
+The profile uses `sqlite.jdbc.version` from the root `pom.xml`, shared with the
+Maven tests, and writes `build/test-dependencies/sqlite-jdbc.jar` for Ant.
+When upgrading the driver, update that property and the compatibility test's
+expected driver version together.
+
+For an existing local copy, pass `-Dsqlite.jdbc.jar=/absolute/path/to/sqlite-jdbc.jar`
+to Ant instead. Keep this test dependency outside `lib/` so it is not bundled
+in the release distribution. CI performs the download before the Ant tests.
