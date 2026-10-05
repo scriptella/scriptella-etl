@@ -1,52 +1,28 @@
-# Publication — RC and Final
+# Maven Central Publishing
 
-## RC publication
+The [release runbook](docs/releases/RELEASE-RUNBOOK.md) owns the release and
+fix-forward policy. This document covers building, uploading, and recovering
+the Maven deployment. Historical RC and release plans are not current gates.
 
-Release-candidate publication uses the default branches and does not require
-Maven Central access.
+Scriptella uses the Central Publisher Portal and
+`central-publishing-maven-plugin` (currently 0.11.0), not legacy Nexus/OSSRH
+staging. The POM keeps `autoPublish=false`: upload and publication are separate.
 
-* Merge both `exp-v1.3` branches into `master`.
-* Deploy the website from `scriptella.github.io/master` with RC1 or RC2 wording.
-* POM versions remain `1.3-SNAPSHOT`.
-* Do not create the final `scriptella-parent-1.3` tag.
-* Do not publish to Maven Central.
-* Do not create a GitHub Release.
-* Do not expose final release asset links.
-* Scriptella 1.2 remains the latest generally available release.
+## Prepare once
 
-An optional source tag may use `scriptella-parent-1.3-rc1` or `scriptella-parent-1.3-rc2`.
+- Confirm Portal access to namespace `org.scriptella`.
+- Configure a Portal user token in private Maven settings under server ID
+  `central`. Always pass that settings file explicitly, even without upload.
+- Select JDK 17 and Maven 3.6+; compiler output remains Java 17-compatible.
+- Confirm the approved signing key and its published public key; use
+  `gpg-agent` with interactive pinentry. Probe signing once and unlock only
+  when needed. Never put a token or passphrase on a command line.
 
-## Final publication
+Use the private operator notes for settings path and signing identity. Private
+settings, keys, credential-bearing logs, and tokens must remain outside Git.
+Do not use Maven debug output or shell tracing around credentials.
 
-Final publication requires Sonatype Central Portal access, a durable signing
-key, and produces immutable public artifacts.
-
-Release 1.3 publishes the Maven reactor through the Sonatype Central Publisher
-Portal. The legacy OSSRH service was retired on June 30, 2025, so its repository
-URLs and credentials no longer work.
-
-The POM uses Sonatype's `central-publishing-maven-plugin`. Uploads require manual
-approval in the Portal: `autoPublish` is intentionally `false`.
-
-## Maintainer prerequisites
-
-Before a real release, a maintainer must:
-
-1. Sign in to the [Central Publisher Portal](https://central.sonatype.com/).
-2. Confirm that the migrated `org.scriptella` namespace is present and that the
-   account may publish to it. Contact Central Support if the migrated namespace
-   is missing.
-3. Generate a Portal user token and add it to the maintainer's Maven
-   `settings.xml` under server ID `central`.
-4. Use the existing Scriptella 1.3 OpenPGP signing key
-   (`5DA760EAF1B4169E1715DB80322E3E0A55DB94CE`). That key already signed the
-   published 1.3 artifacts; its public key is on `keyserver.ubuntu.com`. Do
-   not generate a replacement for 1.4.
-5. Build with the documented Java 8 and Maven 3.6+ environment.
-
-Never commit a Portal token, private key, or passphrase.
-
-Example private Maven settings (replace both token values):
+Example private settings structure:
 
 ```xml
 <settings>
@@ -60,80 +36,86 @@ Example private Maven settings (replace both token values):
 </settings>
 ```
 
-The GPG plugin normally uses `gpg-agent` to request the key passphrase. Do not
-place a clear-text passphrase on the Maven command line or in the project POM.
+## Preferred path: build a bundle, then upload it
 
-## Safe local validation
-
-For the normal `1.3-SNAPSHOT` development version, run the complete publication
-lifecycle without uploading:
+From a fresh checkout of the exact release tag (all POMs at the release version),
+with the non-secret variables from the runbook:
 
 ```bash
-JAVA_HOME=/path/to/jdk8 \
-  mvn clean deploy -Dcentral.skipPublishing=true
-```
-
-Before releasing, perform the same check in a disposable checkout whose POM
-version has been changed to the release version. Enable release signing while
-keeping upload disabled:
-
-```bash
-JAVA_HOME=/path/to/jdk8 \
-  mvn clean deploy \
+mvn-lite -s "$SETTINGS" clean deploy \
   -DperformRelease=true \
-  -Dcentral.skipPublishing=true
+  -Dcentral.skipPublishing=true \
+  -Dgpg.keyname="$SIGNING_KEY"
 ```
 
-The second command must produce and sign the parent POM plus the main, source,
-Javadoc, and attached test artifacts. Verify representative signatures with:
+`skipPublishing` creates the bundle while suppressing upload and publication.
+Preserve `target/central-publishing/central-bundle.zip` and its SHA-256 outside
+build output before another `clean`. Inspect its complete reactor inventory:
+
+- parent POM and Core, Drivers, Tools POMs;
+- main, source, and Javadoc JARs for all three modules;
+- attached Core test JAR;
+- ASCII-armored `.asc` signatures for every POM and JAR;
+- generated checksums (the plugin supplies these).
+
+Check version, required POM metadata (name, description, URL, license,
+developers, SCM), dependency versions, and absence of snapshots. Verify
+signatures and run the release smoke checks. A sources or Javadoc attachment
+failure is a build/configuration problem; uploading again cannot fix it.
+
+After release publication is authorized, upload this exact ZIP at
+[Portal Deployments](https://central.sonatype.com/publishing/deployments),
+keeping manual publication selected. Record its deployment ID, bundle hash,
+and state. Inspect `VALIDATED` before clicking Publish. A successful local
+build is not proof that credentials or namespace authorization are valid;
+the Portal upload/validation checks those separately.
+
+This avoids rebuilding and signing just to retry an upload. The same preserved
+bundle can be uploaded again when an operational failure genuinely requires
+it. Check whether an earlier upload succeeded before submitting a duplicate.
+
+## Alternative: Maven-managed upload
+
+If using the Release Plugin after `release:prepare`, retain its local
+`release.properties` and backups. Use the local tag to avoid requiring SSH
+SCM authentication, and propagate both release signing flags:
 
 ```bash
-gpg --verify artifact.jar.asc artifact.jar
+mvn-lite -s "$SETTINGS" release:perform \
+  -DlocalCheckout=true \
+  -Darguments="-DperformRelease=true -Dgpg.keyname=$SIGNING_KEY"
 ```
 
-The Central plugin generates MD5, SHA-1, SHA-256, and SHA-512 checksums during
-staging. Central requires MD5 and SHA-1; SHA-256 and SHA-512 are also retained.
+This rebuilds the tag and uploads to Central. It requires publication
+authorization just like a Portal upload. Keep `autoPublish=false` in the POM.
+A failed `release:perform` does not require rerunning `release:prepare`,
+changing the version, or deleting the tag. For subsequent operational retries,
+prefer the preserved bundle over another rebuild.
 
-## Release flow
+## Recovery without restarting
 
-Run these only from a clean, pushed release branch with the real Portal token
-and signing key available:
+| Symptom/state | Next action |
+| --- | --- |
+| GPG cannot sign / `Inappropriate ioctl for device` | Unlock the approved key interactively, probe it, rerun the signed build from the same tag. |
+| SSH `Permission denied (publickey)` | Use `-DlocalCheckout=true`, or use the preferred bundle path. |
+| Missing `.asc` files | Ensure `-DperformRelease=true` and key fingerprint reach the build; rebuild the unpublished bundle from the same tag. |
+| Authentication/namespace error | Fix the private Portal token/account access; retry upload of the existing bundle. |
+| Timeout or lost connection | Look up the recorded deployment or Portal list first; a successful upload may still be processing. |
+| `PENDING` / `VALIDATING` | Wait and inspect that deployment. |
+| `FAILED` | Retain sanitized errors; fix the cause. Retain deployment files for Support, otherwise drop the unpublished deployment before retrying. |
+| `VALIDATED` | Inspect and publish the existing deployment under release authorization. |
+| `PUBLISHING` | Wait; do not resubmit. |
+| `PUBLISHED` but consumer cannot resolve | Check public availability/propagation with a fresh Maven repository; keep the same deployment and artifacts. |
+| Wrong artifact contents or required POM metadata | Correct the unpublished candidate under the runbook's blocker policy; published coordinates require a new patch version. |
 
-```bash
-JAVA_HOME=/path/to/jdk8 mvn release:prepare
-JAVA_HOME=/path/to/jdk8 mvn release:perform
-```
+After publication, check every reactor coordinate and run an isolated consumer
+against public Central. Published coordinates are immutable. Website,
+installer, release-note, and follow-up issue fixes continue independently.
 
-`release:prepare` verifies the reactor, changes the POMs to `1.3`, commits and
-tags the release, then advances the branch to the next development version.
-`release:perform` checks out the tag, signs the artifacts, and runs `deploy`.
+## Official references
 
-Because automatic publishing is disabled, a successful deploy uploads a
-validation deployment but does not make it public. Inspect the deployment in
-the Central Portal, resolve any validation errors, and explicitly choose
-**Publish** only after the release-candidate checklist is complete. Published
-Maven Central coordinates are immutable.
-
-## Required artifact and metadata checks
-
-The release must include:
-
-* the parent POM and all three module POMs;
-* main JARs for Core, Drivers, and Tools;
-* source and Javadoc JARs for every main JAR;
-* the Core test JAR used by the reactor;
-* an ASCII-armored `.asc` signature for every POM and JAR;
-* generated checksums for every POM and JAR.
-
-Each effective POM must retain the project name, description, HTTPS project
-URL, organization, Apache-2.0 license, developer information, and SCM
-coordinates. Release
-dependencies must already be available from Maven Central and may not use
-`-SNAPSHOT` versions.
-
-Official references:
-
-* [Central Portal Maven plugin](https://central.sonatype.org/publish/publish-portal-maven/)
-* [Central publication requirements](https://central.sonatype.org/publish/requirements/)
-* [Central GPG requirements](https://central.sonatype.org/publish/requirements/gpg/)
-* [OSSRH retirement and migration](https://central.sonatype.org/pages/ossrh-eol/)
+- [Central Portal Maven plugin: bundle generation and manual publication](https://central.sonatype.org/publish/publish-portal-maven/)
+- [Central Portal API: deployment states and recovery](https://central.sonatype.org/publish/publish-portal-api/)
+- [Central publication requirements](https://central.sonatype.org/publish/requirements/)
+- [Central GPG requirements](https://central.sonatype.org/publish/requirements/gpg/)
+- [OSSRH retirement](https://central.sonatype.org/pages/ossrh-eol/)

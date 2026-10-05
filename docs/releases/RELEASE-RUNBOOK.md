@@ -1,460 +1,300 @@
 # Scriptella Release Runbook
 
-This runbook defines the guarded, reusable procedure for publishing a
-Scriptella release. It coordinates the source repository, Maven Central,
-GitHub Releases, distribution archives, and the public website.
+Release from a recorded source commit, keep completed work, and resume at the
+failed step. Small issues should normally be fixed on `master`, corrected on
+the website or release notes, or recorded for a follow-up patch release.
 
-[RELEASE-PUBLISHING.md](../../RELEASE-PUBLISHING.md) documents the Maven and
-Central configuration. This runbook covers the complete cross-system release
-sequence.
+This is the current procedure for future releases. Historical version plans
+record what happened at the time; they do not add gates to this procedure.
+[RELEASE-PUBLISHING.md](../../RELEASE-PUBLISHING.md) contains Central commands
+and troubleshooting. Private settings, keys, machine paths, and credential-bearing
+logs stay outside Git. Read workspace-local operator notes before executing.
 
-The runbook intentionally contains no credentials, private-key locations,
-machine-specific paths, release-specific commit IDs, or unpublished deployment
-details. Record those values in a private release plan and substitute them only
-while executing a release.
+## Decide whether an issue blocks this release
 
-## Safety model
+The question is: **must the artifacts for this version change before users can
+reasonably use them?** Classify the problem before restarting anything.
 
-A request to prepare or continue release work is not permission to perform an
-externally visible or irreversible action.
-
-Two explicit maintainer approvals are required:
-
-1. **Release GO** — after the complete no-upload release gate and before
-   pushing the release commit or tag, creating a GitHub Release, or uploading
-   to Central.
-2. **Publication GO** — after Central reports `VALIDATED` and the draft GitHub
-   Release has been completely inspected, immediately before publishing.
-
-Stop when a prerequisite or validation step fails. Do not weaken a gate merely
-to finish a release, and never replace artifacts at coordinates that have
-already been published.
-
-## Security rules
-
-* Keep Central tokens in private Maven settings under server ID `central`.
-* Keep private keys, passphrases, revocation material, authentication headers,
-  and credential-bearing logs outside Git.
-* Use a durable, passphrase-protected OpenPGP signing key through `gpg-agent`.
-* Publish the corresponding public key through a Central-supported keyserver.
-* Never put a passphrase or publishing token on a command line.
-* Do not enable shell tracing or Maven/GPG debug logging around credentials.
-* Review command output before copying it into a public issue or release note.
-* Before every commit and push, inspect the staged file list and diff for
-  credential files, private logs, temporary assets, and secret-looking values.
-
-Public signing-key fingerprints, Central deployment IDs, artifact hashes, and
-publication timestamps may be recorded as release evidence. They are not
-credentials. Private keys, passphrases, and tokens must never be recorded.
-
-## Release parameters
-
-The private release plan must resolve and record these placeholders:
-
-| Placeholder | Meaning |
+| Problem | Action |
 | --- | --- |
-| `<release-version>` | Version being published |
-| `<next-development-version>` | Snapshot version after the release |
-| `<release-tag>` | Final immutable source tag |
-| `<release-date>` | Actual publication date |
-| `<source-commit>` | Reviewed source baseline before release preparation |
-| `<website-commit>` | Reviewed final website change |
-| `<binary-zip-sha256>` | Approved SHA-256 for the exact binary ZIP used by the installer |
-| `<signing-key-fingerprint>` | Full approved OpenPGP fingerprint |
-| `<central-deployment-id>` | Deployment returned by Central after upload |
+| Typo, release-note wording, website layout/link, tracking issue, or incomplete evidence | Fix forward or record a follow-up; continue with the same tag and artifacts. |
+| Small known product limitation with an acceptable workaround | Record it in release notes and a follow-up issue; the maintainer may ship and fix it in a patch release. |
+| Locked signing agent, expired token, network failure, incorrect invocation, or missing upload signatures | Correct the environment/invocation and retry the affected step from the same tag. |
+| Unexpected test failure | Investigate; retry an identified environment/flaky-test failure. A real regression needs a severity decision, not an automatic whole-process restart. |
+| Broken primary launch/ETL path, wrong version or contents, corrupt archive, required license omission, unacceptable security defect, or incompatible unannounced change | Block the affected publication. Correct the candidate before publishing, or issue a patch if already public. |
 
-Use shell variables only for non-secret values. Inspect their values before
-running commands that push or publish:
+The classification table above is authoritative. Documentation issues,
+identified flaky tests, signing problems, upload problems, and other operational
+failures do not justify abandoning a version or recreating its tag.
+
+Severity depends on user impact, not whether a checklist box failed. Do not
+silently waive a product regression: record why it is acceptable and the
+follow-up. Signature and checksum failures must be corrected before publication,
+but do not by themselves imply a source defect or a new tag.
+
+Once any artifacts are public, preserve the tag and published binaries. Use a
+new patch version for artifact fixes. Before publication, recreating a pushed
+tag is an exceptional maintainer decision for a genuine release-blocking source
+or artifact-content defect classified in the table above; only in that case,
+prefer abandoning that version and preparing the next patch. Never silently
+force-push or delete a remote tag. Fixes committed on `master` after the tag
+are follow-up work; they are not part of that tagged release.
+
+## Authorization and checkpoints
+
+Preparation is local and needs no separate release approval. For an agent-led
+release, obtain one explicit authorization covering the named version, tag,
+source commit, signing fingerprint, and intended external actions (tag push,
+Central upload/publication, GitHub Release; website edits when included).
+Existing explicit authorization for that scope remains valid across retries and pauses. There is
+no mandatory second GO ceremony; inspect Central validation and draft assets
+before publishing under that authorization. A request only to prepare a
+release does not authorize publication.
+
+A source change to the candidate requires review of the changed scope and
+updated authorization if it falls outside the original approval. Operational
+retries and minor follow-up edits do not invalidate the approved release.
+
+Keep a short release record in the tracking issue or a local non-secret file:
+
+- version, next snapshot, source commit, tag commit, signing fingerprint;
+- validation summary and links to applicable CI runs;
+- staged asset names and SHA-256 hashes, Central bundle path/hash;
+- deployment ID/state, GitHub draft/release URL, website status;
+- publication authorization and deferred issues.
+
+Update this record after each completed stage. Resume from it; do not recreate
+successful uploads, builds, approvals, or website checks just because the
+session ended. A website or tracking-issue delay does not invalidate published
+artifacts or prevent development from continuing.
+
+## 1. Preflight once
+
+Use the current supported release toolchain: JDK 17, Maven 3.6+, Ant 1.10.17,
+and DTDDoc for distribution documentation. Product class files target Java 17.
+Check the selected checkout's configuration if these requirements change.
+
+Confirm a clean source checkout, access to the artifact destinations, an unused
+version/tag, private Maven settings with server ID `central`, and the approved
+signing key with its public key available from a Central-supported keyserver.
+Website readiness and access are not artifact-publication prerequisites.
+Website work normally follows artifact publication.
+
+Use non-secret shell variables for paths and release parameters:
 
 ```bash
 export SOURCE=/path/to/source-checkout
-export WEBSITE=/path/to/website-checkout
+export SETTINGS=/path/to/private-settings.xml
 export DTDDOC_HOME=/path/to/dtddoc
+export JAVA_HOME=/path/to/jdk17
 export VERSION='<release-version>'
 export NEXT_VERSION='<next-development-version>'
-export TAG='<release-tag>'
-export RELEASE_DATE='<release-date>'
-export SIGNING_KEY='<signing-key-fingerprint>'
+export TAG="scriptella-parent-$VERSION"
+export SIGNING_KEY='<full-signing-key-fingerprint>'
 ```
 
-Do not store credential values in shell variables shown in this runbook.
+Always pass `-s "$SETTINGS"`, including no-upload builds. Never print settings
+contents, put tokens or passphrases on command lines, or enable debug tracing
+around credentials. Use `gpg-agent` and interactive pinentry for signing.
 
-## 1. Prerequisite gate
+Perform a detached sign-and-verify probe with the approved key. If the agent
+is already unlocked and the probe succeeds, proceed. Ask the operator to
+unlock it interactively only when needed; no special `GPG_UNLOCKED` response
+or forced agent restart is required. Repeat the probe after an actual signing
+failure or agent-cache expiry, rather than stopping before every Maven phase.
 
-Confirm all of the following:
+## 2. Select the candidate and validate proportionately
 
-* both repositories are clean and synchronized with their remotes;
-* the operator has push and release access to the source repository;
-* the operator has push and Pages-deployment access to the website repository;
-* GitHub CLI authentication is valid without printing its token;
-* the Central account can publish the required namespace and view Deployments;
-* a current Portal user token is configured privately as Maven server
-  `central`;
-* the approved secret signing key is available through `gpg-agent`;
-* the full public signing key is retrievable from a Central-supported
-  keyserver;
-* the documented Java, Maven, Ant, and documentation-tool versions are active;
-* the final tag and GitHub Release do not already exist; and
-* enough uninterrupted time is available to complete and inspect each public
-  stage.
+Fetch source, review changes since the previous release, and record the
+candidate commit. Keep unrelated changes out of this candidate; `master` may
+continue independently after tagging. Prepare version/changelog/release notes.
+Before tagging, sweep documentation shipped in `scriptella-etl`: Markdown and
+README translations, examples, CLI help, and Javadoc where relevant. Describe
+shipping features accurately and remove development/unreleased-only wording;
+preserve experimental labels where they still apply. Record remaining public
+website/documentation work in the release tracking issue. Do not hold a release
+for cosmetic wording or every outstanding issue.
 
-Safe verification examples:
+The `scriptella.github.io` website does not need to be updated or staged before
+artifact publication. An advance branch is optional; normal direct follow-up
+after publication is equally valid.
 
-```bash
-java -version
-mvn -version
-ant -version
-gpg --version
-gpg --list-secret-keys --keyid-format long
-gh auth status
-git -C "$SOURCE" status --short --branch
-git -C "$WEBSITE" status --short --branch
-git -C "$SOURCE" tag --list "$TAG"
-gh release view "$TAG" --repo '<source-repository>'
-```
+For an ordinary patch release:
 
-Verify the signing fingerprint in full, perform a detached sign-and-verify
-test, and retrieve the public key into a separate temporary keyring when
-practical. Stop if the identity, passphrase, signing capability, expiry, or
-public-key distribution is uncertain.
+- run the Maven reactor tests on JDK 17 and a signed no-upload release build;
+- run Ant tests and build distributions if distributing the standalone ZIPs;
+- inspect version, artifact inventory, signatures, licenses, archive integrity;
+- unpack the actual distribution and run the launcher, a representative ETL,
+  and examples; check an isolated Maven consumer;
+- test the changed behavior and any affected driver/integration.
 
-### Mandatory manual signing-key stop
+Reuse successful CI coverage for unchanged areas at the selected source
+revision. Do not manually repeat the full database matrix, dependency audit,
+all website pages, or both JDK builds for every patch. Runtime, dependency,
+packaging, launcher, or compatibility changes require the relevant additional
+checks (including JDK 25 where affected). New compatibility promises require
+evidence. Investigate unexpected test-count reductions rather than requiring
+historical hard-coded totals.
 
-Before any Maven command that signs artifacts, the agent must stop and wait
-for the operator to unlock the approved signing key interactively. Do not
-start Maven and hope that pinentry appears; a non-interactive signing failure
-can occur before the reactor begins.
-
-In a separate interactive terminal, the operator runs the following with the
-private release-plan value substituted for `SIGNING_KEY`:
+Run the signed no-upload lifecycle from a disposable candidate checkout with
+release versions in the four reactor POMs:
 
 ```bash
-export SIGNING_KEY='<signing-key-fingerprint>'
-export GPG_TTY="$(tty)"
-gpgconf --kill gpg-agent 2>/dev/null || true
-PINENTRY="$(command -v pinentry-curses || command -v pinentry)"
-test -n "$PINENTRY" || { echo 'pinentry is not installed' >&2; exit 1; }
-eval "$(gpg-agent --daemon --pinentry-program "$PINENTRY")"
-probe="$(mktemp "${TMPDIR:-/tmp}/scriptella-signing-probe.XXXXXX")"
-trap 'rm -f "$probe" "$probe.asc"' EXIT
-printf '%s\n' 'Scriptella release signing probe' > "$probe"
-gpg --armor --detach-sign \
-  --local-user "$SIGNING_KEY" \
-  --output "$probe.asc" "$probe"
-gpg --verify "$probe.asc" "$probe"
-```
-
-The operator must confirm the successful signature verification explicitly as
-`GPG_UNLOCKED` before the agent continues. The agent then verifies the key and
-starts the signed no-upload Maven gate. Never send the passphrase through the
-agent, put it on a command line, or record it in a log.
-
-## 2. Refresh, review, and freeze
-
-Fetch both repositories and compare every branch used by the release with its
-remote. Require clean worktrees and review all commits since the last validated
-candidate.
-
-```bash
-git -C "$SOURCE" fetch --prune origin
-git -C "$WEBSITE" fetch --prune origin
-git -C "$SOURCE" status --short --branch
-git -C "$WEBSITE" status --short --branch
-git -C "$SOURCE" log --oneline --decorate -10
-git -C "$WEBSITE" log --oneline --decorate -10
-```
-
-Freeze feature, dependency, and cleanup work. Only reviewed release blockers
-and final release wording may enter the selected baseline.
-
-Prepare source wording before the final build:
-
-* set the changelog heading and comparison link to the final version, date,
-  and tag;
-* identify the new version as the latest release in the README;
-* update dependency examples to the release version;
-* retain accurate compatibility and known-limitation statements; and
-* ensure no release-candidate or “not yet published” wording remains in files
-  that will be included in final artifacts.
-
-Prepare final website changes on a branch from current website `master`, but
-do not merge or deploy that branch yet. It must use the final release date and
-the exact planned GitHub asset URLs and Maven coordinates. The live website
-must retain its previous accurate status until the artifacts are public.
-
-Record the exact reviewed source and website commits in the private plan.
-
-## 3. Final no-upload release gate
-
-Create a disposable detached worktree from `<source-commit>`. Change only the
-reactor versions from the development snapshot to `<release-version>` and
-inspect the complete diff.
-
-Run the same release lifecycle used by publication while suppressing Central
-upload:
-
-```bash
-mvn clean deploy \
-  -DperformRelease=true \
-  -Dcentral.skipPublishing=true \
+mvn-lite -s "$SETTINGS" clean deploy \
+  -DperformRelease=true -Dcentral.skipPublishing=true \
   -Dgpg.keyname="$SIGNING_KEY"
+mvn-lite -s "$SETTINGS" -N -Pant-test-dependencies dependency:copy
 ant clean test
 ant -Ddtddoc.dir="$DTDDOC_HOME" clean dist
 ```
 
-Validate all of the following against the expected baseline recorded in the
-private plan:
+The no-upload Central bundle is useful preflight evidence, not a public
+release. If source changes, repeat checks affected by that change plus the
+final signed build; retain unrelated successful evidence. Environment-only
+failures need only the affected command rerun. Never publish a bundle from a
+different source revision as though it came from the final tag.
 
-* Maven reactor modules and test totals;
-* Ant tests and failure propagation;
-* parent and module POM metadata;
-* main, source, Javadoc, test, and distribution JARs as applicable;
-* detached signatures for every POM and Maven artifact required by Central;
-* required checksums;
-* binary, source, and examples archives;
-* manifests and embedded version strings;
-* README, changelog, license, notice, and dependency-license contents;
-* dependency versions and byte-identical bundled copies where expected;
-* the [issue #58 security disposition](../security/dependabot-2026-08.md),
-  including exact dependency versions in every generated archive;
-* successful Maven and Ant validation on JDK 17 and JDK 25, with product
-  class files remaining at `--release 17` (major version 61);
-* unpacked launcher and representative ETL execution;
-* unpacked examples; and
-* an isolated Maven consumer resolving the candidate release version.
+Installer updates may follow publication: pin the checksum to the exact
+published ZIP, then test installation in a disposable home. Avoid a pre-tag
+checksum/rebuild loop. Leave the existing installer pointing to the previous
+working release until the new archive is public. If the tagged installer must
+itself install this new version, freeze its candidate ZIP before tagging and
+publish that exact verified ZIP; never substitute a rebuild with a new hash.
 
-For a release that is actually changing the user-local installer, create a
-dedicated release-candidate staging area from the exact release-version
-content; do not use artifacts from
-the disposable validation worktree as final assets. Freeze the candidate
-binary ZIP there, record its SHA-256, verify its integrity, and update the
-canonical `install.sh` with the release version, tag, archive URL, filename,
-Java baseline, and checksum before tagging. The frozen candidate is the
-approved installer asset. Do not assume that a separately rebuilt post-tag
-ZIP will be byte-for-byte identical: validate any such rebuild by comparing
-normalized archive contents, file modes, launcher/version data, and extracted
-file checksums. If the rebuilt asset is to be published instead, stop, update
-the installer hash before tagging, and repeat the gate.
+## 3. Prepare the tag locally
 
-Verify every ZIP with an archive-integrity tool and every JAR as a readable ZIP
-archive. Record hashes for evidence, but do not reuse artifacts from this
-disposable validation as final release assets.
-
-Stop on any failure, unexpected source difference, dependency change,
-signature problem, archive discrepancy, or smoke-test regression. Fix through
-an ordinary reviewed commit, refresh the frozen commits, and repeat the entire
-gate.
-
-## 4. First maintainer approval
-
-Present:
-
-* exact source and website commit IDs;
-* release version, next version, tag, and actual date;
-* full signing-key fingerprint;
-* tool versions and complete test totals;
-* Maven, Ant, distribution, archive, and smoke-test results;
-* final GitHub asset names;
-* confirmation of GitHub and Central access; and
-* every deviation from this runbook.
-
-Require an unambiguous **GO** naming the source commit, website commit, tag,
-and signing fingerprint. Anything else is **NO-GO**.
-
-## 5. Prepare and inspect release history
-
-Before creating the release tag, review the installer fields and frozen binary
-ZIP hash as part of the release diff. The tag must contain the installer that
-was tested against that exact candidate archive. The 1.4 installer exposes
-only the packaged `bin/scriptella.sh` through the installation's own `bin`
-directory. The simple ZIP-plus-PATH installer remains the default for future
-releases, including 1.5 unless requirements change. Check each future release
-against its actual archive and packaged launcher before updating the release
-version, tag, archive URL, filename, checksum, or installer-facing
-documentation. During the 1.5 transition, leave the 1.4 installer unchanged
-through release preparation and publication. The preserved `installer-1.5`
-implementation is experimental/reference work; revisit it only if future
-requirements justify additional installer behavior. A future `bin/scriptella`
-launcher belongs in the distribution and requires no special installer
-machinery.
-
-Run Maven Release Plugin with remote pushing disabled and every version/tag
-choice supplied explicitly:
+From clean source `master`, prepare without remote pushes:
 
 ```bash
-git -C "$SOURCE" switch master
-test -z "$(git -C "$SOURCE" status --porcelain)"
 cd "$SOURCE"
-mvn --batch-mode release:prepare \
+mvn-lite -s "$SETTINGS" release:prepare \
   -DpushChanges=false \
   -DreleaseVersion="$VERSION" \
   -DdevelopmentVersion="$NEXT_VERSION" \
   -Dtag="$TAG"
 ```
 
-Inspect the resulting graph, release commit, tag, and next-development commit.
-Require the tag to contain the release version and the following local commit
-to contain the next snapshot version. Confirm that only expected version and
-SCM metadata changed.
+Inspect the release commit, tag target, and following snapshot commit. Keep
+`release.properties` and release-plugin backup POMs locally until publication
+is complete; do not commit them. On preparation failure inspect the plugin's
+recorded phase and Git state before choosing resume or rollback. Do not
+blindly roll back successful preparation for a later upload failure.
 
-If preparation fails before push, retain the logs, use `release:rollback` and
-`release:clean` when appropriate, and inspect the result. Do not use destructive
-Git cleanup on an uninspected worktree.
+## 4. Build once from the tag and stage
 
-Push the release commit and tag atomically. Keep the next-development commit
-local until all release surfaces have been published and verified:
+Use a fresh detached worktree at the local tag. Run the signed no-upload Maven
+build above and the applicable Ant distribution build there. This is the final
+artifact set; the earlier candidate gate need not be repeated in its entirety
+if only expected release-version/SCM metadata changed. Check those differences.
 
-```bash
-export RELEASE_COMMIT="$(git -C "$SOURCE" rev-parse "$TAG^{commit}")"
-git -C "$SOURCE" push --atomic origin \
-  "$RELEASE_COMMIT:refs/heads/master" \
-  "refs/tags/$TAG"
-```
+Preserve the complete generated Central bundle (normally
+`target/central-publishing/central-bundle.zip`) outside disposable build output.
+Verify that it contains the complete reactor coordinate set and a signature
+for every POM/JAR; retain its hash. Build GitHub distribution assets from this
+same tag, record SHA-256 hashes, create `.sha256` and detached `.asc` sidecars,
+and verify archives, signatures, and functional smoke tests on the staged files.
 
-Verify the remote branch and tag through GitHub. Record the release, tag, and
-local next-development commit IDs.
+Keep the staged originals until release completion. Reuse them across network,
+Portal, draft, and website failures. If a rebuild is necessary before publication,
+replace only the unpublished candidate set, update hashes, and recheck its
+contents and smoke behavior. Published binaries are immutable.
 
-## 6. Build and stage immutable assets
-
-Create fresh detached worktrees and asset directories from the pushed tag.
-Build the final Maven and Ant outputs there. Copy only the approved primary
-assets into a dedicated staging directory. For an installer release, verify
-the staged binary ZIP against the frozen pre-tag candidate rather than
-silently substituting a separately rebuilt archive. Any independent rebuild
-is validation evidence unless the pre-tag installer/checksum gate is repeated.
-
-For every primary GitHub asset:
-
-* record its byte size and SHA-256 hash;
-* create one detached ASCII-armored signature with the approved key;
-* create one `.sha256` sidecar; and
-* verify the signature, checksum, and archive integrity.
-
-Repeat the functional smoke tests against these exact files. Do not rebuild or
-replace them after recording their hashes and signatures.
-
-Prepare reviewed release notes from the changelog, including upgrade notes and
-known limitations. Create a **draft** GitHub Release from the existing tag and
-upload the complete approved asset set. Verify the tag, draft state, notes,
-asset count, filenames, sizes, hashes, and signatures. Download the draft
-assets through an authenticated request when possible and compare them with
-the staged originals.
-
-## 7. Upload to Central without publishing
-
-Run `release:perform` with the approved fingerprint. The project must keep
-Central automatic publication disabled:
+Present the candidate and validation summary for publication authorization if
+not already granted. Then push the tag and prepared release/snapshot history:
 
 ```bash
-mvn --batch-mode release:perform \
-  -Darguments="-Dgpg.keyname=$SIGNING_KEY"
+git -C "$SOURCE" push --atomic origin master "refs/tags/$TAG"
 ```
 
-Capture logs privately and redact them before sharing. Record the deployment
-ID and URL without recording credentials.
+Verify the remote tag target and branch. Pushing the next snapshot now lets
+normal development resume; it does not change the release tag. If remote
+`master` advanced meanwhile, reconcile normally without rewriting history.
 
-Require Central state `VALIDATED`. `FAILED` is a stop condition. Inspect:
+## 5. Upload the preserved bundle and inspect the GitHub draft
 
-* the deployment name, namespace, version, and complete coordinate set;
-* parent and module POM metadata;
-* main, source, Javadoc, and attached test artifacts as applicable;
-* `.asc` signatures and generated checksums; and
-* absence of snapshots and unexpected files.
+Preferred Central path: upload the preserved signed bundle through the
+[Portal Deployments page](https://central.sonatype.com/publishing/deployments)
+using manual publication. This separates build/signing from network/publishing
+and avoids another `release:perform` rebuild. See
+[Central troubleshooting](../../RELEASE-PUBLISHING.md#recovery-without-restarting).
+Record the deployment ID immediately. Wait for `VALIDATED` and inspect the
+coordinate inventory and validation result. For timeout/connection loss, check
+that deployment before retrying; the upload may have succeeded.
 
-Download representative files from the validated deployment, verify their
-signatures using the published key, and run the isolated consumer smoke test.
-Do not publish yet.
+Create a GitHub draft against the existing tag, upload the preserved signed
+assets, and inspect notes, tag, filenames, hashes, and draft state. A draft's
+`untagged-...` URL is not proof of a wrong tag; inspect its actual tag field.
+Correct draft notes/assets in place before publication.
 
-If validation fails, preserve the errors and drop the unpublished deployment.
-Any decision to remove or recreate a pushed tag requires explicit maintainer
-approval and is permitted only while neither Central nor the GitHub Release is
-public.
+If Central validation fails, identify the cause. Correct signing/invocation or
+settings and retry from the same tag. Required POM/artifact-content changes
+need a corrected candidate. Keep the failed deployment if asking Sonatype
+Support to investigate; otherwise drop it after retaining sanitized errors.
+No full release restart is required for an operational deployment failure.
 
-## 8. Second maintainer approval and publication
+## 6. Publish artifacts
 
-Present the validated Central deployment, complete draft GitHub Release, tag
-commit, hashes, verified signatures, and final smoke-test results. Obtain a
-second explicit **GO** immediately before publication.
+Under the recorded publication authorization:
 
-Publish in this order:
+1. Publish the inspected `VALIDATED` Central deployment.
+2. Wait for `PUBLISHED` and public resolution of the reactor coordinates; run
+   an isolated consumer using a fresh local Maven repository and public Central.
+3. Publish the GitHub draft and download/verify public assets against staged
+   hashes and signatures.
 
-1. Publish the reviewed Central deployment.
-2. Wait for `PUBLISHED` and for every coordinate and representative file to
-   resolve from public Maven Central.
-3. Run a clean Maven consumer against public Central.
-4. Publish the GitHub draft as a non-prerelease.
-5. Download every public GitHub asset and recheck hashes and signatures.
-6. Only then deploy the prepared website changes.
+Propagation delays mean wait and retry read-only checks. Do not rebuild or
+upload identical coordinates to solve them. Pause downstream announcements
+while primary artifacts are unavailable. Once Central or GitHub artifacts are
+public, website failures or unfinished documentation do not invalidate them.
+Central, GitHub Release, and the website do not need atomic publication;
+temporary website lag is acceptable. Website fixes require ordinary commits,
+never a release restart, rebuild, retag, or artifact rollback.
 
-Stop later surfaces if Central does not become publicly resolvable. Published
-Central components are immutable.
+Record public URLs, final deployment state, validation summary, and asset
+hashes. Remove disposable worktrees with `git worktree remove` after preserving
+assets and non-secret records, and clean release-plugin temporary state.
 
-## 9. Website deployment
+## 7. Public website and documentation follow-up
 
-Refresh the website remote and require the prepared website commit to be based
-on the expected current `master`. Confirm all final download URLs return the
-published files, then fast-forward website `master` to the reviewed final
-website commit and push it without rewriting history.
+Use the release tracking issue as the checklist of accumulated public follow-ups.
+After artifact publication:
 
-Inspect the Pages deployment and verify:
+- publish/finalize release notes as appropriate;
+- make a quick sweep of `scriptella.github.io` for shipping features, examples,
+  downloads, version references, installation instructions, generated docs where
+  needed, and stale development/unreleased-only wording;
+- update the installer to the actual published archive and verified checksum;
+- check basic consistency with the published release and test changed links
+  and installer behavior.
 
-* homepage, downloads, changelog, tutorial, reference, and support pages;
-* generated API and DTD documentation;
-* downloadable DTDs and other stable public resources;
-* every final GitHub asset link and Maven example;
-* custom domain and TLS;
-* CSS, JavaScript, images, favicon, nested paths, and important anchors;
-* internal links and desktop/mobile presentation; and
-* absence of stale RC, “in development,” or previous-latest-release wording.
+These are post-release follow-ups, not artifact-publication gates. No special
+website branch, freeze, synchronization ceremony, or additional release GO
+checkpoint is required.
+Keep the release tracking issue open until these promised public follow-ups
+are complete. Other deferred issues do not require reopening the release.
 
-If deployment fails after artifacts are public, revert the website deployment
-through an ordinary commit. Do not alter the published release artifacts.
+## Recovery at a glance
 
-## 10. Advance development and close out
-
-After Central, GitHub, and the website are all public and verified, push the
-previously inspected next-development commit to source `master`. Confirm the
-remote now contains `<next-development-version>`.
-
-Record sanitized evidence in the release-tracking issue:
-
-* both maintainer GO statements and times;
-* release, tag, next-development, and website commit IDs;
-* tool versions, test totals, and smoke-test results;
-* public signing-key fingerprint;
-* final asset names, sizes, and SHA-256 hashes;
-* signature verification results;
-* Central deployment ID, states, timestamps, and public coordinate checks;
-* GitHub Release URL and integrity checks;
-* Pages deployment and live-site checks; and
-* deferred issues and deviations.
-
-Remove disposable worktrees using `git worktree remove`, retain non-secret
-evidence in an approved location, and close the tracking issue only after every
-completion condition passes.
-
-## Recovery matrix
-
-| Failure point | Safe response |
+| Checkpoint | Resume action |
 | --- | --- |
-| Before release/tag push | Roll back and clean local release preparation, fix normally, and repeat every gate. |
-| Tag pushed; nothing public | Stop and obtain explicit approval before dropping drafts/deployments or recreating the tag. Never force-push silently. |
-| Central `FAILED` or `VALIDATED` | Drop the unpublished deployment, fix, rebuild, and revalidate. |
-| Central `PUBLISHED` | Treat the version as immutable; publish a new patch version for artifact defects. |
-| GitHub draft problem | Correct or delete the draft before publication; reuse only the preserved signed assets. |
-| GitHub Release published | Do not replace public binaries or rewrite the tag; use a patch release for defects. |
-| Website deployment problem | Revert the website commit and redeploy without changing release artifacts. |
-| Propagation delay | Pause later surfaces, record times, and repeat read-only checks; never rebuild identical coordinates. |
+| Candidate build fails | Classify; fix and rerun affected checks. No tag/draft cleanup needed. |
+| Local preparation partly completed | Inspect Git and `release.properties`; resume or roll back only preparation as needed. |
+| Signing or bundle packaging fails | Unlock/fix invocation, rebuild from the same tag, verify the corrected unpublished bundle. |
+| Upload fails or times out | Check Portal for an existing deployment; retry upload of the preserved bundle only if needed. |
+| Central `FAILED` | Diagnose; retry operational fixes on the same tag, or correct a genuinely defective unpublished candidate. |
+| Central `VALIDATED` | Resume inspection/publication of that deployment; no rebuild. |
+| Central `PUBLISHING` or `PUBLISHED` | Check state/public resolution; never upload a replacement. |
+| GitHub draft fails | Correct draft/upload missing staged assets; retain the tag and Central progress. |
+| Public artifact has a defect | Assess severity, document workaround, prepare a patch release if needed. |
+| Website/installer fails | Fix or revert through normal commits; keep artifacts and release tag. |
 
-## Authoritative references
+## References
 
-Before each release, recheck the current versions of:
+Recheck these when publishing configuration changes or a service error suggests
+API/requirements drift; routine patch releases do not need a fresh policy audit.
 
-* [Central Portal Maven publishing](https://central.sonatype.org/publish/publish-portal-maven/)
-* [Central Portal API](https://central.sonatype.org/publish/publish-portal-api/)
-* [Central publication requirements](https://central.sonatype.org/publish/requirements/)
-* [Central OpenPGP requirements](https://central.sonatype.org/publish/requirements/gpg/)
-* [Maven release guide](https://maven.apache.org/guides/mini/guide-releasing.html)
-* [GitHub release management](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
-* [GitHub release integrity](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/verify-release-integrity)
-* [GitHub Pages publishing](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+- [Central Maven plugin](https://central.sonatype.org/publish/publish-portal-maven/)
+- [Central Portal API and states](https://central.sonatype.org/publish/publish-portal-api/)
+- [Central publication requirements](https://central.sonatype.org/publish/requirements/)
+- [Central OpenPGP requirements](https://central.sonatype.org/publish/requirements/gpg/)
+- [Maven release guide](https://maven.apache.org/guides/mini/guide-releasing.html)
