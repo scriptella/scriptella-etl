@@ -36,6 +36,12 @@ jobs:
       - name: Install current Scriptella artifacts
         run: mvn --batch-mode --no-transfer-progress install -DskipTests
 
+      - name: Read current Scriptella version
+        id: scriptella
+        run: |
+          version=$(mvn --batch-mode --no-transfer-progress --non-recursive --quiet help:evaluate -Dexpression=project.version -DforceStdout -Dstyle.color=never)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Check out compatibility suite
         uses: actions/checkout@v6
         with:
@@ -43,7 +49,9 @@ jobs:
           path: scriptella-testcontainers
 
       - name: Run database compatibility test
-        run: ./scriptella-testcontainers/run-db-test.sh "${{ matrix.database }}" -Dscriptella.version=1.6-SNAPSHOT
+        env:
+          SCRIPTELLA_VERSION: ${{ steps.scriptella.outputs.version }}
+        run: ./scriptella-testcontainers/run-db-test.sh "${{ matrix.database }}" "-Dscriptella.version=$SCRIPTELLA_VERSION"
 
       - name: Upload compatibility report
         if: always()
