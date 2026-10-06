@@ -1,14 +1,52 @@
 # Changelog
 
-## [Unreleased]
+## [1.6]
 
-* Added the reserved, read-only `${env.FOO}` environment namespace for shared
-  expressions, ETL configuration, and direct SQL connection settings (#65).
-  Missing environment variables fail clearly; ordinary property lookup and
-  precedence remain unchanged.
-* Added `EtlExecutor.newSqlFileExecutor` and `execute-sql` launcher support for
-  direct UTF-8 SQL files, JDBC credentials, property substitution, literal mode,
-  transaction handling, and completion counts without ETL XML.
+Scriptella 1.6 adds direct SQL execution, a shared environment-variable
+namespace for configuration and credentials, and first-class file-backed
+SQLite support. Java 17 remains the minimum runtime and build JDK.
+
+### Added
+
+* Added direct SQL execution without ETL XML (#63).
+  `EtlExecutor.newSqlFileExecutor(...)` runs one UTF-8 SQL file through the
+  normal executor. The `execute-sql` launcher command takes a JDBC URL,
+  optional user, password, and driver class, and exactly one SQL file.
+  Property and expression substitution is on by default, including JVM system
+  properties such as `${schema}` and `?name` bindings. `--no-substitution`,
+  and the Java `substitution` flag, keep dollar and question-mark expressions
+  literal in the SQL file. The command reports completion counts unless
+  `--no-stat` or `--quiet` is used. Exit status is `0` for success, `1` for
+  execution failure, `2` for a missing SQL file, and `3` for invalid or
+  missing arguments.
+* Added the reserved, read-only `${env.FOO}` namespace for shared expressions,
+  ETL configuration, and direct SQL connection settings (#65). A missing
+  referenced variable fails without printing a value. Ordinary `${foo}` lookup
+  and precedence are unchanged, and connection settings still expand when SQL
+  substitution is off. `--password VALUE` remains convenience syntax and can
+  expose the password in shell history and process listings; the documented
+  alternative is `${env.DB_PASSWORD}` or another protected configuration path.
+* Added first-class file-backed SQLite support (#66): a `sqlite` alias,
+  canonical `jdbc:sqlite:` recognition, and autodetection. Tests pin Xerial
+  SQLite JDBC 3.53.4.0. The driver is external and is not bundled. The
+  verified scope is ordinary migration work on a SQLite file, including the
+  canonical SQLite → PostgreSQL example. High-precision NUMERIC/REAL values
+  can lose precision through SQLite and `Double`; do not treat the migration
+  as lossless for arbitrary SQLite numerics.
+
+### Upgrade notes
+
+* Java 17 remains the minimum runtime and build JDK. Scriptella 1.3 remains
+  the Java 8 compatibility line.
+* Direct SQL, `${env.*}`, and the SQLite alias require Scriptella 1.6.
+  The curl installer stays on the published 1.5 archive until that installer
+  is updated after the 1.6 ZIP is public.
+* `--check` remains experimental and performs only a lightweight static check.
+* Vendor JDBC drivers, including Xerial SQLite JDBC, stay external. Supply
+  them on the connection `classpath` or the application classpath.
+* SQLite support is the verified file-backed contract in
+  [docs/sqlite.md](docs/sqlite.md). It is not a version matrix, and it does
+  not add SQLite-specific transaction behavior.
 
 ## [1.5] — 2026-09-08
 
@@ -231,6 +269,7 @@ For changes before 1.0 and additional historical detail, see
 [#20]: https://github.com/scriptella/scriptella-etl/issues/20
 [#29]: https://github.com/scriptella/scriptella-etl/issues/29
 [#32]: https://github.com/scriptella/scriptella-etl/issues/32
+[1.6]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.6
 [1.5]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.5
 [1.4]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.4
 [1.3]: https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.3

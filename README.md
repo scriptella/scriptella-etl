@@ -23,10 +23,9 @@ without a proprietary transformation language or graphical designer.
 
 ## Project status
 
-The latest release is **Scriptella 1.5** (Java 17 baseline), published on
-September 8, 2026.
+The latest release is **Scriptella 1.6** (Java 17 baseline).
 
-Scriptella 1.5 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.5)
+Scriptella 1.6 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.6)
 and [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core).
 
 See the [changelog](CHANGELOG.md) for the release details and compatibility
@@ -36,7 +35,7 @@ changes.
 
 | Version | Java |
 | --- | --- |
-| **Scriptella 1.5** | Java **17** |
+| **Scriptella 1.6** | Java **17** |
 | **Scriptella 1.3 (Java 8 compatibility release)** | Java **8** |
 
 ## Getting Scriptella
@@ -80,17 +79,20 @@ When the installer updates a startup file, start a new shell or reload that
 file before using `scriptella.sh`. Manual ZIP installation and
 `java -jar scriptella.jar` remain available above.
 
-### Direct SQL execution (development version)
+### Direct SQL execution
 
-Run a SQL file directly against a JDBC connection without ETL XML:
+Scriptella 1.6 runs a SQL file directly against a JDBC connection without ETL XML:
 
 ```bash
 scriptella.sh execute-sql --url jdbc:postgresql://localhost/app --user app schema.sql
 ```
 
-Available in development builds. See the [direct SQL guide](docs/cli-usage.md#10-direct-sql-execution-development-version)
-for JDBC driver setup, JVM properties, and CLI options. For embedded execution,
+See the [direct SQL guide](docs/cli-usage.md#10-direct-sql-execution)
+for driver setup, properties, literal mode, and CLI options. For embedded execution,
 see [Executing Scriptella from Java](docs/java-execution.md).
+
+The curl installer above still installs published Scriptella 1.5. Use a 1.6
+distribution for `execute-sql` until that installer is updated.
 
 ### Quick start
 
@@ -171,7 +173,7 @@ the core module:
 <dependency>
   <groupId>org.scriptella</groupId>
   <artifactId>scriptella-core</artifactId>
-  <version>1.5</version>
+  <version>1.6</version>
 </dependency>
 ```
 

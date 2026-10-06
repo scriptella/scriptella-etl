@@ -376,6 +376,7 @@ public class EtlLauncher {
         getOut().println("Usage: scriptella.sh execute-sql --url jdbc:... [options] file.sql");
         getOut().println("  --user NAME           JDBC username");
         getOut().println("  --password VALUE      JDBC password (convenience syntax; may be visible in shell history/process listings)");
+        getOut().println("                        Prefer --password '${env.DB_PASSWORD}' so the secret stays in the environment.");
         getOut().println("  --driver CLASS        Load a JDBC driver class (JAR must be in lib/ or classpath)");
         getOut().println("  --no-substitution     Preserve literal dollar and question-mark expressions");
         getOut().println("  -d, --debug           Enable debug logging and error stack traces");

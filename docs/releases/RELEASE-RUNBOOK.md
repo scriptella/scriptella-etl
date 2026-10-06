@@ -45,7 +45,8 @@ are follow-up work; they are not part of that tagged release.
 Preparation is local and needs no separate release approval. For an agent-led
 release, obtain one explicit authorization covering the named version, tag,
 source commit, signing fingerprint, and intended external actions (tag push,
-Central upload/publication, GitHub Release; website edits when included).
+Central upload/publication, GitHub Release; website edits and the Discussions
+announcement when included).
 Existing explicit authorization for that scope remains valid across retries and pauses. There is
 no mandatory second GO ceremony; inspect Central validation and draft assets
 before publishing under that authorization. A request only to prepare a
@@ -60,7 +61,7 @@ Keep a short release record in the tracking issue or a local non-secret file:
 - version, next snapshot, source commit, tag commit, signing fingerprint;
 - validation summary and links to applicable CI runs;
 - staged asset names and SHA-256 hashes, Central bundle path/hash;
-- deployment ID/state, GitHub draft/release URL, website status;
+- deployment ID/state, GitHub draft/release URL, announcement URL, website status;
 - publication authorization and deferred issues.
 
 Update this record after each completed stage. Resume from it; do not recreate
@@ -243,8 +244,9 @@ Under the recorded publication authorization:
    hashes and signatures.
 
 Propagation delays mean wait and retry read-only checks. Do not rebuild or
-upload identical coordinates to solve them. Pause downstream announcements
-while primary artifacts are unavailable. Once Central or GitHub artifacts are
+upload identical coordinates to solve them. Pause downstream announcements,
+including the Discussions post in section 7, while primary artifacts are
+unavailable. Once Central or GitHub artifacts are
 public, website failures or unfinished documentation do not invalidate them.
 Central, GitHub Release, and the website do not need atomic publication;
 temporary website lag is acceptable. Website fixes require ordinary commits,
@@ -265,7 +267,14 @@ After artifact publication:
   needed, and stale development/unreleased-only wording;
 - update the installer to the actual published archive and verified checksum;
 - check basic consistency with the published release and test changed links
-  and installer behavior.
+  and installer behavior;
+- post a GitHub Discussions announcement in the Announcements category once
+  the GitHub Release is public. Follow the shape of the
+  [Scriptella 1.5 announcement](https://github.com/scriptella/scriptella-etl/discussions/60):
+  version, highlights, and links to that release, the changelog, and the
+  Maven Central coordinates. Mention the curl installer or website only when
+  those already describe this release. A delayed or corrected post is an
+  ordinary edit.
 
 These are post-release follow-ups, not artifact-publication gates. No special
 website branch, freeze, synchronization ceremony, or additional release GO
@@ -287,6 +296,7 @@ are complete. Other deferred issues do not require reopening the release.
 | GitHub draft fails | Correct draft/upload missing staged assets; retain the tag and Central progress. |
 | Public artifact has a defect | Assess severity, document workaround, prepare a patch release if needed. |
 | Website/installer fails | Fix or revert through normal commits; keep artifacts and release tag. |
+| Announcement missing or incorrect | Edit or publish the discussion; keep the tag and published artifacts. |
 
 ## References
 

@@ -368,6 +368,8 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
      * depends on the database. SELECT results are unsupported; use an ETL query.
      * SQL variables come from a snapshot of JVM system properties. Text substitution
      * does not escape SQL; use ?name bindings for data values.
+     * The JDBC URL, user, password, and driver accept the reserved {@code ${env.NAME}}
+     * namespace. Connection settings expand even when {@code substitution} is false.
      *
      * @param file UTF-8 SQL file, read at execution time
      * @param url JDBC connection URL
@@ -376,7 +378,7 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
      * @param driver optional JDBC driver class; null uses JDBC automatic registration
      * @param substitution whether Scriptella SQL substitution is enabled
      * @return a normal ETL executor supporting execute(), progress, JMX, and cancellation
-     * @throws IllegalArgumentException if file is null or the URL does not start with jdbc:
+     * @throws IllegalArgumentException if file is null or the expanded URL is missing or does not start with jdbc:
      */
     public static EtlExecutor newSqlFileExecutor(final File file, String url, String user, String password,
                                                 String driver, boolean substitution) {

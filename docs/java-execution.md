@@ -8,8 +8,8 @@ Both execute through the same engine and return `ExecutionStatistics`.
 Include `org.scriptella:scriptella-core` and the JDBC drivers or Scriptella
 adapters used by your job on the application's classpath. Optional adapters
 are provided by `org.scriptella:scriptella-drivers`. Use matching Scriptella
-artifact versions. Direct SQL execution is currently available only in
-development builds; the XML examples also apply to the current published release.
+artifact versions. `newSqlFileExecutor(...)` is part of Scriptella 1.6.
+The XML examples also apply to the current published release.
 
 The examples below are Java method fragments. Handle or declare their checked
 exceptions in the surrounding application code. Common imports are:
@@ -80,7 +80,7 @@ Replace `MyApplication` with a class in your application. Relative resources
 are resolved from that URL, so use explicit filesystem paths for external input
 and output files when the ETL is packaged inside a JAR.
 
-## Apply a SQL setup or deployment script (development version)
+## Apply a SQL setup or deployment script
 
 For one JDBC connection and one SQL file, create an executor without an XML wrapper:
 
@@ -139,7 +139,7 @@ batches flushed during commit. Zero can also mean that counts are unsupported
 or statistics were suppressed. It is not a count of query rows.
 
 Use ETL XML query elements when you need result processing, transformations,
-multiple data sources, or orchestration. See the [CLI guide](cli-usage.md#10-direct-sql-execution-development-version)
+multiple data sources, or orchestration. See the [CLI guide](cli-usage.md#10-direct-sql-execution)
 for running a SQL file from a shell.
 
 ## Report progress and handle failures

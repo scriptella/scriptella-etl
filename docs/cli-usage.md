@@ -43,8 +43,10 @@ timestamps, progress messages, exception text, or execution statistics as a
 machine protocol.
 
 Supported launcher options are `-h`/`--help`, `-d`/`--debug`, `-q`/`--quiet`,
-`-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, and `-t`/`--template`. Put JVM options,
-including `-D` properties, before `-jar`; put launcher options after the JAR:
+`-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, and `-t`/`--template`.
+Scriptella 1.6 also accepts the `execute-sql` command documented in
+[section 10](#10-direct-sql-execution). Put JVM options, including `-D`
+properties, before `-jar`; put launcher options after the JAR:
 
 ```sh
 java -Dinput.file=/data/input.csv \
@@ -59,10 +61,10 @@ compatibility. Prefer the canonical double-dash options above in new scripts.
 
 | Code | Meaning |
 |---:|---|
-| `0` | All selected ETL files executed successfully, all `--check` files passed, or help/version/template generation succeeded. |
-| `1` | At least one ETL execution or `--check` failed, or template generation failed. |
-| `2` | An ETL input file could not be resolved. No ETL files are executed if resolution of any command-line file fails. |
-| `3` | An unrecognized launcher option was supplied. |
+| `0` | All selected ETL files or the direct SQL file executed successfully, all `--check` files passed, or help/version/template generation succeeded. |
+| `1` | At least one ETL execution, the direct SQL execution, or `--check` failed, or template generation failed. |
+| `2` | An ETL input file could not be resolved, or the `execute-sql` file is missing. No ETL files are executed if resolution of any command-line file fails. |
+| `3` | An unrecognized launcher option was supplied, or `execute-sql` arguments are missing or invalid. |
 
 When several ETL files resolve successfully, the launcher processes them in
 argument order. A runtime or checking failure does not stop later files; the
@@ -239,7 +241,7 @@ java -Dsource.file=/data/input.txt -Dtarget.file=/data/output.txt \
      /absolute/path/to/file-transform.etl.xml
 ```
 
-## 10. Direct SQL execution (development version)
+## 10. Direct SQL execution
 
 Run a UTF-8 SQL file without an ETL XML wrapper:
 
@@ -257,10 +259,11 @@ class if needed. Use `execute-sql --help` for all options. Common options such a
 `--debug`, `--quiet`, `--no-jmx`, and `--no-stat` work before or after `execute-sql`.
 
 `--password VALUE` is convenience syntax; it can expose the password in shell
-history and process listings.
+history and process listings. Prefer a protected configuration path such as
+`${env.DB_PASSWORD}`, described under [Environment variables](#environment-variables).
 
-The curl installer installs the current published release.
-`execute-sql` is currently available only in development builds.
+`execute-sql` is part of Scriptella 1.6. The curl installer still installs the
+published 1.5 release until it is updated after the 1.6 archive is public.
 
 JVM system properties are available to Scriptella's normal SQL substitution,
 using the same property mechanism as ETL XML execution.
