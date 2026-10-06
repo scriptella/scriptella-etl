@@ -24,7 +24,7 @@ and rollback after failure. The adapter uses the existing generic JDBC
 implementation; no SQLite-specific transaction architecture is introduced.
 
 The [canonical SQLite → PostgreSQL sample](https://github.com/scriptella/scriptella-examples/tree/master/sqlite-to-postgresql)
-provides independent Python source setup and native psql destination checks.
+seeds the SQLite file with Scriptella and checks the destination with native psql.
 The verified boundary is PostgreSQL 17.11 with pgJDBC 42.7.13; it does not imply
 verification of other server destinations.
 
