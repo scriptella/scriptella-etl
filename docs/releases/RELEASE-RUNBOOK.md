@@ -1,7 +1,13 @@
 # Scriptella Release Runbook
 
 Release from a recorded source commit, keep completed work, and resume at the
-failed step. Small issues should normally be fixed on `master`, corrected on
+failed step. Resume from the last successful checkpoint. For a low-risk issue
+accepted by the maintainer, record its impact, accepted workaround, and
+follow-up, then continue. Repeat only checks affected by a change. Restart
+preparation only when a release-blocking source defect requires changing the
+tagged source.
+
+Small issues should normally be fixed on `master`, corrected on
 the website or release notes, or recorded for a follow-up patch release.
 
 This is the current procedure for future releases. Historical version plans
@@ -123,7 +129,15 @@ after publication is equally valid.
 Before tagging, require successful Maven and Ant package-contract CI jobs for
 the exact candidate commit, and record their links. A green run on an earlier
 commit is not sufficient. If CI is unavailable, run the equivalent Maven and
-Ant checks locally at that revision. No signed candidate build is required.
+Ant checks locally at that revision. Before a local `ant test`, fetch its
+SQLite JDBC dependency with:
+
+```bash
+mvn-lite -s "$SETTINGS" -N -Pant-test-dependencies dependency:copy
+```
+
+Alternatively, provide an existing driver as described in `CONTRIBUTING.md`.
+No signed candidate build is required.
 
 Reuse that coverage for unchanged areas. Do not manually repeat the full
 database matrix, dependency audit, all website pages, or both JDK builds for
@@ -148,20 +162,22 @@ publish that exact verified ZIP; never substitute a rebuild with a new hash.
 
 ## 3. Prepare the tag locally
 
+The normal procedure assumes one releaser and no concurrent commits until
+the prepared history and tag are pushed.
+
 From clean source `master`, prepare without remote pushes:
 
 ```bash
 cd "$SOURCE"
 mvn-lite -s "$SETTINGS" release:prepare \
   -DpushChanges=false \
-  -DpreparationGoals=clean \
   -DreleaseVersion="$VERSION" \
   -DdevelopmentVersion="$NEXT_VERSION" \
   -Dtag="$TAG"
 ```
 
-`preparationGoals=clean` skips the Release Plugin's default `clean verify`
-after rewriting the POMs. This relies on the exact-commit candidate checks
+The POM configures `<preparationGoals>clean</preparationGoals>`, which skips
+the Release Plugin's default `clean verify` after rewriting the POMs. This relies on the exact-commit candidate checks
 above and the mandatory tested build from the local tag below. A release-POM
 build failure is therefore detected after local tagging, before any tag push
 or artifact upload.
@@ -187,7 +203,6 @@ check the Ant distributions:
 mvn-lite -s "$SETTINGS" clean deploy \
   -DperformRelease=true -Dcentral.skipPublishing=true \
   -Dgpg.keyname="$SIGNING_KEY"
-mvn-lite -s "$SETTINGS" -N -Pant-test-dependencies dependency:copy
 ant -Ddtddoc.dir="$DTDDOC_HOME" test-distribution
 ```
 
@@ -218,8 +233,7 @@ git -C "$SOURCE" push --atomic origin master "refs/tags/$TAG"
 ```
 
 Verify the remote tag target and branch. Pushing the next snapshot now lets
-normal development resume; it does not change the release tag. If remote
-`master` advanced meanwhile, reconcile normally without rewriting history.
+normal development resume; it does not change the release tag.
 
 ## 5. Upload the preserved bundle and inspect the GitHub draft
 
@@ -294,11 +308,18 @@ are complete. Other deferred issues do not require reopening the release.
 
 ## Recovery at a glance
 
+A later source commit is excluded from the current release. Any rebuild for
+that release must use the same tag; follow-up commits do not change its source
+or inspected artifacts.
+
 | Checkpoint | Resume action |
 | --- | --- |
 | Candidate build fails | Classify; fix and rerun affected checks. No tag/draft cleanup needed. |
 | Local preparation partly completed | Inspect Git and `release.properties`; resume or roll back only preparation as needed. |
-| Signing or bundle packaging fails | Unlock/fix invocation, rebuild from the same tag, verify the corrected unpublished bundle. |
+| Cosmetic documentation or release-note issue after local tagging | Correct editable release notes or record a follow-up commit; retain the tag and artifacts. |
+| Accepted minor product limitation | Record the maintainer's decision and follow-up; continue with the inspected artifacts. |
+| Environment, signing, or packaging-command failure | Correct the cause and rerun the affected step from the same tag; verify any rebuilt unpublished artifacts. |
+| Remote `master` advances before the atomic push | Reconcile the branch without rewriting history or changing the release tag; later commits remain excluded from the release. Retry the atomic push and verify the remote tag target and branch. |
 | Upload fails or times out | Check Portal for an existing deployment; retry upload of the preserved bundle only if needed. |
 | Central `FAILED` | Diagnose; retry operational fixes on the same tag, or correct a genuinely defective unpublished candidate. |
 | Central `VALIDATED` | Resume inspection/publication of that deployment; no rebuild. |
