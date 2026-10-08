@@ -8,8 +8,8 @@ website repo. Only the generated trees under `docs/api/` and `docs/dtd/` are
 refreshed by this tooling.
 
 Generate published documentation from the exact released tag, never from an
-unreviewed development checkout. Scriptella 1.4 documentation requires JDK 17;
-Scriptella 1.3 documentation requires Java 8. Keep the live site on its current
+unreviewed development checkout, using the JDK required by that release.
+Current releases require Java 17 or newer. Keep the live site on its current
 released documentation until the replacement artifacts are public and the
 release runbook reaches the website deployment step.
 
@@ -44,11 +44,8 @@ python3 docs/site/sync_generated_docs.py --build --dry-run
 ```
 
 Requires **Python 3.9+**, **rsync**, and (for `--build`) **Ant 1.10.17**. DTDDoc
-is used when present for a full docs rebuild. For a 1.3 docs rebuild, prefer
-**Java 8** for Javadoc so the output matches the frameset layout currently
-published on scriptella.org (`--build` tries to select a Java 8 `JAVA_HOME`
-automatically on macOS). Current `master` requires JDK 17 and should only be
-used for a future 1.4 documentation publication.
+is used when present for a full docs rebuild. Select the build JDK with
+`--java-home` or `JAVA_HOME`; otherwise Ant uses its default JVM.
 
 | Flag / env | Purpose |
 |------------|---------|
@@ -57,7 +54,7 @@ used for a future 1.4 documentation publication.
 | `--site-dir` / `SITE_DIR` | Website checkout (default: sibling `scriptella.github.io`) |
 | `--dtddoc-dir` / `DTDDOC_DIR` | DTDDoc home for `--build` (default: sibling `DTDDoc`) |
 | `--ant` / `ANT` | Ant executable (default: `PATH` or sibling `apache-ant-1.10.17`) |
-| `--java-home` / `JAVA_HOME_8` | JDK for `--build` (default: Temurin 8 if installed) |
+| `--java-home` / `JAVA_HOME` | JDK for `--build` (default: Ant’s JVM) |
 
 `--build` runs `build-docs.xml` `codereports` when DTDDoc is available, or
 `javadoc` only when it is not (with a warning).

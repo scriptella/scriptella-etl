@@ -3,9 +3,8 @@
 
 See docs/site/README.md for layout, options, and the StatCounter allowlist.
 
-The published website currently contains Scriptella 1.3 documentation. Use a
-1.3 checkout/worktree with Java 8 for --build; the current master/1.4 line
-requires JDK 17 and must not be used to refresh the published 1.3 trees.
+Build from the exact released tag with its required JDK. Current releases
+require Java 17 or newer.
 """
 
 from __future__ import annotations
@@ -118,23 +117,13 @@ def resolve_ant(root: Path, explicit: str | None) -> Path | None:
 
 
 def resolve_java_home(explicit: str | None = None) -> Path | None:
-    """Prefer Java 8 for rebuilding the published Scriptella 1.3 Javadoc."""
-    if explicit:
-        home = Path(explicit)
-        return home if home.is_dir() else None
-
-    jvm_root = Path("/Library/Java/JavaVirtualMachines")
-    if jvm_root.is_dir():
-        patterns = ("temurin-8.jdk", "jdk1.8.0_*", "zulu-8.jdk", "adoptopenjdk-8.jdk")
-        for pattern in patterns:
-            for match in sorted(jvm_root.glob(pattern)):
-                home = match / "Contents" / "Home"
-                if home.is_dir():
-                    return home
-
-    env = os.environ.get("JAVA_HOME")
-    if env and Path(env).is_dir():
-        return Path(env)
+    """Use the explicitly selected JDK, then JAVA_HOME, otherwise Ant's JVM."""
+    selected = explicit or os.environ.get("JAVA_HOME")
+    if selected:
+        home = Path(selected)
+        if not home.is_dir():
+            raise SystemExit(f"error: Java home is not a directory: {home}")
+        return home
     return None
 
 
@@ -471,7 +460,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--java-home",
         default=None,
-        help="JAVA_HOME for --build (1.3 docs: Java 8 if found, else env JAVA_HOME)",
+        help="JDK for --build (default: JAVA_HOME, then Ant's JVM)",
     )
     return parser.parse_args(argv)
 
@@ -513,13 +502,11 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit(
                 "error: Ant not found. Install Ant, put it on PATH, or pass --ant."
             )
-        java_home = resolve_java_home(args.java_home or os.environ.get("JAVA_HOME_8"))
-        if java_home is None:
-            java_home = resolve_java_home(os.environ.get("JAVA_HOME"))
+        java_home = resolve_java_home(args.java_home)
         if java_home is None:
             print(
                 "warning: no JAVA_HOME resolved; Ant will use its default JVM.\n"
-                "         Use Java 8 when rebuilding the published 1.3 Javadoc.",
+                "         Current releases require Java 17 or newer.",
                 file=sys.stderr,
             )
         build_docs(root, ant, dtddoc, dry_run=args.dry_run, java_home=java_home)

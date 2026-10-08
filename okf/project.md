@@ -33,8 +33,7 @@ Scriptella has no required server, scheduler, job repository, or graphical ETL
 environment. It is a runtime and provider model, not a hosted job-management
 service.
 
-Scriptella 1.5 uses Java 17 as its runtime baseline. Scriptella 1.3 remains the
-Java 8 compatibility line.
+Scriptella requires Java 17 or newer. See the [version requirements](../README.md#requirements).
 
 # Modules
 

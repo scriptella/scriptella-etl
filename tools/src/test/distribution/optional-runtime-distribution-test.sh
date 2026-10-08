@@ -35,6 +35,14 @@ examples_dir="$work_dir/examples"
 source_dir="$work_dir/source"
 [ -d "$source_dir/lib" ] || fail "source distribution has no top-level lib directory"
 
+# Keep the maintained SQLite example complete in both downloadable archives.
+for sample_root in "$examples_dir/sqlite-to-postgresql" "$source_dir/samples/sqlite-to-postgresql"; do
+    for sample_file in README.md seed.etl.xml migrate.etl.xml verify.sql VALIDATION.md; do
+        [ -s "$sample_root/$sample_file" ] \
+            || fail "$sample_root is missing $sample_file"
+    done
+done
+
 # The packaged README must resolve its maintained documentation links locally.
 for documentation_root in "$dist_dir" "$work_dir/examples" "$source_dir"; do
     for documentation_file in README.md README.zh-CN.md README.ko.md README.de.md \

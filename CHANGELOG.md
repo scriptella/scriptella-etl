@@ -39,8 +39,6 @@ SQLite support. Java 17 remains the minimum runtime and build JDK.
 * Java 17 remains the minimum runtime and build JDK. Scriptella 1.3 remains
   the Java 8 compatibility line.
 * Direct SQL, `${env.*}`, and the SQLite alias require Scriptella 1.6.
-  The curl installer stays on the published 1.5 archive until that installer
-  is updated after the 1.6 ZIP is public.
 * `--check` remains experimental and performs only a lightweight static check.
 * Vendor JDBC drivers, including Xerial SQLite JDBC, stay external. Supply
   them on the connection `classpath` or the application classpath.

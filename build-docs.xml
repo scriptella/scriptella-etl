@@ -36,7 +36,7 @@
         </copy>
     </target>
 
-    <!-- Prefer running Ant under Java 8 so Javadoc matches the frameset layout on scriptella.org. -->
+    <!-- Run Ant with the project’s Java 17 baseline or a newer supported JDK. -->
     <target name="javadoc" depends="clean">
         <mkdir dir="${javadoc.dest.dir}"/>
         <javadoc destdir="${javadoc.dest.dir}" failonerror="true"

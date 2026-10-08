@@ -1,5 +1,5 @@
 #!/bin/sh
-# Scriptella 1.5 user-local installer.
+# Scriptella 1.6 user-local installer.
 #
 # This file is intentionally self-contained and is streamed by the documented
 # curl command. Test-only SCRIPTELLA_INSTALLER_* overrides are documented below
@@ -8,13 +8,13 @@
 set -eu
 set -f
 
-SCRIPTELLA_RELEASE_VERSION=1.5
-SCRIPTELLA_RELEASE_TAG=scriptella-parent-1.5
-SCRIPTELLA_ARCHIVE_NAME=scriptella-1.5.zip
-SCRIPTELLA_ARCHIVE_URL=https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.5/scriptella-1.5.zip
+SCRIPTELLA_RELEASE_VERSION=1.6
+SCRIPTELLA_RELEASE_TAG=scriptella-parent-1.6
+SCRIPTELLA_ARCHIVE_NAME=scriptella-1.6.zip
+SCRIPTELLA_ARCHIVE_URL=https://github.com/scriptella/scriptella-etl/releases/download/scriptella-parent-1.6/scriptella-1.6.zip
 # Independently checked against the GitHub Release API asset digest for the
-# immutable scriptella-parent-1.5/scriptella-1.5.zip asset.
-SCRIPTELLA_ARCHIVE_SHA256=1dffead6fdde974ce6e70f8b505906acf25892362b94662509436eeb234bfcbf
+# immutable scriptella-parent-1.6/scriptella-1.6.zip asset.
+SCRIPTELLA_ARCHIVE_SHA256=473d03a27a99181fc1ffb6cb993e46646691702ceaa9350b72913c6d272a16b6
 
 fail() {
     echo "Scriptella installer: $*" >&2

@@ -59,7 +59,7 @@ attribute as needed. See the
 
 ### Experimental curl installer
 
-Install Scriptella 1.5 with `curl`:
+Install the latest stable release with `curl`:
 
 ```bash
 curl -fsSL https://scriptella.org/install.sh | sh
@@ -74,7 +74,7 @@ exact PATH command to add manually. The guaranteed command is the packaged
 scriptella.sh path/to/file.etl.xml
 ```
 
-The installer does not install Java; Scriptella 1.5 requires Java 17 or newer.
+The installer does not install Java; Scriptella requires Java 17 or newer.
 When the installer updates a startup file, start a new shell or reload that
 file before using `scriptella.sh`. Manual ZIP installation and
 `java -jar scriptella.jar` remain available above.
@@ -90,9 +90,6 @@ scriptella.sh execute-sql --url jdbc:postgresql://localhost/app --user app schem
 See the [direct SQL guide](docs/cli-usage.md#10-direct-sql-execution)
 for driver setup, properties, literal mode, and CLI options. For embedded execution,
 see [Executing Scriptella from Java](docs/java-execution.md).
-
-The curl installer above still installs published Scriptella 1.5. Use a 1.6
-distribution for `execute-sql` until that installer is updated.
 
 ### Quick start
 

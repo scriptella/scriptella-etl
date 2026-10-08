@@ -262,8 +262,7 @@ class if needed. Use `execute-sql --help` for all options. Common options such a
 history and process listings. Prefer a protected configuration path such as
 `${env.DB_PASSWORD}`, described under [Environment variables](#environment-variables).
 
-`execute-sql` is part of Scriptella 1.6. The curl installer still installs the
-published 1.5 release until it is updated after the 1.6 archive is public.
+`execute-sql` requires Scriptella 1.6 or newer.
 
 JVM system properties are available to Scriptella's normal SQL substitution,
 using the same property mechanism as ETL XML execution.

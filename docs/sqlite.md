@@ -23,7 +23,7 @@ common numeric values, Unicode/text, NULL versus empty text, successful commit,
 and rollback after failure. The adapter uses the existing generic JDBC
 implementation; no SQLite-specific transaction architecture is introduced.
 
-The [canonical SQLite → PostgreSQL sample](https://github.com/scriptella/scriptella-examples/tree/master/sqlite-to-postgresql)
+The [canonical SQLite → PostgreSQL sample](https://github.com/scriptella/scriptella-etl/tree/master/samples/sqlite-to-postgresql)
 seeds the SQLite file with Scriptella and checks the destination with native psql.
 The verified boundary is PostgreSQL 17.11 with pgJDBC 42.7.13; it does not imply
 verification of other server destinations.
@@ -53,7 +53,7 @@ Fresh direct JDBC connections verify stored values and transaction results.
 Run it with Java 17 selected:
 
 ```sh
-mvn-lite -pl drivers -am test -Dtest=SQLiteTest,AutoDriverTest \
+mvn -pl drivers -am test -Dtest=SQLiteTest,AutoDriverTest \
     -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
@@ -66,7 +66,3 @@ matrix. No version matrix or broad SQLite suite is implied.
 WAL, concurrent writers/locking, STRICT mode, foreign-key behavior, date/time
 and boolean mappings, binary values, reverse migrations, and special decimal
 adapters remain outside this verified contract.
-
-Public website/generated documentation publication for 1.6 is tracked by
-[#64](https://github.com/scriptella/scriptella-etl/issues/64); this source
-prepares the documentation without making a release announcement.
