@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.6]
+## [1.6] — 2026-10-05
 
 Scriptella 1.6 adds direct SQL execution, a shared environment-variable
 namespace for configuration and credentials, and first-class file-backed
