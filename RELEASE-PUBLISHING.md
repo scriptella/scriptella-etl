@@ -36,7 +36,7 @@ Example private settings structure:
 </settings>
 ```
 
-## Preferred path: build a bundle, then upload it
+## Build a bundle, then upload it
 
 From a fresh checkout of the exact release tag (all POMs at the release version),
 with the non-secret variables from the runbook:
@@ -74,30 +74,11 @@ This avoids rebuilding and signing just to retry an upload. The same preserved
 bundle can be uploaded again when an operational failure genuinely requires
 it. Check whether an earlier upload succeeded before submitting a duplicate.
 
-## Alternative: Maven-managed upload
-
-If using the Release Plugin after `release:prepare`, retain its local
-`release.properties` and backups. Use the local tag to avoid requiring SSH
-SCM authentication, and propagate both release signing flags:
-
-```bash
-mvn-lite -s "$SETTINGS" release:perform \
-  -DlocalCheckout=true \
-  -Darguments="-DperformRelease=true -Dgpg.keyname=$SIGNING_KEY"
-```
-
-This rebuilds the tag and uploads to Central. It requires publication
-authorization just like a Portal upload. Keep `autoPublish=false` in the POM.
-A failed `release:perform` does not require rerunning `release:prepare`,
-changing the version, or deleting the tag. For subsequent operational retries,
-prefer the preserved bundle over another rebuild.
-
 ## Recovery without restarting
 
 | Symptom/state | Next action |
 | --- | --- |
 | GPG cannot sign / `Inappropriate ioctl for device` | Unlock the approved key interactively, probe it, rerun the signed build from the same tag. |
-| SSH `Permission denied (publickey)` | Use `-DlocalCheckout=true`, or use the preferred bundle path. |
 | Missing `.asc` files | Ensure `-DperformRelease=true` and key fingerprint reach the build; rebuild the unpublished bundle from the same tag. |
 | Authentication/namespace error | Fix the private Portal token/account access; retry upload of the existing bundle. |
 | Timeout or lost connection | Look up the recorded deployment or Portal list first; a successful upload may still be processing. |

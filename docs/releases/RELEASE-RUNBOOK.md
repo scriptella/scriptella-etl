@@ -120,40 +120,24 @@ The `scriptella.github.io` website does not need to be updated or staged before
 artifact publication. An advance branch is optional; normal direct follow-up
 after publication is equally valid.
 
-For an ordinary patch release:
+Before tagging, require successful Maven and Ant package-contract CI jobs for
+the exact candidate commit, and record their links. A green run on an earlier
+commit is not sufficient. If CI is unavailable, run the equivalent Maven and
+Ant checks locally at that revision. No signed candidate build is required.
 
-- run the Maven reactor tests on JDK 17 and a signed no-upload release build;
-- run Ant tests and build distributions if distributing the standalone ZIPs;
-- inspect version, artifact inventory, signatures, licenses, archive integrity;
-- unpack the actual distribution and run the launcher, a representative ETL,
-  and examples; check an isolated Maven consumer;
-- test the changed behavior and any affected driver/integration.
+Reuse that coverage for unchanged areas. Do not manually repeat the full
+database matrix, dependency audit, all website pages, or both JDK builds for
+every patch. Runtime, dependency, packaging, launcher, or compatibility changes
+require the relevant additional checks (including JDK 25 where affected). Test
+the changed behavior and any affected driver/integration. New compatibility
+promises require evidence. Investigate unexpected test-count reductions rather
+than requiring historical hard-coded totals.
 
-Reuse successful CI coverage for unchanged areas at the selected source
-revision. Do not manually repeat the full database matrix, dependency audit,
-all website pages, or both JDK builds for every patch. Runtime, dependency,
-packaging, launcher, or compatibility changes require the relevant additional
-checks (including JDK 25 where affected). New compatibility promises require
-evidence. Investigate unexpected test-count reductions rather than requiring
-historical hard-coded totals.
-
-Run the signed no-upload lifecycle from a disposable candidate checkout with
-release versions in the four reactor POMs:
-
-```bash
-mvn-lite -s "$SETTINGS" clean deploy \
-  -DperformRelease=true -Dcentral.skipPublishing=true \
-  -Dgpg.keyname="$SIGNING_KEY"
-mvn-lite -s "$SETTINGS" -N -Pant-test-dependencies dependency:copy
-ant clean test
-ant -Ddtddoc.dir="$DTDDOC_HOME" clean dist
-```
-
-The no-upload Central bundle is useful preflight evidence, not a public
-release. If source changes, repeat checks affected by that change plus the
-final signed build; retain unrelated successful evidence. Environment-only
-failures need only the affected command rerun. Never publish a bundle from a
-different source revision as though it came from the final tag.
+Build and sign the release artifacts from the local tag in section 4. That
+build tests the release-version POMs and supplies the final packaging, signature,
+and smoke-test evidence before the tag is pushed or artifacts are uploaded.
+If source changes before tagging, require successful CI or equivalent local
+checks for the new candidate revision and repeat affected additional checks.
 
 Installer updates may follow publication: pin the checksum to the exact
 published ZIP, then test installation in a disposable home. Avoid a pre-tag
@@ -170,10 +154,17 @@ From clean source `master`, prepare without remote pushes:
 cd "$SOURCE"
 mvn-lite -s "$SETTINGS" release:prepare \
   -DpushChanges=false \
+  -DpreparationGoals=clean \
   -DreleaseVersion="$VERSION" \
   -DdevelopmentVersion="$NEXT_VERSION" \
   -Dtag="$TAG"
 ```
+
+`preparationGoals=clean` skips the Release Plugin's default `clean verify`
+after rewriting the POMs. This relies on the exact-commit candidate checks
+above and the mandatory tested build from the local tag below. A release-POM
+build failure is therefore detected after local tagging, before any tag push
+or artifact upload.
 
 Inspect the release commit, tag target, and following snapshot commit. Keep
 `release.properties` and release-plugin backup POMs locally until publication
@@ -183,10 +174,29 @@ blindly roll back successful preparation for a later upload failure.
 
 ## 4. Build once from the tag and stage
 
-Use a fresh detached worktree at the local tag. Run the signed no-upload Maven
-build above and the applicable Ant distribution build there. This is the final
-artifact set; the earlier candidate gate need not be repeated in its entirety
-if only expected release-version/SCM metadata changed. Check those differences.
+Use a fresh detached worktree at the local tag with release versions in all
+four reactor POMs. Check that differences from the validated candidate are
+only expected release-version/SCM metadata changes; investigate other changes
+and repeat affected checks before proceeding.
+
+Run the signed no-upload Maven lifecycle once from that worktree. It runs the
+reactor tests against the release POMs. For standalone ZIPs, also build and
+check the Ant distributions:
+
+```bash
+mvn-lite -s "$SETTINGS" clean deploy \
+  -DperformRelease=true -Dcentral.skipPublishing=true \
+  -Dgpg.keyname="$SIGNING_KEY"
+mvn-lite -s "$SETTINGS" -N -Pant-test-dependencies dependency:copy
+ant -Ddtddoc.dir="$DTDDOC_HOME" test-distribution
+```
+
+The candidate CI already covers Ant tests; repeat them locally only when
+changes or an unresolved failure require it. Inspect version, artifact
+inventory, licenses, and archive integrity. Unpack the actual distribution and
+run the launcher, a representative ETL, and examples; check an isolated Maven
+consumer against the locally built release artifacts. Complete these checks
+before pushing the tag or uploading artifacts.
 
 Preserve the complete generated Central bundle (normally
 `target/central-publishing/central-bundle.zip`) outside disposable build output.
@@ -213,10 +223,10 @@ normal development resume; it does not change the release tag. If remote
 
 ## 5. Upload the preserved bundle and inspect the GitHub draft
 
-Preferred Central path: upload the preserved signed bundle through the
+Central path: upload the preserved signed bundle through the
 [Portal Deployments page](https://central.sonatype.com/publishing/deployments)
 using manual publication. This separates build/signing from network/publishing
-and avoids another `release:perform` rebuild. See
+and reuses the exact inspected artifacts. See
 [Central troubleshooting](../../RELEASE-PUBLISHING.md#recovery-without-restarting).
 Record the deployment ID immediately. Wait for `VALIDATED` and inspect the
 coordinate inventory and validation result. For timeout/connection loss, check
