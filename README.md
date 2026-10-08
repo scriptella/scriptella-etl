@@ -218,14 +218,6 @@ Pull requests and well-scoped issue reports for compatibility, correctness, and
 maintenance work are welcome. Broad feature development is not currently the
 project focus.
 
-## Licensing
+## License
 
-This software is licensed under the terms in the file named `LICENSE` in this
-directory (Apache License, Version 2.0).
-
-If Scriptella is useful, consider starring the project on GitHub to help others discover it.
-
-Thank you for using Scriptella.
-
-The Scriptella Project Team  
-[https://scriptella.org](https://scriptella.org)
+Scriptella is licensed under the [Apache License 2.0](LICENSE).
