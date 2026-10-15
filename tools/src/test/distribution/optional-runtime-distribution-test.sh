@@ -45,7 +45,7 @@ done
 
 # The packaged README must resolve its maintained documentation links locally.
 for documentation_root in "$dist_dir" "$work_dir/examples" "$source_dir"; do
-    for documentation_file in README.md README.zh-CN.md README.ko.md README.de.md \
+    for documentation_file in README.md \
             CHANGELOG.md CONTRIBUTING.md RELEASE-PUBLISHING.md \
             docs/cli-usage.md docs/java-execution.md docs/first-migration.md \
             docs/core-database-compatibility.md docs/MAINTAINING.md \

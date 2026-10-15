@@ -115,8 +115,8 @@ failure or agent-cache expiry, rather than stopping before every Maven phase.
 Fetch source, review changes since the previous release, and record the
 candidate commit. Keep unrelated changes out of this candidate; `master` may
 continue independently after tagging. Prepare version/changelog/release notes.
-Before tagging, sweep documentation shipped in `scriptella-etl`: Markdown and
-README translations, examples, CLI help, and Javadoc where relevant. Describe
+Before tagging, sweep documentation shipped in `scriptella-etl`: Markdown,
+examples, CLI help, and Javadoc where relevant. Describe
 shipping features accurately and remove development/unreleased-only wording;
 preserve experimental labels where they still apply. Record remaining public
 website/documentation work in the release tracking issue. Do not hold a release
