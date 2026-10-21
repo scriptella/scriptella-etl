@@ -203,11 +203,25 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     @ThreadSafe
     public ExecutionStatistics execute(final ProgressIndicator indicator)
             throws EtlExecutorException {
+        return execute(indicator, null);
+    }
+
+    /**
+     * Executes with optional live counters independent of detailed statistics/JMX.
+     * Use a fresh progress registry for each execution. Reporting threads may read
+     * its snapshots without accessing driver connections.
+     */
+    @ThreadSafe
+    public ExecutionStatistics execute(final ProgressIndicator indicator, ExecutionProgress progress)
+            throws EtlExecutorException {
         EtlContext ctx = null;
         JmxEtlManager etlManager = null;
 
         try {
             ctx = prepare(indicator);
+            if (progress != null) {
+                ctx.getSession().enableProgress(progress);
+            }
             if (jmxEnabled) {
                 etlManager = new JmxEtlManager(ctx);
                 etlManager.register();

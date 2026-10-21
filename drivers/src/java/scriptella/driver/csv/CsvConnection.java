@@ -42,6 +42,11 @@ import java.util.logging.Logger;
  * @version 1.1
  */
 public class CsvConnection extends AbstractTextConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     protected static final Logger LOG = Logger.getLogger(CsvConnection.class.getName());
     private CSVWriter out;
     private Writer writer;

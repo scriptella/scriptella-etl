@@ -68,6 +68,17 @@ public interface Connection {
      */
     long getExecutedStatementsCount();
 
+    /**
+     * Optional live progress counter. Called on the execution thread only.
+     * Return a stable in-memory counter updated with the same semantics as
+     * {@link #getExecutedStatementsCount()}, or null if unavailable. The reporter
+     * reads only its volatile value, never this connection. The counter must
+     * remain valid after close. Existing providers need not implement this method.
+     */
+    default AbstractConnection.StatementCounter getProgressCounter() {
+        return null;
+    }
+
     /** Returns the sum of positive update counts, or zero when unsupported. */
     default long getUpdateCount() {
         return 0;

@@ -42,6 +42,11 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class JdbcConnection extends AbstractConnection implements NativeConnectionProvider {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     public static final String STATEMENT_CACHE_KEY = "statement.cache";
     public static final String STATEMENT_SEPARATOR_KEY = "statement.separator";
     public static final String STATEMENT_SEPARATOR_SINGLELINE_KEY = "statement.separator.singleline";

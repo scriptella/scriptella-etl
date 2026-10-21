@@ -43,6 +43,11 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 public class LdapConnection extends AbstractConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     private static final Logger LOG = Logger.getLogger(LdapConnection.class.getName());
     private DirContext ctx;
     private final SearchControls searchControls; //default search controls

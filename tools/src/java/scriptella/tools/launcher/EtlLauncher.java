@@ -23,6 +23,7 @@ import scriptella.core.DriverFactory;
 import scriptella.execution.EtlExecutor;
 import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
+import scriptella.execution.ExecutionProgress;
 import scriptella.execution.JmxEtlManager;
 import scriptella.expression.PropertiesSubstitutor;
 import scriptella.expression.Expression;
@@ -106,6 +107,8 @@ public class EtlLauncher {
         }
     };
 
+    private long progressIntervalMillis;
+    private boolean labelProgress;
     private EtlExecutor exec = new EtlExecutor();
     private ConfigurationFactory factory = new ConfigurationFactory();
     private ProgressIndicator indicator;
@@ -156,6 +159,8 @@ public class EtlLauncher {
      * @see System#exit(int)
      */
     ErrorCode launch(String[] args) {
+        progressIntervalMillis = 0;
+        labelProgress = false;
         ConsoleHandler h = new ConsoleHandler();
 
         h.setFormatter(STD_FORMATTER);
@@ -183,6 +188,16 @@ public class EtlLauncher {
                     return ErrorCode.OK;
                 }
                 if (isTemplateOption(arg)) {
+                    boolean hasProgress = progressIntervalMillis > 0;
+                    for (String remaining : arguments) {
+                        if ("--progress".equals(remaining) || remaining.startsWith("--progress=")) {
+                            hasProgress = true;
+                        }
+                    }
+                    if (hasProgress) {
+                        getErr().println("--progress requires execution, not template generation");
+                        return ErrorCode.UNRECOGNIZED_OPTION;
+                    }
                     return template(arguments);
                 }
                 if (isCheckOption(arg)) {
@@ -207,6 +222,9 @@ public class EtlLauncher {
                 defaultFile = true;
                 files.add(resolveFile(null, null));
             }
+        } catch (IllegalArgumentException e) {
+            getErr().println(e.getMessage());
+            return ErrorCode.UNRECOGNIZED_OPTION;
         } catch (FileNotFoundException e) {
             if (defaultFile) {
                 getErr().println("ETL file " + DEFAULT_FILE_NAME + " was not found.");
@@ -218,6 +236,11 @@ public class EtlLauncher {
             return ErrorCode.FILE_NOT_FOUND;
         }
 
+        if (checkOnly && progressIntervalMillis > 0) {
+            getErr().println("--progress requires execution, not --check");
+            return ErrorCode.UNRECOGNIZED_OPTION;
+        }
+        labelProgress = files.size() > 1;
         if (indicator != null) {
             setProgressIndicator(indicator);
         }
@@ -262,7 +285,9 @@ public class EtlLauncher {
     }
 
     private boolean handleCommonOption(String arg, ConsoleHandler handler) {
-        if (isDebugOption(arg)) {
+        if ("--progress".equals(arg) || arg.startsWith("--progress=")) {
+            progressIntervalMillis = PeriodicProgressReporter.parseInterval(arg);
+        } else if (isDebugOption(arg)) {
             handler.setLevel(Level.FINE);
         } else if (isQuietOption(arg)) {
             handler.setLevel(Level.WARNING);
@@ -333,7 +358,7 @@ public class EtlLauncher {
                     file, url, user, password, driver, substitution);
             executor.setJmxEnabled(exec.isJmxEnabled());
             executor.setSuppressStatistics(exec.isSuppressStatistics());
-            ExecutionStatistics result = executor.execute(indicator);
+            ExecutionStatistics result = executeWithProgress(executor, null);
             if (handler.getLevel().intValue() <= Level.INFO.intValue()) {
                 String completion = "Successfully executed SQL file " + file;
                 if (!executor.isSuppressStatistics()) {
@@ -385,6 +410,7 @@ public class EtlLauncher {
         getOut().println("                        Prefer --password '${env.DB_PASSWORD}' so the secret stays in the environment.");
         getOut().println("  --driver CLASS        Load a JDBC driver class (JAR must be in lib/ or classpath)");
         getOut().println("  --no-substitution     Preserve literal dollar and question-mark expressions");
+        getOut().println("  --progress[=Ns|Nm]    Periodic statements/throughput on stderr (default 30s, minimum 1s)");
         getOut().println("  -d, --debug           Enable debug logging and error stack traces");
         getOut().println("  -q, --quiet           Suppress informational output");
         getOut().println("      --no-jmx          Disable JMX registration");
@@ -463,6 +489,7 @@ public class EtlLauncher {
         out.println("  -q, --quiet            Suppress informational output");
         out.println("      --check            Load and statically check ETL without executing it");
         out.println("      --no-stat          Disable execution statistics");
+        out.println("      --progress[=Ns|Nm] Periodic statements/throughput on stderr (default 30s, minimum 1s)");
         out.println("      --no-jmx           Disable JMX registration");
         out.println("  -t, --template [name]  Create an ETL template in the current directory");
         out.println();
@@ -513,13 +540,28 @@ public class EtlLauncher {
         final ConfigurationEl c = factory.createConfiguration();
 
         exec.setConfiguration(c);
-        ExecutionStatistics st = exec.execute(indicator);
+        ExecutionStatistics st = executeWithProgress(exec, labelProgress ? file.toString() : null);
         if (LOG.isLoggable(Level.INFO)) {
             if (!exec.isSuppressStatistics()) {
                 LOG.info("Execution statistics:\n" + st.toString());
             }
             LOG.info("Successfully executed ETL file " + file);
         }
+    }
+
+    private ExecutionStatistics executeWithProgress(EtlExecutor executor, String label)
+            throws EtlExecutorException {
+        if (progressIntervalMillis == 0) {
+            return executor.execute(indicator);
+        }
+        ExecutionProgress progress = new ExecutionProgress();
+        try (PeriodicProgressReporter reporter = createProgressReporter(progressIntervalMillis, progress, label)) {
+            return executor.execute(indicator, progress);
+        }
+    }
+
+    PeriodicProgressReporter createProgressReporter(long intervalMillis, ExecutionProgress progress, String label) {
+        return new PeriodicProgressReporter(intervalMillis, progress, getErr(), label);
     }
 
     /**

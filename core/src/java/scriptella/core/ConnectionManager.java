@@ -18,6 +18,7 @@ package scriptella.core;
 import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
 import scriptella.execution.EtlContext;
+import scriptella.execution.ExecutionProgress;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ScriptellaDriver;
@@ -43,6 +44,8 @@ public class ConnectionManager {
     private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
     Connection connection;
     List<Connection> newConnections;
+    private ExecutionProgress progress;
+    private int progressIndex;
     private ScriptellaDriver driver;
     ConnectionParameters connectionParameters;
 
@@ -82,6 +85,9 @@ public class ConnectionManager {
             if (connection == null) {
                 throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
             }
+            if (progress != null) {
+                progress.setCounter(progressIndex, connection.getProgressCounter());
+            }
         }
 
         return connection;
@@ -98,8 +104,21 @@ public class ConnectionManager {
         }
 
         newConnections.add(c);
+        if (progress != null) {
+            progress.addCounter(c.getProgressCounter());
+        }
 
         return c;
+    }
+
+    void enableProgress(ExecutionProgress progress) {
+        this.progress = progress;
+        progressIndex = progress.addCounter(connection == null ? null : connection.getProgressCounter());
+        if (newConnections != null) {
+            for (Connection c : newConnections) {
+                progress.addCounter(c.getProgressCounter());
+            }
+        }
     }
 
     public void rollback() {

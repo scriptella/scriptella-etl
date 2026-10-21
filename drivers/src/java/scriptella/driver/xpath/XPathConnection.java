@@ -38,6 +38,11 @@ import java.util.Map;
  * @version 1.0
  */
 public class XPathConnection extends AbstractConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     
     /**
      * Name of the <code>cache_queries</code> connection property.

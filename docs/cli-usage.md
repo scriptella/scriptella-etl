@@ -43,7 +43,9 @@ timestamps, progress messages, exception text, or execution statistics as a
 machine protocol.
 
 Supported launcher options are `-h`/`--help`, `-d`/`--debug`, `-q`/`--quiet`,
-`-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, and `-t`/`--template`.
+`-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, `--progress[=Ns|Nm]`,
+and `-t`/`--template`. Periodic progress is available in Scriptella 1.7; see
+[section 11](#11-periodic-execution-progress).
 Scriptella 1.6 also accepts the `execute-sql` command documented in
 [section 10](#10-direct-sql-execution). Put JVM options, including `-D`
 properties, before `-jar`; put launcher options after the JAR:
@@ -64,7 +66,7 @@ compatibility. Prefer the canonical double-dash options above in new scripts.
 | `0` | All selected ETL files or the direct SQL file executed successfully, all `--check` files passed, or help/version/template generation succeeded. |
 | `1` | At least one ETL execution, the direct SQL execution, or `--check` failed, or template generation failed. |
 | `2` | An ETL input file could not be resolved, or the `execute-sql` file is missing. No ETL files are executed if resolution of any command-line file fails. |
-| `3` | An unrecognized launcher option was supplied, or `execute-sql` arguments are missing or invalid. |
+| `3` | An unrecognized launcher option or invalid progress interval was supplied, or `execute-sql` arguments are missing or invalid. |
 
 When several ETL files resolve successfully, the launcher processes them in
 argument order. A runtime or checking failure does not stop later files; the
@@ -344,3 +346,67 @@ for protecting that output.
   classpaths, SQL syntax, permissions, transactionality, or idempotency.
 - File-producing drivers and non-transactional systems cannot provide the same
   rollback guarantee as a transactional JDBC connection.
+
+
+## 11. Periodic execution progress
+
+Scriptella 1.7 can report live execution activity on **stderr**, without JMX or
+verbose logging:
+
+```sh
+scriptella.sh --progress import.etl.xml
+scriptella.sh --progress=10s import.etl.xml
+scriptella.sh --progress=2m import.etl.xml
+java -jar "$SCRIPTELLA_JAR" --quiet --no-stat --no-jmx --progress=10s "$ETL_FILE"
+```
+
+Bare `--progress` uses 30 seconds. An override must use `=` and a positive whole
+number followed by lowercase `s` (seconds) or `m` (minutes). Minimum: 1 second.
+The duration must fit in a signed 64-bit nanosecond interval. Empty values,
+missing suffixes, fractions, zero, negative numbers, other units and overflow
+are rejected with exit code `3`. For example, `--progress=`, `--progress=10`,
+`--progress=0s`, and `--progress=0.5s` are invalid. `--progress 10s` is not an
+interval override: the duration must be attached to the option.
+
+Output appears approximately every interval, starting one interval after the
+executor starts. No final periodic line is forced for a short job:
+
+```text
+[00:30] 185,000 statements | 6,167/s
+[01:00] 371,000 statements | 6,183/s
+```
+
+Elapsed time uses a monotonic clock; minutes continue beyond 59. Throughput is
+the cumulative count divided by elapsed seconds, rounded to a whole number.
+Each ETL file gets a fresh timer and count. Multi-file output appends the active
+file's path. The option also works before or after `execute-sql`; `--check` and
+template generation do not execute ETL and cannot be combined with progress.
+
+These are **Scriptella statements**, not migrated rows, server-confirmed
+executions or committed transactions. JDBC updates can be counted when queued
+in a batch, before flushing or commit. A query is counted after its callbacks
+finish, so its count can remain unchanged during a long operation. Nested
+queries are not summed as overlapping element statistics. Rollback does not
+subtract observed statement activity. Progress is not a percentage, ETA or a
+promise that the database is making progress while a statement is blocked.
+
+JDBC, CSV, text, shell, JSON, XPath and LDAP connections expose their existing
+in-memory counters. Other providers can opt in through the optional
+`Connection.getProgressCounter()` method. Existing providers remain compatible;
+the reporter never invokes driver/JDBC methods. Before initialization, or when
+no registered connection supplies a counter, output says `statements unavailable
+| throughput unavailable`. Mixed coverage (including unopened lazy connections)
+is labelled `(partial: some counters unavailable)`. A numeric zero is not used
+to infer counter availability. Snapshot totals are approximate live reads, not
+atomic database snapshots; they survive connection cleanup.
+
+An explicit progress request remains active with `--quiet`, `--no-stat` and
+`--no-jmx`. Quiet still suppresses normal INFO logs; no-stat still suppresses
+detailed execution statistics. Progress does not write to stdout. Failure
+messages and exit status keep their existing behavior. The timer stops on
+success, failure or cooperative cancellation. A hard process termination cannot
+guarantee cleanup or a final message.
+
+Without `--progress`, no periodic reporter or registry is created and existing
+CLI output is unchanged. ETL drivers retain their own logging/output behavior;
+console progress is human-readable and is not the JSON reporting protocol.

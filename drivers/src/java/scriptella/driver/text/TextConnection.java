@@ -34,6 +34,11 @@ import java.io.Reader;
  * @version 1.0
  */
 public class TextConnection extends AbstractTextConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     private TextScriptExecutor out;
 
     /**

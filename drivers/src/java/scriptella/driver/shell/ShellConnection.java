@@ -34,6 +34,11 @@ import java.io.Reader;
  * @version 1.0
  */
 public class ShellConnection extends AbstractTextConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     private ShellScriptExecutor out;
 
     public ShellConnection(ShellConnectionParameters parameters) {

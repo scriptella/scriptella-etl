@@ -22,6 +22,7 @@ import scriptella.configuration.QueryEl;
 import scriptella.configuration.ScriptEl;
 import scriptella.configuration.ScriptingElement;
 import scriptella.execution.EtlContext;
+import scriptella.execution.ExecutionProgress;
 import scriptella.interactive.ProgressCallback;
 import scriptella.spi.Connection;
 
@@ -102,6 +103,13 @@ public class Session {
             ExecutableElement exec = executors.get(i);
             exec.execute(dynCtx);
             progress.step(1, locations.get(i).toString()+" executed");
+        }
+    }
+
+    /** Registers live counters on the execution thread; no connection escapes. */
+    public void enableProgress(ExecutionProgress progress) {
+        for (ConnectionManager manager : managedConnections.values()) {
+            manager.enableProgress(progress);
         }
     }
 

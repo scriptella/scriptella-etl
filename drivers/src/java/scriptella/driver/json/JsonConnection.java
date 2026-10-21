@@ -44,6 +44,11 @@ import java.util.Locale;
 
 /** Streaming input or lazily opened output; construction performs no I/O. */
 public class JsonConnection extends AbstractConnection {
+
+    @Override
+    public StatementCounter getProgressCounter() {
+        return counter;
+    }
     // Disable symbol tables: memory must not grow with distinct keys across records.
     static final JsonFactory FACTORY = JsonFactory.builder()
             .streamReadConstraints(StreamReadConstraints.builder()
