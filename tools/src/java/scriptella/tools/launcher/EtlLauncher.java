@@ -227,6 +227,7 @@ public class EtlLauncher {
             setProperties(CollectionUtils.asMap(System.getProperties()));
         }
         for (File file : files) {
+            long started = System.nanoTime();
             try {
                 if (checkOnly) {
                     check(file);
@@ -243,7 +244,7 @@ public class EtlLauncher {
                     }
                 } else {
                     LOG.log(Level.SEVERE,
-                            "Script " + file + " execution failed.", e);
+                            "Script " + file + " execution failed after " + elapsedMillis(started) + " ms.", e);
                     if (BugReport.isPossibleBug(e)) {
                         LOG.log(Level.SEVERE, new BugReport(e).toString());
                     } else if (h.getLevel().intValue() < Level.INFO.intValue()) {
@@ -326,6 +327,7 @@ public class EtlLauncher {
             return ErrorCode.FILE_NOT_FOUND;
         }
         LoggingConfigurer.configure(handler);
+        long started = System.nanoTime();
         try {
             EtlExecutor executor = EtlExecutor.newSqlFileExecutor(
                     file, url, user, password, driver, substitution);
@@ -342,7 +344,7 @@ public class EtlLauncher {
             }
             return ErrorCode.OK;
         } catch (Exception | LinkageError e) {
-            getErr().println("SQL execution failed: " + e.getMessage());
+            getErr().println("SQL execution failed after " + elapsedMillis(started) + " ms: " + e.getMessage());
             if (handler.getLevel().intValue() < Level.INFO.intValue()) {
                 e.printStackTrace(getErr());
             }
@@ -350,6 +352,10 @@ public class EtlLauncher {
         } finally {
             LoggingConfigurer.remove(handler);
         }
+    }
+
+    private static long elapsedMillis(long started) {
+        return (System.nanoTime() - started) / 1000000;
     }
 
     private static boolean hasLeadingSubstitution(String value) {

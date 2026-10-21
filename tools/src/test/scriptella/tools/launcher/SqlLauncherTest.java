@@ -43,9 +43,19 @@ public class SqlLauncherTest extends TestCase {
             CapturingLauncher debug = new CapturingLauncher();
             assertEquals(EtlLauncher.ErrorCode.FAILED, debug.launch(new String[]{"execute-sql", "--debug", "--no-jmx",
                     "--url", "jdbc:h2:mem:debug", file.toString()}));
-            assertTrue(debug.err.toString().contains("SQL execution failed"));
+            assertTrue(debug.err.toString().matches("(?s).*SQL execution failed after [0-9]+ ms:.*"));
+            assertTrue(debug.err.toString().contains("INVALID SQL"));
             assertTrue(debug.err.toString().contains("EtlExecutorException"));
             assertTrue(debug.err.toString().contains("\tat "));
+
+            for (String option : new String[]{"--quiet", "--no-stat"}) {
+                CapturingLauncher failure = new CapturingLauncher();
+                assertEquals(EtlLauncher.ErrorCode.FAILED, failure.launch(new String[]{"execute-sql",
+                        option, "--no-jmx", "--url", "jdbc:h2:mem:failureTime", file.toString()}));
+                assertTrue(failure.err.toString().matches("(?s).*SQL execution failed after [0-9]+ ms:.*"));
+                assertTrue(failure.err.toString().contains("INVALID SQL"));
+                assertEquals("", failure.out.toString());
+            }
 
             CapturingLauncher prefixDebug = new CapturingLauncher();
             assertEquals(EtlLauncher.ErrorCode.FAILED, prefixDebug.launch(new String[]{"-d", "execute-sql", "-nojmx",
@@ -96,6 +106,9 @@ public class SqlLauncherTest extends TestCase {
         Process process = builder.start();
         String output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
         assertEquals(output, expectedExit, process.waitFor());
+        if (expectedExit != 0) {
+            assertTrue(output, output.matches("(?s).*SQL execution failed after [0-9]+ ms:.*"));
+        }
         assertFalse(output, output.contains("credential-password-marker"));
         assertFalse(output, output.contains("credential-user-marker"));
         assertFalse(output, output.contains("credential-url-marker"));

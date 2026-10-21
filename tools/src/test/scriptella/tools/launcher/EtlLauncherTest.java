@@ -316,6 +316,37 @@ public class EtlLauncherTest extends DBTestCase {
                 getBasedir() + "src/test/scriptella/tools/launcher/EtlLauncherTest"}));
     }
 
+    public void testFailureReportsElapsedTime() throws Exception {
+        java.nio.file.Path file = java.nio.file.Files.createTempFile("scriptella-failure", ".etl.xml");
+        try {
+            java.nio.file.Files.writeString(file, "<!DOCTYPE etl SYSTEM 'http://scriptella.org/dtd/etl.dtd'>"
+                    + "<etl><connection id='db' driver='org.h2.Driver' url='jdbc:h2:mem:failureTime'/>"
+                    + "<script connection-id='db'>INVALID SQL;</script></etl>");
+            for (String option : new String[]{"--debug", "--quiet", "--no-stat"}) {
+                ByteArrayOutputStream errors = new ByteArrayOutputStream();
+                PrintStream previousErr = System.err;
+                CapturingLauncher launcher = new CapturingLauncher();
+                try {
+                    System.setErr(new PrintStream(errors));
+                    assertEquals(EtlLauncher.ErrorCode.FAILED,
+                            launcher.launch(new String[]{option, "--no-jmx", file.toString()}));
+                } finally {
+                    System.setErr(previousErr);
+                }
+                String output = errors.toString();
+                assertTrue(output, output.matches("(?s).*execution failed after [0-9]+ ms\\..*"));
+                assertTrue(output, output.contains("INVALID SQL"));
+                assertFalse(output, output.contains("Successfully executed"));
+                if ("--debug".equals(option)) {
+                    assertTrue(launcher.errText().contains("Debug Stack Trace"));
+                    assertTrue(launcher.errText().contains("\tat "));
+                }
+            }
+        } finally {
+            java.nio.file.Files.deleteIfExists(file);
+        }
+    }
+
     public void testExtensionlessFileInDottedDirectory() throws FileNotFoundException {
         EtlLauncher launcher = new EtlLauncher() {
             @Override
