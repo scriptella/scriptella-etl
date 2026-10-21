@@ -60,13 +60,26 @@ Input is streamed one record at a time; memory includes the current record
 (and physical line for JSON Lines), not the whole document. Very large records
 can still exhaust memory. Parsing preserves integers and decimal precision;
 expression arithmetic and JDBC conversions may change it. These fixtures use
-explicit nulls; absent fields follow existing expression behavior.
+explicit nulls; real inputs may also omit fields.
 
-With zero source rows, no output script runs and existing destinations remain
-untouched; missing destinations remain absent. Output is nontransactional and
-can be partial on failure. A handled mapping error still prevents successful
-writer commit. Commit finalizes and closes output before execution succeeds;
-consumers must check execution success even when a partial file is valid JSON.
+For optional map fields, use `row.get('note')` and
+`text:ifNull(row.get('note'), 'No note')`; use `row.containsKey('note')` to
+distinguish a missing key from explicit null. Guard a missing or null parent
+before accessing nested fields. See the
+[JSON guide](https://github.com/scriptella/scriptella-etl/blob/master/docs/json.md) for
+complete optional-field examples and JDBC timestamp conversion templates,
+including timezone and precision considerations.
+
+> [!WARNING]
+> **Zero source rows leave existing output untouched**, and missing destinations
+> remain absent; standard JSON does not automatically produce `[]`. For scheduled
+> exports, use a fresh staging path for each run, check execution success, and
+> explicitly handle an absent file as an empty result before publishing.
+> Output is nontransactional and can be partial on failure, even when it is valid
+> JSON or complete JSON Lines. Never publish output from a failed execution.
+
+A handled mapping error still prevents successful writer commit. Commit
+finalizes and closes output before execution succeeds.
 
 The complete driver reference at `drivers/src/java/scriptella/driver/json/package.html`
 in the source tree covers properties, paths, supported values, parser limits and
