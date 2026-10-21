@@ -227,7 +227,7 @@ public class JsonConnectionTest extends TestCase {
 
     public void testConfigurationAndLifecycle() {
         try {
-            new JsonConnection(new MockConnectionParameters(Collections.singletonMap("format", "jsonl"), null));
+            new JsonConnection(new MockConnectionParameters(Collections.singletonMap("format", "unknown"), null));
             fail();
         } catch (JsonProviderException expected) {
             assertTrue(expected.getMessage().contains("format"));

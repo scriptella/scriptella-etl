@@ -58,6 +58,17 @@ final class JsonQuery {
         }
     }
 
+    Object readRecord() throws IOException {
+        if (next() == null) {
+            throw error("Empty JSON Lines record");
+        }
+        Object record = value();
+        if (next() != null) {
+            throw error("Additional content after JSON Lines record");
+        }
+        return record;
+    }
+
     private JsonToken next() throws IOException {
         EtlCancelledException.checkEtlCancelled();
         return parser.nextToken();

@@ -28,6 +28,7 @@ import scriptella.spi.Resource;
 import scriptella.util.IOUtils;
 
 import java.io.FilterInputStream;
+import java.io.FilterReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,6 +40,7 @@ import java.io.FilterOutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 /** Streaming input or lazily opened output; construction performs no I/O. */
 public class JsonConnection extends AbstractConnection {
@@ -51,6 +53,7 @@ public class JsonConnection extends AbstractConnection {
             .disable(JsonFactory.Feature.INTERN_FIELD_NAMES).build();
     private final URL url;
     private final Charset encoding;
+    private final boolean jsonLines;
     private boolean reading;
     private boolean writing;
     private boolean finished;
@@ -62,12 +65,15 @@ public class JsonConnection extends AbstractConnection {
     public JsonConnection(ConnectionParameters parameters) {
         super(Driver.DIALECT, parameters);
         String format = parameters.getStringProperty("format");
-        if (format != null && !"json".equals(format)) {
+        if (format != null && !"json".equals(format) && !"jsonl".equals(format)) {
             throw new JsonProviderException("Unsupported JSON format: " + format);
         }
+        url = parameters.getUrl() == null ? null : parameters.getResolvedUrl();
+        String filename = url == null ? "" : url.getPath().toLowerCase(Locale.ROOT);
+        jsonLines = format == null ? filename.endsWith(".jsonl") || filename.endsWith(".ndjson")
+                : "jsonl".equals(format);
         String charset = parameters.getCharsetProperty("encoding");
         encoding = charset == null ? StandardCharsets.UTF_8 : Charset.forName(charset);
-        url = parameters.getUrl() == null ? null : parameters.getResolvedUrl();
     }
 
     protected Reader newInputReader() throws IOException {
@@ -92,6 +98,32 @@ public class JsonConnection extends AbstractConnection {
             path = JsonPath.parse(IOUtils.toString(content).trim());
         } catch (IOException e) {
             throw new JsonProviderException("Cannot read JSON selection path", e);
+        }
+        if (jsonLines && !path.segments.isEmpty()) {
+            throw new JsonProviderException("JSON Lines requires an empty selection query");
+        }
+        if (jsonLines) {
+            try (Reader input = new FilterReader(newInputReader()) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } catch (IOException e) {
+                        // Sanitize before cleanup is suppressed on a parser or callback failure.
+                        throw (IOException) JdbcUtils.sanitize(e, url);
+                    } catch (RuntimeException e) {
+                        Throwable sanitized = JdbcUtils.sanitize(e, url);
+                        throw new JsonProviderException(sanitized.getMessage(), sanitized);
+                    }
+                }
+            }) {
+                JsonLines.execute(input, parameters, callback, url);
+            } catch (IOException e) {
+                throw new JsonProviderException("Cannot read JSON Lines input " + JdbcUtils.getUrlDescription(url),
+                        JdbcUtils.sanitize(e, url));
+            }
+            counter.statements++;
+            return;
         }
         try (PushbackReader input = new PushbackReader(newInputReader(), 1)) {
             int first = input.read();
@@ -120,8 +152,8 @@ public class JsonConnection extends AbstractConnection {
         if (isReadonly()) {
             return;
         }
-        EtlCancelledException.checkEtlCancelled();
         try {
+            EtlCancelledException.checkEtlCancelled();
             String text;
             try (Reader content = script.open()) {
                 text = IOUtils.toString(content);
@@ -136,11 +168,16 @@ public class JsonConnection extends AbstractConnection {
             try {
                 if (output == null) {
                     output = newOutputWriter();
-                    output.write('[');
-                } else {
+                    if (!jsonLines) {
+                        output.write('[');
+                    }
+                } else if (!jsonLines) {
                     output.write(',');
                 }
                 output.write(record);
+                if (jsonLines) {
+                    output.write('\n');
+                }
             } catch (IOException e) {
                 outputFailed = true;
                 throw e;
@@ -165,7 +202,9 @@ public class JsonConnection extends AbstractConnection {
     }
 
     private JsonProviderException outputError(IOException cause) {
-        return new JsonProviderException("Cannot write JSON output " + JdbcUtils.getUrlDescription(url),
+        return new JsonProviderException("Cannot write JSON output " + JdbcUtils.getUrlDescription(url)
+                + " at record " + (counter.statements + (finished ? 0 : 1))
+                + (finished ? " during finalization" : " during record emission"),
                 JdbcUtils.sanitize(cause, url));
     }
 
@@ -178,14 +217,37 @@ public class JsonConnection extends AbstractConnection {
         if (output != null && !finished) {
             finished = true;
             try {
-                output.write(']');
+                if (!jsonLines) {
+                    output.write(']');
+                }
                 output.flush();
+            } catch (IOException e) {
+                outputFailed = true;
+                try {
+                    output.close();
+                } catch (IOException cleanup) {
+                    e.addSuppressed(cleanup);
+                } finally {
+                    output = null;
+                }
+                throw outputError(e);
+            }
+            try {
                 output.close();
-                output = null;
             } catch (IOException e) {
                 outputFailed = true;
                 throw outputError(e);
+            } finally {
+                output = null;
             }
+        }
+    }
+
+    @Override
+    public void rollback() {
+        // Bytes cannot be undone. Prevent later finalization of an aborted export.
+        if (writing) {
+            outputFailed = true;
         }
     }
 

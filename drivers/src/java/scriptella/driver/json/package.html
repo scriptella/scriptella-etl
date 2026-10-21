@@ -3,13 +3,12 @@
 <head><title>Scriptella JSON driver</title></head>
 <body>
 <p>Streaming JSON input/output provider, selected with <code>driver="json"</code>.
-JSON Lines is not implemented yet.</p>
-<p>Connection properties: <code>format=json</code> (the default and only supported
-format), <code>encoding=UTF-8</code> (default). The URL uses normal Scriptella
+Supports standard JSON and JSON Lines.</p>
+<p>Connection properties: <code>format=json</code> or <code>format=jsonl</code>, <code>encoding=UTF-8</code> (default). The URL uses normal Scriptella
 relative URL resolution; omit it to read standard input. Decoding rejects malformed
-bytes. One initial UTF-8 BOM is accepted. Construction opens no input or output.
+bytes. Standard JSON input accepts one initial UTF-8 BOM; JSON Lines rejects BOMs. Construction opens no input or output.
 Each query opens and closes its input; closing standard input leaves System.in open.</p>
-<p>An empty query selects a root array, or emits a root object as one row.
+<p>For standard JSON, an empty query selects a root array, or emits a root object as one row.
 A nonempty query selects exactly one array using a simple path, such as
 <code>response.customers</code>, <code>batches[0].customers</code> or
 <code>['response.data']["customers"]</code>. Identifiers contain ASCII letters,
@@ -66,13 +65,57 @@ connection direction, including a skipped script. The destination is opened only
 the first whole record is validated and serialized. Zero invocations leave existing
 files untouched and absent files absent, even with eager initialization. Omit the URL
 to write standard output, which is flushed without closing System.out.</p>
-<p>Records are emitted into one JSON array in invocation order. Memory includes the
+<p>For standard JSON, records are emitted into one JSON array in invocation order. Memory includes the
 current object, its serialized record, and the most recent compiled template, rather
-than the complete export. Commit writes the closing bracket, flushes and closes the
+than the complete export. Standard JSON commit writes the closing bracket, flushes and closes the
 output; these failures propagate before ETL success. Closing without commit performs
 cleanup only. Output is nontransactional: failures can leave incomplete files, and I/O
 failures can leave partial records. Mapping failures never append part of a record.
 A failed writer cannot continue or commit successfully, even if an onerror handler
 handles the original error. There is no rollback of bytes or cross-connection atomicity.</p>
+<p>On parse or mapping failure, previously emitted records remain, but no bytes of
+the failing mapped record are appended. Opening output may truncate an existing file
+even if opening or the first write fails. Write failures can leave partial records.
+After a handled error the writer rejects further scripts and commit; cleanup does not
+add a closing bracket. Cancellation and rollback likewise leave an unfinished array.
+Cancellation is checked before evaluation and emission; blocked output I/O cannot be
+interrupted by these checks. A downstream database failure triggers rollback and
+cleanup, without undoing output bytes.</p>
+<p>Finalization writes the closing bracket, flushes, then closes. Failure at any of
+these stages fails execution, even if the bytes already form valid JSON. Cleanup is
+attempted after finalization write/flush failure, with cleanup errors suppressed on
+the original cause. A close failure also fails commit. The engine logs failures from
+its final cleanup hook without replacing the execution failure. Connections commit
+in engine order: another connection may already have committed when a later one
+fails. Neither syntactically valid output nor buffered records prove a complete
+successful export; consumers must also check execution success. Output I/O diagnostics
+include destination, record number and emission/finalization stage; template errors
+include line, column and value path without printing record contents.</p>
+<h2>JSON Lines</h2>
+<p>Explicit <code>format=json</code> or <code>format=jsonl</code> takes precedence.
+When omitted, the resolved URL filename selects JSON Lines for <code>.jsonl</code>
+or <code>.ndjson</code>, case-insensitively, ignoring query parameters and fragments.
+All other extensions, missing extensions and omitted URLs default to standard JSON.
+Reading and writing use identical selection. Contents are never inspected to select
+the format.
+Queries must be empty. Each physical line contains exactly one complete JSON value,
+exposed as one <code>row</code>, including scalar, null and array values. Empty files
+yield zero rows. Blank lines, BOMs, multiline values, duplicate keys and extra values
+on a line fail immediately. LF and CRLF are accepted; a final newline is optional.
+Bare CR is rejected. Errors report physical line and record number, with parser
+column details in the cause. A malformed line is validated before its callback;
+earlier callbacks remain executed. There is no skipping or recovery.</p>
+<p>Scripts use the same object templates and typed values as standard JSON.
+Each invocation emits one compact object followed by LF, without array brackets
+or commas between records. Embedded string newlines are escaped. Memory includes
+the current input line and materialized record, or the current serialized output
+record. Very large individual lines can exhaust memory. Cancellation is checked
+while collecting lines and parsing values.</p>
+<p>Lazy opening, encoding, direction, readonly behavior, statement counts, template
+caching and failure rules are shared with standard JSON. Commit flushes and closes
+without adding framing. A handled error, cancellation or rollback can leave complete
+lines that represent only a partial export; execution must still succeed before
+consumers treat output as complete. An I/O failure can leave an incomplete last line.
+No atomic replacement, append/resume or content-based format detection is provided.</p>
 </body>
 </html>
