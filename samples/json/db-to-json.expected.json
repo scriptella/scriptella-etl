@@ -1,0 +1,4 @@
+[
+  {"id": 1, "customer": {"name": "Ada \"Ace\"", "active": true}, "credit": 12.50, "note": null, "source": "database"},
+  {"id": 2, "customer": {"name": "Lin", "active": false}, "credit": 7.25, "note": "follow up", "source": "database"}
+]

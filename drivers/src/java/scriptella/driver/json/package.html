@@ -4,6 +4,31 @@
 <body>
 <p>Streaming JSON input/output provider, selected with <code>driver="json"</code>.
 Supports standard JSON and JSON Lines.</p>
+<h2>Configuration and values</h2>
+<table border="1">
+<caption>JSON connection properties</caption>
+<tr><th>Setting</th><th>Default</th><th>Meaning</th></tr>
+<tr><td>url</td><td>Standard input/output</td><td>File or URL relative to the ETL file; use separate read/write connections.</td></tr>
+<tr><td>format</td><td>Filename inference</td><td>json or jsonl; explicit configuration takes precedence.</td></tr>
+<tr><td>encoding</td><td>UTF-8</td><td>Input decoding and output encoding.</td></tr>
+<tr><td>readonly</td><td>false</td><td>Skip scripts without opening output.</td></tr>
+</table>
+<table border="1">
+<caption>Typed values exposed through row and accepted in output placeholders</caption>
+<tr><th>JSON value</th><th>Reader representation</th><th>Writer mapping</th></tr>
+<tr><td>Object</td><td>Insertion-ordered map</td><td>String-keyed map</td></tr>
+<tr><td>Array</td><td>List</td><td>List</td></tr>
+<tr><td>String</td><td>String</td><td>String, escaped automatically</td></tr>
+<tr><td>Boolean</td><td>Boolean</td><td>Boolean</td></tr>
+<tr><td>Integer</td><td>Long, or BigInteger beyond its range</td><td>Byte, Short, Integer, Long, BigInteger</td></tr>
+<tr><td>Fraction/exponent</td><td>BigDecimal</td><td>BigDecimal and finite Float/Double</td></tr>
+<tr><td>Null</td><td>null</td><td>null</td></tr>
+</table>
+<p>Runnable JSON-to-database, database-to-JSON, JSON-to-JSON and JSON Lines examples
+are included in the examples ZIP under <code>json/</code>, with commands and expected
+results in <code>json/README.md</code>. In the source tree they live under
+<code>samples/json/</code>. The binary and examples ZIPs include Jackson Core;
+Maven applications must add the optional provider dependency explicitly.</p>
 <p>Connection properties: <code>format=json</code> or <code>format=jsonl</code>, <code>encoding=UTF-8</code> (default). The URL uses normal Scriptella
 relative URL resolution; omit it to read standard input. Decoding rejects malformed
 bytes. Standard JSON input accepts one initial UTF-8 BOM; JSON Lines rejects BOMs. Construction opens no input or output.
@@ -43,6 +68,20 @@ transactions. For a minimal Maven runtime, add Jackson Core explicitly alongside
 scriptella-drivers and the chosen JDBC driver: provider dependencies are optional.
 The full Ant distribution carries the intact Jackson jar and its license notices.</p>
 <h2>Writing</h2>
+<p><strong>Use unquoted <code>?{expression}</code> for every dynamic JSON value,
+including strings.</strong> The result retains its JSON type; strings are quoted
+and escaped automatically. For numeric <code>customer_id=123</code>,
+<code>"id": ?{customer_id}</code> emits <code>"id": 123</code>.
+<code>"$customer_id"</code>, <code>"${customer_id}"</code> and
+<code>"?{customer_id}"</code> are literal JSON strings and are not evaluated.
+To construct a dynamic string, put the whole string expression in an unquoted
+<code>?{...}</code> placeholder. Reference variables directly inside expressions,
+such as <code>customer_id</code> or <code>row.customer.name</code>.</p>
+<p>Dollar substitution remains available in supported configuration contexts,
+such as <code>url="${output.file}"</code> and
+<code>&lt;include href="${template}.json"/&gt;</code>, and in other drivers' text
+substitution contexts. It does not interpolate JSON template strings.
+These rules apply to both JSON and JSON Lines.</p>
 <p>Each script is one JSON object template. Unquoted <code>?{expression}</code>
 placeholders occupy complete value positions and use existing Scriptella expressions:</p>
 <pre>{"id": ?{customer_id}, "customer": {"name": ?{customer_name}},

@@ -43,7 +43,7 @@
              includes="samples/** lib/** core/src/** tools/src/** drivers/src/** **/*build.xml build-templates/**
                        *.xml **/pom.xml *.properties README*.md CHANGELOG.md CONTRIBUTING.md RELEASE-PUBLISHING.md docs/*.md docs/agent-templates/**
                        LICENSE NOTICE forrest/status.xml"
-             excludes="samples/lib/** custom*.properties"/>
+             excludes="samples/lib/** samples/json/output/** custom*.properties"/>
     <property name="src.zip.includes" value=""/>
     <property name="examples.zip.name" value="scriptella-examples-${version}.zip"/>
     <tstamp/>
@@ -86,7 +86,7 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
-                <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar lib/jackson-core.jar"/>
+                <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar lib/jackson-core.jar jackson-core.jar"/>
             </manifest>
         </jar>
         <!-- Refresh samples/lib from lib/, pruning leftovers (e.g. reverted upgrades).
@@ -135,7 +135,7 @@
         <delete file="${build.dir}/${examples.zip.name}" failonerror="false"/>
         <zip destfile="${build.dir}/${examples.zip.name}">
             <zipfileset dir="${basedir}" includes="README*.md CHANGELOG.md CONTRIBUTING.md RELEASE-PUBLISHING.md LICENSE NOTICE docs/*.md docs/agent-templates/**"/>
-            <fileset dir="${basedir}/samples"/>
+            <fileset dir="${basedir}/samples" excludes="json/output/**"/>
         </zip>
     </target>
 

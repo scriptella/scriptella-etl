@@ -1,0 +1,4 @@
+[
+  {"customerId": 1, "profile": {"displayName": "Ada \"Ace\"", "active": true}, "purchases": [{"sku": "P-100", "price": 12.50}], "externalCode": "A-1", "note": null, "source": "customer-import"},
+  {"customerId": 2, "profile": {"displayName": "Lin", "active": false}, "purchases": [{"sku": "P-200", "price": 7.25}], "externalCode": "B-2", "note": "follow up", "source": "customer-import"}
+]

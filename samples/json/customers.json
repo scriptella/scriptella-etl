@@ -1,0 +1,20 @@
+{
+  "response": {
+    "customers": [
+      {
+        "id": 1,
+        "customer": {"name": "Ada \"Ace\"", "active": true},
+        "items": [{"sku": "P-100", "price": 12.50}],
+        "external.code": "A-1",
+        "note": null
+      },
+      {
+        "id": 2,
+        "customer": {"name": "Lin", "active": false},
+        "items": [{"sku": "P-200", "price": 7.25}],
+        "external.code": "B-2",
+        "note": "follow up"
+      }
+    ]
+  }
+}

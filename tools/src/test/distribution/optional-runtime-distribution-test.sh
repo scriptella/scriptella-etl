@@ -47,7 +47,7 @@ done
 for documentation_root in "$dist_dir" "$work_dir/examples" "$source_dir"; do
     for documentation_file in README.md \
             CHANGELOG.md CONTRIBUTING.md RELEASE-PUBLISHING.md \
-            docs/cli-usage.md docs/java-execution.md docs/first-migration.md \
+            docs/cli-usage.md docs/java-execution.md docs/first-migration.md docs/json.md \
             docs/core-database-compatibility.md docs/MAINTAINING.md \
             docs/agent-templates/csv-to-sql.etl.xml docs/agent-templates/jdbc-to-jdbc.etl.xml \
             docs/agent-templates/sql-script.etl.xml docs/agent-templates/file-transform.etl.xml \
@@ -100,6 +100,28 @@ assert_rhino_bundle() {
     [ "$provider" = "org.mozilla.javascript.engine.RhinoScriptEngineFactory" ] \
         || fail "$bundle_lib/rhino-engine.jar has an unexpected JSR-223 provider"
 }
+
+# JSON must work from the archives with intact optional dependencies.
+for bundle_lib in "$dist_dir/lib" "$examples_dir/lib" "$source_dir/lib"; do
+    [ -s "$bundle_lib/jackson-core.jar" ] || fail "$bundle_lib has no Jackson Core"
+    [ -s "$bundle_lib/jackson-core.license.txt" ] || fail "$bundle_lib has no Jackson notices"
+    cmp "$source_dir/lib/jackson-core.jar" "$bundle_lib/jackson-core.jar" >/dev/null \
+        || fail "$bundle_lib has a different Jackson artifact"
+done
+[ -s "$dist_dir/docs/api/scriptella/driver/json/package-summary.html" ] \
+    || fail "binary distribution has no JSON driver reference"
+for sample_root in "$examples_dir/json" "$source_dir/samples/json"; do
+    [ ! -e "$sample_root/output" ] \
+        || fail "$sample_root contains generated JSON example output"
+    for sample_file in README.md verify.py customers.json customers.jsonl \
+            json-to-db.etl.xml db-to-json.etl.xml json-to-json.etl.xml jsonl-to-jsonl.etl.xml \
+            json-to-db.expected.json db-to-json.expected.json json-to-json.expected.json; do
+        [ -s "$sample_root/$sample_file" ] || fail "$sample_root is missing $sample_file"
+    done
+done
+python3 "$examples_dir/json/verify.py" || fail "packaged JSON examples failed"
+python3 "$examples_dir/json/verify.py" --jar "$dist_dir/scriptella.jar" \
+    || fail "binary distribution JSON examples failed"
 
 assert_rhino_bundle "$dist_dir/lib"
 assert_rhino_bundle "$examples_dir/lib"
