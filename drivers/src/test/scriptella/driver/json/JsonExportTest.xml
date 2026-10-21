@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
+<etl>
+    <description>JSON export, dynamic includes and zero-row output contract.</description>
+    <connection id="db" driver="h2" url="jdbc:h2:mem:json_phase3" user="sa"/>
+    <connection id="out" driver="json" url="export.json"/>
+    <connection id="in" driver="json" url="input.json"/>
+    <connection id="transformed" driver="json" url="transformed.json"/>
+    <connection id="existing" driver="json" url="existing.json"/>
+    <connection id="absent" driver="json" url="absent.json"/>
+
+    <query connection-id="db">
+        SELECT * FROM (VALUES
+            (2, 'second', CAST(7.25 AS DECIMAL(12,2))),
+            (1, 'first', CAST(12.50 AS DECIMAL(12,2)))
+        ) T("id", "template", "credit") ORDER BY "id"
+        <script connection-id="out"><include href="${template}.json"/></script>
+    </query>
+
+    <query connection-id="in">
+        response.customers
+        <script connection-id="transformed">
+            {"id": ?{row.id}, "items": ?{row.items},
+             "note": ?{row.missing}, "literal": "${row.id}"}
+        </script>
+    </query>
+
+    <query connection-id="db">
+        SELECT 1 WHERE 1=0
+        <script connection-id="existing">{}</script>
+        <script connection-id="absent">{}</script>
+    </query>
+</etl>

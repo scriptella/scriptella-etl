@@ -33,11 +33,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.Writer;
+import java.io.OutputStreamWriter;
+import java.io.FilterOutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-/** A connection opens a fresh input for each query; construction performs no I/O. */
+/** Streaming input or lazily opened output; construction performs no I/O. */
 public class JsonConnection extends AbstractConnection {
     // Disable symbol tables: memory must not grow with distinct keys across records.
     static final JsonFactory FACTORY = JsonFactory.builder()
@@ -49,6 +52,11 @@ public class JsonConnection extends AbstractConnection {
     private final URL url;
     private final Charset encoding;
     private boolean reading;
+    private boolean writing;
+    private boolean finished;
+    private boolean outputFailed;
+    private Writer output;
+    private JsonTemplate template;
     private boolean closed;
 
     public JsonConnection(ConnectionParameters parameters) {
@@ -74,6 +82,9 @@ public class JsonConnection extends AbstractConnection {
 
     public void executeQuery(Resource query, ParametersCallback parameters, QueryCallback callback) {
         checkOpen();
+        if (writing) {
+            throw new JsonProviderException("Cannot read and write through the same JSON connection");
+        }
         reading = true;
         EtlCancelledException.checkEtlCancelled();
         final JsonPath path;
@@ -102,7 +113,80 @@ public class JsonConnection extends AbstractConnection {
         if (reading) {
             throw new JsonProviderException("Cannot read and write through the same JSON connection");
         }
-        throw new JsonProviderException("JSON writing is not implemented yet");
+        writing = true;
+        if (finished || outputFailed) {
+            throw new JsonProviderException("JSON output is finalized or failed");
+        }
+        if (isReadonly()) {
+            return;
+        }
+        EtlCancelledException.checkEtlCancelled();
+        try {
+            String text;
+            try (Reader content = script.open()) {
+                text = IOUtils.toString(content);
+            }
+            // Compare actual content, never Resource identity (dynamic includes can change).
+            // Keep only the latest template so memory cannot grow with invocation count.
+            if (template == null || !template.matches(text)) {
+                template = new JsonTemplate(text);
+            }
+            String record = JsonValues.serialize(template.evaluate(parameters));
+            EtlCancelledException.checkEtlCancelled();
+            try {
+                if (output == null) {
+                    output = newOutputWriter();
+                    output.write('[');
+                } else {
+                    output.write(',');
+                }
+                output.write(record);
+            } catch (IOException e) {
+                outputFailed = true;
+                throw e;
+            }
+            counter.statements++;
+        } catch (IOException e) {
+            outputFailed = true;
+            throw outputError(e);
+        } catch (RuntimeException e) {
+            outputFailed = true;
+            throw e;
+        }
+    }
+
+    protected Writer newOutputWriter() throws IOException {
+        return new OutputStreamWriter(url == null ? new FilterOutputStream(System.out) {
+            @Override
+            public void close() throws IOException {
+                flush();
+            }
+        } : IOUtils.getOutputStream(url), encoding.newEncoder());
+    }
+
+    private JsonProviderException outputError(IOException cause) {
+        return new JsonProviderException("Cannot write JSON output " + JdbcUtils.getUrlDescription(url),
+                JdbcUtils.sanitize(cause, url));
+    }
+
+    @Override
+    public void commit() {
+        checkOpen();
+        if (outputFailed) {
+            throw new JsonProviderException("JSON output failed; export is incomplete");
+        }
+        if (output != null && !finished) {
+            finished = true;
+            try {
+                output.write(']');
+                output.flush();
+                output.close();
+                output = null;
+            } catch (IOException e) {
+                outputFailed = true;
+                throw outputError(e);
+            }
+        }
     }
 
     private void checkOpen() {
@@ -113,5 +197,15 @@ public class JsonConnection extends AbstractConnection {
 
     public void close() {
         closed = true;
+        template = null;
+        if (output != null) {
+            try {
+                output.close();
+            } catch (IOException e) {
+                throw outputError(e);
+            } finally {
+                output = null;
+            }
+        }
     }
 }

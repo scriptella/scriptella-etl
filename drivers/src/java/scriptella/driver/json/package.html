@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
 <html lang="en">
-<head><title>Scriptella JSON reader</title></head>
+<head><title>Scriptella JSON driver</title></head>
 <body>
-<p>Streaming JSON input provider, selected with <code>driver="json"</code>.
-Writing and JSON Lines are not implemented yet.</p>
+<p>Streaming JSON input/output provider, selected with <code>driver="json"</code>.
+JSON Lines is not implemented yet.</p>
 <p>Connection properties: <code>format=json</code> (the default and only supported
 format), <code>encoding=UTF-8</code> (default). The URL uses normal Scriptella
 relative URL resolution; omit it to read standard input. Decoding rejects malformed
@@ -43,5 +43,36 @@ Use separate connections for input and output. The reader does not implement
 transactions. For a minimal Maven runtime, add Jackson Core explicitly alongside
 scriptella-drivers and the chosen JDBC driver: provider dependencies are optional.
 The full Ant distribution carries the intact Jackson jar and its license notices.</p>
+<h2>Writing</h2>
+<p>Each script is one JSON object template. Unquoted <code>?{expression}</code>
+placeholders occupy complete value positions and use existing Scriptella expressions:</p>
+<pre>{"id": ?{customer_id}, "customer": {"name": ?{customer_name}},
+ "items": ?{row.items}, "source": "import", "flags": [true, ?{active}]}</pre>
+<p>Keys are static JSON strings. Placeholder-like text inside strings, including
+<code>${name}</code>, remains literal. Comments, trailing commas, duplicate decoded
+keys and extra root content are rejected. Templates preserve field order. The latest
+compiled template is reused only when freshly opened resource content compares equal;
+dynamic includes are reopened on every invocation.</p>
+<p>Values support null, strings, booleans, Byte/Short/Integer/Long, BigInteger,
+BigDecimal, finite Float/Double, string-keyed maps and lists. Numbers retain their
+existing precision; expressions may change it. Cycles, duplicate map keys, non-string
+keys, non-finite numbers and all other types are rejected. Dates and times (including
+JDBC dates) require explicit formatting or conversion to epoch numbers. Arrays, beans,
+streams and arbitrary iterables are not implicitly converted. Shared acyclic values
+are allowed. Output value nesting is limited to 500 levels.</p>
+<p>Successful scripts count as one statement each. <code>readonly=true</code> skips
+scripts without opening output or incrementing the count. The first operation fixes
+connection direction, including a skipped script. The destination is opened only after
+the first whole record is validated and serialized. Zero invocations leave existing
+files untouched and absent files absent, even with eager initialization. Omit the URL
+to write standard output, which is flushed without closing System.out.</p>
+<p>Records are emitted into one JSON array in invocation order. Memory includes the
+current object, its serialized record, and the most recent compiled template, rather
+than the complete export. Commit writes the closing bracket, flushes and closes the
+output; these failures propagate before ETL success. Closing without commit performs
+cleanup only. Output is nontransactional: failures can leave incomplete files, and I/O
+failures can leave partial records. Mapping failures never append part of a record.
+A failed writer cannot continue or commit successfully, even if an onerror handler
+handles the original error. There is no rollback of bytes or cross-connection atomicity.</p>
 </body>
 </html>
