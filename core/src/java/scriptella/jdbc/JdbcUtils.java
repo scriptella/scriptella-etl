@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -132,8 +133,10 @@ public final class JdbcUtils {
     }
 
     private static Throwable fallbackThrowable(Throwable source, String message, Throwable cause) {
-        return new Exception(source.getClass().getName() +
-                (message == null ? "" : ": " + message), cause);
+        String diagnostic = source.getClass().getName() +
+                (message == null ? "" : ": " + message);
+        return source instanceof java.io.IOException
+                ? new java.io.IOException(diagnostic, cause) : new Exception(diagnostic, cause);
     }
 
     private static String sanitizeMessage(String message, ConnectionParameters parameters, Properties properties) {
@@ -198,6 +201,88 @@ public final class JdbcUtils {
             }
         }
         return "the configured JDBC URL";
+    }
+
+    /**
+     * Returns a credential-safe description of an input/output URL.
+     * Only the protocol is included; authority, path, query and fragment are omitted.
+     *
+     * @param url resolved URL, or null for console I/O
+     * @return a source description without connection details
+     */
+    public static String getUrlDescription(java.net.URL url) {
+        return url == null ? "console" : "URL scheme " + url.getProtocol() + ":";
+    }
+
+    /**
+     * Copies an exception graph with source URL credentials removed from messages.
+     * Causes, suppressed exceptions, stack traces and SQL diagnostics are retained;
+     * repeated/cyclic references never attach an original exception to the copy.
+     *
+     * @param source exception to report
+     * @param url source URL, or null for console I/O
+     * @return sanitized diagnostic copy
+     */
+    public static Throwable sanitize(Throwable source, java.net.URL url) {
+        Set<String> values = new LinkedHashSet<String>();
+        if (url != null) {
+            values.add(url.toExternalForm());
+            String userInfo = url.getUserInfo();
+            if (userInfo != null) {
+                addUrlValue(values, userInfo);
+                for (String part : userInfo.split(":", 2)) {
+                    addUrlValue(values, part);
+                }
+            }
+            // Redact every query value: credential parameter names are not standardized.
+            String query = url.getQuery();
+            if (query != null) {
+                addUrlValue(values, query);
+                for (String parameter : query.split("&")) {
+                    int separator = parameter.indexOf('=');
+                    addUrlValue(values, parameter.substring(separator + 1));
+                }
+            }
+            if (url.getRef() != null) {
+                addUrlValue(values, url.getRef());
+            }
+        }
+        return copyUrlException(source, values, new IdentityHashMap<Throwable, Throwable>());
+    }
+
+    private static Throwable copyUrlException(Throwable source, Set<String> values,
+                                               Map<Throwable, Throwable> copies) {
+        if (source == null) {
+            return null;
+        }
+        if (copies.containsKey(source)) {
+            return copies.get(source);
+        }
+        // Break cause cycles before descending; the placeholder contains no source data.
+        copies.put(source, new Exception("Repeated exception reference"));
+        String message = source.getMessage();
+        for (String value : values) {
+            message = sanitize(message, value, "[hidden]");
+        }
+        Throwable cause = copyUrlException(source.getCause(), values, copies);
+        Throwable copy = source instanceof SQLException
+                ? newSQLException((SQLException) source, message, cause)
+                : newThrowable(source, message, cause);
+        copy.setStackTrace(source.getStackTrace());
+        copies.put(source, copy);
+        for (Throwable suppressed : source.getSuppressed()) {
+            Throwable sanitized = copyUrlException(suppressed, values, copies);
+            if (sanitized != copy) {
+                copy.addSuppressed(sanitized);
+            }
+        }
+        if (source instanceof SQLException) {
+            SQLException next = ((SQLException) source).getNextException();
+            if (next != null && !copies.containsKey(next)) {
+                ((SQLException) copy).setNextException((SQLException) copyUrlException(next, values, copies));
+            }
+        }
+        return copy;
     }
 
     private static String sanitizeUser(String message, String user) {

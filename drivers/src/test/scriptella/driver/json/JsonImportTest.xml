@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE etl SYSTEM "http://scriptella.org/dtd/etl.dtd">
+<etl>
+    <description>JSON reader typed import contract.</description>
+    <connection id="source" driver="json" url="customers.json">
+        format=json
+    </connection>
+    <connection id="db" driver="h2" url="jdbc:h2:mem:json_phase2" user="sa"/>
+
+    <script connection-id="db">
+        CREATE TABLE CUSTOMER (
+            ID INTEGER PRIMARY KEY,
+            CUSTOMER_NAME VARCHAR(100),
+            ACTIVE BOOLEAN,
+            FIRST_PRICE DECIMAL(12, 2),
+            EXTERNAL_CODE VARCHAR(20),
+            NOTE VARCHAR(100), ABSENT VARCHAR(100), LARGE DECIMAL(30, 0)
+        );
+    </script>
+
+    <query connection-id="source">
+        response.customers
+        <script connection-id="db">
+            INSERT INTO CUSTOMER
+                (ID, CUSTOMER_NAME, ACTIVE, FIRST_PRICE, EXTERNAL_CODE, NOTE, ABSENT, LARGE)
+            VALUES (?{row.id}, ?{row.customer.name}, ?{row.customer.active},
+                    ?{row.items[0].price}, ?{row['external.code']}, ?{row.note}, ?{row.absent}, ?{row.large});
+        </script>
+    </query>
+</etl>

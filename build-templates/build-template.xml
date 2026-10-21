@@ -81,7 +81,7 @@
             </classpath>
         </javac>
         <copy todir="${tests.tmp.dir}">
-            <fileset dir="${test.dir}" includes="**/*.properties **/*.xml **/*.sql"/>
+            <fileset dir="${test.dir}" includes="**/*.properties **/*.xml **/*.sql **/*.json"/>
         </copy>
         <mkdir dir="${tests.xml.report.dir}"/>
         <!--Executing junit-->

@@ -2,6 +2,7 @@
     <property name="sqlite.jdbc.jar"
               location="${basedir}/../build/test-dependencies/sqlite-jdbc.jar"/>
     <path id="classpath">
+        <pathelement location="${basedir}/../lib/jackson-core.jar"/>
         <pathelement location="${basedir}/../core/build/tmp/classes"/>
         <pathelement location="${basedir}/../lib/velocity-engine-core.jar"/>
         <pathelement location="${basedir}/../lib/commons-lang3.jar"/>

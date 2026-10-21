@@ -11,6 +11,7 @@
      - Thomas Mueller (http://h2database.com)
      - Arno Unkrig (http://janino.net)
      - The Spring Framework Project (http://www.springframework.org)
+     - FasterXML (https://github.com/FasterXML/jackson-core)
 
    Please read the different license files present in the lib directory of
    this distribution.

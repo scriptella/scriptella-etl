@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head><title>Scriptella JSON reader</title></head>
+<body>
+<p>Streaming JSON input provider, selected with <code>driver="json"</code>.
+Writing and JSON Lines are not implemented yet.</p>
+<p>Connection properties: <code>format=json</code> (the default and only supported
+format), <code>encoding=UTF-8</code> (default). The URL uses normal Scriptella
+relative URL resolution; omit it to read standard input. Decoding rejects malformed
+bytes. One initial UTF-8 BOM is accepted. Construction opens no input or output.
+Each query opens and closes its input; closing standard input leaves System.in open.</p>
+<p>An empty query selects a root array, or emits a root object as one row.
+A nonempty query selects exactly one array using a simple path, such as
+<code>response.customers</code>, <code>batches[0].customers</code> or
+<code>['response.data']["customers"]</code>. Identifiers contain ASCII letters,
+underscores and digits (not a leading digit). Bracket keys use JSON string escapes
+with single or double quotes; single quotes additionally allow escaped apostrophes.
+Indexes are nonnegative Java ints without leading zeros. Outer whitespace is trimmed;
+whitespace between segments, JSONPath operators and expression substitution are unsupported.
+Missing segments, wrong containers and non-array targets fail.</p>
+<p>Each callback exposes <code>row</code>: insertion-ordered maps, lists, strings,
+booleans, null, Long integers (BigInteger beyond the Long range), and BigDecimal
+fractions/exponents. Scalar and null array items each emit a row. Other names delegate
+to the enclosing parameters. Existing expressions support <code>row.customer.name</code>,
+<code>row.items[0].price</code> and <code>row['external.code']</code>. Missing fields
+retain existing expression behavior. Parsing preserves numeric precision; expressions
+and destination JDBC conversions can change it. No date inference is performed.</p>
+<p>Input must contain exactly one document. Empty input, comments, trailing commas,
+trailing root values and duplicate keys in materialized records fail. Repeated
+selected keys at path ancestor objects also fail, including keys occurring after
+rows were emitted. Duplicate unrelated keys are ignored. Syntax validation continues
+through unrelated subtrees and after the selection. Already executed callbacks cannot
+be undone. A successful query counts as one statement, including an empty selection.</p>
+<p>Memory is proportional to the current record, path depth and parser token buffers,
+not document size. Unrelated subtrees are skipped and field-name symbol caching is
+disabled. A very large single record can exhaust available memory. Jackson Core
+2.22.4 uses per-factory limits of 1000 nesting levels, 1000 characters per number,
+20,000,000 per string and 50,000 per field name. Parser constraints remain enabled;
+document length and token count have no fixed limit. Parsing checks cancellation
+between tokens and records; cancellation cannot interrupt a blocked I/O read.</p>
+<p>Failures close query content and input, including downstream callback failures.
+Use separate connections for input and output. The reader does not implement
+transactions. For a minimal Maven runtime, add Jackson Core explicitly alongside
+scriptella-drivers and the chosen JDBC driver: provider dependencies are optional.
+The full Ant distribution carries the intact Jackson jar and its license notices.</p>
+</body>
+</html>

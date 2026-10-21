@@ -86,7 +86,7 @@
             <zipfileset dir="${basedir}" includes="LICENSE NOTICE pom.xml" prefix="META-INF"/>
             <manifest>
                 <attribute name="Main-Class" value="scriptella.tools.launcher.EtlLauncher"/>
-                <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar"/>
+                <attribute name="Class-Path" value="lib/rhino-engine.jar lib/rhino.jar lib/jackson-core.jar"/>
             </manifest>
         </jar>
         <!-- Refresh samples/lib from lib/, pruning leftovers (e.g. reverted upgrades).
@@ -116,7 +116,7 @@
                                   commons-logging.jar commons-logging.license.txt"
                         prefix="${product.name}/lib"/>
             <zipfileset dir="${lib.dir}"
-                        includes="rhino-engine.jar rhino.jar rhino.license.txt rhino.source.txt"
+                        includes="rhino-engine.jar rhino.jar rhino.license.txt rhino.source.txt jackson-core.jar jackson-core.license.txt"
                         prefix="${product.name}/lib"/>
             <zipfileset dir="${build.dir}" includes="scriptella.jar docs/**" prefix="${product.name}"/>
             <zipfileset dir="${build.dir}" includes="scriptella-*.jar" prefix="${product.name}/lib"/>
