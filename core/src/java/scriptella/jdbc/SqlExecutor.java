@@ -30,6 +30,8 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +54,7 @@ class SqlExecutor extends SqlParserBase implements Closeable {
     private int updateCount;//number of updated rows
     private final AbstractConnection.StatementCounter counter;
     private SqlTokenizer cachedTokenizer;
+    private Map<String, SqlBindingPlan> bindingPlans;
 
     public SqlExecutor(final Resource resource, final JdbcConnection connection) {
         this.resource = resource;
@@ -78,13 +81,27 @@ class SqlExecutor extends SqlParserBase implements Closeable {
                 cache = reader instanceof StringReader;
                 if (cache) { //If resource is a String - allow caching
                     tok = new CachedSqlTokenizer(tok);
+                    if (substitution) {
+                        bindingPlans = new IdentityHashMap<String, SqlBindingPlan>();
+                    }
                 }
             } catch (IOException e) {
                 throw new JdbcException("Failed to open resource", e);
             }
         }
         if (substitution) {
-            parse(tok);
+            boolean success = false;
+            try {
+                parse(tok);
+                success = true;
+            } finally {
+                // A failed first execution must reopen and parse the resource next time.
+                if (!success && cache) {
+                    bindingPlans = null;
+                }
+                // Parameter resolution can fail before statementParsed clears the list.
+                params.clear();
+            }
         } else {
             try {
                 String sql;
@@ -106,6 +123,26 @@ class SqlExecutor extends SqlParserBase implements Closeable {
         }
         
 
+    }
+
+    @Override
+    protected void handleStatement(final String sql, final int[] injections) {
+        if (bindingPlans == null || injections == null || injections.length == 0) {
+            super.handleStatement(sql, injections);
+            return;
+        }
+        SqlBindingPlan plan = bindingPlans.get(sql);
+        if (plan == null && !bindingPlans.containsKey(sql)) {
+            plan = SqlBindingPlan.compile(sql, injections);
+            // Remember ineligible statements too, so fallback needs no repeated eligibility check.
+            bindingPlans.put(sql, plan);
+        }
+        if (plan == null) {
+            super.handleStatement(sql, injections);
+        } else {
+            plan.bind(paramsCallback, params);
+            statementParsed(plan.getSql());
+        }
     }
 
     void setSubstitution(boolean substitution) {

@@ -83,7 +83,7 @@ public class SqlParserBase {
     private final Matcher extM = PropertiesSubstitutor.EXPR_PTR.matcher("");
     private final StringBuilder tmpBuf = new StringBuilder();
 
-    private void handleStatement(final String sql,
+    protected void handleStatement(final String sql,
                                  final int[] injections) {
         if (StringUtils.isAsciiWhitespacesOnly(sql)) {
             return;
