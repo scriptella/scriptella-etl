@@ -26,7 +26,41 @@ PostgreSQL pgJDBC adapter for Scriptella.
         <th>Description</th>
         <th>Required</th>
     </tr>
+    <tr>
+        <td>reWriteBatchedInserts</td>
+        <td>pgJDBC option to combine compatible batched inserts into multi-row
+            INSERT statements. Default: <code>false</code>. Set it to
+            <code>true</code> alongside <code>statement.batchSize</code> for
+            batch insert workloads.</td>
+        <td>No</td>
+    </tr>
 </table>
+
+<h2>Batch inserts</h2>
+<p>For repeated compatible INSERT statements, enable Scriptella batching with
+    <code>statement.batchSize=1000</code> and set
+    <code>reWriteBatchedInserts=true</code> in the connection body. Scriptella
+    passes connection properties directly to the JDBC driver. This pgJDBC option
+    combines compatible batched inserts into multi-row INSERT statements and can
+    reduce import time. pgJDBC defaults it to <code>false</code>; Scriptella does
+    not enable it automatically.</p>
+<code><pre>
+    &lt;connection id="db" driver="postgresql"
+                url="jdbc:postgresql://localhost:5432/test"
+                user="username" password="password"&gt;
+        autocommit=false
+        statement.batchSize=1000
+        reWriteBatchedInserts=true
+    &lt;/connection&gt;
+</pre></code>
+<p>The batch size controls statement grouping, not commit frequency. With
+    <code>autocommit=false</code>, batching retains the ETL transaction boundary.
+    Rewriting applies to compatible INSERT batches, not arbitrary SQL; test your
+    workload before enabling it. See the
+    <a href="https://jdbc.postgresql.org/documentation/use/">pgJDBC connection
+        parameters</a> and the
+    <a href="../../jdbc/package-summary.html#package_description">JDBC batching
+        documentation</a> for details.</p>
 
 <h2>Examples</h2>
 <code><pre>
