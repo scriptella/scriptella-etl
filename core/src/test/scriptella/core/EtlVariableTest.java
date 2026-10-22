@@ -54,8 +54,11 @@ public class EtlVariableTest extends AbstractTestCase {
      * Test support of etl variable in expressions.
      */
     public void testExpression() {
+        long before = System.currentTimeMillis();
         Date d = (Date) Expression.compile("etl.date.now()").evaluate(params);
-        assertTrue(d.getTime() >= System.currentTimeMillis());
+        long after = System.currentTimeMillis();
+        assertTrue("Timestamp precedes evaluation", d.getTime() >= before);
+        assertTrue("Timestamp follows evaluation", d.getTime() <= after);
         String format = "MMddyyyy";
 
         PropertiesSubstitutor ps = new PropertiesSubstitutor(params);
@@ -93,8 +96,11 @@ public class EtlVariableTest extends AbstractTestCase {
     public void testNewSyntax() {
         Object o = Expression.compile("text:ifNull(a)").evaluate(params);
         assertEquals("", o);
+        long before = System.currentTimeMillis();
         Date d = (Date) Expression.compile("date:now()").evaluate(params);
-        assertTrue(d.getTime() >= System.currentTimeMillis());
+        long after = System.currentTimeMillis();
+        assertTrue("Timestamp precedes evaluation", d.getTime() >= before);
+        assertTrue("Timestamp follows evaluation", d.getTime() <= after);
         String p = (String) Expression.compile("class:forName('java.lang.System').getProperty('java.version')").
                 evaluate(params);
         assertTrue(p != null);
