@@ -22,9 +22,11 @@ network. Batch size 1000 is a tested starting point, not a universal optimum.
 | `statement.fetchSize` | A JDBC hint for reading query results. | Tune separately for source queries; it does not enable insert batching. |
 
 Executing a batch does not commit a transaction. With `autocommit=false` and
-no periodic commits, batching retains the ETL transaction boundary. Periodic
-commits can limit transaction size, but previously committed work cannot be
-rolled back if a later step fails. Choose that recovery behavior deliberately.
+no periodic commits, batching retains the ETL transaction boundary. If partial
+commits are intentional, `autocommit.size=10000` can commit every 10,000
+statements alongside `statement.batchSize=1000`; commits flush pending batches.
+Periodic commits prevent all-or-nothing rollback and may reduce throughput,
+so leave this setting unset unless that tradeoff is needed.
 
 ## PostgreSQL
 
