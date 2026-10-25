@@ -43,6 +43,9 @@ public class Session {
     Map<String, ConnectionManager> managedConnections = new HashMap<String, ConnectionManager>();
     private List<ExecutableElement> executors;
     private List<Location> locations;
+    private boolean closeAfterUse;
+    private final Map<ConnectionManager, Integer> lastUses =
+            new HashMap<ConnectionManager, Integer>();
 
     public Session(final ConfigurationEl configuration, final EtlContext ctx) {
         final List<ConnectionEl> connections = configuration.getConnections();
@@ -60,6 +63,7 @@ public class Session {
                         ", " + connection.getDialectIdentifier() + ", properties "+c.getProperties());
             }
             managedConnections.put(c.getId(), con);
+            closeAfterUse |= con.isCloseAfterUse();
         }
 
         final List<ScriptingElement> scripts = configuration.getScriptingElements();
@@ -70,6 +74,9 @@ public class Session {
 
         for (ScriptingElement s : scripts) {
             locations.add(s.getLocation());
+            if (closeAfterUse) {
+                recordUses(s, null, locations.size() - 1);
+            }
 
             if (s instanceof QueryEl) {
                 executors.add(QueryExecutor.prepare((QueryEl) s));
@@ -79,6 +86,51 @@ public class Session {
             progressCallback.step(1, s.getLocation() + " prepared");
         }
 
+    }
+
+    /** Conservative subtree analysis: conditions and handlers are potential uses. */
+    private void recordUses(ScriptingElement element, String inheritedId, int index) {
+        String id = element.getConnectionId() == null ? inheritedId : element.getConnectionId();
+        recordUse(id, index);
+        if (element instanceof QueryEl) {
+            for (ScriptingElement child : ((QueryEl) element).getChildScriptinglElements()) {
+                recordUses(child, id, index);
+            }
+        } else if (element instanceof ScriptEl) {
+            if (((ScriptEl) element).getOnerrorElements() == null) {
+                return;
+            }
+            for (scriptella.configuration.OnErrorEl handler : ((ScriptEl) element).getOnerrorElements()) {
+                recordUse(handler.getConnectionId() == null ? id : handler.getConnectionId(), index);
+            }
+        } else {
+            // Unknown executable structure: retain every connection until cleanup.
+            for (ConnectionManager manager : managedConnections.values()) {
+                lastUses.put(manager, Integer.MAX_VALUE);
+            }
+        }
+    }
+
+    private void recordUse(String id, int index) {
+        if (id == null && managedConnections.size() > 1) {
+            // A conditional element may never execute. Keep missing-ID validation
+            // on the runtime path, after its condition has been evaluated.
+            return;
+        }
+        ConnectionManager manager = getConnection(id);
+        Integer previous = lastUses.get(manager);
+        if (previous == null || previous < index) {
+            lastUses.put(manager, index);
+        }
+    }
+
+    private void retireConnections(int completedIndex) {
+        for (ConnectionManager manager : managedConnections.values()) {
+            Integer lastUse = lastUses.get(manager);
+            if (manager.isCloseAfterUse() && (lastUse == null ? completedIndex == -1 : lastUse == completedIndex)) {
+                manager.retire();
+            }
+        }
     }
 
     ConnectionManager getConnection(final String id) {
@@ -99,9 +151,15 @@ public class Session {
                 .fork(executors.size());
         DynamicContext dynCtx = new DynamicContext(ctx);
 
+        if (closeAfterUse) {
+            retireConnections(-1);
+        }
         for (int i = 0, n = executors.size(); i < n; i++) {
             ExecutableElement exec = executors.get(i);
             exec.execute(dynCtx);
+            if (closeAfterUse) {
+                retireConnections(i);
+            }
             progress.step(1, locations.get(i).toString()+" executed");
         }
     }

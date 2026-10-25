@@ -22,6 +22,7 @@ import scriptella.execution.ExecutionProgress;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ScriptellaDriver;
+import scriptella.text.TypedPropertiesSource;
 import scriptella.util.UrlPathTokenizer;
 
 import java.net.MalformedURLException;
@@ -29,6 +30,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +46,10 @@ public class ConnectionManager {
     private static final Logger LOG = Logger.getLogger(ConnectionManager.class.getName());
     Connection connection;
     List<Connection> newConnections;
+    private boolean closeAfterUse;
+    private boolean retired;
+    private long retiredStatements;
+    private long retiredUpdates;
     private ExecutionProgress progress;
     private int progressIndex;
     private ScriptellaDriver driver;
@@ -69,6 +75,13 @@ public class ConnectionManager {
             }
         }
         connectionParameters = new ConnectionParameters(c, ctx);
+        if (connectionParameters.getProperty("close.after.use") != null) {
+            closeAfterUse = connectionParameters.getBooleanProperty("close.after.use");
+        } else {
+            closeAfterUse = new TypedPropertiesSource(Collections.singletonMap(
+                    "scriptella.close.after.use", ctx.getParameter("scriptella.close.after.use")))
+                    .getBooleanProperty("scriptella.close.after.use", false);
+        }
         try {
             driver = DriverFactory.getDriver(c.getDriver(), cl);
         } catch (ClassNotFoundException e) {
@@ -80,6 +93,7 @@ public class ConnectionManager {
     }
 
     public Connection getConnection() {
+        checkNotRetired();
         if (connection == null) {
             connection = driver.connect(connectionParameters);
             if (connection == null) {
@@ -94,6 +108,7 @@ public class ConnectionManager {
     }
 
     public Connection newConnection() {
+        checkNotRetired();
         final Connection c = driver.connect(connectionParameters);
         if (c == null) {
             throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
@@ -109,6 +124,29 @@ public class ConnectionManager {
         }
 
         return c;
+    }
+
+    boolean isCloseAfterUse() {
+        return closeAfterUse;
+    }
+
+    private void checkNotRetired() {
+        if (retired) {
+            throw new IllegalStateException("Connection was retired by close.after.use");
+        }
+    }
+
+    /** Called only after the last top-level subtree has finished successfully. */
+    void retire() {
+        if (!retired) {
+            // On commit failure leave ownership intact for normal rollback/cleanup.
+            EtlCancelledException.checkEtlCancelled();
+            commit();
+            retiredStatements = getExecutedStatementsCount();
+            retiredUpdates = getUpdateCount();
+            close();
+            retired = true;
+        }
     }
 
     void enableProgress(ExecutionProgress progress) {
@@ -174,7 +212,7 @@ public class ConnectionManager {
      * Returns number of executed statements by managed connections.
      */
     public long getExecutedStatementsCount() {
-        long s = 0;
+        long s = retiredStatements;
         if (connection != null) {
             s += connection.getExecutedStatementsCount();
 
@@ -189,7 +227,7 @@ public class ConnectionManager {
 
     /** Returns update counts reported by all managed connections. */
     public long getUpdateCount() {
-        long count = 0;
+        long count = retiredUpdates;
         for (Connection c : getAllConnections()) {
             count += c.getUpdateCount();
         }
