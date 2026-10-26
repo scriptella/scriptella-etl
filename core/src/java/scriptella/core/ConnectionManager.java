@@ -37,7 +37,9 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Add documentation
+ * Manages the primary connection and additional connections
+ * used by new-tx scripts. Each new-tx script element caches
+ * its connection and reuses it across invocations.
  *
  * @author Fyodor Kupolov
  * @version 1.0
@@ -107,6 +109,10 @@ public class ConnectionManager {
         return connection;
     }
 
+    /**
+     * Creates a new connection and registers it for transaction
+     * management and cleanup. Callers may cache and reuse it.
+     */
     public Connection newConnection() {
         checkNotRetired();
         final Connection c = driver.connect(connectionParameters);

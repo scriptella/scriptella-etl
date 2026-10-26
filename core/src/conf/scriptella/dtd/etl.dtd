@@ -237,7 +237,7 @@ Inserts a row into Test table if id>0
 <!--
  @attr connection-id references connection by identifier. The value of this attribute is inherited for nested elements.
        For single connection ETL files the connection-id is optional.
- @attr new-tx true if a new transaction(and extra connection) is required for this element.
+ @attr new-tx true to use a separate connection for this script element. Opened lazily and reused across invocations; not committed after each invocation.
  @attr if expression to test. If result of evaluation is true - the element is evaluated, otherwise skipped.
         Use <a href="http://jakarta.apache.org/commons/jexl">JEXL</a> syntax for expressions.
  @attr id script identifier(name).

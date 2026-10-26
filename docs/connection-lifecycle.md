@@ -4,9 +4,8 @@
 
 Connections open during ETL initialization by default. Setting
 `lazy-init="true"` on a connection defers opening until its first use. Scripts
-and queries referencing the same connection ID reuse its connection. A script
-with `new-tx="true"` uses a separate connection for its transaction, retained
-under the same connection ID's ownership until cleanup.
+and queries referencing the same connection ID normally reuse its connection.
+Scripts with `new-tx="true"` use separate connections as described below.
 
 On successful ETL completion, Scriptella commits pending transactions, including
 flushing pending JDBC batches. On failure or cooperative cancellation, it
@@ -15,6 +14,36 @@ configured autocommit behavior or output from nontransactional drivers.
 
 Connections are closed during final cleanup, regardless of whether execution
 succeeds or fails. Lazy connections that were never used remain unopened.
+
+## Scripts with `new-tx="true"`
+
+Each `new-tx` script element uses its own connection, separate from the
+parent/default transaction, with the settings of its explicit or inherited
+connection ID. It opens lazily on the element's first execution and is reused
+for subsequent executions of that same element during the ETL run. A nested
+script therefore does **not** open a connection per query row. Different
+`new-tx` script elements have separate connections; an element that is always
+skipped opens none. Driver capabilities determine physical connection and
+transaction isolation (for example, externally managed transactions may differ).
+
+Successful invocations do not commit individually. Pending work across rows is
+committed at successful ETL completion, or at the early-closure boundary below.
+If a non-cancellation failure escapes the script's `onerror` handling, Scriptella
+attempts to roll back that element's connection, logs the failure, and continues
+execution. This rollback includes uncommitted work from earlier invocations of
+the same element, not just the failing row. It does not roll back the
+parent/default connection or other `new-tx` elements. Later rows reuse the same connection and can accumulate
+new work for the eventual commit; rollback does not close or replace it.
+Cancellation propagates to the ETL executor for normal rollback and cleanup.
+
+An `onerror` handler without a connection ID uses the script's separate
+connection; an explicit handler connection ID selects that ID's shared
+connection. A handled error (including a successful retry) does not trigger the
+`new-tx` rollback. A failure outside the `new-tx` script that aborts the ETL causes
+normal rollback and cleanup of all still-managed connections. Autocommit,
+explicit commits, and nontransactional drivers limit what rollback can undo.
+JDBC batching can defer execution errors until a flush/commit, outside the
+individual script invocation.
 
 ## Closing connections after final use
 
@@ -89,7 +118,9 @@ ancestor query is active. Conditions are potential uses even if skipped at run
 time; this can delay closure.
 
 The primary connection and all `new-tx` connections owned by its connection ID
-are committed and closed together, in the existing manager transaction order.
+are committed and closed together (`new-tx` connections in creation order, then
+the primary connection). This changes their lifetime and commit boundary, not
+the per-element connection reuse or failure handling of `new-tx`.
 An unused eagerly opened connection is eligible before the first top-level
 operation. An unopened lazy connection is retired without opening it. Retired
 connections cannot be reopened. Cumulative statement/update totals and periodic

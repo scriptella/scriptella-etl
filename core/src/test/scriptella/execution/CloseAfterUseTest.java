@@ -26,10 +26,12 @@ import java.util.*;
 /** Observable driver operations verify ordering without timing or database assumptions. */
 public class CloseAfterUseTest extends TestCase {
     private static final List<String> events = new ArrayList<String>();
+    private static scriptella.core.EtlCancelledException cancellation;
     private static final String GLOBAL = "scriptella.close.after.use";
 
     protected void setUp() {
         events.clear();
+        cancellation = null;
     }
 
     private String connection(String id, String properties) {
@@ -104,6 +106,32 @@ public class CloseAfterUseTest extends TestCase {
         assertEquals(7L, stats.getUpdateCount());
     }
 
+    /** Rollback spans earlier rows, but later rows and other elements can still commit. */
+    public void testNewTxRollbackThenReuseAndIndependentElements() throws Exception {
+        for (boolean earlyClose : new boolean[]{false, true}) {
+            String url = "jdbc:h2:mem:newTxReuse" + System.nanoTime();
+            try (java.sql.Connection observer = java.sql.DriverManager.getConnection(url);
+                 java.sql.Statement sql = observer.createStatement()) {
+                sql.execute("CREATE TABLE result(id INT PRIMARY KEY)");
+                executor("<connection driver='org.h2.Driver' url='" + url + "'>"
+                        + "close.after.use=" + earlyClose + "</connection>"
+                        + "<query>SELECT X AS ID FROM SYSTEM_RANGE(1, 3) ORDER BY X"
+                        + "<script new-tx='true'>INSERT INTO result VALUES (?ID);"
+                        + "INSERT INTO result SELECT ?ID WHERE ?ID=2;</script>"
+                        + "<script new-tx='true'>INSERT INTO result VALUES (?ID+10);</script>"
+                        + "</query>", Collections.emptyMap()).execute();
+                try (java.sql.ResultSet rows = sql.executeQuery("SELECT id FROM result ORDER BY id")) {
+                    // Row 2 fails and rolls back row 1 in the first element only.
+                    for (int id : new int[]{3, 11, 12, 13}) {
+                        assertTrue(rows.next());
+                        assertEquals(id, rows.getInt(1));
+                    }
+                    assertFalse(rows.next());
+                }
+            }
+        }
+    }
+
     public void testHandlersAndConditionsRemainPotentialUses() throws Exception {
         executor(connection("a", "close.after.use=true") + connection("b", "")
                 + "<script connection-id='a'>one</script>"
@@ -171,6 +199,43 @@ public class CloseAfterUseTest extends TestCase {
             assertTrue(events.contains("b:rollback"));
             assertEquals(action.equals("badcommit"), events.contains("a:rollback"));
             assertTrue(progress.snapshot().getStatements() >= 1);
+        }
+    }
+
+    public void testNewTxCancellationPropagatesDespiteConsumedInterruptAndRollbackFailure() throws Exception {
+        for (boolean earlyClose : new boolean[]{false, true}) {
+            for (String action : new String[]{"cancel", "cancel-consumed",
+                    "cancel-consumed-badrollback", "cancel-consumed-errorrollback"}) {
+                events.clear();
+                cancellation = null;
+                try {
+                    executor(connection("a", "close.after.use=" + earlyClose) + connection("b", "")
+                            + "<script connection-id='a'>pending</script>"
+                            + "<query connection-id='a'>rows<script new-tx='true'>" + action
+                            + "</script></query><script connection-id='b'>after</script>",
+                            Collections.emptyMap()).execute();
+                    fail("Expected cancellation: " + action + ", earlyClose=" + earlyClose);
+                } catch (EtlExecutorException expected) {
+                    assertTrue(expected.isCancelled());
+                    Throwable cause = expected;
+                    while (cause.getCause() != null) {
+                        cause = cause.getCause();
+                    }
+                    assertNotNull(cancellation);
+                    assertSame(cancellation, cause);
+                } finally {
+                    Thread.interrupted();
+                }
+                assertFalse(events.contains("a:commit"));
+                assertFalse(events.contains("b:commit"));
+                assertFalse(events.contains("b:after"));
+                assertEquals(1, Collections.frequency(events, "a:" + action));
+                // Local rollback is attempted before the executor rolls back both connections.
+                assertEquals(3, Collections.frequency(events, "a:rollback"));
+                assertEquals(1, Collections.frequency(events, "b:rollback"));
+                assertEquals(2, Collections.frequency(events, "a:close"));
+                assertEquals(1, Collections.frequency(events, "b:close"));
+            }
         }
     }
 
@@ -248,6 +313,8 @@ public class CloseAfterUseTest extends TestCase {
         private final String id;
         private boolean closed;
         private boolean badCommit;
+        private boolean badRollback;
+        private boolean errorRollback;
 
         TestConnection(String id) {
             this.id = id;
@@ -266,9 +333,21 @@ public class CloseAfterUseTest extends TestCase {
             events.add(id + ":" + text);
             counter.statements++;
             if (text.equals("fail")) { throw new IllegalStateException("test failure"); }
-            if (text.equals("cancel")) {
+            if (text.startsWith("cancel")) {
+                badRollback = text.endsWith("badrollback");
+                errorRollback = text.endsWith("errorrollback");
                 Thread.currentThread().interrupt();
-                throw new scriptella.core.EtlCancelledException();
+                if (text.startsWith("cancel-consumed")) {
+                    try {
+                        scriptella.core.EtlCancelledException.checkEtlCancelled();
+                    } catch (scriptella.core.EtlCancelledException e) {
+                        assertFalse(Thread.currentThread().isInterrupted());
+                        cancellation = e;
+                        throw e;
+                    }
+                }
+                cancellation = new scriptella.core.EtlCancelledException();
+                throw cancellation;
             }
             badCommit = text.equals("badcommit");
         }
@@ -286,7 +365,19 @@ public class CloseAfterUseTest extends TestCase {
             events.add(id + ":commit");
             if (badCommit) { throw new IllegalStateException("commit failure"); }
         }
-        public void rollback() { assertFalse(closed); events.add(id + ":rollback"); }
+        public void rollback() {
+            assertFalse(closed);
+            events.add(id + ":rollback");
+            // Fail only the first attempt so executor cleanup can complete normally.
+            if (badRollback) {
+                badRollback = false;
+                throw new IllegalStateException("rollback failure");
+            }
+            if (errorRollback) {
+                errorRollback = false;
+                throw new AssertionError("rollback error");
+            }
+        }
         public void close() { assertFalse(closed); closed = true; events.add(id + ":close"); }
     }
 }
