@@ -40,6 +40,12 @@ Execution failures trigger an attempt to roll back. Rollback depends on the
 providers and database: DDL, autocommit, file writes, and external processes
 may have effects that cannot be undone.
 
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+`executor.executeReport()` returns a schema version 1 report for success,
+failure, cancellation, and setup failures instead of throwing
+`EtlExecutorException`. See [JSON execution reports](reports/execution-report.md).
+
 Relative connection URLs, driver classpaths, and includes use the ETL file's
 location as their base. Resolve the job file explicitly in applications where
 the working directory can vary.

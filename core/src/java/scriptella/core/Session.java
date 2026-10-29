@@ -48,11 +48,16 @@ public class Session {
             new HashMap<ConnectionManager, Integer>();
 
     public Session(final ConfigurationEl configuration, final EtlContext ctx) {
+        // Publish the partially built session so EtlExecutor can clean up
+        // connections if lazy/eager initialization or element setup fails.
+        ctx.setSession(this);
         final List<ConnectionEl> connections = configuration.getConnections();
 
         ProgressCallback progressCallback = ctx.getProgressCallback().fork(50, connections.size());
         for (ConnectionEl c : connections) {
-            final ConnectionManager con = new ConnectionManager(ctx, c);
+            final ConnectionManager con = new ConnectionManager(ctx, c,
+                    ctx.getStatisticsBuilder().getConnectionInfo(c.getId()));
+            managedConnections.put(c.getId(), con);
             if (c.isLazyInit()) {
                 progressCallback.step(1, "Lazy-init specified for connection " + (c.getId() == null ? "" : c.getId()) +
                         " - initialization deferred.");
@@ -62,7 +67,6 @@ public class Session {
                 progressCallback.step(1, "Initialized connection " + id + connection.toString() +
                         ", " + connection.getDialectIdentifier() + ", properties "+c.getProperties());
             }
-            managedConnections.put(c.getId(), con);
             closeAfterUse |= con.isCloseAfterUse();
         }
 

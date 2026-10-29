@@ -44,8 +44,9 @@ machine protocol.
 
 Supported launcher options are `-h`/`--help`, `-d`/`--debug`, `-q`/`--quiet`,
 `-v`/`--version`, `--check`, `--no-stat`, `--no-jmx`, `--progress[=Ns|Nm]`,
-and `-t`/`--template`. Periodic progress is available in Scriptella 1.7; see
-[section 11](#11-periodic-execution-progress).
+`--report=FILE`, and `-t`/`--template`. See
+[section 11](#11-periodic-execution-progress) for periodic progress and the
+[execution report guide](reports/execution-report.md) for `--report=FILE`.
 Scriptella 1.6 also accepts the `execute-sql` command documented in
 [section 10](#10-direct-sql-execution). Put JVM options, including `-D`
 properties, before `-jar`; put launcher options after the JAR:
@@ -258,7 +259,7 @@ SCRIPTELLA_JAVA_OPTS="-Dschema=myapp -Denvironment=prod" \
 Place your JDBC driver JAR in the distribution's `lib/` directory. JDBC driver
 registration is automatic; `--driver org.postgresql.Driver` explicitly loads a
 class if needed. Use `execute-sql --help` for all options. Common options such as
-`--debug`, `--quiet`, `--no-jmx`, and `--no-stat` work before or after `execute-sql`.
+`--debug`, `--quiet`, `--no-jmx`, `--no-stat`, and `--report=FILE` work before or after `execute-sql`.
 
 `--password VALUE` is convenience syntax; it can expose the password in shell
 history and process listings. Prefer a protected configuration path such as
@@ -350,7 +351,9 @@ for protecting that output.
 
 ## 11. Periodic execution progress
 
-Scriptella 1.7 can report live execution activity on **stderr**, without JMX or
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+Scriptella can report live execution activity on **stderr**, without JMX or
 verbose logging:
 
 ```sh

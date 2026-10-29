@@ -107,6 +107,7 @@ public class EtlLauncher {
         }
     };
 
+    private java.nio.file.Path reportFile;
     private long progressIntervalMillis;
     private boolean labelProgress;
     private EtlExecutor exec = new EtlExecutor();
@@ -159,6 +160,7 @@ public class EtlLauncher {
      * @see System#exit(int)
      */
     ErrorCode launch(String[] args) {
+        reportFile = null;
         progressIntervalMillis = 0;
         labelProgress = false;
         ConsoleHandler h = new ConsoleHandler();
@@ -189,13 +191,21 @@ public class EtlLauncher {
                 }
                 if (isTemplateOption(arg)) {
                     boolean hasProgress = progressIntervalMillis > 0;
+                    boolean hasReport = reportFile != null;
                     for (String remaining : arguments) {
                         if ("--progress".equals(remaining) || remaining.startsWith("--progress=")) {
                             hasProgress = true;
                         }
+                        if (remaining.startsWith("--report=")) {
+                            hasReport = true;
+                        }
                     }
                     if (hasProgress) {
                         getErr().println("--progress requires execution, not template generation");
+                        return ErrorCode.UNRECOGNIZED_OPTION;
+                    }
+                    if (hasReport) {
+                        getErr().println("--report requires execution, not template generation");
                         return ErrorCode.UNRECOGNIZED_OPTION;
                     }
                     return template(arguments);
@@ -239,6 +249,21 @@ public class EtlLauncher {
         if (checkOnly && progressIntervalMillis > 0) {
             getErr().println("--progress requires execution, not --check");
             return ErrorCode.UNRECOGNIZED_OPTION;
+        }
+        if (reportFile != null && (checkOnly || files.size() != 1)) {
+            getErr().println("--report requires exactly one execution");
+            return ErrorCode.UNRECOGNIZED_OPTION;
+        }
+        if (reportFile != null) {
+            try {
+                if (reportOverwrites(files.get(0))) {
+                    getErr().println("--report destination must differ from the ETL input file");
+                    return ErrorCode.UNRECOGNIZED_OPTION;
+                }
+            } catch (IOException e) {
+                getErr().println("Unable to verify --report destination");
+                return ErrorCode.UNRECOGNIZED_OPTION;
+            }
         }
         labelProgress = files.size() > 1;
         if (indicator != null) {
@@ -285,7 +310,17 @@ public class EtlLauncher {
     }
 
     private boolean handleCommonOption(String arg, ConsoleHandler handler) {
-        if ("--progress".equals(arg) || arg.startsWith("--progress=")) {
+        if (arg.startsWith("--report=")) {
+            String path = arg.substring("--report=".length());
+            if (path.length() == 0) {
+                throw new IllegalArgumentException("--report requires a destination");
+            }
+            try {
+                reportFile = java.nio.file.Paths.get(path);
+            } catch (RuntimeException e) {
+                throw new IllegalArgumentException("Invalid --report destination", e);
+            }
+        } else if ("--progress".equals(arg) || arg.startsWith("--progress=")) {
             progressIntervalMillis = PeriodicProgressReporter.parseInterval(arg);
         } else if (isDebugOption(arg)) {
             handler.setLevel(Level.FINE);
@@ -351,14 +386,31 @@ public class EtlLauncher {
             getErr().println("SQL file " + file + " was not found.");
             return ErrorCode.FILE_NOT_FOUND;
         }
+        if (reportFile != null) {
+            try {
+                if (reportOverwrites(file)) {
+                    getErr().println("--report destination must differ from the SQL input file");
+                    return ErrorCode.UNRECOGNIZED_OPTION;
+                }
+            } catch (IOException e) {
+                getErr().println("Unable to verify --report destination");
+                return ErrorCode.UNRECOGNIZED_OPTION;
+            }
+        }
         LoggingConfigurer.configure(handler);
         long started = System.nanoTime();
+        scriptella.execution.ExecutionReport report = reportFile == null ? null :
+                new scriptella.execution.ExecutionReport();
+        ExecutionStatistics statistics = null;
+        Throwable failure = null;
+        ErrorCode exitCode = ErrorCode.FAILED;
         try {
             EtlExecutor executor = EtlExecutor.newSqlFileExecutor(
                     file, url, user, password, driver, substitution);
             executor.setJmxEnabled(exec.isJmxEnabled());
             executor.setSuppressStatistics(exec.isSuppressStatistics());
             ExecutionStatistics result = executeWithProgress(executor, null);
+            statistics = executor.isSuppressStatistics() ? null : result;
             if (handler.getLevel().intValue() <= Level.INFO.intValue()) {
                 String completion = "Successfully executed SQL file " + file;
                 if (!executor.isSuppressStatistics()) {
@@ -367,20 +419,47 @@ public class EtlLauncher {
                 }
                 getOut().println(completion);
             }
-            return ErrorCode.OK;
+            exitCode = ErrorCode.OK;
         } catch (Exception | LinkageError e) {
+            failure = e;
+            if (e instanceof EtlExecutorException) {
+                statistics = exec.isSuppressStatistics() ? null : ((EtlExecutorException) e).getStatistics();
+            }
             getErr().println("SQL execution failed after " + elapsedMillis(started) + " ms: " + e.getMessage());
             if (handler.getLevel().intValue() < Level.INFO.intValue()) {
                 e.printStackTrace(getErr());
             }
-            return ErrorCode.FAILED;
+        } catch (Error e) {
+            failure = e;
+            throw e;
         } finally {
             LoggingConfigurer.remove(handler);
+            if (report != null) {
+                try {
+                    report.complete(statistics, failure);
+                    report.write(reportFile);
+                } catch (IOException | RuntimeException e) {
+                    printReportWriteFailure(e);
+                    exitCode = ErrorCode.FAILED;
+                }
+            }
         }
+        return exitCode;
+    }
+
+    private void printReportWriteFailure(Exception e) {
+        getErr().println("Unable to write execution report " + reportFile + ": " + e.getClass().getSimpleName());
     }
 
     private static long elapsedMillis(long started) {
         return (System.nanoTime() - started) / 1000000;
+    }
+
+    private boolean reportOverwrites(File input) throws IOException {
+        java.nio.file.Path inputPath = input.toPath().toAbsolutePath().normalize();
+        java.nio.file.Path reportPath = reportFile.toAbsolutePath().normalize();
+        return inputPath.equals(reportPath) ||
+                (java.nio.file.Files.exists(reportPath) && java.nio.file.Files.isSameFile(inputPath, reportPath));
     }
 
     private static boolean hasLeadingSubstitution(String value) {
@@ -410,6 +489,7 @@ public class EtlLauncher {
         getOut().println("                        Prefer --password '${env.DB_PASSWORD}' so the secret stays in the environment.");
         getOut().println("  --driver CLASS        Load a JDBC driver class (JAR must be in lib/ or classpath)");
         getOut().println("  --no-substitution     Preserve literal dollar and question-mark expressions");
+        getOut().println("  --report=FILE         Write a JSON execution report");
         getOut().println("  --progress[=Ns|Nm]    Periodic statements/throughput on stderr (default 30s, minimum 1s)");
         getOut().println("  -d, --debug           Enable debug logging and error stack traces");
         getOut().println("  -q, --quiet           Suppress informational output");
@@ -488,6 +568,7 @@ public class EtlLauncher {
         out.println("  -d, --debug            Enable debug logging");
         out.println("  -q, --quiet            Suppress informational output");
         out.println("      --check            Load and statically check ETL without executing it");
+        out.println("      --report=FILE      Write a JSON execution report (one ETL file)");
         out.println("      --no-stat          Disable execution statistics");
         out.println("      --progress[=Ns|Nm] Periodic statements/throughput on stderr (default 30s, minimum 1s)");
         out.println("      --no-jmx           Disable JMX registration");
@@ -529,6 +610,47 @@ public class EtlLauncher {
 
     public void execute(final File file)
             throws EtlExecutorException {
+        scriptella.execution.ExecutionReport report = reportFile == null ? null :
+                new scriptella.execution.ExecutionReport();
+        Throwable executionFailure = null;
+        ExecutionStatistics statistics = null;
+        try {
+            ExecutionStatistics result = executeFile(file);
+            statistics = exec.isSuppressStatistics() ? null : result;
+        } catch (EtlExecutorException | RuntimeException | Error e) {
+            executionFailure = e;
+            if (e instanceof EtlExecutorException) {
+                statistics = exec.isSuppressStatistics() ? null : ((EtlExecutorException) e).getStatistics();
+            }
+        }
+
+        if (report != null) {
+            try {
+                report.complete(statistics, executionFailure);
+                report.write(reportFile);
+            } catch (IOException | RuntimeException reportFailure) {
+                printReportWriteFailure(reportFailure);
+                if (executionFailure == null) {
+                    throw new EtlExecutorException(reportFailure);
+                }
+                if (executionFailure != reportFailure) {
+                    executionFailure.addSuppressed(reportFailure);
+                }
+            }
+        }
+
+        if (executionFailure instanceof EtlExecutorException) {
+            throw (EtlExecutorException) executionFailure;
+        }
+        if (executionFailure instanceof RuntimeException) {
+            throw (RuntimeException) executionFailure;
+        }
+        if (executionFailure instanceof Error) {
+            throw (Error) executionFailure;
+        }
+    }
+
+    private ExecutionStatistics executeFile(File file) throws EtlExecutorException {
         try {
             factory.setResourceURL(IOUtils.toUrl(file));
         } catch (MalformedURLException e) {
@@ -547,6 +669,7 @@ public class EtlLauncher {
             }
             LOG.info("Successfully executed ETL file " + file);
         }
+        return st;
     }
 
     private ExecutionStatistics executeWithProgress(EtlExecutor executor, String label)

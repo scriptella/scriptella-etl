@@ -207,6 +207,36 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     }
 
     /**
+     * Executes the configured ETL and returns the same machine-readable report
+     * produced by the CLI. Execution failures are represented in the returned
+     * report; callers can inspect {@link ExecutionReport#getOutcome()} and
+     * {@link ExecutionReport#getStatistics()} without parsing exception text.
+     */
+    @ThreadSafe
+    public ExecutionReport executeReport() {
+        return executeReport(null);
+    }
+
+    /** Executes and returns a report, including partial statistics on failure. */
+    @ThreadSafe
+    public ExecutionReport executeReport(ProgressIndicator indicator) {
+        ExecutionReport report = new ExecutionReport();
+        ExecutionStatistics statistics = null;
+        Throwable failure = null;
+        try {
+            statistics = execute(indicator);
+            if (suppressStatistics) {
+                statistics = null;
+            }
+        } catch (EtlExecutorException e) {
+            failure = e;
+            statistics = suppressStatistics ? null : e.getStatistics();
+        }
+        report.complete(statistics, failure);
+        return report;
+    }
+
+    /**
      * Executes with optional live counters independent of detailed statistics/JMX.
      * Use a fresh progress registry for each execution. Reporting threads may read
      * its snapshots without accessing driver connections.
@@ -216,6 +246,8 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
             throws EtlExecutorException {
         EtlContext ctx = null;
         JmxEtlManager etlManager = null;
+        Throwable executionFailure = null;
+        boolean setupFailure = false;
 
         try {
             ctx = prepare(indicator);
@@ -233,25 +265,81 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
                 ctx.getStatisticsBuilder().getStatistics().updateCount = ctx.session.getUpdateCount();
             }
         } catch (Throwable e) {
-            if (ctx != null) {
-                rollbackAll(ctx);
+            if (e instanceof EtlPreparationException) {
+                EtlPreparationException preparationFailure = (EtlPreparationException) e;
+                ctx = preparationFailure.context;
+                e = preparationFailure.getCause();
+                setupFailure = true;
             }
-            throw new EtlExecutorException(e);
+            executionFailure = e;
+            if (ctx != null) {
+                if (!suppressStatistics && ctx.session != null) {
+                    try {
+                        // Preserve counts already observed by providers before rollback/close.
+                        ctx.getStatisticsBuilder().getStatistics().updateCount = ctx.session.getUpdateCount();
+                    } catch (Throwable metricsFailure) {
+                        executionFailure = appendFailure(executionFailure, metricsFailure);
+                    }
+                }
+                try {
+                    rollbackAll(ctx);
+                } catch (Throwable rollbackFailure) {
+                    executionFailure = appendFailure(executionFailure, rollbackFailure);
+                }
+            }
         } finally {
             if (ctx != null) {
-                closeAll(ctx);
-                ctx.getStatisticsBuilder().etlComplete();
-                ctx.getProgressCallback().complete();
+                try {
+                    closeAll(ctx);
+                } catch (Throwable closeFailure) {
+                    executionFailure = appendFailure(executionFailure, closeFailure);
+                }
+                try {
+                    ctx.getStatisticsBuilder().etlComplete();
+                } catch (Throwable statisticsFailure) {
+                    executionFailure = appendFailure(executionFailure, statisticsFailure);
+                }
+                if (ctx.getProgressCallback() != null) {
+                    try {
+                        ctx.getProgressCallback().complete();
+                    } catch (Throwable progressFailure) {
+                        executionFailure = appendFailure(executionFailure, progressFailure);
+                    }
+                }
             }
             if (etlManager != null) {
-                etlManager.unregister();
+                try {
+                    etlManager.unregister();
+                } catch (Throwable unregisterFailure) {
+                    executionFailure = appendFailure(executionFailure, unregisterFailure);
+                }
             }
         }
 
-        return ctx.getStatisticsBuilder().getStatistics();
+        ExecutionStatistics statistics = ctx == null ? null : ctx.getStatisticsBuilder().getStatistics();
+        if (executionFailure != null) {
+            EtlExecutorException failure = new EtlExecutorException(executionFailure);
+            failure.setSetupFailure(setupFailure);
+            failure.setStatistics(statistics);
+            throw failure;
+        }
+        return statistics;
+    }
+
+    private static Throwable appendFailure(Throwable primary, Throwable secondary) {
+        if (primary == null) {
+            return secondary;
+        }
+        if (primary != secondary) {
+            primary.addSuppressed(secondary);
+        }
+        return primary;
     }
 
     void rollbackAll(final EtlContext ctx) {
+        if (ctx.session == null) {
+            return;
+        }
         try {
             ctx.session.rollback();
         } catch (Exception e) {
@@ -264,7 +352,9 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     }
 
     void closeAll(final EtlContext ctx) {
-        ctx.session.close();
+        if (ctx.session != null) {
+            ctx.session.close();
+        }
     }
 
     private void execute(final EtlContext ctx) {
@@ -287,18 +377,31 @@ public class EtlExecutor implements Runnable, Callable<ExecutionStatistics> {
     protected EtlContext prepare(final ProgressIndicator indicator) {
         EtlContext ctx = new EtlContext(!suppressStatistics);
         ctx.getStatisticsBuilder().etlStarted();
-        ctx.setBaseURL(configuration.getDocumentUrl());
-        ctx.setProgressCallback(new ProgressCallback(100, indicator));
+        try {
+            ctx.setBaseURL(configuration.getDocumentUrl());
+            ctx.setProgressCallback(new ProgressCallback(100, indicator));
 
-        final ProgressCallback progress = ctx.getProgressCallback();
-        progress.step(1, "Initializing properties");
-        ctx.setProperties(configuration.getParameters());
-        ctx.setProgressCallback(progress.fork(9, 100));
-        ctx.session = new Session(configuration, ctx);
-        ctx.getProgressCallback().complete();
-        ctx.setProgressCallback(progress); //Restoring
+            final ProgressCallback progress = ctx.getProgressCallback();
+            progress.step(1, "Initializing properties");
+            ctx.setProperties(configuration.getParameters());
+            ctx.setProgressCallback(progress.fork(9, 100));
+            ctx.session = new Session(configuration, ctx);
+            ctx.getProgressCallback().complete();
+            ctx.setProgressCallback(progress); //Restoring
 
-        return ctx;
+            return ctx;
+        } catch (Throwable failure) {
+            throw new EtlPreparationException(ctx, failure);
+        }
+    }
+
+    private static final class EtlPreparationException extends RuntimeException {
+        private final EtlContext context;
+
+        private EtlPreparationException(EtlContext context, Throwable cause) {
+            super(cause);
+            this.context = context;
+        }
     }
 
     /**

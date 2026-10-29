@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "scriptellaVersion": "1.7-SNAPSHOT",
+  "executionId": "5aa20257-c44d-472a-806e-8cf9c96551bd",
+  "outcome": "cancelled",
+  "started": "2026-10-29T16:00:00Z",
+  "finished": "2026-10-29T16:00:01.030Z",
+  "elapsedNanos": 1030000000,
+  "complete": false,
+  "error": {"category": "cancellation", "terminal": true, "location": null, "exceptionType": "scriptella.core.EtlCancelledException", "message": "Execution failed; sensitive details omitted.", "sqlState": null, "vendorCode": null},
+  "metrics": {
+    "executedStatements": 12,
+    "affectedRowsReported": 10,
+    "queryRowsEmitted": 12,
+    "connections": [
+      {"id": "db", "openAttempts": 1, "opened": 1, "openFailures": 0, "initializationNanos": 18000000, "closeAttempts": 1, "closed": 1, "closeFailures": 0}
+    ]
+  },
+  "elements": [
+    {"location": "/etl/query[1]", "successfulExecutions": 0, "failedExecutions": 1, "statements": 12, "queryRowsEmitted": 12, "workingNanos": 1000000000}
+  ]
+}

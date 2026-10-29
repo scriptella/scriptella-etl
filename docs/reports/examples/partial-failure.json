@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "scriptellaVersion": "1.7-SNAPSHOT",
+  "executionId": "498f09c8-4b3b-4ca7-908b-931d7f1c74bc",
+  "outcome": "failed",
+  "started": "2026-10-29T16:00:00Z",
+  "finished": "2026-10-29T16:00:00.410Z",
+  "elapsedNanos": 410000000,
+  "complete": false,
+  "error": {"category": "execution", "terminal": true, "location": "/etl/script[3]", "exceptionType": "java.sql.SQLIntegrityConstraintViolationException", "message": "Execution failed; sensitive details omitted.", "sqlState": "23505", "vendorCode": 23505},
+  "metrics": {
+    "executedStatements": 5,
+    "affectedRowsReported": 3,
+    "queryRowsEmitted": 2,
+    "connections": [
+      {"id": "db", "openAttempts": 1, "opened": 1, "openFailures": 0, "initializationNanos": 15000000, "closeAttempts": 1, "closed": 1, "closeFailures": 0}
+    ]
+  },
+  "elements": [
+    {"location": "/etl/query[1]", "successfulExecutions": 1, "failedExecutions": 0, "statements": 2, "queryRowsEmitted": 2, "workingNanos": 10000000},
+    {"location": "/etl/script[3]", "successfulExecutions": 0, "failedExecutions": 1, "statements": 1, "queryRowsEmitted": 0, "workingNanos": 5000000}
+  ]
+}

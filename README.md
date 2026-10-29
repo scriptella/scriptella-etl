@@ -137,12 +137,14 @@ cat load.sql
 The generated `load.sql` contains one `INSERT` statement per CSV data row. No
 database or JDBC driver is required.
 
-### JSON and JSON Lines (next release)
+### JSON and JSON Lines
 
-The current source build adds streaming JSON input and typed JSON object templates
-for output, including JSON Lines. See the [JSON guide](docs/json.md)
-for JSON-to-database, database-to-JSON and JSON transformations. They are bundled
-in the examples archive built with `ant examples`; this driver is not in 1.6.
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+The JSON driver adds streaming JSON input and typed JSON object templates for
+output, including JSON Lines. See the [JSON guide](docs/json.md) for
+JSON-to-database, database-to-JSON and JSON transformations. They are bundled in
+the examples archive built with `ant examples`.
 
 ### First migration
 

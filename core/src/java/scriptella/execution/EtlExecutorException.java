@@ -33,6 +33,25 @@ import java.io.StringWriter;
  * @version 1.0
  */
 public class EtlExecutorException extends Exception {
+    private ExecutionStatistics statistics;
+    private boolean setupFailure;
+
+    public ExecutionStatistics getStatistics() {
+        return statistics;
+    }
+
+    void setSetupFailure(boolean setupFailure) {
+        this.setupFailure = setupFailure;
+    }
+
+    boolean isSetupFailure() {
+        return setupFailure;
+    }
+
+    void setStatistics(ExecutionStatistics statistics) {
+        this.statistics = statistics;
+    }
+
     private ProviderException lastProvider;
     private Throwable lastExpression;
     private Location lastElementLocation;

@@ -69,6 +69,15 @@ public interface Connection {
     long getExecutedStatementsCount();
 
     /**
+     * Whether the statement counter is supported. Existing providers default
+     * to unknown because zero from {@link #getExecutedStatementsCount()} may
+     * mean unsupported.
+     */
+    default boolean isExecutedStatementsCountSupported() {
+        return false;
+    }
+
+    /**
      * Optional live progress counter. Called on the execution thread only.
      * Return a stable in-memory counter updated with the same semantics as
      * {@link #getExecutedStatementsCount()}, or null if unavailable. The reporter

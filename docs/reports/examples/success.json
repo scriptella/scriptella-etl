@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "scriptellaVersion": "1.7-SNAPSHOT",
+  "executionId": "2f96e4f0-2496-4a56-ae21-59c75b0f4414",
+  "outcome": "success",
+  "started": "2026-10-29T16:00:00Z",
+  "finished": "2026-10-29T16:00:00.125Z",
+  "elapsedNanos": 125000000,
+  "complete": true,
+  "error": null,
+  "metrics": {
+    "executedStatements": 4,
+    "affectedRowsReported": 3,
+    "queryRowsEmitted": 2,
+    "connections": [
+      {"id": "db", "openAttempts": 1, "opened": 1, "openFailures": 0, "initializationNanos": 12000000, "closeAttempts": 1, "closed": 1, "closeFailures": 0}
+    ]
+  },
+  "elements": [
+    {"location": "/etl/script[1]", "successfulExecutions": 1, "failedExecutions": 0, "statements": 2, "queryRowsEmitted": 0, "workingNanos": 30000000},
+    {"location": "/etl/query[1]", "successfulExecutions": 1, "failedExecutions": 0, "statements": 2, "queryRowsEmitted": 2, "workingNanos": 20000000}
+  ]
+}

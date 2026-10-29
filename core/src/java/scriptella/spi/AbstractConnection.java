@@ -72,6 +72,10 @@ public abstract class AbstractConnection implements Connection {
         return counter.statements; //The default implementation
     }
 
+    public boolean isExecutedStatementsCountSupported() {
+        return true;
+    }
+
     /**
      * Returns readonly mode.
      * <p>readonly=true means updates must be skipped by the driver.

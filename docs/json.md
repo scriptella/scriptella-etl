@@ -1,8 +1,10 @@
-# JSON driver (next release)
+# JSON driver
 
-The current source build supports streaming JSON and JSON Lines input and typed
-JSON object templates for output. This driver is not included in Scriptella 1.6.
-Use `driver="json"` with separate connections for input and output.
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+The JSON driver supports streaming JSON and JSON Lines input and typed JSON
+object templates for output. Use `driver="json"` with separate connections for
+input and output.
 
 ## Use typed placeholders for JSON values
 

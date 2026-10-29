@@ -19,6 +19,7 @@ import scriptella.configuration.ConfigurationException;
 import scriptella.configuration.ConnectionEl;
 import scriptella.execution.EtlContext;
 import scriptella.execution.ExecutionProgress;
+import scriptella.execution.ExecutionStatistics;
 import scriptella.spi.Connection;
 import scriptella.spi.ConnectionParameters;
 import scriptella.spi.ScriptellaDriver;
@@ -56,8 +57,14 @@ public class ConnectionManager {
     private int progressIndex;
     private ScriptellaDriver driver;
     ConnectionParameters connectionParameters;
+    private final ExecutionStatistics.ConnectionInfo statistics;
 
     public ConnectionManager(EtlContext ctx, ConnectionEl c) {
+        this(ctx, c, null);
+    }
+
+    public ConnectionManager(EtlContext ctx, ConnectionEl c, ExecutionStatistics.ConnectionInfo statistics) {
+        this.statistics = statistics;
         //Obtains a classloader
         ClassLoader cl = getClass().getClassLoader();
         if (c.getClasspath() != null) { //if classpath specified
@@ -97,10 +104,7 @@ public class ConnectionManager {
     public Connection getConnection() {
         checkNotRetired();
         if (connection == null) {
-            connection = driver.connect(connectionParameters);
-            if (connection == null) {
-                throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
-            }
+            connection = connect();
             if (progress != null) {
                 progress.setCounter(progressIndex, connection.getProgressCounter());
             }
@@ -115,10 +119,7 @@ public class ConnectionManager {
      */
     public Connection newConnection() {
         checkNotRetired();
-        final Connection c = driver.connect(connectionParameters);
-        if (c == null) {
-            throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
-        }
+        final Connection c = connect();
 
         if (newConnections == null) {
             newConnections = new ArrayList<Connection>();
@@ -130,6 +131,30 @@ public class ConnectionManager {
         }
 
         return c;
+    }
+
+    private Connection connect() {
+        long started = statistics == null ? 0 : System.nanoTime();
+        try {
+            Connection created = driver.connect(connectionParameters);
+            if (created == null) {
+                throw new ConfigurationException("Driver returned null connection for " + connectionParameters);
+            }
+            if (statistics != null) {
+                statistics.recordOpen(true, System.nanoTime() - started);
+            }
+            return created;
+        } catch (RuntimeException e) {
+            if (statistics != null) {
+                statistics.recordOpen(false, System.nanoTime() - started);
+            }
+            throw e;
+        } catch (Error e) {
+            if (statistics != null) {
+                statistics.recordOpen(false, System.nanoTime() - started);
+            }
+            throw e;
+        }
     }
 
     boolean isCloseAfterUse() {
@@ -197,13 +222,19 @@ public class ConnectionManager {
     public void close() {
         for (Connection c : getAllConnections()) {
             if (c != null) {
+                boolean closed = false;
                 try {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Closing " + c);
                     }
                     c.close();
+                    closed = true;
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Problem occured while trying to close connection " + c, e);
+                } finally {
+                    if (statistics != null) {
+                        statistics.recordClose(closed);
+                    }
                 }
             }
         }

@@ -1,8 +1,9 @@
-# JSON and JSON Lines examples (next release)
+# JSON and JSON Lines examples
 
-These examples require the JSON driver in the current source build; Scriptella
-1.6 does not include it. Build the examples archive with `ant examples`, then
-unzip it and change to its `json/` directory. Java 17 or newer is required.
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+These examples require the JSON driver. Build the examples archive with
+`ant examples`, then unzip it and change to its `json/` directory. Java 17 or newer is required.
 The archive includes Scriptella, Jackson Core and H2 in `../lib/`; the H2
 connections declare their JDBC classpath explicitly. No database server is needed.
 

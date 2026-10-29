@@ -37,8 +37,10 @@ import java.util.Map;
  */
 public class ExecutionStatistics {
     int statements;
+    boolean statementsAvailable = true;
     long updateCount;
     Map<String, ElementInfo> elements = new LinkedHashMap<String, ElementInfo>();
+    Map<String, ConnectionInfo> connections = new LinkedHashMap<String, ConnectionInfo>();
     private Date started;
     private Date finished;
     private static final int MINUTE_MILLIS = 60 * 1000;
@@ -54,12 +56,24 @@ public class ExecutionStatistics {
         return statements;
     }
 
+    public Long getExecutedStatementsCountOrNull() {
+        return statementsAvailable ? Long.valueOf(statements) : null;
+    }
+
     /**
      * Sum of positive update counts reported by connections, including batches
      * flushed during commit. Zero also means unsupported or statistics suppressed.
      */
     public long getUpdateCount() {
         return updateCount;
+    }
+
+    public Collection<ConnectionInfo> getConnections() { return connections.values(); }
+
+    public long getQueryRowsCount() {
+        long total = 0;
+        for (ElementInfo element : elements.values()) { total += element.queryRows; }
+        return total;
     }
 
     public Collection<ElementInfo> getElements() {
@@ -257,6 +271,8 @@ public class ExecutionStatistics {
 
 
     public static class ElementInfo {
+        long queryRows;
+        boolean statementsAvailable = true;
         int okCount;
         Connection connection;
         long statementsOnStart;
@@ -269,6 +285,8 @@ public class ExecutionStatistics {
         public int getSuccessfulExecutionCount() {
             return okCount;
         }
+
+        public long getQueryRows() { return queryRows; }
 
         public int getFailedExecutionCount() {
             return failedCount;
@@ -283,6 +301,10 @@ public class ExecutionStatistics {
          */
         public long getStatementsCount() {
             return statements;
+        }
+
+        public Long getStatementsCountOrNull() {
+            return statementsAvailable ? Long.valueOf(statements) : null;
         }
 
         /**
@@ -306,6 +328,32 @@ public class ExecutionStatistics {
 
         public String getId() {
             return id;
+        }
+    }
+
+    /** Basic Scriptella connection lifecycle observations, independent of driver metrics. */
+    public static class ConnectionInfo {
+        private final String id;
+        private long openAttempts, opens, openFailures, closeAttempts, closes, closeFailures;
+        private long initializationNanos;
+
+        public ConnectionInfo(String id) { this.id = id; }
+        public String getId() { return id; }
+        public long getOpenAttempts() { return openAttempts; }
+        public long getOpens() { return opens; }
+        public long getOpenFailures() { return openFailures; }
+        public long getInitializationNanos() { return initializationNanos; }
+        public long getCloseAttempts() { return closeAttempts; }
+        public long getCloses() { return closes; }
+        public long getCloseFailures() { return closeFailures; }
+        public void recordOpen(boolean success, long nanos) {
+            openAttempts++;
+            initializationNanos += Math.max(0, nanos);
+            if (success) { opens++; } else { openFailures++; }
+        }
+        public void recordClose(boolean success) {
+            closeAttempts++;
+            if (success) { closes++; } else { closeFailures++; }
         }
     }
 }

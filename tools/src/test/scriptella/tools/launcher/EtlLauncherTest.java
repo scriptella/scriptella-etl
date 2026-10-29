@@ -124,6 +124,10 @@ public class EtlLauncherTest extends DBTestCase {
         assertFalse(help.toLowerCase().contains("artificial intelligence"));
 
         launcher.reset();
+        assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"execute-sql", "--help"}));
+        assertTrue(launcher.outText().contains("--report=FILE"));
+
+        launcher.reset();
         assertEquals(EtlLauncher.ErrorCode.OK, launcher.launch(new String[]{"-h"}));
         assertTrue(launcher.outText().contains("Scriptella ETL"));
 
@@ -344,6 +348,209 @@ public class EtlLauncherTest extends DBTestCase {
             }
         } finally {
             java.nio.file.Files.deleteIfExists(file);
+        }
+    }
+
+    public void testReportCoversSetupFailureAndReportWriteFailure() throws Exception {
+        java.nio.file.Path malformed = java.nio.file.Files.createTempFile("scriptella-report-setup", ".etl.xml");
+        java.nio.file.Path report = java.nio.file.Files.createTempFile("scriptella-report-output", ".json");
+        java.nio.file.Path successful = java.nio.file.Files.createTempFile("scriptella-report-success", ".etl.xml");
+        java.nio.file.Path missingDestination = report.resolveSibling(report.getFileName() + "-missing/report.json");
+        try {
+            java.nio.file.Files.writeString(malformed, "<etl>");
+            CapturingLauncher setupLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.FAILED, setupLauncher.launch(new String[]{
+                    "--no-jmx", "--report=" + report, malformed.toString()}));
+            String setupReport = java.nio.file.Files.readString(report);
+            assertTrue(setupReport.contains("\"category\":\"setup\""));
+            assertTrue(setupReport.contains("\"complete\":false"));
+
+            java.nio.file.Files.writeString(successful,
+                    "<!DOCTYPE etl SYSTEM 'http://scriptella.org/dtd/etl.dtd'>"
+                            + "<etl><connection id='db' driver='org.h2.Driver' url='jdbc:h2:mem:reportSuccess'/></etl>");
+            CapturingLauncher successfulLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.OK, successfulLauncher.launch(new String[]{
+                    "--no-jmx", "--report=" + report, successful.toString()}));
+            String successReport = java.nio.file.Files.readString(report);
+            assertTrue(successReport.contains("\"outcome\":\"success\""));
+            assertTrue(successReport.contains("\"complete\":true"));
+
+            CapturingLauncher noStatisticsLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.OK, noStatisticsLauncher.launch(new String[]{
+                    "--no-stat", "--no-jmx", "--report=" + report, successful.toString()}));
+            assertTrue(java.nio.file.Files.readString(report).contains("\"metrics\":null"));
+
+            CapturingLauncher writeFailureLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.FAILED, writeFailureLauncher.launch(new String[]{
+                    "--no-jmx", "--report=" + missingDestination, successful.toString()}));
+            assertTrue(writeFailureLauncher.errText().contains(
+                    "Unable to write execution report " + missingDestination + ": NoSuchFileException"));
+
+            ByteArrayOutputStream primaryError = new ByteArrayOutputStream();
+            PrintStream previousErr = System.err;
+            CapturingLauncher executionAndWriteFailure = new CapturingLauncher();
+            try {
+                System.setErr(new PrintStream(primaryError));
+                assertEquals(EtlLauncher.ErrorCode.FAILED, executionAndWriteFailure.launch(new String[]{
+                        "--no-jmx", "--report=" + missingDestination, malformed.toString()}));
+            } finally {
+                System.setErr(previousErr);
+            }
+            assertTrue(executionAndWriteFailure.errText().contains("Unable to write execution report"));
+            assertTrue("The original setup failure remains the logged failure",
+                    primaryError.toString().contains("XML document structures must start and end"));
+
+            CapturingLauncher multipleFiles = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION, multipleFiles.launch(new String[]{
+                    "--report=" + report, successful.toString(), successful.toString()}));
+            assertTrue(multipleFiles.errText().contains("--report requires exactly one execution"));
+
+            CapturingLauncher invalidPathLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION, invalidPathLauncher.launch(new String[]{
+                    "--report=" + String.valueOf((char) 0), successful.toString()}));
+            assertTrue(invalidPathLauncher.errText().contains("Invalid --report destination"));
+        } finally {
+            java.nio.file.Files.deleteIfExists(malformed);
+            java.nio.file.Files.deleteIfExists(report);
+            java.nio.file.Files.deleteIfExists(successful);
+        }
+    }
+
+    public void testReportDestinationCannotOverwriteInput() throws Exception {
+        java.nio.file.Path etl = java.nio.file.Files.createTempFile("scriptella-report-collision", ".etl.xml");
+        java.nio.file.Path sql = java.nio.file.Files.createTempFile("scriptella-report-collision", ".sql");
+        String etlContents = "<etl>preserve ETL input</etl>";
+        String sqlContents = "SELECT 'preserve SQL input';";
+        try {
+            java.nio.file.Files.writeString(etl, etlContents);
+            java.nio.file.Files.writeString(sql, sqlContents);
+
+            CapturingLauncher etlLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                    etlLauncher.launch(new String[]{"--report=" + etl, etl.toString()}));
+            assertTrue(etlLauncher.errText().contains("report destination must differ from the ETL input"));
+            assertEquals(etlContents, java.nio.file.Files.readString(etl));
+
+            String normalizedSqlReport = sql.getParent().resolve(".").resolve(sql.getFileName()).toString();
+            CapturingLauncher sqlLauncher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                    sqlLauncher.launch(new String[]{"execute-sql", "--url", "jdbc:h2:mem:unused",
+                            "--report=" + normalizedSqlReport, sql.toString()}));
+            assertTrue(sqlLauncher.errText().contains("report destination must differ from the SQL input"));
+            assertEquals(sqlContents, java.nio.file.Files.readString(sql));
+        } finally {
+            java.nio.file.Files.deleteIfExists(etl);
+            java.nio.file.Files.deleteIfExists(sql);
+        }
+    }
+
+    public void testReportDestinationCannotOverwriteThroughSymlinkedDirectory() throws Exception {
+        java.nio.file.Path root = java.nio.file.Files.createTempDirectory("scriptella-report-symlink");
+        java.nio.file.Path actualDirectory = root.resolve("releases/v1");
+        java.nio.file.Files.createDirectories(actualDirectory);
+        java.nio.file.Path aliasDirectory = root.resolve("current");
+        java.nio.file.Path input = actualDirectory.resolve("import.etl.xml");
+        java.nio.file.Path report = aliasDirectory.resolve("import.etl.xml");
+        String contents = "<etl>preserve symlinked input</etl>";
+        try {
+            try {
+                java.nio.file.Files.createSymbolicLink(aliasDirectory, actualDirectory);
+            } catch (UnsupportedOperationException | java.io.IOException unsupported) {
+                // Windows can reject symlink creation. Skipping keeps the suite portable.
+                return;
+            }
+            java.nio.file.Files.writeString(input, contents);
+            CapturingLauncher launcher = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                    launcher.launch(new String[]{"--report=" + report, input.toString()}));
+            assertTrue(launcher.errText().contains("report destination must differ from the ETL input"));
+            assertEquals(contents, java.nio.file.Files.readString(input));
+        } finally {
+            java.nio.file.Files.deleteIfExists(input);
+            java.nio.file.Files.deleteIfExists(aliasDirectory);
+            java.nio.file.Files.deleteIfExists(actualDirectory);
+            java.nio.file.Files.deleteIfExists(actualDirectory.getParent());
+            java.nio.file.Files.deleteIfExists(root);
+        }
+    }
+
+    public void testReportRejectedForTemplateGenerationInEitherOptionOrder() {
+        final boolean[] templateCalled = {false};
+        CapturingLauncher launcher = new CapturingLauncher() {
+            @Override
+            protected ErrorCode template(List<String> args) {
+                templateCalled[0] = true;
+                return ErrorCode.OK;
+            }
+        };
+        assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                launcher.launch(new String[]{"--report=output.json", "--template"}));
+        assertTrue(launcher.errText().contains("--report requires execution"));
+        assertFalse(templateCalled[0]);
+        launcher.reset();
+        assertEquals(EtlLauncher.ErrorCode.UNRECOGNIZED_OPTION,
+                launcher.launch(new String[]{"--template", "--report=output.json"}));
+        assertTrue(launcher.errText().contains("--report requires execution"));
+        assertFalse(templateCalled[0]);
+    }
+
+    public void testExecuteSqlWritesSuccessAndPartialFailureReports() throws Exception {
+        java.nio.file.Path sql = java.nio.file.Files.createTempFile("scriptella-sql-report", ".sql");
+        java.nio.file.Path report = java.nio.file.Files.createTempFile("scriptella-sql-report", ".json");
+        String database = "jdbc:h2:mem:sqlReport" + Long.toHexString(System.nanoTime())
+                + ";MODE=LEGACY;DB_CLOSE_DELAY=-1";
+        try {
+            java.nio.file.Files.writeString(sql, "CREATE TABLE t(id INT PRIMARY KEY); INSERT INTO t VALUES (1);");
+            CapturingLauncher success = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.OK, success.launch(new String[]{
+                    "execute-sql", "--url", database, "--no-jmx",
+                    "--report=" + report, sql.toString()}));
+            String successJson = java.nio.file.Files.readString(report);
+            assertTrue(successJson.contains("\"outcome\":\"success\""));
+            assertTrue(successJson.contains("\"executedStatements\":2"));
+
+            java.nio.file.Files.writeString(sql, "INSERT INTO t VALUES (2); INSERT INTO t VALUES (2);");
+            CapturingLauncher failure = new CapturingLauncher();
+            assertEquals(EtlLauncher.ErrorCode.FAILED, failure.launch(new String[]{
+                    "execute-sql", "--url", database, "--no-jmx",
+                    "--report=" + report, sql.toString()}));
+            String failureJson = java.nio.file.Files.readString(report);
+            assertTrue(failureJson.contains("\"outcome\":\"failed\""));
+            assertTrue(failureJson.contains("\"complete\":false"));
+            assertTrue(failureJson, failureJson.contains("\"executedStatements\":1"));
+        } finally {
+            java.nio.file.Files.deleteIfExists(sql);
+            java.nio.file.Files.deleteIfExists(report);
+        }
+    }
+
+    public void testExecuteSqlReportWriteFailureDoesNotHideError() throws Exception {
+        java.nio.file.Path sql = java.nio.file.Files.createTempFile("scriptella-sql-error", ".sql");
+        java.nio.file.Path report = java.nio.file.Files.createTempFile("scriptella-sql-error", ".json");
+        java.nio.file.Path missingDestination = report.resolveSibling(report.getFileName() + "-missing/report.json");
+        final Error error = new Error("simulated");
+        try {
+            java.nio.file.Files.writeString(sql, "CREATE TABLE t(id INT);");
+            for (java.nio.file.Path destination : new java.nio.file.Path[]{report, missingDestination}) {
+                CapturingLauncher launcher = new CapturingLauncher() {
+                    @Override
+                    protected PrintStream getOut() {
+                        throw error;
+                    }
+                };
+                Error propagated = null;
+                try {
+                    launcher.launch(new String[]{"execute-sql", "--url", "jdbc:h2:mem:sqlError", "--no-jmx",
+                            "--report=" + destination, sql.toString()});
+                } catch (Error e) {
+                    propagated = e;
+                }
+                assertSame(launcher.errText(), error, propagated);
+            }
+            assertTrue(java.nio.file.Files.readString(report).contains("\"outcome\":\"failed\""));
+        } finally {
+            java.nio.file.Files.deleteIfExists(sql);
+            java.nio.file.Files.deleteIfExists(report);
         }
     }
 

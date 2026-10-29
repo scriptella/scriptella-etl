@@ -48,4 +48,18 @@ public class SilentExecutionStatisticsBuilder extends ExecutionStatisticsBuilder
         //Do nothing
     }
 
+    @Override
+    public ExecutionStatistics.ElementInfo getQueryRowStatistics(Location location) {
+        return null;
+    }
+
+    @Override
+    public void queryRowEmitted(ExecutionStatistics.ElementInfo info) {
+        //Do nothing
+    }
+
+    @Override
+    public ExecutionStatistics.ConnectionInfo getConnectionInfo(String id) {
+        return null;
+    }
 }

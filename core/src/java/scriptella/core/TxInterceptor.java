@@ -47,14 +47,18 @@ public class TxInterceptor extends ElementInterceptor {
             executeNext(ctxDecorator);
         } catch (EtlCancelledException e) {
             try {
-                ctxDecorator.c.rollback();
+                if (ctxDecorator.c != null) {
+                    ctxDecorator.c.rollback();
+                }
             } catch (Throwable rollbackFailure) {
                 LOG.log(Level.WARNING, "Unable to rollback cancelled transaction", rollbackFailure);
             }
             throw e;
         } catch (Throwable e) {
             try {
-                ctxDecorator.c.rollback();
+                if (ctxDecorator.c != null) {
+                    ctxDecorator.c.rollback();
+                }
             } catch (Exception e1) {
                 LOG.log(Level.WARNING, "Unable to rollback transaction", e1);
             }

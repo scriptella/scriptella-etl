@@ -102,6 +102,12 @@ public class ExecutionStatisticsBuilder {
         ended.connection = null; //clear the connection to avoid leaks
         long conStatements = con.getExecutedStatementsCount();
         long elStatements = conStatements - ended.statementsOnStart;
+        if (conStatements < ended.statementsOnStart ||
+                (conStatements == 0 && ended.statementsOnStart == 0 &&
+                        !con.isExecutedStatementsCountSupported())) {
+            ended.statementsAvailable = false;
+            executionStatistics.statementsAvailable = false;
+        }
         if (ok) {
             ended.okCount++;
         } else {
@@ -120,6 +126,10 @@ public class ExecutionStatisticsBuilder {
             parent.workingTime -= ti;
             if (parent.connection == con) { //if the same objects
                 parent.statementsOnStart += elStatements;
+                if (!ended.statementsAvailable) {
+                    parent.statementsAvailable = false;
+                    executionStatistics.statementsAvailable = false;
+                }
             }
         }
 
@@ -127,6 +137,26 @@ public class ExecutionStatisticsBuilder {
 
     public void elementFailed() {
         setElementState(false);
+    }
+
+    /** Resolve once per query invocation so row emission has no per-row XPath lookup. */
+    public ExecutionStatistics.ElementInfo getQueryRowStatistics(Location location) {
+        return executionStatistics == null ? null : getInfo(location);
+    }
+
+    public void queryRowEmitted(ExecutionStatistics.ElementInfo info) {
+        if (info != null) { info.queryRows++; }
+    }
+
+    public ExecutionStatistics.ConnectionInfo getConnectionInfo(String id) {
+        if (executionStatistics == null) { return null; }
+        String key = id == null ? "(default)" : id;
+        ExecutionStatistics.ConnectionInfo info = executionStatistics.connections.get(key);
+        if (info == null) {
+            info = new ExecutionStatistics.ConnectionInfo(key);
+            executionStatistics.connections.put(key, info);
+        }
+        return info;
     }
 
     private ExecutionStatistics.ElementInfo getInfo(final Location loc) {

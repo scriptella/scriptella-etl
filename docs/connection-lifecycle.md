@@ -47,9 +47,10 @@ individual script invocation.
 
 ## Closing connections after final use
 
-Starting with Scriptella 1.7.0, set `close.after.use=true` inside a connection to
-opt into **early commit and close**. The default lifecycle remains unchanged
-unless this option is enabled:
+**Upcoming in 1.7** — available in source builds; not included in the current stable release.
+
+Set `close.after.use=true` inside a connection to opt into **early commit and
+close**. The default lifecycle remains unchanged unless this option is enabled:
 
 ```xml
 <connection id="source" driver="csv" url="input.csv">

@@ -95,15 +95,18 @@ public final class QueryExecutor extends ContentExecutor<QueryEl> {
         private ParametersCallback params;
         private int rownum; //current row number
         private final Map<String, Object> cachedParams = new HashMap<String, Object>();
+        private final scriptella.execution.ExecutionStatistics.ElementInfo queryStatistics;
 
         public QueryCtxDecorator(DynamicContext context) {
             super(context);
+            queryStatistics = getGlobalContext().getStatisticsBuilder().getQueryRowStatistics(getLocation());
         }
 
 
         public void processRow(final ParametersCallback parameters) {
             EtlCancelledException.checkEtlCancelled();
             rownum++;
+            getGlobalContext().getStatisticsBuilder().queryRowEmitted(queryStatistics);
             params = parameters;
             cachedParams.clear();
             if (debug) {

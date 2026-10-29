@@ -103,4 +103,9 @@ public class EtlContext implements ParametersCallback, DriverContext {
         return session;
     }
 
+    /** Publishes a partially constructed session so setup failures can close opened connections. */
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
 }
