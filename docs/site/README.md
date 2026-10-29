@@ -11,7 +11,9 @@ Generate published documentation from the exact released tag, never from an
 unreviewed development checkout, using the JDK required by that release.
 Current releases require Java 17 or newer. Keep the live site on its current
 released documentation until the replacement artifacts are public and the
-release runbook reaches the website deployment step.
+maintainer release procedure reaches the website step. That procedure is
+`../scriptella-private/releases/RUNBOOK.md`, relative to this repository,
+and is available only to maintainers with the private checkout.
 
 ## Layout assumptions
 
@@ -19,6 +21,7 @@ release runbook reaches the website deployment step.
 <workspace>/
   scriptella-etl/          # this repository
   scriptella.github.io/    # public site (sibling checkout)
+  scriptella-private/      # maintainer release procedure
   DTDDoc/                  # optional, for --build with DTD docs
   apache-ant-…/            # optional local Ant
 ```

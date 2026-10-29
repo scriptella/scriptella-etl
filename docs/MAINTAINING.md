@@ -8,15 +8,21 @@ publication procedures.
 
 Use the [generated-docs sync instructions](https://github.com/scriptella/scriptella-etl/blob/master/docs/site/README.md)
 to rebuild API and DTD documentation from the exact released tag with its
-required JDK. Publish them when the release runbook reaches the website step.
+required JDK. Publish them at the website step in
+`../scriptella-private/releases/RUNBOOK.md`, relative to this repository.
+That procedure is available only to maintainers with the private checkout.
 
 ## Release and publication
 
-Use the [release runbook](https://github.com/scriptella/scriptella-etl/blob/master/docs/releases/RELEASE-RUNBOOK.md) for the complete,
-approval-gated release sequence across the source repository, Maven Central,
-GitHub Releases, distribution archives, and website.
+The release model is the [release runbook](releases/RELEASE-RUNBOOK.md):
+tag `scriptella-parent-$VERSION`, JDK 17, one signed Central bundle from that
+tag, manual publication, and fix-forward after artifacts are public.
 
-The Maven Central configuration and artifact publication details are in
+Maintainer steps are in the sibling checkout
+`../scriptella-private/releases/RUNBOOK.md`, relative to this repository.
+That procedure is available only to maintainers with the private checkout.
+
+Maven Central bundle contents and deployment recovery are in
 [`RELEASE-PUBLISHING.md`](../RELEASE-PUBLISHING.md).
 
 ## Release history

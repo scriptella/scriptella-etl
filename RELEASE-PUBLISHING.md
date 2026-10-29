@@ -1,8 +1,11 @@
 # Maven Central Publishing
 
-The [release runbook](docs/releases/RELEASE-RUNBOOK.md) owns the release and
-fix-forward policy. This document covers building, uploading, and recovering
-the Maven deployment. Historical RC and release plans are not current gates.
+The [release model](docs/releases/RELEASE-RUNBOOK.md) states how a release is
+cut. Maintainer steps are in the sibling checkout
+`../scriptella-private/releases/RUNBOOK.md`, relative to this repository.
+That procedure is available only to maintainers with the private checkout.
+This document covers building, uploading, and recovering the Maven deployment.
+Historical RC and release plans are not current gates.
 
 Scriptella uses the Central Publisher Portal and
 `central-publishing-maven-plugin` (currently 0.11.0), not legacy Nexus/OSSRH
@@ -18,8 +21,9 @@ staging. The POM keeps `autoPublish=false`: upload and publication are separate.
   `gpg-agent` with interactive pinentry. Probe signing once and unlock only
   when needed. Never put a token or passphrase on a command line.
 
-Use the private operator notes for settings path and signing identity. Private
-settings, keys, credential-bearing logs, and tokens must remain outside Git.
+The settings path and signing fingerprint are in
+`../scriptella-private/releases/RUNBOOK.md`.
+Private settings, keys, credential-bearing logs, and tokens stay outside Git.
 Do not use Maven debug output or shell tracing around credentials.
 
 Example private settings structure:
