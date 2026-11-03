@@ -2,8 +2,9 @@
 
 ## [1.7.0]
 
-Scriptella 1.7.0 adds structured JSON data interchange and execution reporting,
-while retaining Java 17 as the minimum runtime and build JDK.
+Scriptella 1.7.0 reduces repeated SQL parsing overhead in data imports and adds
+structured JSON data interchange and execution reporting, while retaining Java
+17 as the minimum runtime and build JDK.
 
 ### Added
 
@@ -22,8 +23,10 @@ while retaining Java 17 as the minimum runtime and build JDK.
 
 ### Changed and fixed
 
-* Cache binding plans for eligible repeated static SQL while preserving dynamic
-  SQL fallback (#71).
+* **Faster repeated SQL execution:** reduce parsing and parameter setup for
+  eligible static SQL, including repeated INSERTs used in CSV imports (#71).
+  Scriptella caches the statement's binding plan while resolving fresh values
+  for each execution. Dynamic SQL continues through the existing parser.
 * Show elapsed time when ETL or `execute-sql` execution fails (#18).
 * Propagate cancellation from `new-tx` scripts so pending transactions are
   rolled back instead of reporting success (#75).
