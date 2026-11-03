@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.7.0] — Unreleased
+## [1.7.0]
 
 Scriptella 1.7.0 adds structured JSON data interchange and execution reporting,
 while retaining Java 17 as the minimum runtime and build JDK.
