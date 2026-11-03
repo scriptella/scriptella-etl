@@ -4,7 +4,7 @@
 [![CI](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/scriptella/scriptella-etl/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.scriptella/scriptella-core?logo=apachemaven)](https://central.sonatype.com/artifact/org.scriptella/scriptella-core)
 [![GitHub release](https://img.shields.io/github/v/release/scriptella/scriptella-etl?logo=github)](https://github.com/scriptella/scriptella-etl/releases/latest)
-[![DB CI pipeline: PG, MariaDB, Oracle, MSSQL](https://raw.githubusercontent.com/scriptella/scriptella-testcontainers/main/docs/scriptella-testcontainers-tested.svg)](https://github.com/scriptella/scriptella-testcontainers/blob/main/docs/compatibility-results.md#2026-10-05--scriptella-16)
+[![DB CI pipeline: PG, MariaDB, Oracle, MSSQL](https://raw.githubusercontent.com/scriptella/scriptella-testcontainers/main/docs/scriptella-testcontainers-tested.svg)](https://github.com/scriptella/scriptella-testcontainers/blob/main/docs/compatibility-results.md#2026-11-03--scriptella-170)
 
 Scriptella is a lightweight, XML-driven ETL and database migration tool for
 Java. Use SQL and scripting languages directly to move and transform data
