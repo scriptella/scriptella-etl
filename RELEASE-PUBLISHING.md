@@ -52,15 +52,19 @@ mvn-lite -s "$SETTINGS" clean deploy \
   -Dgpg.keyname="$SIGNING_KEY"
 ```
 
-`skipPublishing` creates the bundle while suppressing upload and publication.
-Preserve `target/central-publishing/central-bundle.zip` and its SHA-256 outside
-build output before another `clean`. Inspect its complete reactor inventory:
+With plugin 0.11.0, `skipPublishing` suppresses staging as well as upload: it
+does not create a bundle. Preserve the signed artifacts from the build and
+assemble a ZIP in [Maven repository layout](https://central.sonatype.org/publish/publish-portal-upload/),
+including their checksums and signatures. The private runbook records the 1.7.0
+assembly. Plugin 0.12.0 adds `skipUpload` for bundle-only builds; do not assume
+that option exists in 0.11.0. Preserve the ZIP and its SHA-256 outside build
+output before another `clean`. Inspect its complete reactor inventory:
 
 - parent POM and Core, Drivers, Tools POMs;
 - main, source, and Javadoc JARs for all three modules;
 - attached Core test JAR;
 - ASCII-armored `.asc` signatures for every POM and JAR;
-- generated checksums (the plugin supplies these).
+- checksums for each POM and JAR.
 
 Check version, required POM metadata (name, description, URL, license,
 developers, SCM), dependency versions, and absence of snapshots. Verify

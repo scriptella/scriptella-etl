@@ -1,7 +1,5 @@
 # JSON and JSON Lines examples
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 These examples require the JSON driver. Build the examples archive with
 `ant examples`, then unzip it and change to its `json/` directory. Java 17 or newer is required.
 The archive includes Scriptella, Jackson Core and H2 in `../lib/`; the H2
