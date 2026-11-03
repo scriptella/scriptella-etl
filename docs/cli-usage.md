@@ -351,8 +351,6 @@ for protecting that output.
 
 ## 11. Periodic execution progress
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 Scriptella can report live execution activity on **stderr**, without JMX or
 verbose logging:
 

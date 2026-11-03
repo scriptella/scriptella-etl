@@ -139,8 +139,6 @@ database or JDBC driver is required.
 
 ### JSON and JSON Lines
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 The JSON driver adds streaming JSON input and typed JSON object templates for
 output, including JSON Lines. See the [JSON guide](docs/json.md) for
 JSON-to-database, database-to-JSON and JSON transformations. They are bundled in

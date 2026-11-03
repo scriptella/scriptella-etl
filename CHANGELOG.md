@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.7.0] — Unreleased
+
+Scriptella 1.7.0 adds structured JSON data interchange and execution reporting,
+while retaining Java 17 as the minimum runtime and build JDK.
+
+### Added
+
+* Added a streaming JSON and JSON Lines driver with typed input and output
+  templates, examples, and support for JSON-to-database, database-to-JSON,
+  and JSON-to-JSON workflows (#72). See [the JSON guide](docs/json.md).
+* Added optional periodic CLI progress reporting with `--progress` (#74).
+  Counts describe observed work, not committed rows. See [CLI usage](docs/cli-usage.md).
+* Added JSON execution reports for the CLI and Java API (#73), including
+  success, failure and cancellation outcomes and available execution metrics.
+  Batch, transaction, throughput, warning and other advanced metrics are
+  deferred. See [the report guide](docs/reports/execution-report.md).
+* Added opt-in connection closure after final use (#19). This commits pending
+  work; later failures cannot roll it back. The default remains disabled. See
+  [connection lifecycle](docs/connection-lifecycle.md).
+
+### Changed and fixed
+
+* Cache binding plans for eligible repeated static SQL while preserving dynamic
+  SQL fallback (#71).
+* Show elapsed time when ETL or `execute-sql` execution fails (#18).
+* Propagate cancellation from `new-tx` scripts so pending transactions are
+  rolled back instead of reporting success (#75).
+* Added [batching and insert-performance guidance](docs/batching-performance.md).
+
+### Upgrade notes
+
+* Java 17 remains the minimum runtime and build JDK. Existing connection
+  lifecycle behavior remains the default.
+* JSON output is nontransactional and can remain partial after a failure.
+  Driver-reported counts do not guarantee committed rows.
+* Vendor JDBC drivers remain external; JSON support requires Jackson Core when
+  used outside the bundled distribution.
+
 ## [1.6] — 2026-10-05
 
 Scriptella 1.6 adds direct SQL execution, a shared environment-variable

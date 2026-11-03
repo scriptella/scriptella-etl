@@ -1,7 +1,5 @@
 # JSON execution reports
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 Use `--report=FILE` with one ETL XML execution or `execute-sql` to write a
 machine-readable report separately from console output. Scriptella writes a
 same-directory temporary file and prefers atomic replacement. If atomic moves

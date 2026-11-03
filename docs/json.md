@@ -1,7 +1,5 @@
 # JSON driver
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 The JSON driver supports streaming JSON and JSON Lines input and typed JSON
 object templates for output. Use `driver="json"` with separate connections for
 input and output.

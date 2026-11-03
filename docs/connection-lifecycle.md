@@ -47,8 +47,6 @@ individual script invocation.
 
 ## Closing connections after final use
 
-**Upcoming in 1.7** — available in source builds; not included in the current stable release.
-
 Set `close.after.use=true` inside a connection to opt into **early commit and
 close**. The default lifecycle remains unchanged unless this option is enabled:
 
