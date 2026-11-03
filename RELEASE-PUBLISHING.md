@@ -71,12 +71,14 @@ developers, SCM), dependency versions, and absence of snapshots. Verify
 signatures and run the release smoke checks. A sources or Javadoc attachment
 failure is a build/configuration problem; uploading again cannot fix it.
 
-After release publication is authorized, upload this exact ZIP at
-[Portal Deployments](https://central.sonatype.com/publishing/deployments),
-keeping manual publication selected. Record its deployment ID, bundle hash,
-and state. Inspect `VALIDATED` before clicking Publish. A successful local
-build is not proof that credentials or namespace authorization are valid;
-the Portal upload/validation checks those separately.
+After release publication is authorized, upload this exact ZIP with the
+[Central Publisher API](https://central.sonatype.org/publish/publish-portal-api/)
+using `USER_MANAGED` publication. The private runbook supplies a helper that
+reads the token from Maven settings without exposing it in command arguments.
+Record the deployment ID, bundle hash, and state. Inspect `VALIDATED` and the
+coordinates before publishing that deployment. A successful local build is not
+proof that credentials or namespace authorization are valid; upload and
+validation check those separately. The Portal UI is a recovery alternative.
 
 This avoids rebuilding and signing just to retry an upload. The same preserved
 bundle can be uploaded again when an operational failure genuinely requires
