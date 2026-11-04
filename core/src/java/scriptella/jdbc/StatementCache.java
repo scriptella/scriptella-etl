@@ -178,12 +178,16 @@ class StatementCache implements Closeable {
     }
 
     public void close() {
-        IOUtils.closeSilently(sharedBatchedStatement);
-        sharedBatchedStatement = null;
-        if (map != null) {
-            //closing statements
-            IOUtils.closeSilently(map.values());
-            map = null;
+        try {
+            IOUtils.closeSilently(sharedBatchedStatement);
+            sharedBatchedStatement = null;
+            if (map != null) {
+                //closing statements
+                IOUtils.closeSilently(map.values());
+                map = null;
+            }
+        } finally {
+            IOUtils.closeSilently(converter);
         }
     }
 

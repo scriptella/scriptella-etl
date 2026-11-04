@@ -49,6 +49,48 @@ public class StatementCacheResourceTest extends TestCase {
         }
     }
 
+    public void testCloseReleasesPendingLobResources() throws Exception {
+        for (boolean failBinding : new boolean[]{false, true}) {
+            final int[] closed = {0};
+            final int[] executed = {0};
+            java.io.InputStream stream = new java.io.ByteArrayInputStream(new byte[]{1}) {
+                public void close() {
+                    closed[0]++;
+                }
+            };
+            java.sql.Blob blob = new ProxyAdapter<java.sql.Blob>(java.sql.Blob.class) {
+                public java.io.InputStream getBinaryStream() { return stream; }
+                public long length() { return 1; }
+            }.getProxy();
+            PreparedStatement statement = new ProxyAdapter<PreparedStatement>(PreparedStatement.class) {
+                public void setBinaryStream(int index, java.io.InputStream value, int length) { }
+                public void setObject(int index, Object value) throws SQLException {
+                    if (failBinding) { throw new SQLException("binding failed"); }
+                }
+                public void addBatch() { }
+                public int[] executeBatch() { executed[0]++; return new int[]{1}; }
+                public void close() { }
+            }.getProxy();
+            Connection connection = new ProxyAdapter<Connection>(Connection.class) {
+                public PreparedStatement prepareStatement(String sql) { return statement; }
+            }.getProxy();
+            StatementCache cache = new StatementCache(connection, 1, 10, 0);
+            try {
+                StatementWrapper<?> wrapper = cache.prepare("insert into test values (?, ?)",
+                        java.util.Arrays.<Object>asList(blob, "value"));
+                assertFalse(failBinding);
+                wrapper.update();
+            } catch (SQLException expected) {
+                assertTrue(failBinding);
+            }
+            assertEquals(0, closed[0]);
+            cache.close();
+            cache.close();
+            assertEquals(1, closed[0]);
+            assertEquals(0, executed[0]);
+        }
+    }
+
     public void testFailedFetchSizeClosesStatement() throws SQLException {
         for (boolean prepared : new boolean[]{false, true}) {
             for (Exception failure : new Exception[]{new SQLException("fetch size rejected"),
