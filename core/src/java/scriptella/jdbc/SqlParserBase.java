@@ -114,7 +114,7 @@ public class SqlParserBase {
                 if (found != null) {
                     //? - jdbcParam, $ - insert value as text
                     boolean jdbcParam = sql.charAt(index) == '?';
-                    tmpBuf.append(sql.substring(lastPos, index));
+                    tmpBuf.append(sql, lastPos, index);
                     lastPos = found.end();
                     tmpBuf.append(handleParameter(found.group(1), expr, jdbcParam));
                 }
@@ -122,7 +122,7 @@ public class SqlParserBase {
             }
 
             if (lastPos < sql.length()) { //Add right side
-                tmpBuf.append(sql.substring(lastPos, sql.length()));
+                tmpBuf.append(sql, lastPos, sql.length());
             }
             statementParsed(tmpBuf.toString());
         } else {

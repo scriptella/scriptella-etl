@@ -143,7 +143,7 @@ public class PropertiesSubstitutor {
                         res = new StringBuilder(s.length());
                     }
                     if (i > lastPos) { //if we have unflushed character
-                        res.append(s.substring(lastPos, i));
+                        res.append(s, lastPos, i);
                     }
                     lastPos = m.end();
                     res.append(v);
@@ -155,7 +155,7 @@ public class PropertiesSubstitutor {
             return s;
         }
         if (lastPos <= len) {
-            res.append(s.substring(lastPos, s.length()));
+            res.append(s, lastPos, s.length());
         }
         return res.toString();
     }
