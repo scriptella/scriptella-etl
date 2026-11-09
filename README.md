@@ -21,9 +21,9 @@ without a proprietary transformation language or graphical designer.
 
 ## Project status
 
-The latest release is **Scriptella 1.6** (Java 17 baseline).
+The latest release is **Scriptella 1.7.0** (Java 17 baseline).
 
-Scriptella 1.6 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.6)
+Scriptella 1.7.0 is available from [GitHub Releases](https://github.com/scriptella/scriptella-etl/releases/tag/scriptella-parent-1.7.0)
 and [Maven Central](https://central.sonatype.com/artifact/org.scriptella/scriptella-core).
 
 See the [changelog](CHANGELOG.md) for the release details and compatibility
@@ -33,7 +33,7 @@ changes.
 
 | Version | Java |
 | --- | --- |
-| **Scriptella 1.6** | Java **17** |
+| **Scriptella 1.7.0** | Java **17** |
 | **Scriptella 1.3 (Java 8 compatibility release)** | Java **8** |
 
 ## Getting Scriptella
@@ -79,7 +79,7 @@ file before using `scriptella.sh`. Manual ZIP installation and
 
 ### Direct SQL execution
 
-Scriptella 1.6 runs a SQL file directly against a JDBC connection without ETL XML:
+Scriptella can execute a SQL file directly against a JDBC connection without ETL XML:
 
 ```bash
 scriptella.sh execute-sql --url jdbc:postgresql://localhost/app --user app schema.sql
@@ -175,7 +175,7 @@ the core module:
 <dependency>
   <groupId>org.scriptella</groupId>
   <artifactId>scriptella-core</artifactId>
-  <version>1.6</version>
+  <version>1.7.0</version>
 </dependency>
 ```
 
